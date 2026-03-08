@@ -51,7 +51,7 @@ export const useTime = () => {
     let [h, m] = parseTimeString(timeString);
     m = m + step;
     if (m > 60) {
-      m - +60;
+      m -= 60;
       h++;
     }
     if (h > 23) h -= 24;

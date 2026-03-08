@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef, useId } from 'react';
+import { type InputHTMLAttributes, useId } from 'react';
 import { Controller, type FieldValues } from 'react-hook-form';
 
 import { FormControl, FormLabel, FormMessage } from '@components/forms';
@@ -8,10 +8,9 @@ import { cn } from '@utils';
 
 import type { ControlledFieldBaseProps } from '@app-types';
 
-type FormCheckboxProps<TFieldValues extends FieldValues> = ControlledFieldBaseProps<
-  TFieldValues,
-  ComponentPropsWithoutRef<typeof Checkbox>
->;
+type FormCheckboxProps<TFieldValues extends FieldValues> = ControlledFieldBaseProps<TFieldValues, InputHTMLAttributes<HTMLInputElement>> & {
+  checkboxClassName?: string;
+};
 
 function FormCheckbox<TFieldValues extends FieldValues>({
   name,
@@ -23,9 +22,10 @@ function FormCheckbox<TFieldValues extends FieldValues>({
   className,
   errorClassName,
   required,
-  ...props
+  disabled,
+  checkboxClassName,
 }: FormCheckboxProps<TFieldValues>) {
-  const id = useId();
+  const id = `${name}-${useId()}`;
 
   return (
     <Controller<TFieldValues>
@@ -33,32 +33,41 @@ function FormCheckbox<TFieldValues extends FieldValues>({
       control={control}
       rules={rules}
       render={({ field, fieldState: { error } }) => (
-        <FormControl className={cn('flex flex-row items-center space-y-0 space-x-2 rounded-md', error && 'ps-8', containerClassName)}>
-          <Checkbox
-            id={`${id}-${name}`}
-            checked={!!field.value}
-            onCheckedChange={field.onChange}
+        <FormControl className={containerClassName}>
+          <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={id} required={required}>
+            {label}
+          </FormLabel>
+
+          <label
+            htmlFor={id}
             className={cn(
-              error && 'border-destructive data-[state=checked]:bg-destructive hover:ring-destructive focus-within:ring-destructive',
+              'border-muted-200 bg-surface relative flex h-10.5 w-full cursor-pointer items-center gap-3 rounded-md border px-3 py-2',
+              !!field.value && 'bg-secondary-100',
+              disabled && 'cursor-not-allowed opacity-70',
+              error && 'ring-destructive ring-1',
               className,
             )}
-            {...field}
-            {...props}
-          />
-
-          <div className="leading-none">
-            <FormLabel
-              className={cn('cursor-pointer', labelClassName)}
-              hidden={!label}
-              error={error!}
-              htmlFor={`${id}-${name}`}
-              required={required}
+          >
+            <span
+              className={cn(
+                'flex flex-1 items-center text-sm font-normal',
+                field.value ? 'text-primary-900' : 'text-muted',
+                disabled && 'text-muted-300',
+              )}
             >
               {label}
-            </FormLabel>
-          </div>
+            </span>
 
-          <FormMessage className={errorClassName} hidden={!error} error={error!} />
+            <Checkbox
+              id={id}
+              checked={!!field.value}
+              onCheckedChange={field.onChange}
+              disabled={field.disabled || disabled}
+              className={cn(error && 'border-destructive data-[state=checked]:bg-destructive', checkboxClassName)}
+            />
+
+            <FormMessage className={cn('start-auto end-9', errorClassName)} hidden={!error} error={error!} />
+          </label>
         </FormControl>
       )}
     />

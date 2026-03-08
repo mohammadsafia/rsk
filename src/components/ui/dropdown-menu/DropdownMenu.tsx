@@ -64,7 +64,7 @@ const SubTrigger: FC<DropdownMenuSubTriggerProps> = ({ className, inset, childre
   <DropdownMenuPrimitive.SubTrigger
     data-slot="dropdown-subtrigger"
     className={cn(
-      'focus:bg-accent data-[state=open]:bg-accent flex cursor-base-project items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none',
+      'focus:bg-accent data-[state=open]:bg-accent flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none',
       inset && 'ps-8',
       className,
     )}
@@ -98,7 +98,7 @@ const Content: FC<DropdownMenuContentProps> = ({ className, sideOffset = 4, ...p
         'bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
         'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2',
-        'data-[side=top]:slide-in-from-bottom-2 shadow-boundary-ghost z-50 min-w-[8rem] overflow-hidden rounded-md p-1 shadow-xl',
+        'data-[side=top]:slide-in-from-bottom-2 shadow-boundary-ghost z-50 min-w-[8rem] overflow-hidden rounded-md p-1',
         className,
       )}
       {...props}
@@ -110,7 +110,7 @@ const Item: FC<DropdownMenuItemProps & { inset?: boolean }> = ({ className, inse
   <DropdownMenuPrimitive.Item
     data-slot="dropdown-item"
     className={cn(
-      'hover:bg-accent relative flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm transition-colors',
+      'hover:bg-primary hover:text-primary-foreground text-primary-900 relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors',
       'outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       inset && 'ps-8',
       className,
@@ -123,7 +123,7 @@ const CheckboxItem: FC<DropdownMenuCheckboxItemProps> = ({ className, children, 
   <DropdownMenuPrimitive.CheckboxItem
     data-slot="dropdown-checkbox-item"
     className={cn(
-      'focus:bg-accent focus:text-accent-foreground relative flex cursor-base-project items-center rounded-sm py-1.5',
+      'focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center rounded-sm py-1.5',
       'ps-8 pe-2 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className,
     )}
@@ -144,7 +144,7 @@ const RadioItem: FC<DropdownMenuRadioItemProps> = ({ className, children, ...pro
   <DropdownMenuPrimitive.RadioItem
     data-slot="dropdown-radio-item"
     className={cn(
-      'focus:bg-accent focus:text-accent-foreground relative flex cursor-base-project items-center rounded-sm py-1.5',
+      'focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center rounded-sm py-1.5',
       'ps-8 pe-2 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className,
     )}
@@ -169,7 +169,7 @@ const Label: FC<DropdownMenuLabelProps & { inset?: boolean }> = ({ className, in
 );
 
 const Separator: FC<DropdownMenuSeparatorProps> = ({ className, ...props }) => (
-  <DropdownMenuPrimitive.Separator data-slot="dropdown-separator" className={cn('bg-primary/10 -mx-1 my-1 h-px', className)} {...props} />
+  <DropdownMenuPrimitive.Separator data-slot="dropdown-separator" className={cn('bg-muted-200 -mx-1 my-1 h-px', className)} {...props} />
 );
 
 const Shortcut: FC<DropdownMenuShortcutProps> = ({ className, ...props }) => {

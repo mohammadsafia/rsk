@@ -1,20 +1,22 @@
-import { type InputHTMLAttributes, forwardRef } from 'react';
-
+import * as React from 'react';
 import { cn } from '@utils';
 
-type InputProps = InputHTMLAttributes<HTMLInputElement> & {
+export type InputProps = React.ComponentProps<'input'> & {
   className?: string;
 };
 
-const Input = forwardRef<HTMLInputElement, InputProps>(({ className, ...props }, ref) => {
+const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, id, ...props }, ref) => {
   return (
     <input
+      id={id}
+      type={props.type ?? 'text'}
       data-slot="input"
       className={cn(
-        'border-accent bg-background flex w-full rounded-md disabled:cursor-not-allowed disabled:opacity-50',
-        'border px-3 py-2 text-sm shadow-xs transition-colors',
-        'file:border-0 file:bg-transparent file:text-sm file:font-medium',
-        'hover:ring-accent focus-visible:ring-accent hover:ring focus-visible:ring focus-visible:outline-none',
+        'file:text-foreground text-primary-900 placeholder:text-muted selection:bg-primary selection:text-primary-foreground',
+        'border-muted-200 bg-surface h-12 w-full min-w-0 rounded-md border px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7',
+        'file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+        'focus-visible:border-primary focus-visible:ring-primary focus-visible:ring-1',
+        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
         className,
       )}
       ref={ref}
@@ -22,7 +24,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({ className, ...props },
     />
   );
 });
-
 Input.displayName = 'Input';
 
 export default Input;

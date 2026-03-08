@@ -2,7 +2,7 @@ import { type ComponentPropsWithoutRef, type KeyboardEvent, type RefCallback } f
 import { type NumberFormatValues, NumericFormat } from 'react-number-format';
 
 import { Button } from '@components/ui';
-import { Conditional } from '@components/shared';
+import { Conditional } from '@components/utils';
 
 import { cn } from '@utils';
 
@@ -68,10 +68,11 @@ export const FormattedNumber = ({
           <NumericFormat
             data-slot="formatted-number-input"
             className={cn(
-              'border-accent bg-background hover:ring-accent focus-visible:ring-accent',
-              'rounded-md border px-3 py-2 text-sm shadow-xs transition-colors',
-              'hover:ring focus-visible:ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
-              'flex w-full items-center justify-around gap-2',
+              'text-primary-900 placeholder:text-muted selection:bg-primary selection:text-primary-foreground',
+              'border-muted-200 h-12 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none',
+              'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+              'focus-visible:border-primary focus-visible:ring-primary focus-visible:ring-1',
+              'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
               className,
             )}
             getInputRef={(el: HTMLInputElement) => ref?.(el)}
@@ -96,21 +97,21 @@ export const FormattedNumber = ({
               <Button
                 type="button"
                 variant="ghost"
-                className="bg-accent h-fit rounded-none rounded-t-md p-0"
+                className="bg-background h-fit rounded-none rounded-t-md p-0"
                 onClick={onIncrement}
                 disabled={props.disabled || isIncrementDisabled}
               >
-                <ChevronUp size={14} />
+                <ChevronUp size={20} />
               </Button>
 
               <Button
                 type="button"
                 variant="ghost"
-                className="bg-accent h-fit rounded-none rounded-b-md p-0"
+                className="bg-background h-fit rounded-none rounded-b-md p-0"
                 onClick={onDecrement}
                 disabled={props.disabled || isDecrementDisabled}
               >
-                <ChevronDown size={14} />
+                <ChevronDown size={20} />
               </Button>
             </div>
           </Conditional.If>

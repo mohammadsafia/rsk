@@ -1,8 +1,8 @@
 import { UserHandler } from '@api/handlers';
-import { usePaginatedDataTableQuery } from '@hooks/utils';
+import { useDataTableQuery } from '@hooks/shared';
 
 export const useUsersQuery = () => {
-  const query = usePaginatedDataTableQuery({
+  const query = useDataTableQuery({
     queryKey: [UserHandler.list.queryKey],
     queryFn: UserHandler.list.request,
   });

@@ -2,7 +2,7 @@ import type { ChangeEvent, ReactNode } from 'react';
 import type { ControllerRenderProps, FieldError, FieldValues } from 'react-hook-form';
 
 import { Button } from '@components/ui';
-import { Conditional } from '@components/shared';
+import { Conditional } from '@components/utils';
 
 import { cn } from '@utils';
 
@@ -14,48 +14,9 @@ export type UploadFileProps = ControllerRenderProps<FieldValues, string> & {
   isUploading?: boolean;
   error?: FieldError;
   label?: ReactNode;
-  hidePreview?: boolean;
 };
 
-const ACCEPTED_IMAGE_TYPES = [
-  'jpg',
-  'jpeg',
-  'png',
-  'gif',
-  'bmp',
-  'webp',
-  'svg+xml',
-  'tiff',
-  'tif',
-  'x-icon',
-  'avif',
-  'heic',
-  'heif',
-  'svg',
-] as const;
-
-function UploadFile({
-  ref,
-  name,
-  value,
-  label,
-  disabled,
-  accept = 'image/*',
-  isUploading = false,
-  error,
-  onChange,
-  hidePreview = false,
-}: UploadFileProps) {
-  const isImage = (file: File | string): boolean => {
-    if (typeof file === 'string') return false;
-    if (!file) return false;
-
-    const fileExtension = file.name.split('.').pop()?.toLowerCase();
-    const mimeType = file.type.toLowerCase();
-
-    return ACCEPTED_IMAGE_TYPES.includes(fileExtension as any) || mimeType.startsWith('image/');
-  };
-
+function UploadFile({ ref, name, value, label, disabled, accept = 'image/*', isUploading = false, error, onChange }: UploadFileProps) {
   const onRemoveFile = () => {
     onChange('');
   };
@@ -67,12 +28,6 @@ function UploadFile({
 
     onChange(file);
   };
-
-  const previewURL = value ? URL.createObjectURL(value) : '';
-
-  const hasFile = !!value;
-  const showPreview = !isUploading && previewURL && isImage(value);
-  const showRemoveButton = hasFile && !disabled && !isUploading;
 
   return (
     <div data-slot="upload-file" className="relative w-full">
@@ -89,12 +44,9 @@ function UploadFile({
       <label
         htmlFor={`${name}-file-upload`}
         className={cn(
-          'border-primary relative flex min-h-[100px] cursor-pointer items-center justify-center gap-4 overflow-visible rounded-lg border border-dashed p-5',
+          'border-primary relative flex cursor-pointer items-center justify-center gap-4 overflow-visible rounded-lg border border-dashed p-5',
           error && 'border-destructive text-destructive',
-          disabled && 'cursor-base-project opacity-50',
-          {
-            'flex-col': label && typeof label === 'object',
-          },
+          disabled && 'cursor-default opacity-50',
         )}
       >
         <Conditional>
@@ -103,13 +55,11 @@ function UploadFile({
           </Conditional.If>
 
           <Conditional.If condition={!!value}>
-            <div className="flex flex-col items-center gap-2 pl-[150px] lg:flex-row lg:justify-center lg:pr-9">
-              <p title={value?.name} className="max-w-[60%] overflow-hidden text-ellipsis">
-                {value?.name ?? label}
-              </p>
+            <p title={value?.name} className="max-w-[60%] overflow-hidden text-ellipsis">
+              {value?.name ?? label}
+            </p>
 
-              <p className="text-sm">{(+(value?.size ?? 0) / 1024).toFixed(2)} KB</p>
-            </div>
+            <p className="text-sm">{(+(value?.size ?? 0) / 1024).toFixed(2)} KB</p>
           </Conditional.If>
 
           <Conditional.Else>
@@ -122,17 +72,7 @@ function UploadFile({
         <FormMessage hidden={!error} error={error!} />
       </label>
 
-      <Conditional.If condition={!!showPreview && !hidePreview}>
-        <div className="absolute inset-y-0 start-[40px] flex items-center justify-center">
-          <img
-            src={previewURL}
-            alt="Upload Preview"
-            className="aspect-square h-[80px] w-[130px] rounded-lg border border-gray-200 object-cover"
-          />
-        </div>
-      </Conditional.If>
-
-      <Conditional.If condition={showRemoveButton}>
+      <Conditional.If condition={!!value && !disabled && !isUploading}>
         <div className="absolute end-[1%] top-1/2 z-10 -translate-y-1/2">
           <Button variant="outline" size="icon" type="button" onClick={onRemoveFile}>
             <XCircleIcon size={20} />

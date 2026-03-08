@@ -1,7 +1,8 @@
 import { type HTMLAttributes } from 'react';
 import { type FieldError } from 'react-hook-form';
 
-import { Conditional, ErrorTooltip } from '@components/shared';
+import { Conditional } from '@components/utils';
+import { ErrorTooltip } from '@components/shared';
 
 import { cn } from '@utils';
 

@@ -1,7 +1,7 @@
 import { type Control, useController } from 'react-hook-form';
 
 import { Badge, Button, Command, Divider, Popover } from '@components/ui';
-import { Conditional } from '@components/shared';
+import { Conditional } from '@components/utils';
 import { FormDateRange, FormInput } from '@components/forms';
 import { cn } from '@utils';
 

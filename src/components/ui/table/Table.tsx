@@ -1,10 +1,11 @@
 import { type ComponentPropsWithoutRef, type FC, type ReactNode } from 'react';
+
 import { Skeleton } from '@components/ui';
-import { Loader } from '@components/shared';
+import { PrimeLoader } from '@components/shared';
 
 import { cn } from '@utils';
 
-import { Database } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 type TableProps = ComponentPropsWithoutRef<'table'> & {
   isLoading?: boolean;
@@ -17,7 +18,12 @@ type TableRowProps = ComponentPropsWithoutRef<'tr'>;
 type TableHeadProps = ComponentPropsWithoutRef<'th'>;
 type TableCellProps = ComponentPropsWithoutRef<'td'>;
 type TableCaptionProps = ComponentPropsWithoutRef<'caption'>;
-type TableEmptyProps = ComponentPropsWithoutRef<'tr'> & { colSpan?: number; message?: ReactNode; when: boolean };
+type TableEmptyProps = ComponentPropsWithoutRef<'tr'> & {
+  colSpan?: number;
+  title?: ReactNode;
+  description?: ReactNode;
+  when: boolean;
+};
 type TableLoaderProps = {
   colSpan: number;
   rows?: number;
@@ -38,7 +44,7 @@ type TableComponents = FC<TableProps> & {
 };
 
 const Header = ({ className, ...props }: TableHeaderProps) => (
-  <thead data-slot="table-header" className={cn('[&_tr]:border-b', className)} {...props} />
+  <thead data-slot="table-header" className={cn('bg-primary-15 [&_tr]:border-muted-200 [&_tr]:border-b', className)} {...props} />
 );
 
 const Body = ({ className, ...props }: TableBodyProps) => (
@@ -52,7 +58,10 @@ const Footer = ({ className, ...props }: TableFooterProps) => (
 const Row = ({ className, ...props }: TableRowProps) => (
   <tr
     data-slot="table-row"
-    className={cn('hover:bg-accent/20 border-b-accent data-[state=selected]:bg-accent border-b transition-colors', className)}
+    className={cn(
+      'hover:bg-primary-15 data-[state=selected]:bg-primary-15 border-muted-200 bg-background border-b transition-colors',
+      className,
+    )}
     {...props}
   />
 );
@@ -60,28 +69,48 @@ const Row = ({ className, ...props }: TableRowProps) => (
 const Head = ({ className, ...props }: TableHeadProps) => (
   <th
     data-slot="table-head"
-    className={cn('bg-accent/20 text-primary-300 h-12 px-4 text-start align-middle font-medium [&:has([role=checkbox])]:pe-0', className)}
+    className={cn(
+      'bg-primary-25 text-primary-900 h-10.5 px-6 py-3 text-start align-middle text-xs leading-4.5 font-bold [&:has([role=checkbox])]:pe-0',
+      className,
+    )}
     {...props}
   />
 );
 
 const Cell = ({ className, ...props }: TableCellProps) => (
-  <td data-slot="table-cell" className={cn('p-4 align-middle [&:has([role=checkbox])]:pe-0', className)} {...props} />
+  <td
+    data-slot="table-cell"
+    className={cn('text-primary-900 h-18 px-6 py-2 align-middle text-xs whitespace-nowrap [&:has([role=checkbox])]:pe-0', className)}
+    {...props}
+  />
 );
 
 const Caption = ({ className, ...props }: TableCaptionProps) => (
-  <caption data-slot="table-caption" className={cn('text-primary mt-4 text-sm', className)} {...props} />
+  <caption data-slot="table-caption" className={cn('text-muted mt-4 text-sm', className)} {...props} />
 );
 
-const Empty = ({ className, colSpan = 1, message = 'No Data', when, ...props }: TableEmptyProps) => {
+const Empty = ({
+  className,
+  colSpan = 1,
+  title = 'No Results Found',
+  description = 'No results found for your search. Please try again with different keywords.',
+  when,
+  ...props
+}: TableEmptyProps) => {
   if (!when) return null;
 
   return (
-    <tr data-slot="table-empty" className={cn('h-96 hover:bg-transparent', className)} {...props}>
-      <td colSpan={colSpan} className="text-center">
-        <Database size={50} className="mx-auto block" />
+    <tr data-slot="table-empty" className={cn('h-full hover:bg-transparent', className)} {...props}>
+      <td colSpan={colSpan} className="bg-muted-50 text-center">
+        <div className="relative inline-flex h-30 flex-col items-center justify-center">
+          <Search strokeWidth={1.5} className="text-muted-200 absolute top-1/2 left-1/2 size-30 -translate-x-1/2 -translate-y-1/2" />
 
-        <span className="mt-2 block text-2xl">{message}</span>
+          <div className="relative flex flex-col items-center gap-1">
+            <span className="text-muted-400 block text-lg font-medium capitalize">{title}</span>
+
+            <span className="text-muted-400 block text-sm font-normal">{description}</span>
+          </div>
+        </div>
       </td>
     </tr>
   );
@@ -90,7 +119,7 @@ const Empty = ({ className, colSpan = 1, message = 'No Data', when, ...props }: 
 const TableLoader = ({ colSpan, loaderType = 'skeleton', isLoading = false, rows = 10 }: TableLoaderProps) => {
   if (!isLoading) return null;
 
-  if (loaderType === 'spinner') return <Loader data-slot="table-loader" displayLogo={false} withOverlay={false} />;
+  if (loaderType === 'spinner') return <PrimeLoader data-slot="table-loader" displayLogo={false} withOverlay={false} />;
 
   return (
     <>
@@ -108,7 +137,7 @@ const TableLoader = ({ colSpan, loaderType = 'skeleton', isLoading = false, rows
 };
 
 const Table: TableComponents = ({ className, ...props }) => (
-  <table data-slot="table" className={cn('w-full caption-bottom overflow-x-auto text-sm max-sm:block max-sm:pb-3', className)} {...props} />
+  <table data-slot="table" className={cn('w-full caption-bottom text-sm', className)} {...props} />
 );
 
 Table.Header = Header;

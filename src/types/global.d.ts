@@ -16,16 +16,3 @@ declare module 'axios' {
     withTenantKey?: boolean;
   }
 }
-
-declare module '@tanstack/react-table' {
-  // biome-ignore lint/correctness/noUnusedVariables: <explanation>
-  interface ColumnMeta<TData extends RowData, TValue> {
-    label?: string;
-    placeholder?: string;
-    variant?: FilterVariant;
-    options?: Option[];
-    range?: [number, number];
-    unit?: string;
-    icon?: React.FC<React.SVGProps<SVGSVGElement>>;
-  }
-}

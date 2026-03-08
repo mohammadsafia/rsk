@@ -21,7 +21,7 @@ function ErrorTooltip({ className, message, ...props }: ErrorTooltipProps) {
           asChild
           {...props}
         >
-          <InfoIcon size={16} />
+          <InfoIcon size={20} />
         </Tooltip.Trigger>
 
         <Tooltip.Content className="bg-destructive text-destructive-foreground text-sm">

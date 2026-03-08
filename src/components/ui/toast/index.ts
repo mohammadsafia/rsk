@@ -1,1 +1,1 @@
-export { default as Toast, type ToastProps } from './Toast';
+export { default as Toast, type ToastProps, type ToastPosition } from './Toast';

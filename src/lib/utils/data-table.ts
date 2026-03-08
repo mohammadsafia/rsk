@@ -1,15 +1,23 @@
-import type { Column } from '@tanstack/react-table';
-import * as React from 'react';
-import { DATA_TABLE_CONFIG } from '@app-config';
-import { ExtendedColumnFilter, FilterOperator, FilterVariant } from '@app-types';
+import type { CSSProperties } from 'react';
 
-export function getCommonPinningStyles<TData>({
+import type { Column, ColumnSort } from '@tanstack/react-table';
+import { createParser } from 'nuqs';
+
+import type { AsyncOptionsFn } from '@hooks/shared';
+
+import type { DataTableFilterMeta } from '@app-types';
+
+/**
+ * Returns CSS styles for pinned (sticky) columns.
+ * Handles left/right pinning with proper z-index and positioning.
+ */
+export const getCommonPinningStyles = <TData>({
   column,
   withBorder = false,
 }: {
   column: Column<TData>;
   withBorder?: boolean;
-}): React.CSSProperties {
+}): CSSProperties => {
   const isPinned = column.getIsPinned();
   const isLastLeftPinnedColumn = isPinned === 'left' && column.getIsLastColumn('left');
   const isFirstRightPinnedColumn = isPinned === 'right' && column.getIsFirstColumn('right');
@@ -29,31 +37,79 @@ export function getCommonPinningStyles<TData>({
     width: column.getSize(),
     zIndex: isPinned ? 1 : 0,
   };
-}
+};
 
-export function getFilterOperators(filterVariant: FilterVariant) {
-  const operatorMap: Record<FilterVariant, { label: string; value: FilterOperator }[]> = {
-    text: DATA_TABLE_CONFIG.textOperators,
-    number: DATA_TABLE_CONFIG.numericOperators,
-    range: DATA_TABLE_CONFIG.numericOperators,
-    date: DATA_TABLE_CONFIG.dateOperators,
-    dateRange: DATA_TABLE_CONFIG.dateOperators,
-    boolean: DATA_TABLE_CONFIG.booleanOperators,
-    select: DATA_TABLE_CONFIG.selectOperators,
-    multiSelect: DATA_TABLE_CONFIG.multiSelectOperators,
-  };
+/**
+ * Creates a nuqs parser for URL-synced sorting state.
+ * Serializes/deserializes sorting columns to/from URL query params.
+ *
+ * Format: "column.asc" or "column.desc", comma-separated for multi-sort
+ */
+export const getSortingStateParser = (columnIds: Set<string>) =>
+  createParser<ColumnSort[]>({
+    parse: (value: string) => {
+      if (!value) return [];
 
-  return operatorMap[filterVariant] ?? DATA_TABLE_CONFIG.textOperators;
-}
+      return value
+        .split(',')
+        .map((segment) => {
+          const [id, direction] = segment.split('.') as [string, string];
+          if (!id || !columnIds.has(id)) return null;
 
-export function getDefaultFilterOperator(filterVariant: FilterVariant) {
-  const operators = getFilterOperators(filterVariant);
+          return {
+            id,
+            desc: direction === 'desc',
+          } satisfies ColumnSort;
+        })
+        .filter(Boolean) as ColumnSort[];
+    },
+    serialize: (value: ColumnSort[]) => {
+      return value.map((sort) => `${sort.id}.${sort.desc ? 'desc' : 'asc'}`).join(',');
+    },
+    eq: (a, b) => JSON.stringify(a) === JSON.stringify(b),
+  });
 
-  return operators[0]?.value ?? (filterVariant === 'text' ? 'iLike' : 'eq');
-}
+/**
+ * Type-safe helper for creating filter configs (both static and async).
+ *
+ * TanStack Table's ColumnMeta erases per-column option generics.
+ * This helper provides full type inference at the definition site
+ * (TS infers `TOption` from the options prop) and safely casts
+ * to the stored type.
+ *
+ * @example
+ * ```tsx
+ * // Async options
+ * filterMeta: createFilterMeta({
+ *   variant: 'multiSelect',
+ *   label: 'Roles',
+ *   options: LookupService.roles.request,
+ *   getOptionLabel: (option) => option.displayName, // option inferred as RoleLookupDto
+ *   getOptionValue: (option) => option.id,
+ * })
+ *
+ * // Static options
+ * filterMeta: createFilterMeta({
+ *   variant: 'select',
+ *   label: 'Status',
+ *   options: [{ id: 'active', name: 'Active' }, { id: 'inactive', name: 'Inactive' }],
+ *   getOptionLabel: (option) => option.name, // option inferred from array
+ *   getOptionValue: (option) => option.id,
+ * })
+ * ```
+ */
+export const createFilterMeta = <TOption>(config: {
+  variant: 'select' | 'multiSelect';
+  label: string;
+  placeholder?: string;
+  options: TOption[] | AsyncOptionsFn<TOption>;
+  getOptionLabel: (option: TOption) => string;
+  getOptionValue: (option: TOption) => string;
+  queryKey?: string;
+  urlSearchParams?: URLSearchParams | string;
+}): DataTableFilterMeta => config as unknown as DataTableFilterMeta;
 
-export function getValidFilters<TData>(filters: ExtendedColumnFilter<TData>[]): ExtendedColumnFilter<TData>[] {
-  return filters.filter((filter) =>
-    Array.isArray(filter.value) ? filter.value.length > 0 : filter.value !== '' && filter.value !== null && filter.value !== undefined,
-  );
-}
+/**
+ * Type guard: checks if filter options are async (function) vs static (array).
+ */
+export const isAsyncFilterMeta = (meta: DataTableFilterMeta): boolean => typeof meta.options === 'function';

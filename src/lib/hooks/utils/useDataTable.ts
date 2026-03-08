@@ -1,53 +1,53 @@
-import { ExtendedSortingState } from '@app-types';
+import React, { useCallback, useMemo, useState } from 'react';
+
 import {
-  OnChangeFn,
+  type ColumnSort,
+  getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  type OnChangeFn,
   type PaginationState,
   type RowSelectionState,
   type SortingState,
   type TableOptions,
   type TableState,
   type Updater,
-  type VisibilityState,
-  getCoreRowModel,
-  getFacetedMinMaxValues,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
+  type VisibilityState,
 } from '@tanstack/react-table';
+
+import { parseAsInteger, useQueryState, type UseQueryStateOptions } from 'nuqs';
+
 import { getSortingStateParser } from '@utils';
-import { type UseQueryStateOptions, parseAsInteger, useQueryState } from 'nuqs';
-import * as React from 'react';
 
 const PAGE_KEY = 'page';
-const PER_PAGE_KEY = 'perPage';
+const PER_PAGE_KEY = 'pageSize';
 const SORT_KEY = 'sort';
 const DEBOUNCE_MS = 300;
 const THROTTLE_MS = 50;
 
-interface UseDataTableProps<TData extends Record<string, unknown>>
-  extends Omit<
-      TableOptions<TData>,
-      'initialState' | 'pageCount' | 'getCoreRowModel' | 'manualFiltering' | 'manualPagination' | 'manualSorting' | 'onSortingChange'
-    >,
-    Required<Pick<TableOptions<TData>, 'pageCount'>> {
+type UseDataTableProps<TData extends Record<string, unknown>> = Omit<
+  TableOptions<TData>,
+  'initialState' | 'pageCount' | 'getCoreRowModel' | 'manualFiltering' | 'manualPagination' | 'manualSorting' | 'onSortingChange'
+> &
+  Required<Pick<TableOptions<TData>, 'pageCount'>> & {
   initialState?: Omit<Partial<TableState>, 'sorting'> & {
-    sorting?: ExtendedSortingState<TData>;
+    sorting?: ColumnSort[];
   };
   history?: 'push' | 'replace';
   debounceMs?: number;
   throttleMs?: number;
   clearOnDefault?: boolean;
-  enableAdvancedFilter?: boolean;
-  scroll?: boolean;
   shallow?: boolean;
+  scroll?: boolean;
   startTransition?: React.TransitionStartFunction;
-  onSortingChange?: Updater<ExtendedSortingState<TData>>;
-}
+  onSortingChange?: (updaterOrValue: Updater<ColumnSort[]>) => void;
+};
 
-export function useDataTable<TData extends Record<string, unknown>>(props: UseDataTableProps<TData>) {
+export const useDataTable = <TData extends Record<string, unknown>>(props: UseDataTableProps<TData>) => {
   const {
     columns,
     pageCount = -1,
@@ -56,14 +56,13 @@ export function useDataTable<TData extends Record<string, unknown>>(props: UseDa
     debounceMs = DEBOUNCE_MS,
     throttleMs = THROTTLE_MS,
     clearOnDefault = false,
-    enableAdvancedFilter = false,
-    scroll = false,
     shallow = true,
+    scroll = false,
     startTransition,
     ...tableProps
   } = props;
 
-  const queryStateOptions = React.useMemo<Omit<UseQueryStateOptions<string>, 'parse'>>(
+  const queryStateOptions = useMemo<Omit<UseQueryStateOptions<string>, 'parse'>>(
     () => ({
       history,
       scroll,
@@ -76,23 +75,30 @@ export function useDataTable<TData extends Record<string, unknown>>(props: UseDa
     [history, scroll, shallow, throttleMs, debounceMs, clearOnDefault, startTransition],
   );
 
-  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>(initialState?.rowSelection ?? {});
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(initialState?.columnVisibility ?? {});
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>(initialState?.rowSelection ?? {});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialState?.columnVisibility ?? {});
 
+  // URL-synced pagination
   const [page, setPage] = useQueryState(PAGE_KEY, parseAsInteger.withOptions(queryStateOptions).withDefault(1));
   const [perPage, setPerPage] = useQueryState(
     PER_PAGE_KEY,
     parseAsInteger.withOptions(queryStateOptions).withDefault(initialState?.pagination?.pageSize ?? 10),
   );
 
-  const pagination: PaginationState = React.useMemo(() => {
-    return {
-      pageIndex: page - 1, // zero-based index -> one-based index
+  const pagination: PaginationState = useMemo(
+    () => ({
+      pageIndex: page - 1,
       pageSize: perPage,
-    };
-  }, [page, perPage]);
+    }),
+    [page, perPage],
+  );
 
-  const onPaginationChange = React.useCallback(
+  // URL-synced sorting
+  const columnIds = useMemo(() => {
+    return new Set(columns.map((column) => column.id).filter(Boolean) as string[]);
+  }, [columns]);
+
+  const onPaginationChange = useCallback(
     (updaterOrValue: Updater<PaginationState>) => {
       if (typeof updaterOrValue === 'function') {
         const newPagination = updaterOrValue(pagination);
@@ -106,24 +112,20 @@ export function useDataTable<TData extends Record<string, unknown>>(props: UseDa
     [pagination, setPage, setPerPage],
   );
 
-  const columnIds = React.useMemo(() => {
-    return new Set(columns.map((column) => column.id).filter(Boolean) as string[]);
-  }, [columns]);
-
   const [sorting, setSorting] = useQueryState(
     SORT_KEY,
-    getSortingStateParser<TData>(columnIds)
+    getSortingStateParser(columnIds)
       .withOptions(queryStateOptions)
       .withDefault(initialState?.sorting ?? []),
   );
 
-  const onSortingChange = React.useCallback(
-    (updaterOrValue: Updater<ExtendedSortingState<TData>>) => {
+  const onSortingChange = useCallback(
+    (updaterOrValue: Updater<ColumnSort[]>) => {
       if (typeof updaterOrValue === 'function') {
         const newSorting = updaterOrValue(sorting);
-        setSorting?.(newSorting as ExtendedSortingState<TData>);
+        void setSorting(newSorting);
       } else {
-        setSorting?.(updaterOrValue as ExtendedSortingState<TData>);
+        void setSorting(updaterOrValue);
       }
     },
     [sorting, setSorting],
@@ -155,11 +157,10 @@ export function useDataTable<TData extends Record<string, unknown>>(props: UseDa
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
     manualPagination: true,
     manualSorting: true,
     manualFiltering: true,
   });
 
-  return { table, shallow, debounceMs, throttleMs };
-}
+  return { table };
+};

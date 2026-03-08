@@ -1,27 +1,60 @@
-import * as React from 'react';
+import { type ComponentPropsWithoutRef, type FC, type ReactNode, type RefCallback } from 'react';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
-import { CircleIcon } from 'lucide-react';
+
 import { cn } from '@utils';
 
-function RadioGroup({ className, ...props }: React.ComponentProps<typeof RadioGroupPrimitive.Root>) {
-  return <RadioGroupPrimitive.Root data-slot="radio-group" className={cn('grid gap-3', className)} {...props} />;
-}
+type RadioGroupComponent = FC<ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>> & {
+  Item: FC<RadioGroupItemProps>;
+  Indicator: FC<RadioGroupIndicatorProps>;
+};
 
-function RadioGroupItem({ className, ...props }: React.ComponentProps<typeof RadioGroupPrimitive.Item>) {
-  return (
-    <RadioGroupPrimitive.Item
-      data-slot="radio-group-item"
-      className={cn(
-        'border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
-        className,
-      )}
-      {...props}
-    >
-      <RadioGroupPrimitive.Indicator data-slot="radio-group-indicator" className="relative flex items-center justify-center">
-        <CircleIcon className="fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2" />
-      </RadioGroupPrimitive.Indicator>
-    </RadioGroupPrimitive.Item>
-  );
-}
+type RadioGroupItemProps = ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item> & {
+  ref?: RefCallback<HTMLButtonElement>;
+  children: ReactNode;
+};
 
-export { RadioGroup, RadioGroupItem };
+type RadioGroupIndicatorProps = ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Indicator> & {
+  children: ReactNode;
+};
+
+const RadioGroup: RadioGroupComponent = ({ className, ...props }) => (
+  <RadioGroupPrimitive.Root data-slot="radio-group" className={cn('grid w-full gap-2', className)} {...props} />
+);
+
+const Item = ({ ref, className, children, ...props }: RadioGroupItemProps) => (
+  <RadioGroupPrimitive.Item
+    ref={(el) => ref?.(el)}
+    data-slot="radio-group-item"
+    className={cn(
+      'group/radio-item border-muted-200 bg-surface-500 flex h-[42px] w-full cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 outline-none',
+      'data-[state=checked]:border-muted-200 data-[state=checked]:bg-secondary-100',
+      'focus-visible:ring-ring focus-visible:ring-2',
+      'disabled:bg-muted-50 disabled:cursor-not-allowed disabled:opacity-70',
+      'disabled:data-[state=checked]:bg-muted-50 disabled:data-[state=checked]:border-muted-200',
+      className,
+    )}
+    {...props}
+  >
+    {children}
+  </RadioGroupPrimitive.Item>
+);
+
+const Indicator = ({ className, children, ...props }: RadioGroupIndicatorProps) => (
+  <RadioGroupPrimitive.Indicator
+    data-slot="radio-group-indicator"
+    className={cn('flex shrink-0 items-center justify-center', className)}
+    forceMount
+    {...props}
+  >
+    {children}
+  </RadioGroupPrimitive.Indicator>
+);
+
+RadioGroup.Item = Item;
+RadioGroup.Indicator = Indicator;
+
+Item.displayName = 'RadioGroupItem';
+Indicator.displayName = 'RadioGroupIndicator';
+RadioGroup.displayName = 'RadioGroup';
+
+export default RadioGroup;

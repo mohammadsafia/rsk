@@ -32,7 +32,7 @@ function DateNavigation({ handlePrevious, handleNext, onSetDate, date }: DateNav
         Today
       </Button>
 
-      <span className="md:text-md xl:text-xl text-xs font-medium lg:text-lg">
+      <span className="md:text-md text-xs font-medium lg:text-lg xl:text-xl">
         {toDate(date, constants.DateFormats.FULL_WEEKDAY_SHORT_MONTH_DAY_YEAR)}
       </span>
     </div>

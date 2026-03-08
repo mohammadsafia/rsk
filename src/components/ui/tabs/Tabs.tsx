@@ -14,13 +14,13 @@ type TabsComponent = typeof TabsPrimitive.Root & {
   Content: FC<TabsContentProps>;
 };
 
-const tabsListVariants = cva('inline-flex items-center justify-center rounded-lg p-1 gap-1 overflow-x-auto scrollbar-hide', {
+const tabsListVariants = cva('inline-flex items-center justify-center rounded-2xl p-1 gap-1', {
   variants: {
     variant: {
-      default: 'bg-secondary text-secondary-foreground w-full',
+      default: 'bg-transparent text-foreground w-full border border-muted-200',
       compact: 'w-auto',
-      plain: 'text-secondary-foreground bg-transparent',
-      compactPlain: 'w-auto text-secondary-foreground bg-transparent',
+      plain: 'text-foreground bg-transparent',
+      compactPlain: 'w-auto text-foreground bg-transparent',
     },
   },
   defaultVariants: {
@@ -29,7 +29,11 @@ const tabsListVariants = cva('inline-flex items-center justify-center rounded-lg
 });
 
 const tabsTriggerVariants = cva(
-  'inline-flex cursor-pointer items-center justify-center rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap transition-all focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm ring-offset-background data-[state=active]:bg-background data-[state=active]:text-foreground hover:bg-background hover:text-foreground',
+  `
+  inline-flex cursor-pointer items-center justify-center rounded-[inherit] px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors
+  focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50
+  data-[state=active]:bg-primary data-[state=active]:font-bold data-[state=active]:text-surface hover:bg-primary-15 hover:text-foreground
+  `,
   {
     variants: {
       variant: {

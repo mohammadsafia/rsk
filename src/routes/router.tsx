@@ -12,7 +12,6 @@ import { FULL_ROUTES_PATH } from './routes';
 import { ROLES } from '@app-types';
 
 const UsersPage = lazy(() => import('@pages/users/UsersPage'));
-const ComponentsGalleryPage = lazy(() => import('@pages/components/ComponentsGalleryPage'));
 const HomePage = lazy(() => import('@pages/home/HomePage'));
 
 export const router = createBrowserRouter(
@@ -21,11 +20,7 @@ export const router = createBrowserRouter(
     {
       path: FULL_ROUTES_PATH.HOME.INDEX,
       element: <App />,
-      children: [
-        { index: true, element: <ComponentsGalleryPage /> },
-        { path: FULL_ROUTES_PATH.DOCS.INDEX, element: <ComponentsGalleryPage /> },
-        { path: FULL_ROUTES_PATH.HOME.HOME, element: <HomePage /> },
-      ],
+      children: [{ path: FULL_ROUTES_PATH.HOME.HOME, element: <HomePage /> }],
     },
 
     // Auth routes

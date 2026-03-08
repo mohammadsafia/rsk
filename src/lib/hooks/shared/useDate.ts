@@ -1,85 +1,93 @@
-import { useTime } from '@hooks/shared';
-import dayjs, { Dayjs } from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import duration from 'dayjs/plugin/duration';
-import isBetween from 'dayjs/plugin/isBetween';
-import quarterOfYear from 'dayjs/plugin/quarterOfYear';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import utc from 'dayjs/plugin/utc';
-import weekOfYear from 'dayjs/plugin/weekOfYear';
-
-dayjs.extend(duration);
-dayjs.extend(utc);
-dayjs.extend(relativeTime);
-dayjs.extend(isBetween);
-dayjs.extend(weekOfYear);
-dayjs.extend(customParseFormat);
-dayjs.extend(quarterOfYear);
+import {
+  add,
+  differenceInDays,
+  differenceInHours,
+  differenceInMilliseconds,
+  differenceInMinutes,
+  differenceInMonths,
+  differenceInSeconds,
+  differenceInYears,
+  eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  endOfYear,
+  format,
+  formatDistanceToNow,
+  getDay,
+  getHours,
+  getMilliseconds,
+  getMinutes,
+  getMonth,
+  getSeconds,
+  getWeek,
+  getYear,
+  isAfter,
+  isBefore,
+  isValid,
+  isWithinInterval,
+  parse,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+  sub,
+} from 'date-fns';
 
 export const DATE_FORMATS = {
-  // Example: "22/12/2024"
-  DAY_MONTH_YEAR: 'DD/MM/YYYY',
   // Example: "2024/12/22"
-  YEAR_MONTH_DAY: 'YYYY/MM/DD',
-  // Example: "Dec 22, 2024" (LL or ll)
-  SHORT_MONTH_DAY_YEAR: 'MMM DD, YYYY',
+  YEAR_MONTH_DAY: 'yyyy/MM/dd',
+  // Example: "Dec 22, 2024"
+  SHORT_MONTH_DAY_YEAR: 'MMM dd, yyyy',
   // Example: "December 22, 2024"
-  FULL_MONTH_DAY_YEAR: 'MMMM D, YYYY',
+  FULL_MONTH_DAY_YEAR: 'MMMM d, yyyy',
+  // Example: "2024-12-22" (ISO 8601 date format)
+  ISO_DATE: 'yyyy-MM-dd',
+  // Example: "2024-12-22T12:00:00.000Z" (ISO 8601 datetime format)
+  ISO_DATETIME: "yyyy-MM-dd'T'HH:mm:ss.SSSxxx",
+  // Example: "12/22/2024"
+  US_DATE: 'MM/dd/yyyy',
+  // Example: "22/12/2024"
+  EU_DATE: 'dd/MM/yyyy',
+  // Example: "December 2024"
+  FULL_MONTH_YEAR: 'MMMM yyyy',
+  // Example: "Dec 2024"
+  SHORT_MONTH_YEAR: 'MMM yyyy',
+  // Example: "2024"
+  YEAR: 'yyyy',
   // Example: "Dec 22, 2024 12:00 PM"
-  SHORT_MONTH_DAY_YEAR_TIME: 'LLL',
+  SHORT_MONTH_DAY_YEAR_TIME: 'MMM dd, yyyy h:mm a',
   // Example: "Sunday, Dec 22 12:00 PM"
-  DAY_MONTH_DATE_TIME: 'dddd, MMM DD hh:mm A',
-  // Example: "2024/12/22 - 12:00 PM"
-  YEAR_DAY_MONTH_DATE_TIME: 'YYYY/MM/DD - hh:mm A',
+  DAY_MONTH_DATE_TIME: 'EEEE, MMM dd h:mm a',
+  // Example: "Sunday, December 22, 2024"
+  FULL_WEEKDAY_SHORT_MONTH_DAY_YEAR: 'EEEE, MMMM d, yyyy',
   // Example: "Sunday, Dec 22"
-  FULL_DAY_MONTH_DATE: 'dddd, MMM DD',
+  FULL_DAY_MONTH_DATE: 'EEEE, MMM dd',
   // Example: "Sunday, Dec 22, 2024 12:00 PM"
-  FULL_DAY_MONTH_DATE_YEAR_TIME: 'LLLL',
+  FULL_DAY_MONTH_DATE_YEAR_TIME: 'EEEE, MMM dd, yyyy h:mm a',
   // Example: "Sunday" (Full day name)
-  FULL_DAY: 'dddd',
+  FULL_DAY: 'EEEE',
   // Example: "Sun" (Short day name)
-  SHORT_DAY: 'ddd',
+  SHORT_DAY: 'EEE',
   // Example: "22" (Day of the month)
-  DAY_OF_MONTH: 'D',
+  DAY_OF_MONTH: 'd',
   // Example: "December" (Full month name)
   FULL_MONTH: 'MMMM',
   // Example: "Dec" (Short month name)
   SHORT_MONTH: 'MMM',
   // Example: "Sunday, 22nd of December"
-  FULL_DAY_ORDINAL_MONTH: 'dddd, Do [of] MMMM',
-  // Example: "2024-12-22" (ISO 8601)
-  ISO_DATE: 'YYYY-MM-DD',
-  // Example: "Tuesday, Dec 22, 2024"
-  FULL_WEEKDAY_SHORT_MONTH_DAY_YEAR: 'dddd, MMM D, YYYY',
-  // Example: "Tue, Dec 22, 2024"
-  SHORT_WEEKDAY_SHORT_MONTH_DAY_YEAR: 'dd, MMM D, YYYY',
-  // Example: "22 Dec"
-  DAY_SHORT_MONTH: 'DD MMM',
-  // Example: "December 2024"
-  FULL_MONTH_YEAR: 'MMMM YYYY',
-  // Example: 2024 (Year only)
-  YEAR: 'YYYY',
-  // Example: 2025-06-20T00:00:00Z
-  ISO_DATE_TIME: 'YYYY-MM-DDTHH:mm:ssZ',
-  // Example: "12.00 PM - 22/12/2024"
-  CUSTOM_TIME_DATE: 'h:mm A - D/MM/YYYY',
-  // Example: "2027-07-25 01:45"
-  DATE_24H_TIME: 'YYYY-MM-DD HH:mm',
+  DAY_SHORT_MONTH: 'EEE, MMM d',
 } as const;
 
 export const TIME_FORMATS = {
   // Example: "12:00 PM" (12-hour format with AM/PM)
-  HOUR_MINUTES_AMPM: 'hh:mm A',
-  // Example: "14:00" (24-hour format)
+  HOUR_MINUTES_12: 'h:mm a',
+  // Example: "12:00:30 PM" (12-hour format with seconds and AM/PM)
+  HOUR_MINUTES_SECONDS_12: 'h:mm:ss a',
+  // Example: "12:00" (24-hour format)
   HOUR_MINUTES_24: 'HH:mm',
-  // Example: "12:00:30 PM" (12-hour format with seconds)
-  HOUR_MINUTES_SECONDS_AMPM: 'LTS',
-  // Example: "14:30:00" (24-hour format with seconds)
+  // Example: "12:00:30" (24-hour format with seconds)
   HOUR_MINUTES_SECONDS_24: 'HH:mm:ss',
   // Example: "30:45" (Minutes and seconds)
   MINUTES_SECONDS: 'mm:ss',
-  // Example: "12.00 PM" (12-hour format with AM/PM, no minutes)
-  HOUR_AMPM: 'h.mm A',
 } as const;
 
 const UNIT_OF_TIME = {
@@ -93,8 +101,7 @@ const UNIT_OF_TIME = {
   MILLISECONDS: 'milliseconds',
 } as const;
 
-// Types
-export type DateInput = string | number | Date | undefined | dayjs.Dayjs;
+export type DateInput = string | number | Date | undefined;
 export type DateFormat = (typeof DATE_FORMATS)[keyof typeof DATE_FORMATS];
 export type TimeFormat = (typeof TIME_FORMATS)[keyof typeof TIME_FORMATS];
 export type UnitOfTime = (typeof UNIT_OF_TIME)[keyof typeof UNIT_OF_TIME];
@@ -110,268 +117,285 @@ type DurationUnits = {
   milliseconds: number;
 };
 
-// Helper to map unit strings from our constants to dayjs-accepted units.
-const mapUnit = (unit: UnitOfTime): dayjs.ManipulateType => {
-  switch (unit) {
-    case 'hours':
-      return 'hour';
-    case 'minutes':
-      return 'minute';
-    case 'seconds':
-      return 'second';
-    case 'milliseconds':
-      return 'millisecond';
-    default:
-      return unit as dayjs.ManipulateType;
-  }
+const toNativeDate = (input: DateInput): Date => {
+  if (input instanceof Date) return input;
+  return new Date(input || new Date());
 };
 
 export const useDate = () => {
-  const { parseTimeString } = useTime();
-
   const toDate = (input: DateInput = new Date(), inputFormat?: DateFormat | TimeFormat): string => {
-    return dayjs(input).format(inputFormat);
-  };
-
-  const dayjsDate = (input: DateInput = new Date()): dayjs.Dayjs => {
-    const date = dayjs(input);
-    if (!date.isValid()) throw new Error('useDate: Invalid date input');
-    return date;
+    const date = toNativeDate(input);
+    return format(date, inputFormat || DATE_FORMATS.ISO_DATE);
   };
 
   const toDateFromParts = (year: number, month: number, day: number): string => {
     const date = new Date(year, month, day);
-
     if (!isValid(date)) throw new Error('useDate: Invalid date parts provided');
-
     return toDate(date);
   };
 
-  const formatDate = (input: DateInput, format: DateFormat | TimeFormat): string => {
-    if (!isValid(input)) throw new Error('useDate: Invalid date input');
-
-    return dayjs(input).format(format);
+  const formatDate = (input: DateInput, dateFormat: DateFormat): string => {
+    const date = toNativeDate(input);
+    if (!isValid(date)) throw new Error('useDate: Invalid date input');
+    return format(date, dateFormat);
   };
 
-  const formatNullableDate = (input: DateInput | null, format: DateFormat, fallback = '-'): string => {
-    if (!isValid(input)) return fallback;
-
-    return dayjs(input).format(format);
-  };
-
-  /**
-   * e.g.
-   * ```ts
-   * formatDateArray(["2025-08-01", "2025-08-02"]) // 'Aug 1, 2'
-   * formatDateArray(["2025-08-01", "2025-09-01", "YYYY", "MM", " and "]) // '2025 08 and 09'
-   * formatDateArray(["2025-08-01", "2025-09-01", "2026-09-01", "YYYY", "MMM", "-", " | "]) // '2025 Aug-Sep | 2026 Sep'
-   * ```
-   */
-  const formatDateArray = (
-    input: DateInput[],
-    joinUnitFormat = 'MMM',
-    joinedFormat = 'DD',
-    joinDelimiter = ',',
-    finalJoinDelimiter = ' / ',
-    fallback = '-',
-  ): string => {
-    if (input.length === 0) return fallback;
-    return Object.entries(
-      input
-        .filter((dateArg) => isValid(dateArg))
-        .map((dateArg) => [dayjs(dateArg).format(joinUnitFormat), dayjs(dateArg).format(joinedFormat)] as const)
-        .reduce(
-          (prev, [joinUnit, joinedUnit]) => {
-            if (!prev[joinUnit]) prev[joinUnit] = joinedUnit.toString();
-            else prev[joinUnit] += `${joinDelimiter}${joinedUnit.toString()}`;
-            return prev;
-          },
-          {} as Record<string, string>,
-        ),
-    )
-      .map(([joinUnit, joinedUnits]) => `${joinUnit} ${joinedUnits}`)
-      .join(finalJoinDelimiter);
-  };
-
-  const formatNullableDateUTC = (input: DateInput | null, format: DateFormat, fallback = '-'): string => {
-    if (!isValid(input)) return fallback;
-
-    return dayjs.utc(input).format(format);
-  };
-
-  const formatDateUTC = (input: DateInput, format: DateFormat | TimeFormat): string => {
-    if (!isValid(input)) throw new Error('useDate: Invalid date input');
-
-    return dayjs.utc(input).format(format);
+  const formatNullableDate = (input: DateInput | null, dateFormat: DateFormat, fallback = '-'): string => {
+    if (!input) return fallback;
+    const date = toNativeDate(input);
+    if (!isValid(date)) return fallback;
+    return format(date, dateFormat);
   };
 
   const addDuration = (input: DateInput, amount: number, unit: UnitOfTime): string => {
-    if (!isValid(input)) throw new Error('useDate: Invalid date input');
-    return dayjs(input).add(amount, mapUnit(unit)).toISOString();
+    const date = toNativeDate(input);
+    if (!isValid(date)) throw new Error('useDate: Invalid date input');
+
+    const unitToKey: Record<string, string> = {
+      year: 'years',
+      month: 'months',
+      week: 'weeks',
+      day: 'days',
+      hours: 'hours',
+      minutes: 'minutes',
+      seconds: 'seconds',
+      milliseconds: 'milliseconds',
+    };
+
+    const duration: Record<string, number> = {};
+    duration[unitToKey[unit] || unit] = amount;
+
+    return add(date, duration).toISOString();
   };
 
   const subtractDuration = (input: DateInput, amount: number, unit: UnitOfTime): string => {
-    if (!isValid(input)) throw new Error('useDate: Invalid date input');
-    return dayjs(input).subtract(amount, mapUnit(unit)).toISOString();
+    const date = toNativeDate(input);
+    if (!isValid(date)) throw new Error('useDate: Invalid date input');
+
+    const unitToKey: Record<string, string> = {
+      year: 'years',
+      month: 'months',
+      week: 'weeks',
+      day: 'days',
+      hours: 'hours',
+      minutes: 'minutes',
+      seconds: 'seconds',
+      milliseconds: 'milliseconds',
+    };
+
+    const duration: Record<string, number> = {};
+    duration[unitToKey[unit] || unit] = amount;
+
+    return sub(date, duration).toISOString();
   };
 
   const getDifference = (start: DateInput, end: DateInput, unit: UnitOfTime = UNIT_OF_TIME.DAY): number => {
-    return dayjs(end).diff(dayjs(start), mapUnit(unit));
+    const startDate = toNativeDate(start);
+    const endDate = toNativeDate(end);
+
+    switch (unit) {
+      case 'year':
+        return differenceInYears(endDate, startDate);
+      case 'month':
+        return differenceInMonths(endDate, startDate);
+      case 'day':
+        return differenceInDays(endDate, startDate);
+      case 'hours':
+        return differenceInHours(endDate, startDate);
+      case 'minutes':
+        return differenceInMinutes(endDate, startDate);
+      case 'seconds':
+        return differenceInSeconds(endDate, startDate);
+      case 'milliseconds':
+        return differenceInMilliseconds(endDate, startDate);
+      default:
+        return differenceInDays(endDate, startDate);
+    }
   };
 
   const getUTC = (date: DateInput): string => {
-    return dayjs(date).utc().toISOString();
+    const d = toNativeDate(date);
+    return d.toISOString();
   };
 
   const getTimeAgo = (date: DateInput): string => {
-    return dayjs(date).fromNow();
+    const d = toNativeDate(date);
+    return formatDistanceToNow(d, { addSuffix: true });
   };
 
   const toDurationUnits = (value: number, unit: UnitOfTime = UNIT_OF_TIME.SECONDS): DurationUnits => {
-    const d = dayjs.duration(value, mapUnit(unit));
+    // Simple conversion to milliseconds first
+    let totalMs = value;
+    switch (unit) {
+      case 'seconds':
+        totalMs = value * 1000;
+        break;
+      case 'minutes':
+        totalMs = value * 60 * 1000;
+        break;
+      case 'hours':
+        totalMs = value * 60 * 60 * 1000;
+        break;
+      case 'day':
+        totalMs = value * 24 * 60 * 60 * 1000;
+        break;
+      case 'week':
+        totalMs = value * 7 * 24 * 60 * 60 * 1000;
+        break;
+      case 'month':
+        totalMs = value * 30 * 24 * 60 * 60 * 1000; // approximate
+        break;
+      case 'year':
+        totalMs = value * 365 * 24 * 60 * 60 * 1000; // approximate
+        break;
+    }
+
+    const years = Math.floor(totalMs / (365 * 24 * 60 * 60 * 1000));
+    const months = Math.floor((totalMs % (365 * 24 * 60 * 60 * 1000)) / (30 * 24 * 60 * 60 * 1000));
+    const days = Math.floor((totalMs % (30 * 24 * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000));
+    const weeks = Math.floor(days / 7);
+    const hours = Math.floor((totalMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+    const minutes = Math.floor((totalMs % (60 * 60 * 1000)) / (60 * 1000));
+    const seconds = Math.floor((totalMs % (60 * 1000)) / 1000);
+    const milliseconds = Math.floor(totalMs % 1000);
+
     return {
-      years: d.years(),
-      months: d.months(),
-      // Approximate weeks as the total days divided by 7.
-      weeks: Math.floor(d.asDays() / 7),
-      days: d.days(),
-      hours: d.hours(),
-      minutes: d.minutes(),
-      seconds: d.seconds(),
-      milliseconds: d.milliseconds(),
+      years,
+      months,
+      weeks,
+      days: days % 7,
+      hours,
+      minutes,
+      seconds,
+      milliseconds,
     };
   };
 
   const toDuration = (value: number, unit: UnitOfTime = UNIT_OF_TIME.SECONDS): number => {
-    return dayjs.duration(value, mapUnit(unit)).asMilliseconds();
+    const multipliers = {
+      [UNIT_OF_TIME.MILLISECONDS]: 1,
+      [UNIT_OF_TIME.SECONDS]: 1000,
+      [UNIT_OF_TIME.MINUTES]: 60000,
+      [UNIT_OF_TIME.HOURS]: 3600000,
+      [UNIT_OF_TIME.DAY]: 86400000,
+      [UNIT_OF_TIME.WEEK]: 604800000,
+      [UNIT_OF_TIME.MONTH]: 2629746000,
+      [UNIT_OF_TIME.YEAR]: 31556952000,
+    };
+
+    return value * (multipliers[unit] || 1000);
   };
 
-  const toFormattedDuration = (value: number, format: TimeFormat, unit: UnitOfTime = UNIT_OF_TIME.SECONDS): string => {
-    const dur = dayjs.duration(value, mapUnit(unit));
-    // Create a UTC dayjs object from the duration's milliseconds.
-    return dayjs.utc(dur.asMilliseconds()).format(format);
+  const toFormattedDuration = (value: number, timeFormat: TimeFormat, unit: UnitOfTime = UNIT_OF_TIME.SECONDS): string => {
+    const totalMs = toDuration(value, unit);
+    const date = new Date(totalMs);
+    return format(date, timeFormat);
   };
 
   const toDateUnits = (date: DateInput): DurationUnits => {
-    const d = dayjs(date);
+    const d = toNativeDate(date);
     return {
-      years: d.year(),
-      months: d.month(),
-      weeks: d.week(), // Requires weekOfYear plugin.
-      days: d.day(), // Day of week.
-      hours: d.hour(),
-      minutes: d.minute(),
-      seconds: d.second(),
-      milliseconds: d.millisecond(),
+      years: getYear(d),
+      months: getMonth(d), // 0-based in date-fns
+      weeks: getWeek(d),
+      days: getDay(d), // Day of week (0-6)
+      hours: getHours(d),
+      minutes: getMinutes(d),
+      seconds: getSeconds(d),
+      milliseconds: getMilliseconds(d),
     };
   };
 
   const toStartAndEndOf = (date?: DateInput, unitOfTime: UnitOfTime = UNIT_OF_TIME.MONTH) => {
-    const inputDate = date ? dayjs(date) : dayjs();
-    const startOf = inputDate.startOf(mapUnit(unitOfTime)).format(DATE_FORMATS.ISO_DATE);
-    const endOf = inputDate.endOf(mapUnit(unitOfTime)).format(DATE_FORMATS.ISO_DATE);
+    const inputDate = toNativeDate(date);
+    let startOf: Date;
+    let endOf: Date;
+
+    switch (unitOfTime) {
+      case 'week':
+        startOf = startOfWeek(inputDate);
+        endOf = endOfWeek(inputDate);
+        break;
+      case 'month':
+        startOf = startOfMonth(inputDate);
+        endOf = endOfMonth(inputDate);
+        break;
+      case 'year':
+        startOf = startOfYear(inputDate);
+        endOf = endOfYear(inputDate);
+        break;
+      default:
+        startOf = startOfMonth(inputDate);
+        endOf = endOfMonth(inputDate);
+    }
+
     return {
-      startOf,
-      endOf,
+      startOf: format(startOf, DATE_FORMATS.ISO_DATE),
+      endOf: format(endOf, DATE_FORMATS.ISO_DATE),
     } as const;
   };
 
-  const isBefore = (date: DateInput, comparison: DateInput): boolean => {
-    return dayjs(date).isBefore(dayjs(comparison));
+  const isBeforeDate = (date: DateInput, comparison: DateInput): boolean => {
+    const d1 = toNativeDate(date);
+    const d2 = toNativeDate(comparison);
+    return isBefore(d1, d2);
   };
 
-  const isAfter = (date: DateInput, comparison: DateInput): boolean => {
-    return dayjs(date).isAfter(dayjs(comparison));
+  const isAfterDate = (date: DateInput, comparison: DateInput): boolean => {
+    const d1 = toNativeDate(date);
+    const d2 = toNativeDate(comparison);
+    return isAfter(d1, d2);
   };
 
   const isBetween = (input: DateInput, start: DateInput, end: DateInput): boolean => {
-    return dayjs(input).isBetween(dayjs(start), dayjs(end));
+    const inputDate = toNativeDate(input);
+    const startDate = toNativeDate(start);
+    const endDate = toNativeDate(end);
+    return isWithinInterval(inputDate, { start: startDate, end: endDate });
   };
 
-  const isSameDay = (a?: DateInput, b?: DateInput): boolean => {
-    if (!a || !b) return false;
-    const dateA = dayjs(a);
-    const dateB = dayjs(b);
-    return dateA.isSame(dateB, 'day');
+  const isValidDate = (input: DateInput | null): boolean => {
+    if (!input) return false;
+    const date = toNativeDate(input);
+    return isValid(date);
   };
-  const toUtcIgnoringTimezone = (date: number | Date, isEndDate = false) => {
-    let d = dayjs(date);
 
-    if (isEndDate) {
-      d = d.hour(23).minute(59).second(59).millisecond(999);
+  const parseDate = (dateString: string, dateFormat: DateFormat): Date | undefined => {
+    if (!dateString) return undefined;
+
+    const normalizedString = dateString.replace(/[-/]/g, '/');
+    const normalizedFormat = dateFormat.replace(/[-/]/g, '/');
+
+    const parsed = parse(normalizedString, normalizedFormat, new Date());
+
+    if (isValid(parsed)) {
+      const year = parsed.getFullYear();
+      if (year >= 1900 && year <= 2100) {
+        return parsed;
+      }
     }
 
-    return d.subtract(d.toDate().getTimezoneOffset(), 'minute').toDate();
-  };
-  const localToUTC = (date: DateInput, time: string) => {
-    const localDayjs = dayjs(`${date} ${time}`, DATE_FORMATS.ISO_DATE_TIME);
-    if (!localDayjs.isValid()) throw new Error('useDate: Invalid local date or time');
-    const utcDayjs = localDayjs.utc();
-    return {
-      utcDateTime: utcDayjs.toISOString(),
-      utcDate: utcDayjs.format(DATE_FORMATS.ISO_DATE),
-      utcTime: utcDayjs.format(TIME_FORMATS.HOUR_MINUTES_SECONDS_24),
-    };
-  };
-  const utcToLocal = (date: DateInput, time: string) => {
-    const utcDayjs = dayjs.utc(`${date} ${time}`, DATE_FORMATS.ISO_DATE_TIME);
-    if (!utcDayjs.isValid()) throw new Error('useDate: Invalid UTC date or time');
-    const localDayjs = utcDayjs.local();
-    return {
-      localDateTime: localDayjs.toISOString(),
-      localDate: localDayjs.format(DATE_FORMATS.ISO_DATE),
-      localTime: localDayjs.format(TIME_FORMATS.HOUR_MINUTES_SECONDS_24),
-    };
-  };
-  const isValid = (input: DateInput | null): boolean => {
-    return dayjs(input).isValid();
-  };
-  const getDateRangeArray = (start: DateInput, end: DateInput, format: DateFormat = DATE_FORMATS.ISO_DATE): string[] => {
-    const startDate = dayjs(start);
-    const endDate = dayjs(end);
-
-    if (!startDate.isValid()) throw new Error('Invalid start date');
-    if (!endDate.isValid()) throw new Error('Invalid end date');
-    if (startDate.isAfter(endDate)) throw new Error('Start date must be before or equal to end date');
-
-    const dateArray: string[] = [];
-    let currentDate = startDate;
-
-    while (currentDate.isSame(endDate) || currentDate.isBefore(endDate)) {
-      dateArray.push(currentDate.format(format));
-      currentDate = currentDate.add(1, 'day');
-    }
-
-    return dateArray;
+    return undefined;
   };
 
-  const fromDateStrAndMinutes = (dateStr: string, minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    const date = new Date(dateStr);
-    date.setHours(hours, mins, 0, 0);
-    return date;
-  };
+  const getDateRangeArray = (start: DateInput, end: DateInput, dateFormat: DateFormat = DATE_FORMATS.ISO_DATE): string[] => {
+    const startDate = toNativeDate(start);
+    const endDate = toNativeDate(end);
 
-  const setTime = (date: DateInput, timeStr: string) => {
-    const [h, m] = parseTimeString(timeStr);
-    return dayjs(date).set('hours', h).set('minutes', m);
-  };
+    if (!isValid(startDate)) throw new Error('Invalid start date');
+    if (!isValid(endDate)) throw new Error('Invalid end date');
+    if (isAfter(startDate, endDate)) throw new Error('Start date must be before or equal to end date');
 
-  function getDateRange(date: DateInput, view: Parameters<Dayjs['startOf']>[0]) {
-    const inputDate = dayjs(date);
-    const start = inputDate.startOf(view);
-    const end = inputDate.endOf(view);
-    return { start, end };
-  }
+    const dateArray = eachDayOfInterval({ start: startDate, end: endDate });
+    return dateArray.map((date) => format(date, dateFormat));
+  };
 
   return {
     toDate,
     toDateFromParts,
     formatDate,
     formatNullableDate,
-    formatNullableDateUTC,
-    formatDateUTC,
+    parseDate,
     addDuration,
     subtractDuration,
     getDifference,
@@ -381,25 +405,16 @@ export const useDate = () => {
     toFormattedDuration,
     toDateUnits,
     toStartAndEndOf,
-    isBefore,
-    isAfter,
+    isBefore: isBeforeDate,
+    isAfter: isAfterDate,
     isBetween,
-    isValid,
     getTimeAgo,
+    isValid: isValidDate,
     getDateRangeArray,
-    dayjsDate,
-    isSameDay,
-    utcToLocal,
-    localToUTC,
-    toUtcIgnoringTimezone,
-    fromDateStrAndMinutes,
-    formatDateArray,
-    setTime,
     constants: {
       DateFormats: DATE_FORMATS,
       TimeFormats: TIME_FORMATS,
       UnitOfTime: UNIT_OF_TIME,
     },
-    getDateRange,
   };
 };

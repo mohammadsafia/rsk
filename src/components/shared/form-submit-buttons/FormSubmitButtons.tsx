@@ -2,7 +2,8 @@ import type { PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@components/ui';
-import { Conditional, FormSubmitButton } from '@components/shared';
+import { Conditional } from '@components/utils';
+import { FormSubmitButton } from '@components/shared';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
@@ -36,12 +37,12 @@ function FormSubmitButtons({ align, className, ...props }: FormActionButtonsProp
   return (
     <div
       className={cn(
-        'bg-background shadow-boundary-ghost border-accent sticky bottom-2.5 z-10 flex gap-4 rounded-md border p-2',
+        'bg-background shadow-boundary-ghost sticky bottom-2.5 z-10 flex gap-1 rounded-md p-2',
         formSubmitBtnsVariants({ align }),
         className,
       )}
     >
-      <Button variant="outline" size="lg" type="reset" onClick={() => navigate(-1)}>
+      <Button size="lg" variant="muted" type="reset" onClick={() => navigate(-1)}>
         Cancel
       </Button>
 
@@ -51,6 +52,7 @@ function FormSubmitButtons({ align, className, ...props }: FormActionButtonsProp
         <Conditional.Else>
           <FormSubmitButton
             className="lg:ms-0"
+            size="lg"
             loading={props.defaultPrimaryLoading}
             textContent={props.defaultPrimaryText || (props.defaultPrimaryCreateUpdate ? 'Update' : 'Create')}
           />

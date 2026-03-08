@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Button } from '@components/ui';
-import { Conditional } from '@components/shared';
+import { Conditional } from '@components/utils';
 
 import { DownloadIcon, PaperclipIcon } from 'lucide-react';
 import { cn } from '@utils';

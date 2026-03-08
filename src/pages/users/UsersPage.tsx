@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { type ColumnDef } from '@tanstack/react-table';
 
-import { Avatar, Button, TooltipButton } from '@components/ui';
-import { Breadcrumb } from '@components/shared';
-import { DataTable, DataTableToolbar } from '@components/tables';
+import { Avatar, Button } from '@components/ui';
+import { Breadcrumb, TooltipButton } from '@components/shared';
+import { DataTable } from '@components/tables';
 
 import { useUsersQuery } from '@hooks/queries';
 import { ROUTES_PATH } from '@routes';
@@ -15,25 +15,19 @@ import { useMemo } from 'react';
 function UsersPage() {
   const navigate = useNavigate();
 
+  const { data, tableUtils, isLoading, isFetching } = useUsersQuery();
+
   const {
-    data,
-    sorting,
-    globalFilter,
-    columnFilters,
+    totalCount: rowCount,
+    totalPages,
+    state: { sorting, globalFilter, columnFilters, pagination },
     setPagination,
     setGlobalFilter,
     setSorting,
     setColumnFilters,
-    rowCount,
-    pagination,
-    totalPages,
-    isLoading,
-    isFetching,
-  } = useUsersQuery();
+  } = tableUtils;
 
-  const columns = useMemo<
-    ColumnDef<any>[]
-  >(
+  const columns = useMemo<ColumnDef<any>[]>(
     () => [
       {
         header: 'Employees',
@@ -120,12 +114,10 @@ function UsersPage() {
         <Button>Create User</Button>
       </div>
 
-      <DataTable
-        isLoading={isLoading || isFetching}
-        table={table}
-        getRowClassName={(row) => ((row?.original?.unreadCount ?? 0 > 0) ? 'bg-gray-700/10' : '')}
-      >
-        <DataTableToolbar table={table} />
+      <DataTable isLoading={isLoading || isFetching} table={table}>
+        <DataTable.Toolbar />
+        <DataTable.Content />
+        <DataTable.Pagination />
       </DataTable>
     </section>
   );

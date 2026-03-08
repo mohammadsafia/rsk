@@ -21,7 +21,7 @@ function LinkButton({ to, textContent, className, containerClassName, withContai
   return !withContainer ? (
     child
   ) : (
-    <div className={cn('mb-10 flex items-center rounded-xl bg-primary px-5 py-3', containerClassName)}>{child}</div>
+    <div className={cn('bg-primary mb-10 flex items-center rounded-xl px-5 py-3', containerClassName)}>{child}</div>
   );
 }
 

@@ -1,7 +1,7 @@
 import { type ReactNode, useState } from 'react';
 import { type Control, Controller, type FieldError, type FieldValues, type Path } from 'react-hook-form';
 
-import { Conditional } from '@components/shared';
+import { Conditional } from '@components/utils';
 import { UploadFile, UploadFilePreview, type UploadFilePreviewProps } from '@components/ui';
 
 type FormUploadFileBase<T extends FieldValues = FieldValues> = {

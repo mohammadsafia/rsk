@@ -7,7 +7,9 @@ import { cn } from '@utils';
 
 import { Asterisk } from 'lucide-react';
 
-const labelVariants = cva('inline-block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70');
+const labelVariants = cva(
+  'text-muted inline-block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+);
 
 type FormLabelProps = ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &
   VariantProps<typeof labelVariants> & {
@@ -16,14 +18,19 @@ type FormLabelProps = ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &
     hidden?: boolean;
   };
 
-const FormLabel: FC<FormLabelProps> = ({ className, error, children, required, hidden, ...props }) => {
+const FormLabel: FC<FormLabelProps> = ({ className, error, children, required, hidden, id, ...props }) => {
   if (hidden) return null;
 
   return (
-    <LabelPrimitive.Root data-slot="form-label" className={cn(labelVariants(), error && 'text-destructive', className)} {...props}>
+    <LabelPrimitive.Root
+      htmlFor={id}
+      data-slot="form-label"
+      className={cn(labelVariants(), { 'text-destructive': !!error }, className)}
+      {...props}
+    >
       {children}
 
-      {required && <Asterisk className="ml-0.5 inline-block align-text-top text-red-500" size={10} />}
+      {required && <Asterisk className="ml-0.5 inline-block align-text-top text-inherit" size={10} />}
     </LabelPrimitive.Root>
   );
 };
