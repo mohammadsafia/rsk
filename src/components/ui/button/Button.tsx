@@ -3,7 +3,7 @@ import { type ComponentProps, type FC, forwardRef } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@utils';
+import { cn, FOCUS_RING, TRANSITION_DEFAULT } from '@utils';
 
 export type ButtonVariants = VariantProps<typeof buttonVariants>;
 
@@ -15,7 +15,7 @@ export type ButtonProps = ComponentProps<'button'> &
 export const buttonVariants = cva(
   `
     inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background
-    transition-colors duration-300 ease-in-out focus-visible:outline-none cursor-pointer
+    ${TRANSITION_DEFAULT} ${FOCUS_RING} cursor-pointer
     disabled:pointer-events-none disabled:opacity-50
     aria-disabled:pointer-events-none aria-disabled:opacity-50
   `,

@@ -1,7 +1,7 @@
 import { type ComponentPropsWithoutRef, type FC } from 'react';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 
-import { cn } from '@utils';
+import { cn, FOCUS_RING } from '@utils';
 
 import { ChevronDown } from 'lucide-react';
 
@@ -16,7 +16,7 @@ const Trigger: FC<ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>> =
     <AccordionPrimitive.Trigger
       data-slot="accordion-trigger"
       className={cn(
-        'flex flex-1 cursor-pointer items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180',
+        `flex flex-1 cursor-pointer items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180 ${FOCUS_RING}`,
         className,
       )}
       {...props}

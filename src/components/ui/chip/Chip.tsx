@@ -1,14 +1,14 @@
 import { type ComponentPropsWithoutRef } from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@utils';
+import { cn, DISABLED_STYLES } from '@utils';
 
 export type ChipVariants = VariantProps<typeof chipVariants>;
 
 export type ChipProps = ComponentPropsWithoutRef<'div'> & ChipVariants;
 
 export const chipVariants = cva(
-  'inline-flex items-center rounded-lg border border-transparent transition-colors outline-hidden shadow-sm font-semibold cursor-default',
+  `inline-flex items-center rounded-lg border border-transparent transition-colors outline-hidden shadow-sm font-semibold cursor-default ${DISABLED_STYLES}`,
   {
     variants: {
       variant: {

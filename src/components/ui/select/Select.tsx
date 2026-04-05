@@ -2,7 +2,7 @@ import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef
 
 import * as SelectPrimitive from '@radix-ui/react-select';
 
-import { cn } from '@utils';
+import { cn, DISABLED_STYLES, FOCUS_RING, TRANSITION_DEFAULT } from '@utils';
 
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 
@@ -40,12 +40,12 @@ const SelectTrigger: FC<SelectTriggerProps> = ({ ref, className, children, ...pr
     ref={ref}
     data-slot="select-trigger"
     className={cn(
-      'group/select-trigger bg-background relative flex w-full cursor-pointer items-center gap-2 rounded-md border p-3 text-sm shadow-xs',
-      'border-muted-200 transition-[color,box-shadow]',
-      'data-[state=open]:border-primary data-[state=open]:ring-primary data-[state=open]:ring',
-      'hover:not-disabled:border-primary hover:not-disabled:ring-primary hover:not-disabled:ring',
-      'focus-visible:ring-primary focus-visible:border-primary focus-visible:ring focus-visible:outline-none',
-      'disabled:bg-muted-50 disabled:text-muted-300 disabled:pointer-events-none',
+      `group/select-trigger bg-background relative flex w-full cursor-pointer items-center gap-2 rounded-md border p-3 text-sm shadow-xs`,
+      `border-muted-200 ${TRANSITION_DEFAULT}`,
+      'data-[state=open]:border-primary-200 data-[state=open]:ring-primary/40 data-[state=open]:ring',
+      'hover:not-disabled:border-primary-200 hover:not-disabled:ring-primary/40 hover:not-disabled:ring',
+      FOCUS_RING,
+      `disabled:bg-muted-50 disabled:text-muted-300 ${DISABLED_STYLES}`,
       className,
     )}
     {...props}
@@ -137,7 +137,7 @@ const SelectItem: FC<SelectItemProps> = ({ className, children, ...props }) => (
   <SelectPrimitive.Item
     data-slot="select-item"
     className={cn(
-      'bg-background border-muted-200 relative flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors outline-none select-none not-last:border-b',
+      `bg-background border-muted-200 relative flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm ${TRANSITION_DEFAULT} outline-none select-none not-last:border-b`,
       'data-[state=checked]:bg-primary-25 data-[state=checked]:text-primary-900 data-[state=checked]:border-b-muted-50',
       'data-highlighted:bg-primary-15',
       'focus:bg-muted-100 focus:text-foreground',

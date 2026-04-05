@@ -2,7 +2,7 @@ import { type ComponentPropsWithoutRef, type FC } from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@utils';
+import { cn, FOCUS_RING, TRANSITION_DEFAULT } from '@utils';
 
 type TabsListProps = ComponentPropsWithoutRef<typeof TabsPrimitive.List> & VariantProps<typeof tabsListVariants>;
 type TabsTriggerProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> & VariantProps<typeof tabsTriggerVariants>;
@@ -31,8 +31,8 @@ const tabsListVariants = cva('flex items-center rounded-2xl p-1 gap-1 overflow-x
 
 const tabsTriggerVariants = cva(
   `
-  inline-flex cursor-pointer items-center justify-center rounded-[inherit] px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors
-  focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50
+  inline-flex cursor-pointer items-center justify-center rounded-[inherit] px-3 py-2 text-sm font-medium whitespace-nowrap ${TRANSITION_DEFAULT}
+  ${FOCUS_RING} disabled:pointer-events-none disabled:opacity-50
   data-[state=active]:bg-primary data-[state=active]:font-bold data-[state=active]:text-surface hover:bg-primary-15 hover:text-foreground
   `,
   {
