@@ -27,12 +27,12 @@ function DashboardHeader() {
       {/* Right Section: Actions */}
       <div className="flex items-center gap-1">
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground relative h-9 w-9">
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground relative h-9 w-9" aria-label="Notifications">
           <Bell className="h-4 w-4" />
         </Button>
 
         {/* Help/Support */}
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-9 w-9">
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-9 w-9" aria-label="Help">
           <HelpCircle className="h-4 w-4" />
         </Button>
 
@@ -52,7 +52,15 @@ function DashboardHeader() {
                 </Conditional.If>
 
                 <Avatar.Fallback className="bg-primary/10 text-primary text-xs font-medium">
-                  {currentUser?.name?.charAt(0)?.toUpperCase() || <User className="h-3.5 w-3.5" />}
+                  <Conditional>
+                    <Conditional.If condition={!!currentUser?.name}>
+                      {currentUser?.name?.charAt(0)?.toUpperCase()}
+                    </Conditional.If>
+
+                    <Conditional.Else>
+                      <User className="h-3.5 w-3.5" />
+                    </Conditional.Else>
+                  </Conditional>
                 </Avatar.Fallback>
               </Avatar>
             </Button>

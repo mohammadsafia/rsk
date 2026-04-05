@@ -34,10 +34,10 @@ export function ThemeProvider({ children, defaultTheme = THEME_TYPES.DARK, stora
   const [theme, setTheme] = useState<Theme>(storageTheme);
 
   const onSetTheme = useCallback(
-    (theme: Theme) => {
-      setStorageTheme(theme);
+    (newTheme: Theme) => {
+      setStorageTheme(newTheme);
 
-      setTheme(theme);
+      setTheme(newTheme);
     },
     [setStorageTheme],
   );

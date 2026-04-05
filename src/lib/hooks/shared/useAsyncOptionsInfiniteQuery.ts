@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 
-import type { PaginatedDataTable } from 'types';
+import type { PaginatedDataTable } from './useDataTableQuery';
 
 export type AsyncOptionsFn<TOption> = (queryParams: string) => Promise<PaginatedDataTable<TOption>>;
 

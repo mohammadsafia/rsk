@@ -8,7 +8,7 @@ import type { AxiosRequestConfig } from 'axios';
 
 import type { ExtendedSortingState, PaginatedResult } from '@app-types';
 
-export type PaginatedDataTable<T extends Record<string, unknown>> = PaginatedResult<T>;
+export type PaginatedDataTable<T> = PaginatedResult<T>;
 
 export type UseDataTableQueryProps<
   T extends Record<string, unknown>,
@@ -216,7 +216,7 @@ export const useDataTableQuery = <T extends Record<string, unknown>>(props: UseD
     data: (dataTableQuery.data?.data ?? []) as T[],
     tableUtils: {
       totalCount: dataTableQuery.data?.pagination.total ?? 0,
-      totalPages: dataTableQuery.data?.pagination.totalPages ?? 0,
+      totalPages: dataTableQuery.data?.pagination.totalPage ?? 0,
       state: {
         sorting,
         columnFilters,

@@ -12,7 +12,7 @@ function getFadeUp(prefersReduced: boolean | null, delay = 0) {
     initial: { opacity: 0, y: 20 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, margin: '-60px' },
-    transition: { duration: 0.5, ease: 'easeOut', delay },
+    transition: { duration: 0.5, ease: 'easeOut' as const, delay },
   };
 }
 
@@ -161,7 +161,7 @@ function GrainOverlay() {
 function Navbar() {
   return (
     <nav className="fixed top-0 right-0 left-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between px-6 lg:px-8">
+      <div className="mx-auto flex h-14 max-w-300 items-center justify-between px-6 lg:px-8">
         <a href="/" className="text-sm font-bold tracking-[0.05em] text-foreground">
           RSK
         </a>
@@ -198,9 +198,9 @@ function Hero() {
   const fadeRight = getFadeUp(pr, 0.15);
 
   return (
-    <section className="mx-auto max-w-[1200px] px-6 pt-32 pb-20 lg:px-8 lg:pt-40 lg:pb-28">
+    <section className="mx-auto max-w-300 px-6 pt-32 pb-20 lg:px-8 lg:pt-40 lg:pb-28">
       <div className="flex flex-col gap-12 md:flex-row md:justify-between">
-        <motion.div className="max-w-2xl flex-[7]" {...fade}>
+        <motion.div className="max-w-2xl flex-7" {...fade}>
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-400">
             REACT &middot; TYPESCRIPT &middot; VITE
           </p>
@@ -234,13 +234,13 @@ function Hero() {
           </div>
         </motion.div>
 
-        <motion.div className="flex flex-row gap-8 border-border md:flex-col md:gap-6 md:border-l md:pl-10" {...fadeRight}>
+        <motion.div className="flex flex-row gap-8 border-border md:flex-col md:gap-6 md:border-s md:ps-10" {...fadeRight}>
           {STATS.map((stat) => {
             const f = getFadeUp(pr, 0.1);
             return (
               <motion.div key={stat.label} {...f}>
                 <p className="text-[32px] font-bold text-foreground">{stat.value}</p>
-                <p className="text-[10px] uppercase tracking-[0.1em] text-muted-400">{stat.label}</p>
+                <p className="text-[10px] uppercase tracking-widest text-muted-400">{stat.label}</p>
               </motion.div>
             );
           })}
@@ -259,7 +259,7 @@ function TechStack() {
   const fade = getFadeUp(pr);
 
   return (
-    <motion.section className="mx-auto max-w-[1200px] border-y border-border px-6 py-10 lg:px-8" {...fade}>
+    <motion.section className="mx-auto max-w-300 border-y border-border px-6 py-10 lg:px-8" {...fade}>
       <div className="flex items-center justify-center gap-10 md:gap-16">
         {TECH_STACK.map((tech) => (
           <div key={tech.name} className="flex flex-col items-center gap-2">
@@ -279,7 +279,7 @@ function TechStack() {
 function Features() {
   const pr = useReducedMotion();
   return (
-    <section id="features" className="mx-auto max-w-[1200px] px-6 py-20 lg:px-8 lg:py-28">
+    <section id="features" className="mx-auto max-w-300 px-6 py-20 lg:px-8 lg:py-28">
       <motion.p className="mb-8 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-400" {...getFadeUp(pr)}>
         WHAT&apos;S INSIDE
       </motion.p>
@@ -290,7 +290,7 @@ function Features() {
           return (
             <motion.div
               key={feature.title}
-              className={`rounded-xl border border-foreground/[0.06] bg-foreground/[0.02] p-6 ${feature.large ? 'md:row-span-2' : ''}`}
+              className={`rounded-xl border border-foreground/6 bg-foreground/2 p-6 ${feature.large ? 'md:row-span-2' : ''}`}
               {...fade}
             >
               <h3 className="mb-2 text-[15px] font-semibold text-foreground">{feature.title}</h3>
@@ -313,9 +313,9 @@ function ComponentShowcase() {
   const fadeRight = getFadeUp(pr, 0.15);
 
   return (
-    <section className="mx-auto max-w-[1200px] px-6 py-20 lg:px-8 lg:py-28">
+    <section className="mx-auto max-w-300 px-6 py-20 lg:px-8 lg:py-28">
       <div className="flex flex-col items-center gap-10 md:flex-row md:gap-16">
-        <motion.div className="flex-[4]" {...fadeLeft}>
+        <motion.div className="flex-4" {...fadeLeft}>
           <h2
             className="mb-4 text-foreground"
             style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(24px, 3.5vw, 36px)' }}
@@ -331,18 +331,18 @@ function ComponentShowcase() {
           </a>
         </motion.div>
 
-        <motion.div className="flex-[6]" {...fadeRight}>
-          <div className="overflow-hidden rounded-xl border border-border bg-white shadow">
+        <motion.div className="flex-6" {...fadeRight}>
+          <div className="overflow-hidden rounded-xl border border-border bg-background shadow">
             <div className="flex items-center gap-2 border-b border-border px-4 py-3">
               <div className="h-2.5 w-2.5 rounded-full bg-muted-200" />
               <div className="h-2.5 w-2.5 rounded-full bg-muted-200" />
               <div className="h-2.5 w-2.5 rounded-full bg-muted-200" />
-              <span className="ml-3 text-[11px] text-muted-400">localhost:5173/components</span>
+              <span className="ms-3 text-[11px] text-muted-400">localhost:5173/components</span>
             </div>
 
             <div className="flex">
-              <div className="hidden w-[180px] border-r border-border p-4 md:block">
-                <div className="mb-3 rounded-md bg-foreground/[0.03] px-3 py-1.5 text-[11px] text-muted-400">Search...</div>
+              <div className="hidden w-45 border-r border-border p-4 md:block">
+                <div className="mb-3 rounded-md bg-foreground/3 px-3 py-1.5 text-[11px] text-muted-400">Search...</div>
                 <div className="flex flex-col gap-0.5">
                   {SIDEBAR_ITEMS.map((item, idx) => (
                     <div
@@ -412,7 +412,7 @@ function CliSection() {
           </div>
         </motion.div>
 
-        <motion.div className="flex-[45]" {...fadeRight}>
+        <motion.div className="flex-45" {...fadeRight}>
           <h2
             className="mb-4 text-foreground"
             style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(24px, 3.5vw, 36px)' }}
@@ -438,9 +438,9 @@ function Architecture() {
   const fadeRight = getFadeUp(pr, 0.15);
 
   return (
-    <section className="mx-auto max-w-[1200px] px-6 py-20 lg:px-8 lg:py-28">
+    <section className="mx-auto max-w-300 px-6 py-20 lg:px-8 lg:py-28">
       <div className="flex flex-col items-center gap-10 md:flex-row md:gap-16">
-        <motion.div className="flex-[45]" {...fadeLeft}>
+        <motion.div className="flex-45" {...fadeLeft}>
           <h2
             className="mb-4 text-foreground"
             style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(24px, 3.5vw, 36px)' }}
@@ -452,7 +452,7 @@ function Architecture() {
           </p>
         </motion.div>
 
-        <motion.div className="flex-[55] self-stretch" {...fadeRight}>
+        <motion.div className="flex-55 self-stretch" {...fadeRight}>
           <div className="h-full overflow-hidden rounded-xl bg-code-surface">
             <div className="flex items-center gap-2 px-4 py-3">
               <div className="h-2.5 w-2.5 rounded-full bg-code-muted/30" />
@@ -523,7 +523,7 @@ function GettingStarted() {
 function Footer() {
   return (
     <footer className="border-t border-border bg-background py-10">
-      <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 lg:px-8">
+      <div className="mx-auto flex max-w-300 items-center justify-between px-6 lg:px-8">
         <p className="text-[13px] text-muted-400">Built by Mohammad Safia</p>
         <a
           href="https://github.com/mohammadsafia/rsk"

@@ -9,7 +9,7 @@ import { DocsLayout } from '@component-docs';
 import { getComponentDocsRegistry, componentDocsErrors } from '@component-docs/registry';
 import { useSelectedDocComponent } from '@component-docs/gallery';
 import { mdxComponents } from '@component-docs/gallery/utils';
-import { FULL_ROUTES_PATH } from '@routes/routes';
+import { FULL_ROUTES_PATH } from '@routes';
 
 const ComponentDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -83,7 +83,7 @@ const ComponentDetailPage = () => {
         {componentDocsErrors.length > 0 ? (
           <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive-200 p-4 text-sm">
             <div className="mb-2 font-semibold">MDX docs validation issues</div>
-            <ul className="list-disc space-y-1 pl-5">
+            <ul className="list-disc space-y-1 ps-5">
               {componentDocsErrors.map((error, index) => (
                 <li key={`${index}-${error}`}>{error}</li>
               ))}

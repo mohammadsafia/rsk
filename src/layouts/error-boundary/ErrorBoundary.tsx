@@ -24,18 +24,18 @@ function ErrorBoundary() {
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button onClick={() => window.location.reload()} size="lg" variant="default">
-            <RefreshCw className="mr-2 h-4 w-4" />
+            <RefreshCw className="me-2 h-4 w-4" />
             Refresh
           </Button>
 
           <Button onClick={() => navigate(-1)} size="lg" variant="ghost-muted">
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="me-2 h-4 w-4" />
             Go Back
           </Button>
 
           <Button asChild size="lg" variant="ghost-muted">
             <Link to={FULL_ROUTES_PATH.HOME.INDEX}>
-              <Home className="mr-2 h-4 w-4" />
+              <Home className="me-2 h-4 w-4" />
               Home
             </Link>
           </Button>

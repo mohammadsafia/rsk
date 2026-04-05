@@ -47,7 +47,7 @@ export const httpClient: HttpClient = {
       .catch(responseError);
   },
   async patch<T, D = any>(url: string, data?: D, config: HttpClientRequestConfig<D> = BASE_CONFIG) {
-    return await AxiosInstance.put<T>(url, data, { ...BASE_CONFIG, ...config })
+    return await AxiosInstance.patch<T>(url, data, { ...BASE_CONFIG, ...config })
       .then(responseBody)
       .catch(responseError);
   },

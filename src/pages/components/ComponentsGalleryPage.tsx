@@ -170,13 +170,13 @@ const ComponentsGalleryPage = () => {
           </div>
 
           <div className="relative w-64">
-            <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-400" />
+            <Search className="pointer-events-none absolute top-1/2 inset-s-3 h-4 w-4 -translate-y-1/2 text-muted-400" />
             <Input
               aria-label="Search components"
               placeholder="Search..."
               value={searchText}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="py-2 pl-10 text-sm"
+              className="py-2 ps-10 text-sm"
             />
           </div>
         </header>
@@ -193,7 +193,7 @@ const ComponentsGalleryPage = () => {
               return (
                 <Tabs.Trigger key={tab.key} value={tab.key} variant="underline">
                   {tab.label}
-                  <span className="ml-1.5 text-xs opacity-60">{count}</span>
+                  <span className="ms-1.5 text-xs opacity-60">{count}</span>
                 </Tabs.Trigger>
               );
             })}

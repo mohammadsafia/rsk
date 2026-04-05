@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { type DateRange } from 'react-day-picker';
 import { CalendarIcon, Check, CheckSquare, CircleCheck, ChevronsUpDown, Circle, Square, Star, StarOffIcon, Trash2, X } from 'lucide-react';
 import { Button, Calendar, CheckboxGroup, Command, Popover, RadioGroup, TimePicker } from '@components/ui';
-import { Dialog } from '@components/ui/dialog';
+import { Dialog } from '@components/ui';
 import {
   FormCheckbox,
   FormCheckboxGroup,
@@ -95,7 +95,7 @@ export function CommandAutocompleteDemo() {
       <Popover.Trigger asChild>
         <Button variant="outline" role="combobox" aria-expanded={open} className="w-50 justify-between">
           {selectedFramework ? selectedFramework.label : 'Select framework...'}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </Popover.Trigger>
       <Popover.Content className="w-50 p-0">
@@ -114,7 +114,7 @@ export function CommandAutocompleteDemo() {
                     setOpen(false);
                   }}
                 >
-                  <Check className={`mr-2 h-4 w-4 ${value === framework.value ? 'opacity-100' : 'opacity-0'}`} />
+                  <Check className={`me-2 h-4 w-4 ${value === framework.value ? 'opacity-100' : 'opacity-0'}`} />
                   {framework.label}
                 </Command.Item>
               ))}
@@ -152,8 +152,8 @@ export function FormBasicDemo() {
           { id: 'orange', name: 'Orange' },
           { id: 'banana', name: 'Banana' },
         ]}
-        getOptionLabel={(o: any) => (o as any).name}
-        getOptionValue={(o: any) => (o as any).id}
+        getOptionLabel={(o: { id: string; name: string }) => o.name}
+        getOptionValue={(o: { id: string; name: string }) => o.id}
         placeholder="Pick a fruit"
         required
         disabled={disabled}
@@ -286,7 +286,7 @@ export function FormWithValidationDemo() {
   });
 
   return (
-    <FormContainer formContext={form} onSuccess={(data) => console.log(data)} className="w-96 space-y-3">
+    <FormContainer formContext={form} onSuccess={() => {}} className="w-96 space-y-3">
       <FormInput name="email" label="Email" required disabled={disabled} />
       <FormInput name="password" label="Password" type="password" required disabled={disabled} />
       <FormNumber name="age" control={form.control} label="Age" disabled={disabled} />
@@ -947,7 +947,7 @@ export function CalendarDemo() {
         <Popover>
           <Popover.Trigger asChild>
             <Button variant="outline" className="w-70 justify-start text-left font-normal">
-              <CalendarIcon className="mr-2 h-4 w-4" />
+              <CalendarIcon className="me-2 h-4 w-4" />
               {date ? date.toLocaleDateString() : 'Pick a date'}
             </Button>
           </Popover.Trigger>
@@ -955,7 +955,7 @@ export function CalendarDemo() {
             <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
           </Popover.Content>
         </Popover>
-        <Button variant="outline" size="sm" className="ml-2" onClick={() => setDate(undefined)}>
+        <Button variant="outline" size="sm" className="ms-2" onClick={() => setDate(undefined)}>
           Clear
         </Button>
       </div>
@@ -964,7 +964,7 @@ export function CalendarDemo() {
         <Popover>
           <Popover.Trigger asChild>
             <Button variant="outline" className="w-70 justify-start text-left font-normal">
-              <CalendarIcon className="mr-2 h-4 w-4" />
+              <CalendarIcon className="me-2 h-4 w-4" />
               {dateRange?.from ? (
                 dateRange.to ? (
                   <>
@@ -989,7 +989,7 @@ export function CalendarDemo() {
             />
           </Popover.Content>
         </Popover>
-        <Button variant="outline" size="sm" className="ml-2" onClick={() => setDateRange(undefined)}>
+        <Button variant="outline" size="sm" className="ms-2" onClick={() => setDateRange(undefined)}>
           Clear
         </Button>
       </div>
