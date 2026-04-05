@@ -47,7 +47,7 @@ function FormCheckbox<TFieldValues extends FieldValues>({
           <label
             htmlFor={id}
             className={cn(
-              'border-muted-200 bg-background relative flex w-full cursor-pointer items-center gap-3 rounded-md border p-3 transition-[color,box-shadow]',
+              'border-muted-200 bg-muted-50 relative flex w-full cursor-pointer items-center gap-3 rounded-md border p-3 transition-[color,box-shadow]',
               !!field.value && 'bg-secondary-100 border-secondary-200',
               !disabled &&
                 'hover:border-primary hover:ring-primary focus-visible:ring-primary focus-visible:border-primary hover:ring focus-visible:ring focus-visible:outline-none',

@@ -12,7 +12,7 @@ type CheckboxProps = ComponentProps<typeof CheckboxPrimitive.Root> & VariantProp
 
 const checkboxVariants = cva(
   [
-    `border-muted-200 bg-background h-5 w-5 shrink-0 rounded border transition-[color,box-shadow] outline-none ${FOCUS_RING}`,
+    `border-muted-200 bg-muted-50 h-5 w-5 shrink-0 rounded border transition-[color,box-shadow] outline-none ${FOCUS_RING}`,
     'hover:not-disabled:border-primary-200 hover:not-disabled:ring-primary/40 hover:not-disabled:ring',
     `disabled:data-[state=checked]:bg-muted-400 disabled:data-[state=checked]:border-muted-400 ${DISABLED_STYLES}`,
   ],

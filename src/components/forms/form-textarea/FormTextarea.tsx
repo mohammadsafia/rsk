@@ -36,7 +36,7 @@ function FormTextarea<TFieldValues extends FieldValues>({
           id={id}
           data-slot="textarea"
           className={cn(
-            'border-muted-200 bg-background flex field-sizing-content w-full resize-y rounded-md border p-3 text-sm shadow-xs transition-[color,box-shadow] outline-none',
+            'border-muted-200 bg-muted-50 flex field-sizing-content w-full resize-y rounded-md border p-3 text-sm shadow-xs transition-[color,box-shadow] outline-none',
             'placeholder:text-muted',
             'hover:not-disabled:border-primary hover:not-disabled:ring-primary hover:not-disabled:ring',
             'focus-visible:ring-primary focus-visible:border-primary focus-visible:ring',

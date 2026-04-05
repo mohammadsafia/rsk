@@ -19,7 +19,7 @@ const Item: FC<CheckboxGroupItemProps> = ({ ref, className, children, ...props }
     ref={ref}
     data-slot="checkbox-group-item"
     className={cn(
-      'group/checkbox-item border-muted-200 bg-background flex cursor-pointer items-center gap-5 rounded-md border p-3 transition-[color,box-shadow]',
+      'group/checkbox-item border-muted-200 bg-muted-50 flex cursor-pointer items-center gap-5 rounded-md border p-3 transition-[color,box-shadow]',
       'data-[state=checked]:border-secondary-200 data-[state=checked]:bg-secondary-100',
       'hover:border-primary hover:ring-primary focus-visible:ring-primary focus-visible:border-primary hover:ring focus-visible:ring focus-visible:outline-none',
       'data-[state=checked]:hover:border-secondary-200 data-[state=checked]:hover:ring-secondary-200 data-[state=checked]:focus-visible:border-secondary-200 data-[state=checked]:focus-visible:ring-secondary-200',
@@ -37,7 +37,7 @@ const Indicator = ({ className, children, ...props }: CheckboxGroupIndicatorProp
   <CheckboxPrimitive.Indicator
     data-slot="checkbox-group-indicator"
     className={cn(
-      'border-muted-200 bg-background flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-[color,box-shadow] outline-none',
+      'border-muted-200 bg-muted-50 flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-[color,box-shadow] outline-none',
       'data-[state=checked]:border-secondary data-[state=checked]:bg-secondary data-[state=checked]:text-secondary-foreground',
       'group-hover/checkbox-item:border-primary group-hover/checkbox-item:ring-primary group-hover/checkbox-item:ring',
       'data-[state=checked]:group-hover/checkbox-item:border-secondary data-[state=checked]:group-hover/checkbox-item:ring-secondary',

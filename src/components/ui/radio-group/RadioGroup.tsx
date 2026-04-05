@@ -19,7 +19,7 @@ const Item: FC<RadioGroupItemProps> = ({ ref, className, children, ...props }) =
     ref={ref}
     data-slot="radio-group-item"
     className={cn(
-      'group/radio-item border-muted-200 bg-background flex cursor-pointer items-center gap-5 rounded-md border p-3 transition-[color,box-shadow]',
+      'group/radio-item border-muted-200 bg-muted-50 flex cursor-pointer items-center gap-5 rounded-md border p-3 transition-[color,box-shadow]',
       'data-[state=checked]:border-secondary-200 data-[state=checked]:bg-secondary-100',
       `hover:border-primary-200 hover:ring-primary/40 ${FOCUS_RING} hover:ring`,
       'data-[state=checked]:hover:border-secondary-200 data-[state=checked]:hover:ring-secondary-200 data-[state=checked]:focus-visible:border-secondary-200 data-[state=checked]:focus-visible:ring-secondary-200',
@@ -37,7 +37,7 @@ const Indicator = ({ className, children, ...props }: RadioGroupIndicatorProps) 
   <RadioGroupPrimitive.Indicator
     data-slot="radio-group-indicator"
     className={cn(
-      'border-muted-200 bg-background flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-[color,box-shadow] outline-none',
+      'border-muted-200 bg-muted-50 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-[color,box-shadow] outline-none',
       'data-[state=checked]:border-secondary data-[state=checked]:bg-secondary data-[state=checked]:text-secondary-foreground',
       'group-hover/radio-item:border-primary-200 group-hover/radio-item:ring-primary/40 group-hover/radio-item:ring',
       'data-[state=checked]:group-hover/radio-item:border-secondary data-[state=checked]:group-hover/radio-item:ring-secondary',

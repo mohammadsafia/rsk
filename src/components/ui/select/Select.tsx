@@ -40,7 +40,7 @@ const SelectTrigger: FC<SelectTriggerProps> = ({ ref, className, children, ...pr
     ref={ref}
     data-slot="select-trigger"
     className={cn(
-      `group/select-trigger bg-background relative flex w-full cursor-pointer items-center gap-2 rounded-md border p-3 text-sm shadow-xs`,
+      `group/select-trigger bg-muted-50 relative flex w-full cursor-pointer items-center gap-2 rounded-md border p-3 text-sm shadow-xs`,
       `border-muted-200 ${TRANSITION_DEFAULT}`,
       'data-[state=open]:border-primary-200 data-[state=open]:ring-primary/40 data-[state=open]:ring',
       'hover:not-disabled:border-primary-200 hover:not-disabled:ring-primary/40 hover:not-disabled:ring',
