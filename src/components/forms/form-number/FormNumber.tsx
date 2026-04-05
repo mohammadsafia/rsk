@@ -39,7 +39,11 @@ function FormNumber<TFieldValues extends FieldValues>({
             <div className="relative">
               <FormattedNumber
                 id={`${id}-${name}`}
-                className={cn(error && 'border-destructive hover:ring-destructive focus-visible:ring-destructive ps-8', className)}
+                className={cn(
+                  error &&
+                    'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive placeholder:text-destructive ps-8',
+                  className,
+                )}
                 {...field}
                 {...props}
               />

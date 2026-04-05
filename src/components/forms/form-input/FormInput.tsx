@@ -31,13 +31,14 @@ function FormInput<TFieldValues extends FieldValues>({
       <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={id} required={required}>
         {label}
       </FormLabel>
+
       <div className="relative">
         <Input
           id={id}
           autoComplete="off"
           className={cn(
             error &&
-              'border-destructive hover:ring-destructive focus-visible:ring-destructive focus-visible:border-destructive ps-8 focus-visible:ring-1',
+              'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive placeholder:text-destructive ps-8',
             className,
           )}
           {...register(name)}

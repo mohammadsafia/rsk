@@ -1,0 +1,42 @@
+---
+id: form-select
+title: FormSelect
+section: Components
+category: Forms
+description: 'Controlled select dropdown with option mapping and clear button.'
+tags: [forms, select, dropdown]
+---
+
+## Demo
+
+<p className="text-sm text-muted-foreground">FormSelect requires a form context. See the code example below for usage.</p>
+
+## Imports
+
+```tsx
+import { FormContainer, FormSelect } from '@components/forms';
+import { useForm } from 'react-hook-form';
+```
+
+## Code
+
+```tsx
+const form = useForm({ defaultValues: { role: '' } });
+
+const options = [
+  { id: '1', name: 'Admin' },
+  { id: '2', name: 'Editor' },
+  { id: '3', name: 'Viewer' },
+];
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormSelect
+    name="role"
+    label="Role"
+    options={options}
+    getOptionLabel={(o) => o.name}
+    getOptionValue={(o) => o.id}
+    placeholder="Select a role"
+  />
+</FormContainer>
+```

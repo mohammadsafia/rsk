@@ -5,37 +5,88 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "useDefineForClassFields": true,
+
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "incremental": false,
     "jsx": "react-jsx",
+
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Path resolution */
     "baseUrl": ".",
     "paths": {
+      /* ✅ EXISTING path aliases (backward compatibility - DO NOT REMOVE) */
+      "App": ["./src/App"],
+      "api": ["./src/api"],
+      "api/*": ["./src/api/*"],
+      "app-constants": ["./src/app-constants"],
+      "app-constants/*": ["./src/app-constants/*"],
+      "assets/*": ["./src/assets/*"],
+      "components/*": ["./src/components/*"],
+      "config": ["./src/config"],
+      "config/*": ["./src/config/*"],
+      "context": ["./src/context"],
+      "context/*": ["./src/context/*"],
+      "hooks": ["./src/hooks"],
+      "hooks/*": ["./src/hooks/*"],
+      "layout": ["./src/layout"],
+      "layout/*": ["./src/layout/*"],
+      "lib/*": ["./src/lib/*"],
+      "locales": ["./src/locales"],
+      "locales/*": ["./src/locales/*"],
+      "pages/*": ["./src/pages/*"],
+      "router": ["./src/router"],
+      "router/*": ["./src/router/*"],
+      "schemas": ["./src/schemas"],
+      "schemas/*": ["./src/schemas/*"],
+      "stores": ["./src/stores"],
+      "stores/*": ["./src/stores/*"],
+      "themes": ["./src/themes"],
+      "themes/*": ["./src/themes/*"],
+      "types": ["./src/types"],
+      "types/*": ["./src/types/*"],
+      "utils": ["./src/utils"],
+      "utils/*": ["./src/utils/*"],
+
+      /* ✅ NEW @ prefix aliases (for template/new code) */
       "@api/*": ["./src/api/*"],
       "@assets/*": ["./src/assets/*"],
       "@app-config": ["./src/app-config/index"],
       "@hooks/*": ["./src/lib/hooks/*"],
       "@contexts": ["./src/lib/contexts/index"],
       "@constants": ["./src/lib/constants/index"],
-      "@components/*": ["./src/components/*"],
-      "@pages/*": ["./src/pages/*"],
-      "@views/*": ["./src/views/*"],
-      "@layouts/*": ["./src/layouts/*"],
-      "@app-types": ["./src/types/index"],
       "@utils": ["./src/lib/utils/index"],
       "@hoc": ["./src/lib/hoc/index"],
+      "@components/*": ["./src/components_v2/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@views/*": ["./src/views/*"],
+      "@layouts": ["./src/layouts/index"],
+      "@app-types": ["./src/types/index"],
       "@routes": ["./src/routes/index"],
-      "@lib/*": ["./src/lib/*"],
-      "@locales": ["./src/locales/index"]
-    }
+      "@locales": ["./src/locales/index"],
+      "@component-docs": ["./src/component-docs/index.ts"],
+      "@component-docs/*": ["./src/component-docs/*"]
+    },
+
+    /* Vite specific */
+    "types": ["vite/client", "node"],
+
+    /* Additional */
+    "allowJs": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
+    "resolveJsonModule": true
   },
   "include": ["src"]
 }

@@ -1,0 +1,45 @@
+---
+id: form-radio-group
+title: FormRadioGroup
+section: Components
+category: Forms
+description: 'Controlled radio group with options, label, and validation support.'
+tags: [forms, radio, radio-group]
+---
+
+import { FormRadioGroupDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormRadioGroupDemo />
+
+## Imports
+
+```tsx
+import { FormContainer, FormRadioGroup } from '@components/forms';
+import { useForm } from 'react-hook-form';
+```
+
+## Code
+
+```tsx
+const form = useForm({ defaultValues: { plan: 'basic' } });
+const plans = [
+  { id: 'basic', name: 'Basic Plan' },
+  { id: 'pro', name: 'Pro Plan' },
+  { id: 'enterprise', name: 'Enterprise Plan' },
+];
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormRadioGroup
+    name="plan"
+    control={form.control}
+    label="Select Plan"
+    required
+    options={plans}
+    getOptionLabel={(o) => o.name}
+    getOptionValue={(o) => o.id}
+  />
+  <Button type="submit">Submit</Button>
+</FormContainer>
+```

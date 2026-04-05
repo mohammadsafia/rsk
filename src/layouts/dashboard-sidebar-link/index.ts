@@ -1,1 +1,1 @@
-export { default as DashboardSidebarLink, SidebarSubLink, SidebarSubLinkDropdown } from './DashboardSidebarLink';
+export { default as DashboardSidebarLink, SidebarSubLink } from './DashboardSidebarLink';

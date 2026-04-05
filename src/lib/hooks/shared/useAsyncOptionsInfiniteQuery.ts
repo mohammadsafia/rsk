@@ -1,8 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 
-import type { PaginatedResult } from '@app-types';
+import type { PaginatedDataTable } from 'types';
 
-export type AsyncOptionsFn<TOption> = (queryParams: string) => Promise<PaginatedResult<TOption>>;
+export type AsyncOptionsFn<TOption> = (queryParams: string) => Promise<PaginatedDataTable<TOption>>;
 
 type UseAsyncOptionsInfiniteQueryOptions<TOption> = {
   /**
@@ -18,7 +18,7 @@ type UseAsyncOptionsInfiniteQueryOptions<TOption> = {
    */
   searchTerm?: string;
   /**
-   * Array of selected item IDs to exclude from results
+   * Array of selected item IDs — sent to the BE so selected items appear on top of results.
    */
   selectedItemsIds?: string[];
   /**
@@ -66,10 +66,9 @@ export function useAsyncOptionsInfiniteQuery<TOption>({
   pageSize = 20,
   enabled = true,
 }: UseAsyncOptionsInfiniteQueryOptions<TOption>) {
-  return useInfiniteQuery<PaginatedResult<TOption>>({
+  return useInfiniteQuery({
     queryKey: [queryKey, searchTerm, urlSearchParams?.toString()],
-    initialPageParam: 1,
-    queryFn: async ({ pageParam }) => {
+    queryFn: async ({ pageParam = 1 }) => {
       const queryParams = new URLSearchParams();
 
       // Parse urlSearchParams if provided as string
@@ -81,7 +80,7 @@ export function useAsyncOptionsInfiniteQuery<TOption>({
         }
       }
 
-      queryParams.append('pageNumber', (pageParam as number).toString());
+      queryParams.append('pageNumber', pageParam.toString());
       queryParams.append('pageSize', pageSize.toString());
 
       if (searchTerm) {
@@ -94,11 +93,12 @@ export function useAsyncOptionsInfiniteQuery<TOption>({
 
       return fetchOptions(queryParams.toString());
     },
-    getNextPageParam: (lastPage: PaginatedResult<TOption>, pages: PaginatedResult<TOption>[]) => {
+    getNextPageParam: (lastPage, pages) => {
       const totalLoaded = pages.length * pageSize;
       return totalLoaded < lastPage.pagination.total ? pages.length + 1 : undefined;
     },
     enabled,
+    keepPreviousData: true,
     staleTime: Infinity,
   });
 }

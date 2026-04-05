@@ -117,7 +117,7 @@ function dispatch(action: Action) {
   listeners.forEach((listener) => listener(memoryState));
 }
 
-const toast = (props: Toast) => {
+export const toast = (props: Toast) => {
   const id = genId();
 
   const update = (props: ToasterToast) => dispatch({ type: 'UPDATE_TOAST', toast: { ...props, id } });

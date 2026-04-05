@@ -1,0 +1,36 @@
+---
+id: form-textarea
+title: FormTextarea
+section: Components
+category: Forms
+description: 'Multi-line text input with validation and error tooltip.'
+tags: [forms, textarea, input]
+---
+
+import { FormNumberTextareaDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormNumberTextareaDemo />
+
+## Imports
+
+```tsx
+import { FormContainer, FormTextarea } from '@components/forms';
+import { useForm } from 'react-hook-form';
+```
+
+## Code
+
+```tsx
+const form = useForm({ defaultValues: { notes: '' } });
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormTextarea
+    name="notes"
+    label="Notes"
+    placeholder="Enter your notes..."
+    required
+  />
+</FormContainer>
+```

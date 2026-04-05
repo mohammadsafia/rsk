@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { type DateFormat, useDate } from '@hooks/shared';
 
@@ -109,6 +109,13 @@ export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn
   const separator = useMemo(() => getSeparator(dateFormat), [dateFormat]);
   const placeholder = useMemo(() => getPlaceholder(dateFormat), [dateFormat]);
   const formatOrder = useMemo(() => getFormatOrder(dateFormat), [dateFormat]);
+
+  const formatDateToString = useCallback(
+    (date: Date | undefined): string => {
+      return dateUtilsRef.current.formatNullableDate(date, dateFormat as DateFormat, '');
+    },
+    [dateFormat, dateUtilsRef],
+  );
 
   const parseDateString = useCallback(
     (value: string): Date | undefined => {
@@ -369,8 +376,8 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
 
       if (sepIndex !== -1) {
         fromPart = rawValue.slice(0, sepIndex);
-
-        toPart = rawValue.slice(sepIndex).replace(/^\s*-\s*/, '');
+        const afterSep = rawValue.slice(sepIndex).replace(/^\s*-\s*/, '');
+        toPart = afterSep;
         hasSeparator = true;
       } else {
         fromPart = rawValue;

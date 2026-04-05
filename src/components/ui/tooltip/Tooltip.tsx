@@ -1,21 +1,21 @@
-import { type ComponentPropsWithoutRef, type ComponentPropsWithRef, type FC } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef } from 'react';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 
 import { cn } from '@utils';
 
 type ProviderProps = ComponentPropsWithoutRef<typeof TooltipPrimitive.Provider>;
-type TriggerProps = ComponentPropsWithRef<typeof TooltipPrimitive.Trigger>;
+type TriggerProps = ComponentProps<typeof TooltipPrimitive.Trigger>;
 type ContentProps = ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>;
 
 type TooltipComponent = typeof TooltipPrimitive.Root & {
-  Provider: typeof Provider;
-  Trigger: typeof Trigger;
-  Content: typeof Content;
+  Provider: FC<ProviderProps>;
+  Trigger: FC<TriggerProps>;
+  Content: FC<ContentProps>;
 };
 
 const Provider: FC<ProviderProps> = (props) => <TooltipPrimitive.Provider data-slot="tooltip-provider" {...props} />;
 
-const Trigger: FC<TriggerProps> = (props) => <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
+const Trigger: FC<TriggerProps> = ({ ref, ...props }) => <TooltipPrimitive.Trigger ref={ref} data-slot="tooltip-trigger" {...props} />;
 
 const Content: FC<ContentProps> = ({ className, sideOffset = 4, ...props }) => (
   <TooltipPrimitive.Content
@@ -36,9 +36,11 @@ const Content: FC<ContentProps> = ({ className, sideOffset = 4, ...props }) => (
 const Tooltip = TooltipPrimitive.Root as TooltipComponent;
 
 Tooltip.Provider = Provider;
-Tooltip.Trigger = Trigger;
+// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
+Tooltip.Trigger = forwardRef<HTMLButtonElement, TriggerProps>((props, ref) => Trigger({ ...props, ref }));
 Tooltip.Content = Content;
 
+Tooltip.Trigger.displayName = 'TooltipTrigger';
 Content.displayName = TooltipPrimitive.Content.displayName;
 
 export default Tooltip;

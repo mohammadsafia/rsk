@@ -1,23 +1,23 @@
 import { type ComponentPropsWithoutRef } from 'react';
 import { Controller, type FieldValues } from 'react-hook-form';
-import { Square } from 'lucide-react';
-import { CheckSquareFilled } from '@assets/icons';
 
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
 import { CheckboxGroup } from '@components/ui';
+import { FormControl, FormLabel, FormMessage } from '@components/forms';
 
 import { cn } from '@utils';
 
-import type { ControlledFieldBaseProps, FormSelectOption } from '@app-types';
+import { Check } from 'lucide-react';
+
+import type { ControlledFieldBaseProps, FormSelectOption, ResolvedOption } from '@app-types';
 
 type FormCheckboxGroupProps<TFieldValues extends FieldValues, TOption = FormSelectOption> = ControlledFieldBaseProps<
   TFieldValues,
-  Omit<ComponentPropsWithoutRef<'div'>, 'defaultValue'>
+  ComponentPropsWithoutRef<typeof CheckboxGroup>
 > & {
   options: TOption[];
-  getOptionLabel(option: TOption): string;
-  getOptionValue(option: TOption): string;
   checkboxItemClassName?: string;
+  getOptionLabel(option: ResolvedOption<TOption>): string;
+  getOptionValue(option: ResolvedOption<TOption>): string;
 };
 
 function FormCheckboxGroup<TFieldValues extends FieldValues, TOption = FormSelectOption>({
@@ -30,10 +30,10 @@ function FormCheckboxGroup<TFieldValues extends FieldValues, TOption = FormSelec
   className,
   errorClassName,
   required,
+  disabled,
   options,
   getOptionLabel,
   getOptionValue,
-  disabled,
   checkboxItemClassName,
   ...props
 }: FormCheckboxGroupProps<TFieldValues, TOption>) {
@@ -56,34 +56,40 @@ function FormCheckboxGroup<TFieldValues extends FieldValues, TOption = FormSelec
               {label}
             </FormLabel>
 
-            <CheckboxGroup className={className} {...props}>
+            <CheckboxGroup className={cn('relative flex flex-wrap gap-3 md:gap-6', className)} {...props}>
               {options.map((option) => {
                 const value = getOptionValue(option);
+
                 return (
                   <CheckboxGroup.Item
                     key={value}
+                    ref={field.ref}
+                    className={cn(
+                      'flex-1 shrink-0',
+                      error &&
+                        'border-destructive hover:border-destructive hover:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive text-destructive',
+                      checkboxItemClassName,
+                    )}
                     checked={selectedValues.includes(value)}
+                    disabled={field.disabled || disabled}
                     onCheckedChange={(checked) => handleCheckedChange(value, !!checked)}
-                    disabled={disabled}
-                    className={cn(error && 'ring-destructive rounded-xl ring-1', checkboxItemClassName)}
                   >
-                    <span className="text-muted group-data-[state=checked]/checkbox-item:text-primary-900 group-disabled/checkbox-item:text-muted-300 flex flex-1 items-center text-sm font-normal">
-                      {getOptionLabel(option)}
-                    </span>
-                    <CheckboxGroup.Indicator>
-                      <CheckSquareFilled className="text-secondary group-disabled/checkbox-item:text-muted-400 hidden group-data-[state=checked]/checkbox-item:block" />
-                      <Square
-                        size={24}
-                        strokeWidth={1.5}
-                        className="text-muted-300 block rounded group-data-[state=checked]/checkbox-item:hidden"
-                      />
+                    <span className="flex flex-1 items-center text-sm font-normal">{getOptionLabel(option)}</span>
+
+                    <CheckboxGroup.Indicator
+                      className={cn(
+                        error &&
+                          'border-destructive data-[state=checked]:bg-destructive data-[state=checked]:border-destructive group-hover/checkbox-item:border-destructive group-hover/checkbox-item:ring-destructive',
+                      )}
+                    >
+                      <Check size={16} stroke="white" className="hidden group-data-[state=checked]/checkbox-item:block" />
                     </CheckboxGroup.Indicator>
                   </CheckboxGroup.Item>
                 );
               })}
-            </CheckboxGroup>
 
-            <FormMessage className={errorClassName} hidden={!error} error={error!} />
+              <FormMessage className={cn('inset-s-auto inset-e-9 inset-bs-6', errorClassName)} hidden={!error} error={error!} />
+            </CheckboxGroup>
           </FormControl>
         );
       }}

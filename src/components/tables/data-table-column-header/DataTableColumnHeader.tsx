@@ -4,7 +4,7 @@ import type { Column } from '@tanstack/react-table';
 
 import { cn } from '@utils';
 
-import { SortIcon } from '@assets/icons';
+import { SortIcon } from 'assets/icons';
 
 type DataTableColumnHeaderProps<TData, TValue> = {
   column: Column<TData, TValue>;

@@ -1,0 +1,47 @@
+---
+id: checkbox-group
+title: CheckboxGroup
+section: Components
+category: UI
+description: 'Card-style checkbox group with composable indicator for custom icons.'
+tags: [ui, checkbox, input]
+---
+
+import { CheckboxGroupDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<CheckboxGroupDemo />
+
+## Imports
+
+```tsx
+import { CheckboxGroup } from '@components/ui';
+import { CheckSquareFilled } from '@assets/icons';
+import { Square } from 'lucide-react';
+```
+
+## Code
+
+```tsx
+<CheckboxGroup>
+  <CheckboxGroup.Item checked={checked} onCheckedChange={setChecked}>
+    <span className="...">Option 1</span>
+    <CheckboxGroup.Indicator>
+      <CheckSquareFilled className="hidden text-secondary group-data-[state=checked]/checkbox-item:block" />
+      <Square size={24} strokeWidth={1.5} className="block rounded text-muted-300 group-data-[state=checked]/checkbox-item:hidden" />
+    </CheckboxGroup.Indicator>
+  </CheckboxGroup.Item>
+</CheckboxGroup>
+
+// Custom Icons
+<CheckboxGroup>
+  <CheckboxGroup.Item checked={checked} onCheckedChange={setChecked}>
+    <span className="...">Option 1</span>
+    <CheckboxGroup.Indicator>
+      <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/checkbox-item:block" />
+      <Star size={20} className="block text-muted-300 group-data-[state=checked]/checkbox-item:hidden" />
+    </CheckboxGroup.Indicator>
+  </CheckboxGroup.Item>
+</CheckboxGroup>
+```

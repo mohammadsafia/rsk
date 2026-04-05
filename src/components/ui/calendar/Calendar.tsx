@@ -1,14 +1,18 @@
-import * as React from 'react';
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { DayButton, DayPicker, type DropdownProps, getDefaultClassNames } from 'react-day-picker';
 import { Button, buttonVariants, Select } from '@components/ui';
 import { cn } from '@utils';
+import { type ChangeEvent, type ComponentProps, useEffect, useRef } from 'react';
 
-function CalendarDayButton({ className, day, modifiers, ...props }: React.ComponentProps<typeof DayButton>) {
+export type CalendarProps = ComponentProps<typeof DayPicker> & {
+  buttonVariant?: ComponentProps<typeof Button>['variant'];
+};
+
+function CalendarDayButton({ className, day, modifiers, ...props }: ComponentProps<typeof DayButton>) {
   const defaultClassNames = getDefaultClassNames();
 
-  const ref = React.useRef<any | null>(null);
-  React.useEffect(() => {
+  const ref = useRef<any | null>(null);
+  useEffect(() => {
     if (modifiers.focused) ref.current?.focus();
   }, [modifiers.focused]);
 
@@ -58,7 +62,7 @@ function CalendarMonthsDropdown({ options, value, onChange, disabled }: Dropdown
   const handleValueChange = (newValue: string) => {
     const numericValue = Number(newValue);
     if (onChange) {
-      onChange({ target: { value: String(numericValue) } } as React.ChangeEvent<HTMLSelectElement>);
+      onChange({ target: { value: String(numericValue) } } as ChangeEvent<HTMLSelectElement>);
     }
   };
 
@@ -94,7 +98,7 @@ function CalendarYearsDropdown({ options, value, onChange, disabled }: DropdownP
   const handleValueChange = (newValue: string) => {
     const numericValue = Number(newValue);
     if (onChange) {
-      onChange({ target: { value: String(numericValue) } } as React.ChangeEvent<HTMLSelectElement>);
+      onChange({ target: { value: String(numericValue) } } as ChangeEvent<HTMLSelectElement>);
     }
   };
 
@@ -102,7 +106,10 @@ function CalendarYearsDropdown({ options, value, onChange, disabled }: DropdownP
     <Select value={value ? String(value) : ''} onValueChange={handleValueChange} disabled={disabled}>
       <Select.Trigger className="h-8 justify-center text-xs">
         <Select.Value className="text-center" />
+
+        <Select.Icon />
       </Select.Trigger>
+
       <Select.Content position="popper">
         {selectOptions.map((option) => (
           <Select.Item
@@ -111,16 +118,14 @@ function CalendarYearsDropdown({ options, value, onChange, disabled }: DropdownP
             disabled={options.find((o) => String(o.value) === option.id)?.disabled}
             className="justify-center text-center"
           >
-            {option.name}
+            <Select.Text>{option.name}</Select.Text>
           </Select.Item>
         ))}
       </Select.Content>
     </Select>
   );
 }
-export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
-  buttonVariant?: React.ComponentProps<typeof Button>['variant'];
-};
+
 function Calendar({
   className,
   classNames,

@@ -1,0 +1,31 @@
+---
+id: popover
+title: Popover
+section: Components
+category: UI
+description: 'Floating content on click.'
+tags: [ui, popover]
+---
+
+import { PopoverDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<PopoverDemo />
+
+## Imports
+
+```tsx
+import { Popover, Button } from '@components/ui';
+```
+
+## Code
+
+```tsx
+<Popover>
+  <Popover.Trigger asChild>
+    <Button>Open</Button>
+  </Popover.Trigger>
+  <Popover.Content>Content here</Popover.Content>
+</Popover>
+```

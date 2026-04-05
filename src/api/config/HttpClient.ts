@@ -1,56 +1,28 @@
-import { AxiosError, type AxiosRequestConfig, type AxiosResponse } from 'axios';
-import { AxiosInstance } from '@api/config';
+import { AxiosInstance } from 'api';
 
-type HttpClientRequestConfig<TConfig = any> = AxiosRequestConfig<TConfig>;
-type HttpClientResponse<TData = any> = AxiosResponse<TData>;
-type HttpClientError = AxiosError<{ message: string }>;
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 export type HttpClient = {
-  get<T, D = any>(url: string, config?: HttpClientRequestConfig<D>): Promise<T>;
-  post<T, D = any>(url: string, data?: D, config?: HttpClientRequestConfig<D>): Promise<T>;
-  put<T, D = any>(url: string, data?: D, config?: HttpClientRequestConfig<D>): Promise<T>;
-  delete<T, D = any>(url: string, config?: HttpClientRequestConfig<D>): Promise<T>;
-  patch<T, D = any>(url: string, data?: D, config?: HttpClientRequestConfig<D>): Promise<T>;
+  get<T, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<T>;
+  post<T, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<T>;
+  put<T, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<T>;
+  delete<T, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<T>;
 };
 
-const BASE_CONFIG: HttpClientRequestConfig = {
-  withToken: true,
-  withTenantKey: true,
-};
-
-const responseBody = <T>(response: HttpClientResponse<T>) => response.data;
-
-const responseError = <T>(error: HttpClientError | T) => {
-  if (error instanceof AxiosError && error.response) throw error.response.data;
-
-  throw error;
-};
+const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 const httpClient: HttpClient = {
-  async get<T, D = any>(url: string, config: HttpClientRequestConfig<D> = BASE_CONFIG) {
-    return await AxiosInstance.get<T>(url, { ...BASE_CONFIG, ...config })
-      .then(responseBody)
-      .catch(responseError);
+  get: async function <T, D = any>(url: string, config?: AxiosRequestConfig<D>) {
+    return await AxiosInstance.get<T>(url, config).then(responseBody);
   },
-  async post<T, D = any>(url: string, data?: D, config: HttpClientRequestConfig<D> = BASE_CONFIG) {
-    return await AxiosInstance.post<T>(url, data, { ...BASE_CONFIG, ...config })
-      .then(responseBody)
-      .catch(responseError);
+  post: async function <T, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>) {
+    return await AxiosInstance.post<T>(url, data, config).then(responseBody);
   },
-  async put<T, D = any>(url: string, data?: D, config: HttpClientRequestConfig<D> = BASE_CONFIG) {
-    return await AxiosInstance.put<T>(url, data, { ...BASE_CONFIG, ...config })
-      .then(responseBody)
-      .catch(responseError);
+  put: async function <T, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>) {
+    return await AxiosInstance.put<T>(url, data, config).then(responseBody);
   },
-  async delete<T, D = any>(url: string, config: HttpClientRequestConfig<D> = BASE_CONFIG) {
-    return await AxiosInstance.delete<T>(url, { ...BASE_CONFIG, ...config })
-      .then(responseBody)
-      .catch(responseError);
-  },
-  async patch<T, D = any>(url: string, data?: D, config: HttpClientRequestConfig<D> = BASE_CONFIG) {
-    return await AxiosInstance.patch<T>(url, data, { ...BASE_CONFIG, ...config })
-      .then(responseBody)
-      .catch(responseError);
+  delete: async function <T, D = any>(url: string, config?: AxiosRequestConfig<D>) {
+    return await AxiosInstance.delete<T>(url, config).then(responseBody);
   },
 };
 

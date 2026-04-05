@@ -1,0 +1,60 @@
+---
+id: combobox
+title: Combobox
+section: Components
+category: Shared
+description: 'Searchable dropdown with command input and loading state.'
+tags: [shared, combobox, select, search]
+---
+
+import { Combobox } from '@components/shared';
+
+## Demo
+
+<div className="w-64">
+  <Combobox>
+    <Combobox.Trigger>
+      <Combobox.Value placeholder="Select an option..." />
+    </Combobox.Trigger>
+
+    <Combobox.Content>
+      <Combobox.Input placeholder="Search..." />
+
+      <Combobox.List>
+        <Combobox.Empty>No results found.</Combobox.Empty>
+
+        <Combobox.Item value="option-1">Option 1</Combobox.Item>
+
+        <Combobox.Item value="option-2">Option 2</Combobox.Item>
+
+        <Combobox.Item value="option-3">Option 3</Combobox.Item>
+      </Combobox.List>
+    </Combobox.Content>
+  </Combobox>
+</div>
+
+## Imports
+
+```tsx
+import { Combobox } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<Combobox open={open} onOpenChange={setOpen}>
+  <Combobox.Trigger>
+    <Combobox.Value placeholder="Select..." />
+    <Combobox.Clear onClick={handleClear} />
+  </Combobox.Trigger>
+
+  <Combobox.Content>
+    <Combobox.Input placeholder="Search..." />
+
+    <Combobox.List>
+      <Combobox.Empty>No results.</Combobox.Empty>
+      <Combobox.Item value="item-1">Item 1</Combobox.Item>
+    </Combobox.List>
+  </Combobox.Content>
+</Combobox>
+```

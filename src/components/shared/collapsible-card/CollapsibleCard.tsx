@@ -10,6 +10,7 @@ import { ChevronDown } from 'lucide-react';
 type CollapsibleCardContextValue = VariantProps<typeof collapsibleCardVariants>;
 
 type CollapsibleCardHeaderProps = ComponentPropsWithoutRef<typeof Card.Header> & VariantProps<typeof collapsibleCardHeaderVariants>;
+type CollapsibleCardHeaderLeadingProps = ComponentPropsWithoutRef<'div'>;
 type CollapsibleCardTitleProps = ComponentPropsWithoutRef<typeof Card.Title>;
 type CollapsibleCardTriggerProps = ComponentPropsWithoutRef<typeof Collapsible.Trigger>;
 type CollapsibleCardTriggerIconProps = SVGProps<SVGSVGElement>;
@@ -23,6 +24,7 @@ type CollapsibleCardProps = ComponentPropsWithoutRef<typeof Card> &
 
 type CollapsibleCardComponent = FC<CollapsibleCardProps> & {
   Header: FC<CollapsibleCardHeaderProps>;
+  Leading: FC<CollapsibleCardHeaderLeadingProps>;
   Title: FC<CollapsibleCardTitleProps>;
   Trigger: FC<CollapsibleCardTriggerProps>;
   TriggerIcon: FC<CollapsibleCardTriggerIconProps>;
@@ -34,17 +36,17 @@ type CollapsibleCardComponent = FC<CollapsibleCardProps> & {
 const collapsibleCardHeaderVariants = cva('', {
   variants: {
     variant: {
-      default: 'border-primary-25',
-      primary: 'border-primary-25',
-      secondary: 'border-primary-25',
-      success: 'border-primary-25',
-      destructive: 'border-primary-25',
-      warning: 'border-primary-25',
-      info: 'border-primary-25',
-      outline: 'border-primary-25',
-      'outline-secondary': 'border-primary-25',
-      glass: 'border-primary-25',
-      gradient: 'border-primary-25',
+      default: 'bg-background border-primary-25',
+      primary: 'bg-background border-primary-25',
+      secondary: 'bg-background border-primary-25',
+      success: 'bg-background border-primary-25',
+      destructive: 'bg-background border-primary-25',
+      warning: 'bg-background border-primary-25',
+      info: 'bg-background border-primary-25',
+      outline: 'bg-background border-primary-25',
+      'outline-secondary': 'bg-background border-primary-25',
+      glass: 'bg-background border-primary-25',
+      gradient: 'bg-background border-primary-25',
     },
   },
   defaultVariants: {
@@ -76,16 +78,24 @@ const collapsibleCardVariants = cva('', {
 
 const CollapsibleCardContext = createContext<CollapsibleCardContextValue>({ variant: 'default' });
 
-const CollapsibleCardHeader: FC<CollapsibleCardHeaderProps> = ({ variant, className, children, ...props }) => {
+const useCollapsibleCardContext = () => {
   const context = useContext(CollapsibleCardContext);
+
+  if (!context) throw new Error('CollapsibleCard subcomponents must be used within <CollapsibleCard>');
+
+  return context;
+};
+
+const CollapsibleCardHeader: FC<CollapsibleCardHeaderProps> = ({ variant, className, children, ...props }) => {
+  const context = useCollapsibleCardContext();
 
   return (
     <Card.Header
       className={cn(
         'flex items-center justify-between transition-all duration-75',
-        'bg-background border-primary-25 flex items-center justify-between rounded-t-[inherit]',
-        'group-data-[state=open]:border-b group-data-[state=closed]:[&:has(~[data-slot=card-footer])]:border-b group-data-[state=closed]:[&:not(:has(~[data-slot=card-footer]))]:border-b-0',
-        'group-data-[state=closed]:[&:not(:has(~[data-slot=card-footer]))]:rounded-b-[inherit]',
+        'rounded-t-[inherit]',
+        'group-data-[state=open]/collapsible-card:border-b group-data-[state=closed]/collapsible-card:[&:has(~[data-slot=card-footer])]:border-b group-data-[state=closed]/collapsible-card:[&:not(:has(~[data-slot=card-footer]))]:border-b-0',
+        'group-data-[state=closed]/collapsible-card:[&:not(:has(~[data-slot=card-footer]))]:rounded-b-[inherit]',
         collapsibleCardHeaderVariants({ variant: variant ?? context.variant }),
         className,
       )}
@@ -96,6 +106,16 @@ const CollapsibleCardHeader: FC<CollapsibleCardHeaderProps> = ({ variant, classN
   );
 };
 
+const CollapsibleCardHeaderLeading: FC<CollapsibleCardHeaderLeadingProps> = ({ className, children, ...props }) => (
+  <div
+    data-slot="collapsible-card-header-leading"
+    className={cn('grid grid-cols-[auto_1fr] items-center gap-x-2', '*:data-[slot=card-description]:col-start-2', className)}
+    {...props}
+  >
+    {children}
+  </div>
+);
+
 const CollapsibleCardTitle: FC<CollapsibleCardTitleProps> = ({ className, children, ...props }) => (
   <Card.Title className={cn(className)} {...props}>
     {children}
@@ -103,7 +123,7 @@ const CollapsibleCardTitle: FC<CollapsibleCardTitleProps> = ({ className, childr
 );
 
 const CollapsibleCardTrigger: FC<CollapsibleCardTriggerProps> = ({ className, children, ...props }) => (
-  <Collapsible.Trigger className={cn('group transition-all hover:opacity-80', className)} {...props}>
+  <Collapsible.Trigger className={cn('group/collapsible-trigger transition-all hover:opacity-80', className)} {...props}>
     {children}
   </Collapsible.Trigger>
 );
@@ -113,7 +133,7 @@ const CollapsibleCardTriggerIcon: FC<CollapsibleCardTriggerIconProps> = ({ class
     children ?? (
       <ChevronDown
         size={16}
-        className={cn('shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180', className)}
+        className={cn('shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible-trigger:rotate-180', className)}
         {...props}
       />
     )
@@ -143,7 +163,7 @@ const CollapsibleCardFooter: FC<CollapsibleCardFooterProps> = ({ className, chil
 const CollapsibleCard: CollapsibleCardComponent = ({
   open,
   onOpenChange,
-  defaultOpen,
+  defaultOpen = true,
   disabled,
   className,
   variant,
@@ -152,7 +172,7 @@ const CollapsibleCard: CollapsibleCardComponent = ({
 }) => {
   return (
     <CollapsibleCardContext.Provider value={{ variant }}>
-      <Collapsible className="group" open={open} defaultOpen={defaultOpen} disabled={disabled} onOpenChange={onOpenChange}>
+      <Collapsible className="group/collapsible-card" open={open} defaultOpen={defaultOpen} disabled={disabled} onOpenChange={onOpenChange}>
         <Card className={cn(collapsibleCardVariants({ variant }), className)} {...props}>
           {children}
         </Card>
@@ -162,6 +182,7 @@ const CollapsibleCard: CollapsibleCardComponent = ({
 };
 
 CollapsibleCard.Header = CollapsibleCardHeader;
+CollapsibleCard.Leading = CollapsibleCardHeaderLeading;
 CollapsibleCard.Title = CollapsibleCardTitle;
 CollapsibleCard.Trigger = CollapsibleCardTrigger;
 CollapsibleCard.TriggerIcon = CollapsibleCardTriggerIcon;

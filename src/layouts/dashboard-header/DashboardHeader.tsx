@@ -1,79 +1,128 @@
 import { useNavigate } from 'react-router-dom';
 
-import { Avatar, Button, DropdownMenu } from '@components/ui';
-import { ThemeSwitcher } from '@components/shared';
+import { Avatar, DropdownMenu } from '@components/ui';
+import { Conditional } from '@components/utils';
+import { TooltipButton } from 'components/common';
+import { Notifications } from 'components/layout/notifications';
+import { AuthorizationWrapper } from 'components/permissions';
 
 import { useAuth } from '@hooks/shared';
+import { useAppointmentsLiveExcelUrlQuery } from 'hooks';
 
 import { ROUTES_PATH } from '@routes';
+import { AppPermissions } from 'app-constants';
 
-import { User } from 'lucide-react';
+import APP_CONFIGURATIONS from 'config/AppConfigurations';
+
+import { ChevronDown, LogOut, Settings, User } from 'lucide-react';
+import { ExcelSheetIcon } from 'assets/icons';
 
 function DashboardHeader() {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
 
-  const onNavigateToProfile = () => {
-    navigate(`${ROUTES_PATH.USERS.INDEX}/${ROUTES_PATH.USERS.PERSONAL_PROFILE}/me`);
+  const { currentUser, removeCurrentUser } = useAuth();
+
+  const { exportAppointmentsToLiveExcel, isExporting } = useAppointmentsLiveExcelUrlQuery();
+
+  const initials = currentUser?.name
+    ? currentUser.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : '';
+
+  const handleNavigateToProfile = () => {
+    if (!currentUser?.userId) return;
+    navigate(`/${ROUTES_PATH.USERS.INDEX}/${ROUTES_PATH.USERS.PERSONAL_PROFILE}/${currentUser.userId}`);
   };
 
   return (
-    <header className="flex h-auto w-full items-center justify-between p-2 md:px-8 md:py-4">
-      <div />
+    <header className="bg-background sticky top-0 z-40 flex h-17.5 w-full shrink-0 items-center gap-6 px-6 py-3 shadow-[0px_0px_16px_0px_rgba(10,8,29,0.08)]">
+      <div className="flex flex-1 items-center">
+        <img
+          src={APP_CONFIGURATIONS.VITE_APP_TENANT_LOGO_URL}
+          alt={APP_CONFIGURATIONS.VITE_APP_TENANT_NAME}
+          className="hidden h-8.5 w-auto md:block"
+        />
+      </div>
 
-      <div className="flex items-center space-x-5">
-        <ThemeSwitcher />
+      <AuthorizationWrapper permissions={[AppPermissions.Notifications.Actions.ViewNotifications]}>
+        <Notifications />
+      </AuthorizationWrapper>
 
-        <DropdownMenu>
-          <DropdownMenu.Trigger asChild>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-              <Avatar className="border-accent h-8 w-8 border-2">
-                <Avatar.Image src="" alt="user avatar" />
+      <div className="flex h-5 items-center justify-center">
+        <div className="bg-background h-full w-px" />
+      </div>
 
-                <Avatar.Fallback className="text-primary">
-                  <User />
-                </Avatar.Fallback>
-              </Avatar>
-            </Button>
-          </DropdownMenu.Trigger>
+      <TooltipButton
+        permissions={[AppPermissions.UpcomingAppointmentDocumentManagement.Actions.ViewLiveExcelsheet]}
+        title="Export Appointments To Live Excel"
+        disabled={isExporting}
+        onClick={exportAppointmentsToLiveExcel}
+      >
+        <ExcelSheetIcon />
+      </TooltipButton>
 
-          <DropdownMenu.Content className="w-56" align="end" forceMount>
-            <DropdownMenu.Label className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm leading-none font-medium">{currentUser?.name}</p>
+      <DropdownMenu>
+        <DropdownMenu.Trigger asChild>
+          <button
+            type="button"
+            className="border-muted-200 bg-background flex h-12.5 items-center gap-3 overflow-hidden rounded-[10px] border px-3 py-1.5"
+            aria-label="Open user menu"
+          >
+            <Avatar className="bg-primary-400 size-9 shrink-0 rounded-full">
+              <Conditional.If condition={!!currentUser?.picture}>
+                <Avatar.Image src={currentUser?.picture} alt="User avatar" />
+              </Conditional.If>
 
-                <p className="text-xs leading-none">{currentUser?.email}</p>
+              <Avatar.Fallback className="bg-primary-400 text-xs font-bold text-white">{initials}</Avatar.Fallback>
+            </Avatar>
+
+            <div className="hidden items-center gap-3 md:flex">
+              <div className="flex flex-col items-start">
+                <p className="text-primary-900 text-xs leading-[18px] font-medium whitespace-nowrap">{currentUser?.name}</p>
+
+                <p className="text-primary-900 text-[10px] leading-4 whitespace-nowrap">{currentUser?.email}</p>
               </div>
-            </DropdownMenu.Label>
 
-            <DropdownMenu.Separator />
+              <ChevronDown className="text-primary-900 size-6 shrink-0" />
+            </div>
+          </button>
+        </DropdownMenu.Trigger>
 
-            <DropdownMenu.Group>
-              <DropdownMenu.Item onClick={onNavigateToProfile}>
-                My profile
-                <DropdownMenu.Shortcut>⇧⌘P</DropdownMenu.Shortcut>
-              </DropdownMenu.Item>
+        <DropdownMenu.Content className="w-56" align="end" forceMount>
+          <DropdownMenu.Label className="font-normal">
+            <div className="flex flex-col gap-1">
+              <p className="text-sm leading-none font-medium">{currentUser?.name}</p>
 
-              <DropdownMenu.Item>
-                My time report
-                <DropdownMenu.Shortcut>⌘B</DropdownMenu.Shortcut>
-              </DropdownMenu.Item>
+              <p className="text-muted text-xs leading-none">{currentUser?.email}</p>
+            </div>
+          </DropdownMenu.Label>
 
-              <DropdownMenu.Item>
-                Notifications
-                <DropdownMenu.Shortcut>⌘S</DropdownMenu.Shortcut>
-              </DropdownMenu.Item>
-            </DropdownMenu.Group>
+          <DropdownMenu.Separator />
 
-            <DropdownMenu.Separator />
+          <DropdownMenu.Group>
+            <DropdownMenu.Item onClick={handleNavigateToProfile}>
+              <User className="mr-2 h-4 w-4" />
+              My profile
+            </DropdownMenu.Item>
 
             <DropdownMenu.Item>
-              Log out
-              <DropdownMenu.Shortcut>⇧⌘Q</DropdownMenu.Shortcut>
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
             </DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu>
-      </div>
+          </DropdownMenu.Group>
+
+          <DropdownMenu.Separator />
+
+          <DropdownMenu.Item onClick={removeCurrentUser}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Log out
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu>
     </header>
   );
 }

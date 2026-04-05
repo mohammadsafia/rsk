@@ -1,0 +1,89 @@
+---
+id: chip
+title: Chip
+section: Components
+category: UI
+description: 'Compact element for displaying a label, status, or count with variant styles.'
+tags: [ui, chip]
+---
+
+import { Chip } from '@components/ui';
+
+## Demo
+
+<div className="space-y-4">
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Variants</p>
+    <div className="flex flex-wrap items-center gap-2">
+      <Chip variant="default">Default</Chip>
+      <Chip variant="success">Success</Chip>
+      <Chip variant="destructive">Destructive</Chip>
+      <Chip variant="warning">Warning</Chip>
+      <Chip variant="accent">Accent</Chip>
+      <Chip variant="muted">Muted</Chip>
+    </div>
+  </div>
+
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Usage Examples</p>
+    <div className="flex flex-wrap items-center gap-2">
+      <Chip variant="default" size="default">
+        Default
+      </Chip>
+      <Chip variant="success" size="xs">
+        Success
+      </Chip>
+      <Chip variant="destructive" size="sm">
+        Destructive
+      </Chip>
+      <Chip variant="warning" size="md">
+        Warning
+      </Chip>
+      <Chip variant="accent" size="lg">
+        Accent
+      </Chip>
+      <Chip variant="muted" size="lg">
+        Muted
+      </Chip>
+    </div>
+  </div>
+</div>
+
+## Imports
+
+```tsx
+import { Chip } from '@components/ui';
+```
+
+## Code
+
+```tsx
+// Variants
+
+<Chip variant="success">Success</Chip>
+<Chip variant="destructive">Destructive</Chip>
+<Chip variant="warning">Warning</Chip>
+<Chip variant="accent">Accent</Chip>
+<Chip variant="muted">Muted</Chip>
+
+// Examples
+
+<Chip variant="default" size="default">
+  Default
+</Chip>
+<Chip variant="success" size="xs">
+  Success
+</Chip>
+<Chip variant="destructive" size="sm">
+  Destructive
+</Chip>
+<Chip variant="warning" size="md">
+  Warning
+</Chip>
+<Chip variant="accent" size="lg">
+  Accent
+</Chip>
+<Chip variant="muted" size="lg">
+  Muted
+</Chip>
+```

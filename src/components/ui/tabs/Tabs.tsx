@@ -7,20 +7,21 @@ import { cn } from '@utils';
 type TabsListProps = ComponentPropsWithoutRef<typeof TabsPrimitive.List> & VariantProps<typeof tabsListVariants>;
 type TabsTriggerProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> & VariantProps<typeof tabsTriggerVariants>;
 type TabsContentProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Content>;
+type TabsProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Root>;
 
-type TabsComponent = typeof TabsPrimitive.Root & {
+type TabsComponent = FC<TabsProps> & {
   List: FC<TabsListProps>;
   Trigger: FC<TabsTriggerProps>;
   Content: FC<TabsContentProps>;
 };
 
-const tabsListVariants = cva('inline-flex items-center justify-center rounded-2xl p-1 gap-1', {
+const tabsListVariants = cva('flex items-center rounded-2xl p-1 gap-1 overflow-x-auto', {
   variants: {
     variant: {
-      default: 'bg-transparent text-foreground w-full border border-muted-200',
-      compact: 'w-auto',
+      default: 'bg-background text-foreground w-full border border-muted-200',
+      compact: 'w-fit bg-background border border-muted-200 text-foreground',
       plain: 'text-foreground bg-transparent',
-      compactPlain: 'w-auto text-foreground bg-transparent',
+      compactPlain: 'w-fit text-foreground bg-transparent',
     },
   },
   defaultVariants: {
@@ -37,7 +38,7 @@ const tabsTriggerVariants = cva(
   {
     variants: {
       variant: {
-        default: 'grow',
+        default: 'grow flex gap-1',
         fitContent: '',
       },
     },
@@ -56,10 +57,10 @@ const Trigger: FC<TabsTriggerProps> = ({ className, variant, ...props }) => (
 );
 
 const Content: FC<TabsContentProps> = ({ className, ...props }) => (
-  <TabsPrimitive.Content data-slot="tabs-content" className={cn('mt-2 focus-visible:outline-none', className)} {...props} />
+  <TabsPrimitive.Content data-slot="tabs-content" className={cn('mt-6 focus-visible:outline-none', className)} {...props} />
 );
 
-const Tabs: TabsComponent = TabsPrimitive.Root as unknown as TabsComponent;
+const Tabs: TabsComponent = (props) => <TabsPrimitive.Root data-slot="tabs" {...props} />;
 
 Tabs.List = List;
 Tabs.Trigger = Trigger;

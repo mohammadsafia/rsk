@@ -8,23 +8,25 @@ export type ChipVariants = VariantProps<typeof chipVariants>;
 export type ChipProps = ComponentPropsWithoutRef<'div'> & ChipVariants;
 
 export const chipVariants = cva(
-  'inline-flex items-center rounded-md border border-transparent transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow-sm font-semibold',
+  'inline-flex items-center rounded-lg border border-transparent transition-colors outline-hidden shadow-sm font-semibold cursor-default',
   {
     variants: {
       variant: {
-        default: 'bg-primary-25 text-primary hover:bg-accent/45',
-        success: 'bg-success-300 text-success hover:bg-success/45',
-        destructive: 'bg-destructive-300 text-destructive hover:bg-destructive/45',
-        warning: 'bg-warning-200 text-warning hover:bg-warning/45',
-        accent: 'bg-accent-200 text-accent hover:bg-accent/45',
-        muted: 'bg-muted-200 text-primary-900 hover:bg-muted/45',
+        default: 'bg-primary-25 text-primary hover:text-primary-foreground hover:bg-primary-400',
+        success: 'bg-success-200 text-success hover:text-success-foreground hover:bg-success-400',
+        destructive: 'bg-destructive-300 text-destructive hover:text-destructive-foreground hover:bg-destructive-400',
+        warning: 'bg-warning-200 text-warning hover:text-warning-foreground hover:bg-warning-400',
+        accent: 'bg-accent-200 text-accent hover:text-accent-foreground hover:bg-accent-400',
+        muted: 'bg-muted-200 text-foreground hover:text-muted-foreground hover:bg-muted-400',
       },
       size: {
         default: 'px-3 py-0.5 text-xs',
-        xs: 'px-2 py-0.5 text-2xs',
+        xxs: 'px-0.5 py-0.5 text-2xs leading-none',
+        xs: 'px-2 py-0.5 text-2xs leading-none',
         sm: 'px-2.5 py-1 text-sm',
         md: 'px-3 py-1.5 text-md',
         lg: 'px-3.5 py-2 text-lg',
+        unstyled: '',
       },
     },
     defaultVariants: {
@@ -34,8 +36,8 @@ export const chipVariants = cva(
   },
 );
 
-const Chip = ({ className, variant, size, ...props }: ChipProps) => {
-  return <div data-slot="chip" className={cn(chipVariants({ variant, size }), className)} {...props} />;
-};
+const Chip = ({ className, variant, size, ...props }: ChipProps) => (
+  <div data-slot="chip" className={cn(chipVariants({ variant, size }), className)} {...props} />
+);
 
 export default Chip;

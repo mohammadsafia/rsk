@@ -1,0 +1,47 @@
+---
+id: dropdown-menu
+title: DropdownMenu
+section: Components
+category: UI
+description: 'Context menu with items, checkboxes, and radio options.'
+tags: [ui, dropdown, menu]
+---
+
+import { DropdownMenu, Button } from '@components/ui';
+
+## Demo
+
+<DropdownMenu>
+  <DropdownMenu.Trigger asChild>
+    <Button variant="outline">Open Menu</Button>
+  </DropdownMenu.Trigger>
+  <DropdownMenu.Content className="w-56">
+    <DropdownMenu.Label>My Account</DropdownMenu.Label>
+    <DropdownMenu.Separator />
+    <DropdownMenu.Item>Profile</DropdownMenu.Item>
+    <DropdownMenu.Item>Settings</DropdownMenu.Item>
+    <DropdownMenu.Separator />
+    <DropdownMenu.Item>Logout</DropdownMenu.Item>
+  </DropdownMenu.Content>
+</DropdownMenu>
+
+## Imports
+
+```tsx
+import { DropdownMenu, Button } from '@components/ui';
+```
+
+## Code
+
+```tsx
+<DropdownMenu>
+  <DropdownMenu.Trigger asChild>
+    <Button>Open</Button>
+  </DropdownMenu.Trigger>
+  <DropdownMenu.Content>
+    <DropdownMenu.Label>Menu</DropdownMenu.Label>
+    <DropdownMenu.Item>Item 1</DropdownMenu.Item>
+    <DropdownMenu.Item>Item 2</DropdownMenu.Item>
+  </DropdownMenu.Content>
+</DropdownMenu>
+```

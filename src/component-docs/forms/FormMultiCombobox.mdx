@@ -1,0 +1,43 @@
+---
+id: form-multi-combobox
+title: FormMultiCombobox (Multi-select)
+section: Components
+category: Forms
+description: Multiple selection with badges and search.
+tags: [forms, multi-select, combobox]
+---
+
+import { FormMultiComboboxDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormMultiComboboxDemo />
+
+## Imports
+
+```tsx
+import { FormContainer, FormMultiCombobox } from '@components/forms';
+import { useForm } from 'react-hook-form';
+```
+
+## Code
+
+```tsx
+const form = useForm({ defaultValues: { skills: [] } });
+const skills = [
+  { id: 'js', name: 'JavaScript' },
+  { id: 'ts', name: 'TypeScript' },
+];
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormMultiCombobox
+    name="skills"
+    control={form.control}
+    label="Skills"
+    options={skills}
+    getOptionLabel={(o) => o.name}
+    getOptionValue={(o) => o.id}
+    placeholder="Select skills..."
+  />
+</FormContainer>;
+```

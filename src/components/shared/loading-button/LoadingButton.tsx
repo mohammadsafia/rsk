@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { type FC, forwardRef } from 'react';
 
 import { Button, type ButtonProps } from '@components/ui';
 import { Conditional } from '@components/utils';
@@ -11,24 +11,19 @@ export type LoadingButtonProps = ButtonProps & {
   loading?: boolean;
 };
 
-const LoadingButton = forwardRef<HTMLButtonElement, LoadingButtonProps>(
-  ({ className, loading = false, disabled, children, ...props }, ref) => {
-    return (
-      <Button className={cn(`gap relative`, className)} disabled={disabled ?? loading} ref={ref} {...props}>
-        <div role="button">
-          <span className={cn(loading ? 'opacity-0' : 'opacity-100', className)}>{children}</span>
+const LoadingButton: FC<LoadingButtonProps> = ({ ref, className, loading = false, disabled, children, ...props }) => (
+  <Button className={cn('gap relative', className)} disabled={disabled ?? loading} ref={ref} {...props}>
+    <div role="button">
+      <span className={cn(loading ? 'opacity-0' : 'opacity-100', className)}>{children}</span>
 
-          <Conditional.If condition={loading}>
-            <div className="absolute start-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <Loader2Icon className="animate-spin text-inherit" size={20} aria-label="loading" />
-            </div>
-          </Conditional.If>
+      <Conditional.If condition={loading}>
+        <div className="absolute inset-s-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <Loader2Icon className="animate-spin text-inherit" size={20} aria-label="loading" />
         </div>
-      </Button>
-    );
-  },
+      </Conditional.If>
+    </div>
+  </Button>
 );
 
-LoadingButton.displayName = 'LoadingButton';
-
-export default LoadingButton;
+// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
+export default forwardRef<HTMLButtonElement, LoadingButtonProps>((props, ref) => LoadingButton({ ...props, ref }));

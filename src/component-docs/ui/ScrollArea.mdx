@@ -1,0 +1,36 @@
+---
+id: scroll-area
+title: ScrollArea
+section: Components
+category: UI
+description: 'Custom styled scrollable area.'
+tags: [ui, scroll, scrollarea]
+---
+
+import { ScrollArea } from '@components/ui';
+
+## Demo
+
+<ScrollArea className="h-48 w-80 rounded-md border p-4">
+  <div className="space-y-2">
+    {Array.from({ length: 20 }).map((_, i) => (
+      <div key={i} className="text-sm">
+        Item {i + 1}
+      </div>
+    ))}
+  </div>
+</ScrollArea>
+
+## Imports
+
+```tsx
+import { ScrollArea } from '@components/ui';
+```
+
+## Code
+
+```tsx
+<ScrollArea className="h-48 w-80">
+  <div>Long scrollable content...</div>
+</ScrollArea>
+```

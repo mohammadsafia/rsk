@@ -1,0 +1,40 @@
+---
+id: form-basic
+title: Form (Input + Select)
+section: Components
+category: Forms
+description: Minimal form using react-hook-form and provided fields.
+tags: [forms, input, select]
+---
+
+import { FormBasicDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormBasicDemo />
+
+## Imports
+
+```tsx
+import { FormContainer, FormInput, FormSelect } from '@components/forms';
+import { useForm } from 'react-hook-form';
+```
+
+## Code
+
+```tsx
+import { Button } from '@components/ui';
+const form = useForm();
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormInput name="email" label="Email" />
+  <FormSelect
+    name="fruit"
+    control={form.control}
+    options={[{ id: 'apple', name: 'Apple' }]}
+    getOptionLabel={(o) => o.name}
+    getOptionValue={(o) => o.id}
+  />
+  <Button type="submit">Submit</Button>
+</FormContainer>;
+```

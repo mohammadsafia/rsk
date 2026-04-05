@@ -1,31 +1,27 @@
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 
-import DashboardHeader from '@layouts/dashboard-header';
-import DashboardSidebar from '@layouts/dashboard-sidebar';
-import { Loader, Toaster } from '@components/shared';
+import { PrimeLoader, Toaster } from '@components/shared';
 
-import { ThemeProvider } from '@contexts';
+import { DashboardHeader, DashboardSidebar } from '@layouts';
 
 function DashboardLayout() {
   return (
-    <ThemeProvider>
-      <div className="flex min-h-dvh flex-col flex-wrap md:flex-row md:flex-nowrap">
-        <DashboardSidebar />
+    <div className="bg-muted-100 flex h-dvh flex-col overflow-hidden md:flex-row">
+      <DashboardSidebar />
 
-        <div className="flex grow flex-col [&>*]:shrink-0">
-          <DashboardHeader />
+      <div className="flex h-dvh flex-1 flex-col overflow-hidden">
+        <DashboardHeader />
 
-          <main className="relative grow p-2 md:px-10 md:py-4">
-            <Suspense fallback={<Loader />}>
-              <Outlet />
-            </Suspense>
-          </main>
-        </div>
+        <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
+          <Suspense fallback={<PrimeLoader />}>
+            <Outlet />
+          </Suspense>
+        </main>
       </div>
 
       <Toaster />
-    </ThemeProvider>
+    </div>
   );
 }
 

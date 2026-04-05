@@ -1,0 +1,31 @@
+---
+id: form-daterange
+title: FormDateRange
+section: Components
+category: Forms
+description: Pick a date range.
+tags: [forms, date]
+---
+
+import { FormDateRangeDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormDateRangeDemo />
+
+## Imports
+
+```tsx
+import { FormContainer, FormDateRange } from '@components/forms';
+import { useForm } from 'react-hook-form';
+```
+
+## Code
+
+```tsx
+const form = useForm();
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormDateRange name="range" control={form.control} label="Range" />
+</FormContainer>;
+```

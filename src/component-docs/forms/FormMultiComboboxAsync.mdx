@@ -1,0 +1,44 @@
+---
+id: form-multi-combobox-async
+title: FormMultiCombobox (Async Multi-select with Infinite Scroll)
+section: Components
+category: Forms
+description: Async multi-select with backend API, infinite pagination, and debounced search.
+tags: [forms, multi-select, combobox, async, infinite-scroll, api]
+---
+
+import { FormMultiComboboxAsyncDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormMultiComboboxAsyncDemo />
+
+## Imports
+
+```tsx
+import { FormContainer, FormMultiCombobox } from '@components/forms';
+import { useForm } from 'react-hook-form';
+import { LookupService } from 'api';
+```
+
+## Code
+
+```tsx
+const form = useForm({ defaultValues: { userIds: [] } });
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormMultiCombobox
+    name="userIds"
+    control={form.control}
+    label="Users"
+    options={LookupService.users.request}
+    getOptionLabel={(o) => o.name || o.label || String(o)}
+    getOptionValue={(o) => o.id || String(o)}
+    placeholder="Search and select users..."
+    urlSearchParams={new URLSearchParams({ roles: 'admin,user' })}
+    debounceMs={500}
+    pageSize={20}
+    valueType="flat"
+  />
+</FormContainer>;
+```

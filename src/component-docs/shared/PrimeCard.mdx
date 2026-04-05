@@ -1,0 +1,41 @@
+---
+id: prime-card
+title: PrimeCard
+section: Components
+category: Shared
+description: 'Enhanced card with multiple variants and automatic header styling.'
+tags: [shared, prime-card, card, variants]
+---
+
+import { PrimeCard } from '@components/shared';
+import { Home, CheckCircle } from 'lucide-react';
+
+## Demo
+
+<div className="space-y-4">
+  <PrimeCard title="Default Card" icon={<Home size={20} />} variant="default">
+    Card content goes here
+  </PrimeCard>
+
+<PrimeCard title="Success Card" icon={<CheckCircle size={20} />} variant="success">
+  Operation completed successfully
+</PrimeCard>
+
+  <PrimeCard title="Elevated Card" variant="elevated">
+    With shadow elevation
+  </PrimeCard>
+</div>
+
+## Imports
+
+```tsx
+import { PrimeCard } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<PrimeCard title="Card Title" icon={<Icon />} variant="default | primary | success | danger | warning | info | elevated | glass">
+  Content
+</PrimeCard>
+```

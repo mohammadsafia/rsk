@@ -1,0 +1,31 @@
+---
+id: form-time-picker
+title: FormTimePicker
+section: Components
+category: Forms
+description: 'Time picker field.'
+tags: [forms, time, picker]
+---
+
+import { FormTimePickerDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormTimePickerDemo />
+
+## Imports
+
+```tsx
+import { FormContainer, FormTimePicker } from '@components/forms';
+import { useForm } from 'react-hook-form';
+```
+
+## Code
+
+```tsx
+const form = useForm();
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormTimePicker name="time" control={form.control} label="Time" />
+</FormContainer>;
+```

@@ -26,22 +26,23 @@ function FilterChipList({ chips, onRemoveChip, maxVisibleChips = MAX_VISIBLE_CHI
 
   return (
     <>
-      <Divider orientation="vertical" className="mx-0.5 h-4" />
+      <Divider orientation="vertical" />
 
       <div className="flex items-center gap-2">
         {visibleChips.map((chip) => (
-          <span key={chip.value} className="text-2xs text-muted-400 flex items-center gap-0.5 font-normal">
+          <span key={chip.value} className="text-2xs text-muted-400 flex items-center gap-1">
             {chip.label}
 
             <MinusCircle
-              className="text-muted-400 hover:text-error-500 size-4 cursor-pointer"
+              size={12}
+              className="text-muted-400 hover:text-destructive cursor-pointer transition-colors"
               onClick={(e) => onRemoveChip(chip.value, e)}
             />
           </span>
         ))}
 
         <Conditional.If condition={overflowCount > 0}>
-          <span className="text-2xs text-primary-900 font-normal">+{overflowCount}</span>
+          <span className="bg-primary-15 rounded-full p-0.5 leading-none">+{overflowCount}</span>
         </Conditional.If>
       </div>
     </>

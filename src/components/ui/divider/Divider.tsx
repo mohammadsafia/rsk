@@ -12,7 +12,7 @@ export const dividerVariants = cva('border-0 m-0', {
   variants: {
     orientation: {
       horizontal: 'h-px w-full',
-      vertical: 'w-px h-full',
+      vertical: 'w-px h-[stretch]',
     },
     variant: {
       solid: 'bg-muted-200',

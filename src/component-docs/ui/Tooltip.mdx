@@ -1,0 +1,40 @@
+---
+id: tooltip
+title: Tooltip
+section: Components
+category: UI
+description: 'Contextual hints on hover or focus.'
+tags: [ui, tooltip, feedback]
+---
+
+import { Tooltip, Button } from '@components/ui';
+
+## Demo
+
+<Tooltip.Provider>
+  <Tooltip>
+    <Tooltip.Trigger asChild>
+      <Button variant="secondary">Hover me</Button>
+    </Tooltip.Trigger>
+    <Tooltip.Content>Helpful hint</Tooltip.Content>
+  </Tooltip>
+</Tooltip.Provider>
+
+## Imports
+
+```tsx
+import { Tooltip, Button } from '@components/ui';
+```
+
+## Code
+
+```tsx
+<Tooltip.Provider>
+  <Tooltip>
+    <Tooltip.Trigger asChild>
+      <Button>Hover me</Button>
+    </Tooltip.Trigger>
+    <Tooltip.Content>Helpful hint</Tooltip.Content>
+  </Tooltip>
+</Tooltip.Provider>
+```

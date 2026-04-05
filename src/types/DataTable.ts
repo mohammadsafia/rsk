@@ -3,13 +3,7 @@ import '@tanstack/react-table';
 import type { RowData, ColumnSort } from '@tanstack/react-table';
 
 import type { AsyncOptionsFn } from '@hooks/shared';
-
-export type Pagination = {
-  page: number;
-  total: number;
-  totalPages: number;
-  pageSize: number;
-};
+import type { Pagination } from 'types/api';
 
 export type ExtendedSortingState<TData extends Record<string, unknown>> = Array<
   Omit<ColumnSort, 'id'> & { id: Extract<keyof TData, string> }
@@ -42,5 +36,12 @@ declare module '@tanstack/table-core' {
   interface ColumnMeta<TData extends RowData, TValue> {
     label?: string;
     filterMeta?: DataTableFilterMeta;
+    // TODO: this will be removed after the migration to the new component
+    autoComplete?: {
+      queryKey: string[];
+      request: (params: string) => Promise<PaginatedResult<unknown>>;
+      optionValue: (option: unknown) => string;
+      optionLabel: (option: unknown) => string;
+    };
   }
 }

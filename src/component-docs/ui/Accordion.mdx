@@ -1,0 +1,42 @@
+---
+id: accordion
+title: Accordion
+section: Components
+category: UI
+description: 'Expandable content panels.'
+tags: [ui, accordion, disclosure]
+---
+
+import { Accordion } from '@components/ui';
+
+## Demo
+
+<Accordion type="single" collapsible className="w-80">
+    <Accordion.Item value="item-1">
+        <Accordion.Trigger>Section 1</Accordion.Trigger>
+        <Accordion.Content>Content for section 1.</Accordion.Content>
+    </Accordion.Item>
+
+    <Accordion.Item value="item-2">
+        <Accordion.Trigger>Section 2</Accordion.Trigger>
+        <Accordion.Content>Content for section 2.</Accordion.Content>
+    </Accordion.Item>
+
+</Accordion>
+
+## Imports
+
+```tsx
+import { Accordion } from '@components/ui';
+```
+
+## Code
+
+```tsx
+<Accordion type="single" collapsible>
+  <Accordion.Item value="item-1">
+    <Accordion.Trigger>Section 1</Accordion.Trigger>
+    <Accordion.Content>Content here</Accordion.Content>
+  </Accordion.Item>
+</Accordion>
+```

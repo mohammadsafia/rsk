@@ -1,0 +1,47 @@
+---
+id: action-panel
+title: ActionPanel
+section: Components
+category: Shared
+description: Container for page actions with header and action buttons.
+tags: [shared, action-panel, header, actions]
+---
+
+import { Home, Settings, Plus } from 'lucide-react';
+import { ActionPanel } from '@components/shared';
+
+## Demo
+
+<ActionPanel>
+  <ActionPanel.Header>
+    <Home size={20} />
+    Dashboard
+  </ActionPanel.Header>
+  <ActionPanel.Actions>
+    <ActionPanel.Action icon={<Plus size={16} />} title="Add New">
+      Add
+    </ActionPanel.Action>
+    <ActionPanel.Action icon={<Settings size={16} />} title="Settings" variant="secondary">
+      Settings
+    </ActionPanel.Action>
+  </ActionPanel.Actions>
+</ActionPanel>
+
+## Imports
+
+```tsx
+import { ActionPanel } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<ActionPanel>
+  <ActionPanel.Header>Page Title</ActionPanel.Header>
+  <ActionPanel.Actions>
+    <ActionPanel.Action icon={<Icon />} title="Action">
+      Action
+    </ActionPanel.Action>
+  </ActionPanel.Actions>
+</ActionPanel>
+```

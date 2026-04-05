@@ -8,13 +8,7 @@ type FormSubmitButton = LoadingButtonProps & {
 
 function FormSubmitButton({ className, size = 'default', textContent = 'Save', variant = 'default', ...props }: FormSubmitButton) {
   return (
-    <LoadingButton
-      className={cn('block w-fit max-lg:mx-auto lg:ms-auto', className)}
-      variant={variant}
-      size={size}
-      type="submit"
-      {...props}
-    >
+    <LoadingButton className={cn('block w-fit', className)} variant={variant} size={size} type="submit" {...props}>
       {textContent}
     </LoadingButton>
   );

@@ -10,7 +10,7 @@ import { cn } from '@utils';
 
 import { XIcon } from 'lucide-react';
 
-import type { ControlledFieldBaseProps, FormSelectOption } from '@app-types';
+import type { ControlledFieldBaseProps, FormSelectOption, ResolvedOption } from '@app-types';
 
 type FormSelectProps<TFieldValues extends FieldValues, TOption = FormSelectOption> = ControlledFieldBaseProps<
   TFieldValues,
@@ -21,9 +21,9 @@ type FormSelectProps<TFieldValues extends FieldValues, TOption = FormSelectOptio
   placeholder?: string;
   valueType?: 'flat' | 'contain';
   noOptionsText?: string;
-  getOptionLabel(option: TOption): string;
-  getOptionValue(option: TOption): string;
-  optionMapper?(option: TOption): TOption;
+  getOptionLabel(option: ResolvedOption<TOption>): string;
+  getOptionValue(option: ResolvedOption<TOption>): string;
+  optionMapper?(option: ResolvedOption<TOption>): ResolvedOption<TOption>;
 };
 
 function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption>({
@@ -76,16 +76,20 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
             <div className="relative">
               <Select value={internalValue ?? ''} onValueChange={onValueChange} {...field} {...props}>
                 <Select.Trigger
-                  ref={ref as React.Ref<HTMLButtonElement>}
+                  ref={ref}
                   id={name}
-                  error={!!error}
-                  className={cn('text-start', className)}
-                  disabled={props.disabled}
+                  className={cn(
+                    !!error &&
+                      'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive text-destructive ps-8',
+                    className,
+                  )}
+                  disabled={field.disabled || props.disabled}
                 >
                   <Select.Value placeholder={placeholder} />
 
-                  <Conditional.If condition={!!internalValue && internalValue !== '' && !props.disabled}>
+                  <Conditional.If condition={!!internalValue && !field.disabled && !props.disabled}>
                     <TooltipButton
+                      asChild
                       title="Clear"
                       variant="ghost-muted-destructive"
                       size="unstyled"
@@ -99,22 +103,19 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
                       <XIcon size={16} />
                     </TooltipButton>
                   </Conditional.If>
+
+                  <Select.Icon />
                 </Select.Trigger>
 
                 <Select.Content position="popper">
-                  <Select.Item
-                    aria-hidden="true"
-                    className={cn('cursor-pointer', mappedOptions.length > 0 && 'hidden')}
-                    value="none"
-                    disabled
-                  >
-                    {noOptionsText}
+                  <Select.Item className={cn(mappedOptions.length > 0 && 'hidden')} aria-hidden="true" value="none" disabled>
+                    <Select.Text>{noOptionsText}</Select.Text>
                   </Select.Item>
 
                   {mappedOptions.map((option) => (
                     <Fragment key={getOptionValue(option)}>
-                      <Select.Item value={getOptionValue(option)} className="cursor-pointer">
-                        {getOptionLabel(option)}
+                      <Select.Item value={getOptionValue(option)}>
+                        <Select.Text>{getOptionLabel(option)}</Select.Text>
                       </Select.Item>
                     </Fragment>
                   ))}

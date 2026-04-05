@@ -2,7 +2,6 @@ import { type TextareaHTMLAttributes, useId } from 'react';
 import { type FieldValues, useController, useFormContext } from 'react-hook-form';
 
 import { FormControl, FormLabel, FormMessage } from '@components/forms';
-import { Textarea } from '@components/ui';
 
 import { cn } from '@utils';
 
@@ -33,18 +32,24 @@ function FormTextarea<TFieldValues extends FieldValues>({
       </FormLabel>
 
       <div className="relative">
-        <Textarea
+        <textarea
           id={id}
+          data-slot="textarea"
           className={cn(
-            {
-              'border-destructive hover:ring-destructive focus-visible:ring-destructive ps-8': !!error,
-            },
+            'border-muted-200 bg-background flex field-sizing-content w-full resize-y rounded-md border p-3 text-sm shadow-xs transition-[color,box-shadow] outline-none',
+            'placeholder:text-muted',
+            'hover:not-disabled:border-primary hover:not-disabled:ring-primary hover:not-disabled:ring',
+            'focus-visible:ring-primary focus-visible:border-primary focus-visible:ring',
+            'disabled:bg-muted-50 disabled:text-muted-300 disabled:placeholder:text-muted-300 disabled:pointer-events-none disabled:field-sizing-fixed',
+            error &&
+              'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive placeholder:text-destructive ps-8',
             className,
           )}
           {...register(name)}
           {...props}
         />
-        <FormMessage className={cn('top-5', errorClassName)} hidden={!error} error={error!} />
+
+        <FormMessage className={cn('inset-bs-6', errorClassName)} hidden={!error} error={error!} />
       </div>
     </FormControl>
   );

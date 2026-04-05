@@ -66,14 +66,15 @@ const Trigger: FC<TriggerProps> = ({ children, ...props }) => (
 
 const Panel: FC<PanelProps> = ({ dismissible = false, className, children, ...props }) => (
   <Dialog.Panel
-    className={cn('py-0 md:max-w-[800px]', className)}
+    className={cn('py-0 md:max-w-200', className)}
+    aria-describedby={undefined}
     onInteractOutside={(e) => !dismissible && e.preventDefault()}
     onEscapeKeyDown={(e) => !dismissible && e.preventDefault()}
     {...props}
   >
     <Dialog.Close
       aria-label="Close"
-      className="absolute end-4 top-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
+      className="absolute inset-e-4 top-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
     >
       <X size={18} />
     </Dialog.Close>

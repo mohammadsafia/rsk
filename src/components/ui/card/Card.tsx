@@ -47,11 +47,11 @@ const Header: FC<CardHeaderProps> = ({ className, ...props }) => (
 );
 
 const Title: FC<CardTitleProps> = ({ className, ...props }) => (
-  <h3 data-slot="card-title" className={cn('text-primary-900 text-xl leading-none font-bold', className)} {...props} />
+  <h3 data-slot="card-title" className={cn('text-xl leading-none font-bold', className)} {...props} />
 );
 
 const Description: FC<CardDescriptionProps> = ({ className, ...props }) => (
-  <p data-slot="card-description" className={cn('text-muted text-sm', className)} {...props} />
+  <p data-slot="card-description" className={cn('text-muted-400 text-xs', className)} {...props} />
 );
 
 const Content: FC<CardContentProps> = ({ className, ...props }) => (

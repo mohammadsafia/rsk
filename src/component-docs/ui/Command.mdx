@@ -1,0 +1,66 @@
+---
+id: command
+title: Command
+section: Components
+category: UI
+description: 'Autocomplete field with searchable options.'
+tags: [ui, command, autocomplete, combobox]
+---
+
+import { CommandAutocompleteDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<CommandAutocompleteDemo />
+
+## Imports
+
+```tsx
+import { Command, Popover, Button } from '@components/ui';
+import { Check, ChevronsUpDown } from 'lucide-react';
+```
+
+## Code
+
+```tsx
+const [open, setOpen] = useState(false);
+const [value, setValue] = useState('');
+
+const frameworks = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'angular', label: 'Angular' },
+];
+
+<Popover open={open} onOpenChange={setOpen}>
+  <Popover.Trigger asChild>
+    <Button variant="outline" role="combobox" aria-expanded={open}>
+      {value ? frameworks.find((f) => f.value === value)?.label : 'Select...'}
+      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+    </Button>
+  </Popover.Trigger>
+  <Popover.Content className="w-[200px] p-0">
+    <Command>
+      <Command.Input placeholder="Search..." />
+      <Command.List>
+        <Command.Empty>No results found.</Command.Empty>
+        <Command.Group>
+          {frameworks.map((framework) => (
+            <Command.Item
+              key={framework.value}
+              value={framework.label}
+              onSelect={() => {
+                setValue(framework.value === value ? '' : framework.value);
+                setOpen(false);
+              }}
+            >
+              <Check className={`mr-2 h-4 w-4 ${value === framework.value ? 'opacity-100' : 'opacity-0'}`} />
+              {framework.label}
+            </Command.Item>
+          ))}
+        </Command.Group>
+      </Command.List>
+    </Command>
+  </Popover.Content>
+</Popover>;
+```

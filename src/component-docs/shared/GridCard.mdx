@@ -1,0 +1,57 @@
+---
+id: grid-card
+title: GridCard
+section: Components
+category: Shared
+description: 'Flexible grid layout wrapper for card-based layouts with consistent spacing.'
+tags: [shared, grid, card, layout]
+---
+
+import { GridCard } from '@components/shared';
+
+## Demo
+
+<GridCard.List className="grid-cols-2 gap-4">
+  <GridCard.Item>
+    <GridCard.Header>
+      <GridCard.Title>Card 1</GridCard.Title>
+      <GridCard.Description>First card description</GridCard.Description>
+    </GridCard.Header>
+
+    <GridCard.Content>
+      <p className="text-sm text-muted-foreground">Content area</p>
+    </GridCard.Content>
+  </GridCard.Item>
+
+  <GridCard.Item>
+    <GridCard.Header>
+      <GridCard.Title>Card 2</GridCard.Title>
+      <GridCard.Description>Second card description</GridCard.Description>
+    </GridCard.Header>
+
+    <GridCard.Content>
+      <p className="text-sm text-muted-foreground">Content area</p>
+    </GridCard.Content>
+  </GridCard.Item>
+</GridCard.List>
+
+## Imports
+
+```tsx
+import { GridCard } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<GridCard.List className="grid-cols-3 gap-4">
+  <GridCard.Item>
+    <GridCard.Header>
+      <GridCard.Title>Title</GridCard.Title>
+      <GridCard.Description>Description</GridCard.Description>
+    </GridCard.Header>
+    <GridCard.Content>Content</GridCard.Content>
+    <GridCard.Footer>Footer</GridCard.Footer>
+  </GridCard.Item>
+</GridCard.List>
+```

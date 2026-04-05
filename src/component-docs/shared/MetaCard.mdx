@@ -1,0 +1,30 @@
+---
+id: meta-card
+title: MetaCard
+section: Components
+category: Shared
+description: 'Card for displaying metadata with optional image, loading state, and flexible content.'
+tags: [shared, meta-card, card, metadata]
+---
+
+import { MetaCard } from '@components/shared';
+
+## Demo
+
+<div className="space-y-4">
+  <MetaCard title="User Name" subtitle="Role" description="john.doe@example.com" />
+  <MetaCard title="Status" subtitle="Active" imageURL="https://via.placeholder.com/100" />
+  <MetaCard title="Loading" isLoading />
+</div>
+
+## Imports
+
+```tsx
+import { MetaCard } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<MetaCard title="Title" subtitle="Subtitle" description="Description" imageURL="url" isLoading={false} />
+```

@@ -31,12 +31,12 @@ type ToastComponent = FC<ToastProps> & {
 const viewportVariants = cva('fixed z-100 w-full md:max-w-max', {
   variants: {
     position: {
-      'top-start': 'top-20 start-3',
-      'top-center': 'top-20 start-1/2 -translate-x-1/2',
-      'top-end': 'top-20 end-3',
-      'bottom-start': 'bottom-2 start-3',
-      'bottom-center': 'bottom-2 start-1/2 -translate-x-1/2',
-      'bottom-end': 'bottom-2 end-3',
+      'top-start': 'top-20 inset-s-3',
+      'top-center': 'top-20 inset-s-1/2 -translate-x-1/2',
+      'top-end': 'top-20 inset-e-3',
+      'bottom-start': 'bottom-2 inset-s-3',
+      'bottom-center': 'bottom-2 inset-s-1/2 -translate-x-1/2',
+      'bottom-end': 'bottom-2 inset-e-3',
     },
   },
   defaultVariants: {
@@ -88,7 +88,11 @@ const ToastTitle = ({ className, ...props }: ToastTitleProps) => (
 );
 
 const ToastDescription = ({ className, ...props }: ToastDescriptionProps) => (
-  <ToastPrimitives.Description data-slot="toast-description" className={cn('text-sm opacity-90', className)} {...props} />
+  <ToastPrimitives.Description
+    data-slot="toast-description"
+    className={cn('text-sm whitespace-pre-line opacity-90 select-text md:max-w-[30dvw]', className)}
+    {...props}
+  />
 );
 
 const ToastClose = ({ className, ...props }: ToastCloseProps) => (
@@ -96,7 +100,7 @@ const ToastClose = ({ className, ...props }: ToastCloseProps) => (
     aria-label="Close"
     data-slot="toast-close"
     className={cn(
-      'absolute end-2 top-2 cursor-pointer rounded-md p-1 text-inherit opacity-0',
+      'absolute inset-e-2 top-2 cursor-pointer rounded-md p-1 text-inherit opacity-0',
       'transition-opacity group-hover:opacity-100 focus:opacity-100 focus:outline-none',
       className,
     )}
@@ -134,7 +138,7 @@ const ToastAction = ({ className, ...props }: ToastActionProps) => (
 const Toast: ToastComponent = ({ className, variant, position, children, ...props }: ToastProps) => {
   return (
     <ToastContext.Provider value={{ variant, position }}>
-      <ToastPrimitives.Root data-slot="toast" className={cn(toastVariants({ variant, position }), className)} {...props}>
+      <ToastPrimitives.Root data-slot="toast" className={cn('outline-none', toastVariants({ variant, position }), className)} {...props}>
         {children}
       </ToastPrimitives.Root>
     </ToastContext.Provider>

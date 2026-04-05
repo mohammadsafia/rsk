@@ -1,0 +1,85 @@
+---
+id: avatar
+title: Avatar
+section: Components
+category: UI
+description: 'User profile image with fallback support and different sizes.'
+tags: [ui, avatar, image]
+---
+
+import { Avatar } from '@components/ui';
+import { User } from 'lucide-react';
+
+## Demo
+
+<div className="space-y-4">
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">With Image</p>
+    <div className="flex gap-2">
+      <Avatar className="h-8 w-8">
+        <Avatar.Image src="https://github.com/shadcn.png" alt="User" />
+        <Avatar.Fallback>SM</Avatar.Fallback>
+      </Avatar>
+
+      <Avatar>
+        <Avatar.Image src="https://github.com/shadcn.png" alt="User" />
+        <Avatar.Fallback>MD</Avatar.Fallback>
+      </Avatar>
+
+      <Avatar className="h-12 w-12">
+        <Avatar.Image src="https://github.com/shadcn.png" alt="User" />
+        <Avatar.Fallback>LG</Avatar.Fallback>
+      </Avatar>
+    </div>
+
+  </div>
+
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Fallback (Text & Icon)</p>
+    <div className="flex gap-2">
+      <Avatar>
+        <Avatar.Image alt="User" />
+        <Avatar.Fallback>JD</Avatar.Fallback>
+      </Avatar>
+
+      <Avatar>
+        <Avatar.Image alt="User" />
+        <Avatar.Fallback>
+          <User size={16} />
+        </Avatar.Fallback>
+      </Avatar>
+    </div>
+
+  </div>
+</div>
+
+## Imports
+
+```tsx
+import { Avatar } from '@components/ui';
+import { User } from 'lucide-react';
+```
+
+## Code
+
+```tsx
+// With Image
+<Avatar>
+  <Avatar.Image src="..." alt="User" />
+  <Avatar.Fallback>CN</Avatar.Fallback>
+</Avatar>
+
+// Custom Size
+<Avatar className="h-12 w-12">
+  <Avatar.Image src="..." alt="User" />
+  <Avatar.Fallback>LG</Avatar.Fallback>
+</Avatar>
+
+// Icon Fallback
+<Avatar>
+  <Avatar.Image alt="User" />
+  <Avatar.Fallback>
+    <User />
+  </Avatar.Fallback>
+</Avatar>
+```

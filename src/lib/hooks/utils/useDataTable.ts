@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
   type ColumnSort,
@@ -34,18 +34,18 @@ type UseDataTableProps<TData extends Record<string, unknown>> = Omit<
   'initialState' | 'pageCount' | 'getCoreRowModel' | 'manualFiltering' | 'manualPagination' | 'manualSorting' | 'onSortingChange'
 > &
   Required<Pick<TableOptions<TData>, 'pageCount'>> & {
-  initialState?: Omit<Partial<TableState>, 'sorting'> & {
-    sorting?: ColumnSort[];
+    initialState?: Omit<Partial<TableState>, 'sorting'> & {
+      sorting?: ColumnSort[];
+    };
+    history?: 'push' | 'replace';
+    debounceMs?: number;
+    throttleMs?: number;
+    clearOnDefault?: boolean;
+    shallow?: boolean;
+    scroll?: boolean;
+    startTransition?: React.TransitionStartFunction;
+    onSortingChange?: (updaterOrValue: Updater<ColumnSort[]>) => void;
   };
-  history?: 'push' | 'replace';
-  debounceMs?: number;
-  throttleMs?: number;
-  clearOnDefault?: boolean;
-  shallow?: boolean;
-  scroll?: boolean;
-  startTransition?: React.TransitionStartFunction;
-  onSortingChange?: (updaterOrValue: Updater<ColumnSort[]>) => void;
-};
 
 export const useDataTable = <TData extends Record<string, unknown>>(props: UseDataTableProps<TData>) => {
   const {
@@ -114,7 +114,7 @@ export const useDataTable = <TData extends Record<string, unknown>>(props: UseDa
 
   const [sorting, setSorting] = useQueryState(
     SORT_KEY,
-    getSortingStateParser(columnIds)
+    getSortingStateParser<TData>(columnIds)
       .withOptions(queryStateOptions)
       .withDefault(initialState?.sorting ?? []),
   );

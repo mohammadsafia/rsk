@@ -1,0 +1,36 @@
+---
+id: form-control
+title: FormControl
+section: Components
+category: Forms
+description: 'Simple wrapper for consistent spacing between form fields.'
+tags: [forms, control, layout]
+---
+
+import { FormControl, FormInput } from '@components/forms';
+
+## Demo
+
+<div className="w-64 space-y-2">
+  <FormControl>
+    <p className="text-sm text-muted-foreground">Field inside FormControl</p>
+  </FormControl>
+
+  <FormControl>
+    <p className="text-sm text-muted-foreground">Another field</p>
+  </FormControl>
+</div>
+
+## Imports
+
+```tsx
+import { FormControl } from '@components/forms';
+```
+
+## Code
+
+```tsx
+<FormControl>
+  {/* Form field content */}
+</FormControl>
+```

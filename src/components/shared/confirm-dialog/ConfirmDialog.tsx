@@ -182,13 +182,13 @@ function ConfirmDialog({
       >
         <Dialog.Close
           aria-label="Close"
-          className="absolute end-4 top-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
+          className="absolute inset-e-4 top-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
         >
           <X size={18} />
         </Dialog.Close>
 
         <Conditional.If condition={!!title}>
-          <Dialog.Header className="flex flex-col items-center gap-y-1.5">
+          <Dialog.Header className="flex flex-col items-center gap-y-1.5 text-center">
             <Icon className={confirmDialogIconVariants({ variant })} size={48} />
 
             <Dialog.Title>{title}</Dialog.Title>

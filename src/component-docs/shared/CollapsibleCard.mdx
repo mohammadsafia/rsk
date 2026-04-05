@@ -1,0 +1,230 @@
+---
+id: collapsible-card
+title: CollapsibleCard
+section: Components
+category: Shared
+description: Card component with collapsible content and built-in variants. Includes TriggerIcon with default chevron.
+tags: [shared, collapsible-card, card, collapse, variants, trigger-icon]
+---
+
+import { CollapsibleCard } from '@components/shared';
+import { Collapsible } from '@components/ui';
+import { Card } from '@components/ui';
+import { Plus, User, Settings, ChevronDown } from 'lucide-react';
+
+## Demo
+
+<div className="grid grow gap-4">
+  {/* Using primitive Collapsible + Card components (before CollapsibleCard) */}
+  <Collapsible>
+    <Card>
+      <Card.Header>
+        <Card.Title>
+          <Collapsible.Trigger>
+            Primitive Components Example
+            {/* No built-in TriggerIcon - you need to add your own icon */}
+          </Collapsible.Trigger>
+        </Card.Title>
+      </Card.Header>
+      <Collapsible.Content>
+        <Card.Content>This shows how you'd build it with primitive components before CollapsibleCard existed.</Card.Content>
+      </Collapsible.Content>
+    </Card>
+  </Collapsible>
+
+  {/* Using CollapsibleCard component with clickable title and default TriggerIcon */}
+  <CollapsibleCard>
+    <CollapsibleCard.Header>
+      <CollapsibleCard.Trigger className="flex w-full items-center justify-between">
+        <CollapsibleCard.Title>Default Trigger Icon</CollapsibleCard.Title>
+
+        <CollapsibleCard.TriggerIcon />
+      </CollapsibleCard.Trigger>
+    </CollapsibleCard.Header>
+
+    <CollapsibleCard.Content>
+      The entire header (title + icon) is clickable. Icon uses default ChevronDown with rotation animation.
+    </CollapsibleCard.Content>
+  </CollapsibleCard>
+
+  {/* TriggerIcon with custom children and clickable title */}
+  <CollapsibleCard variant="primary">
+    <CollapsibleCard.Header>
+      <CollapsibleCard.Trigger className="flex w-full items-center justify-between">
+        <CollapsibleCard.Title>Custom Icon Override</CollapsibleCard.Title>
+
+        <CollapsibleCard.TriggerIcon>
+          <Plus className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-45" />
+        </CollapsibleCard.TriggerIcon>
+      </CollapsibleCard.Trigger>
+    </CollapsibleCard.Header>
+
+    <CollapsibleCard.Content>
+      Override the default icon by passing children to TriggerIcon. Entire header is clickable.
+    </CollapsibleCard.Content>
+  </CollapsibleCard>
+
+  {/* Custom text as TriggerIcon children */}
+  <CollapsibleCard variant="success">
+    <CollapsibleCard.Header>
+      <CollapsibleCard.Title>Text Trigger</CollapsibleCard.Title>
+
+      <CollapsibleCard.Trigger>
+        <CollapsibleCard.TriggerIcon>
+          <span className="text-sm font-medium group-data-[state=open]:hidden">Show</span>
+
+          <span className="hidden text-sm font-medium group-data-[state=open]:inline">Hide</span>
+        </CollapsibleCard.TriggerIcon>
+      </CollapsibleCard.Trigger>
+    </CollapsibleCard.Header>
+
+    <CollapsibleCard.Content>You can even use text or any React element as the trigger.</CollapsibleCard.Content>
+  </CollapsibleCard>
+
+  {/* With title and icon in trigger - icon at the end */}
+  <CollapsibleCard variant="primary" defaultOpen={true}>
+    <CollapsibleCard.Header>
+      <CollapsibleCard.Trigger className="flex w-full items-center gap-2">
+        <User size={24} />
+
+        <CollapsibleCard.Title>User Profile</CollapsibleCard.Title>
+
+        <CollapsibleCard.TriggerIcon className="ms-auto" />
+      </CollapsibleCard.Trigger>
+    </CollapsibleCard.Header>
+
+    <CollapsibleCard.Content>
+      <div className="space-y-3">
+        <div>
+          <p className="text-sm font-medium">Name</p>
+
+          <p className="text-muted text-sm">John Doe</p>
+        </div>
+        <div>
+          <p className="text-sm font-medium">Email</p>
+
+          <p className="text-muted text-sm">john@example.com</p>
+        </div>
+      </div>
+    </CollapsibleCard.Content>
+
+    <CollapsibleCard.Footer className="flex justify-between gap-4">
+      <button className="text-primary text-sm hover:underline">Edit</button>
+
+      <button className="text-destructive text-sm hover:underline">Delete</button>
+    </CollapsibleCard.Footer>
+  </CollapsibleCard>
+
+  {/* Glass variant with custom compound icon */}
+  <CollapsibleCard variant="glass">
+    <CollapsibleCard.Header>
+      <div className="flex items-center gap-3">
+        <Settings className="text-primary h-5 w-5" />
+
+        <CollapsibleCard.Title>Settings</CollapsibleCard.Title>
+      </div>
+
+      <CollapsibleCard.Trigger>
+        <CollapsibleCard.TriggerIcon>
+          <div className="flex items-center gap-1">
+            <ChevronDown className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+          </div>
+        </CollapsibleCard.TriggerIcon>
+      </CollapsibleCard.Trigger>
+    </CollapsibleCard.Header>
+
+    <CollapsibleCard.Content>
+      <div className="space-y-2">
+        <div className="text-sm">Option 1: Enabled</div>
+
+        <div className="text-sm">Option 2: Disabled</div>
+
+        <div className="text-sm">Option 3: Pending</div>
+      </div>
+    </CollapsibleCard.Content>
+  </CollapsibleCard>
+</div>
+
+## Imports
+
+```tsx
+import { CollapsibleCard } from '@components/shared';
+```
+
+## Code
+
+```tsx
+// Basic usage with clickable title and default TriggerIcon
+<CollapsibleCard>
+  <CollapsibleCard.Header>
+    <CollapsibleCard.Trigger className="flex w-full items-center justify-between">
+      <CollapsibleCard.Title>Title</CollapsibleCard.Title>
+      <CollapsibleCard.TriggerIcon />
+    </CollapsibleCard.Trigger>
+  </CollapsibleCard.Header>
+  <CollapsibleCard.Content>
+    Content here
+  </CollapsibleCard.Content>
+</CollapsibleCard>
+
+// Override TriggerIcon with custom icon and clickable title
+<CollapsibleCard variant="primary">
+  <CollapsibleCard.Header>
+    <CollapsibleCard.Trigger className="flex w-full items-center justify-between">
+      <CollapsibleCard.Title>Title</CollapsibleCard.Title>
+      <CollapsibleCard.TriggerIcon>
+        <Plus className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-45" />
+      </CollapsibleCard.TriggerIcon>
+    </CollapsibleCard.Trigger>
+  </CollapsibleCard.Header>
+  <CollapsibleCard.Content>Content</CollapsibleCard.Content>
+</CollapsibleCard>
+
+// Another custom icon example
+<CollapsibleCard variant="warning">
+  <CollapsibleCard.Header>
+    <CollapsibleCard.Title>Title</CollapsibleCard.Title>
+    <CollapsibleCard.Trigger>
+      <CollapsibleCard.TriggerIcon>
+        <Plus className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+      </CollapsibleCard.TriggerIcon>
+    </CollapsibleCard.Trigger>
+  </CollapsibleCard.Header>
+  <CollapsibleCard.Content>Content</CollapsibleCard.Content>
+</CollapsibleCard>
+
+// TriggerIcon with text or custom elements
+<CollapsibleCard variant="success">
+  <CollapsibleCard.Header>
+    <CollapsibleCard.Title>Title</CollapsibleCard.Title>
+    <CollapsibleCard.Trigger>
+      <CollapsibleCard.TriggerIcon>
+        <span>Show/Hide</span>
+      </CollapsibleCard.TriggerIcon>
+    </CollapsibleCard.Trigger>
+  </CollapsibleCard.Header>
+  <CollapsibleCard.Content>Content</CollapsibleCard.Content>
+</CollapsibleCard>
+
+// Everything in the trigger - icon pushed to the end
+<CollapsibleCard variant="info">
+  <CollapsibleCard.Header>
+    <CollapsibleCard.Trigger className="flex w-full items-center gap-2">
+      <Icon className="h-5 w-5" />
+      <CollapsibleCard.Title>Clickable Title</CollapsibleCard.Title>
+      <CollapsibleCard.TriggerIcon className="ml-auto" />
+    </CollapsibleCard.Trigger>
+  </CollapsibleCard.Header>
+  <CollapsibleCard.Content>Content</CollapsibleCard.Content>
+</CollapsibleCard>
+
+// Controlled state
+<CollapsibleCard open={isOpen} onOpenChange={setIsOpen}>
+  ...
+</CollapsibleCard>
+
+// Available variants
+variant="default" | "primary" | "secondary" | "success" | "danger" | "warning" | "info" |
+        "outline" | "outline-secondary" | "flat" | "elevated" | "elevated-lg" |
+        "elevated-xl" | "glass" | "gradient"
+```

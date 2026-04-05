@@ -1,6 +1,6 @@
 import type { Column } from '@tanstack/react-table';
 
-import { AsyncMultiSelectFilter, AsyncSingleSelectFilter, ListFilter } from '@components/tables';
+import { AsyncSelectFilter, SelectFilter } from '@components/tables';
 
 import { isAsyncFilterMeta } from '@utils';
 
@@ -13,15 +13,9 @@ function DataTableFacetedFilter<TData>({ column }: DataTableFacetedFilterProps<T
 
   if (!filterMeta) return null;
 
-  if (isAsyncFilterMeta(filterMeta) && filterMeta.variant === 'multiSelect') {
-    return <AsyncMultiSelectFilter column={column} filterMeta={filterMeta} />;
-  }
+  if (isAsyncFilterMeta(filterMeta)) return <AsyncSelectFilter column={column} filterMeta={filterMeta} />;
 
-  if (isAsyncFilterMeta(filterMeta) && filterMeta.variant === 'select') {
-    return <AsyncSingleSelectFilter column={column} filterMeta={filterMeta} />;
-  }
-
-  return <ListFilter column={column} filterMeta={filterMeta} />;
+  return <SelectFilter column={column} filterMeta={filterMeta} />;
 }
 
 export default DataTableFacetedFilter;

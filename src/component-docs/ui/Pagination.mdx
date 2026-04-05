@@ -1,0 +1,170 @@
+---
+id: pagination
+title: Pagination
+section: Components
+category: UI
+description: 'Navigation component for paginated content with previous, next, and page number controls.'
+tags: [ui, pagination, navigation]
+---
+
+import { Pagination } from '@components/ui';
+
+## Demo
+
+<div className="space-y-6">
+  <div>
+    <p className="text-muted-foreground mb-3 text-xs font-medium">Basic Pagination</p>
+    <Pagination>
+      <Pagination.List>
+        <Pagination.Item>
+          <Pagination.Previous />
+        </Pagination.Item>
+        <Pagination.Item>
+          <Pagination.NavButton>1</Pagination.NavButton>
+        </Pagination.Item>
+        <Pagination.Item>
+          <Pagination.NavButton>2</Pagination.NavButton>
+        </Pagination.Item>
+        <Pagination.Item>
+          <Pagination.NavButton isActive>3</Pagination.NavButton>
+        </Pagination.Item>
+        <Pagination.Item>
+          <Pagination.NavButton>4</Pagination.NavButton>
+        </Pagination.Item>
+        <Pagination.Item>
+          <Pagination.NavButton>5</Pagination.NavButton>
+        </Pagination.Item>
+        <Pagination.Item>
+          <Pagination.Next />
+        </Pagination.Item>
+      </Pagination.List>
+    </Pagination>
+  </div>
+
+<div>
+  <p className="text-muted-foreground mb-3 text-xs font-medium">With Ellipsis</p>
+  <Pagination>
+    <Pagination.List>
+      <Pagination.Item>
+        <Pagination.Previous />
+      </Pagination.Item>
+      <Pagination.Item>
+        <Pagination.NavButton>1</Pagination.NavButton>
+      </Pagination.Item>
+      <Pagination.Item>
+        <Pagination.NavButton isActive>2</Pagination.NavButton>
+      </Pagination.Item>
+      <Pagination.Item>
+        <Pagination.NavButton>3</Pagination.NavButton>
+      </Pagination.Item>
+      <Pagination.Item>
+        <Pagination.Ellipsis />
+      </Pagination.Item>
+      <Pagination.Item>
+        <Pagination.NavButton>10</Pagination.NavButton>
+      </Pagination.Item>
+      <Pagination.Item>
+        <Pagination.Next />
+      </Pagination.Item>
+    </Pagination.List>
+  </Pagination>
+</div>
+
+  <div>
+    <p className="text-muted-foreground mb-3 text-xs font-medium">Compact</p>
+    <Pagination>
+      <Pagination.List>
+        <Pagination.Item>
+          <Pagination.Previous />
+        </Pagination.Item>
+        <Pagination.Item>
+          <Pagination.NavButton isActive>5</Pagination.NavButton>
+        </Pagination.Item>
+        <Pagination.Item>
+          <Pagination.Next />
+        </Pagination.Item>
+      </Pagination.List>
+    </Pagination>
+  </div>
+</div>
+
+## Imports
+
+```tsx
+import { Pagination } from '@components/ui';
+```
+
+## Code
+
+```tsx
+import { Pagination } from '@components/ui';
+
+// Basic Pagination
+<Pagination>
+  <Pagination.List>
+    <Pagination.Item>
+      <Pagination.Previous />
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.NavButton>1</Pagination.NavButton>
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.NavButton>2</Pagination.NavButton>
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.NavButton isActive>3</Pagination.NavButton>
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.NavButton>4</Pagination.NavButton>
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.NavButton>5</Pagination.NavButton>
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.Next />
+    </Pagination.Item>
+  </Pagination.List>
+</Pagination>
+
+// With Ellipsis
+<Pagination>
+  <Pagination.List>
+    <Pagination.Item>
+      <Pagination.Previous />
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.NavButton>1</Pagination.NavButton>
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.NavButton isActive>2</Pagination.NavButton>
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.NavButton>3</Pagination.NavButton>
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.Ellipsis />
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.NavButton>10</Pagination.NavButton>
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.Next />
+    </Pagination.Item>
+  </Pagination.List>
+</Pagination>
+
+// Compact
+<Pagination>
+  <Pagination.List>
+    <Pagination.Item>
+      <Pagination.Previous />
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.NavButton isActive>5</Pagination.NavButton>
+    </Pagination.Item>
+    <Pagination.Item>
+      <Pagination.Next />
+    </Pagination.Item>
+  </Pagination.List>
+</Pagination>
+```

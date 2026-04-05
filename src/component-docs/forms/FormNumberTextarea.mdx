@@ -1,0 +1,32 @@
+---
+id: form-number-textarea
+title: FormNumber & FormTextarea
+section: Components
+category: Forms
+description: Numeric and multi-line text fields.
+tags: [forms, number, textarea]
+---
+
+import { FormNumberTextareaDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormNumberTextareaDemo />
+
+## Imports
+
+```tsx
+import { FormContainer, FormNumber, FormTextarea } from '@components/forms';
+import { useForm } from 'react-hook-form';
+```
+
+## Code
+
+```tsx
+const form = useForm();
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormNumber name="qty" control={form.control} label="Quantity" />
+  <FormTextarea name="notes" label="Notes" />
+</FormContainer>;
+```

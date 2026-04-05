@@ -58,12 +58,14 @@ const DataTablePagination: FC<PaginationProps> = ({ pageSizeOptions = [30, 50, 1
         <Select value={`${table.getState().pagination.pageSize}`} onValueChange={handlePageSizeChange}>
           <Select.Trigger className="h-7 w-14 border-0 bg-transparent px-1 py-0 text-xs font-normal shadow-none focus-visible:ring-0 data-size:h-7">
             <Select.Value placeholder={table.getState().pagination.pageSize} />
+
+            <Select.Icon />
           </Select.Trigger>
 
           <Select.Content side="top">
             {pageSizeOptions.map((pageSize) => (
               <Select.Item key={pageSize} value={`${pageSize}`}>
-                {pageSize}
+                <Select.Text>{pageSize}</Select.Text>
               </Select.Item>
             ))}
           </Select.Content>

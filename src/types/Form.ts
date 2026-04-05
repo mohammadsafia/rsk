@@ -20,3 +20,13 @@ export type ControlledFieldBaseProps<TFieldValues extends FieldValues = FieldVal
   FieldBaseProps<TFieldValues>;
 
 export type FormSelectOption = Record<string, any> | string;
+
+/**
+ * Resolves `TOption` to `any` when it's the unresolved default (`FormSelectOption`),
+ * preserving the specific inferred type otherwise.
+ *
+ * This fixes TypeScript's partial generic inference limitation where
+ * explicitly specifying `TFieldValues` (e.g. `<FormSelect<Schema>>`)
+ * causes `TOption` to fall to its default instead of being inferred from `options`.
+ */
+export type ResolvedOption<TOption> = FormSelectOption extends TOption ? any : TOption;

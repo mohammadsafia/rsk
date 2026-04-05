@@ -6,7 +6,7 @@ export * from './form-input';
 export * from './form-select';
 export * from './form-checkbox';
 export * from './form-textarea';
-export * from './form-upload-file';
+export * from './form-file-uploader';
 export * from './form-combobox';
 export * from './form-multi-combobox';
 export * from './form-date-picker';

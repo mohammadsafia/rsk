@@ -1,0 +1,70 @@
+---
+id: badge
+title: Badge
+section: Components
+category: UI
+description: 'Small count or status descriptor with variant styles.'
+tags: [ui, badge]
+---
+
+import { Badge } from '@components/ui';
+
+## Demo
+
+<div className="space-y-4">
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Variants</p>
+    <div className="flex flex-wrap items-center gap-2">
+      <Badge variant="default">Default</Badge>
+      <Badge variant="secondary">Success</Badge>
+      <Badge variant="destructive">Destructive</Badge>
+      <Badge variant="warning">Warning</Badge>
+      <Badge variant="muted">Muted</Badge>
+      <Badge variant="neutral">Neutral</Badge>
+      <Badge variant="accent">Accent</Badge>
+    </div>
+
+  </div>
+
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Usage Examples</p>
+    <div className="flex flex-wrap items-center gap-2">
+      <Badge variant="default" size="default">Default</Badge>
+      <Badge variant="secondary" size="xs">Success</Badge>
+      <Badge variant="destructive" size="sm">Destructive</Badge>
+      <Badge variant="warning" size="md">Warning</Badge>
+      <Badge variant="muted" size="lg">Muted</Badge>
+      <Badge variant="neutral" size="default">Neutral</Badge>
+      <Badge variant="accent" size="sm">Accent</Badge>
+    </div>
+
+  </div>
+</div>
+
+## Imports
+
+```tsx
+import { Badge } from '@components/ui';
+```
+
+## Code
+
+```tsx
+// Variants
+<Badge variant="default">Default</Badge>
+<Badge variant="secondary">Success</Badge>
+<Badge variant="destructive">Destructive</Badge>
+<Badge variant="warning">Warning</Badge>
+<Badge variant="muted">Muted</Badge>
+<Badge variant="neutral">Neutral</Badge>
+<Badge variant="accent">Accent</Badge>
+
+// Examples
+<Badge variant="default" size="default">Default</Badge>
+<Badge variant="secondary" size="xs">Success</Badge>
+<Badge variant="destructive" size="sm">Destructive</Badge>
+<Badge variant="warning" size="md">Warning</Badge>
+<Badge variant="muted" size="lg">Muted</Badge>
+<Badge variant="neutral" size="default">Neutral</Badge>
+<Badge variant="accent" size="sm">Accent</Badge>
+```

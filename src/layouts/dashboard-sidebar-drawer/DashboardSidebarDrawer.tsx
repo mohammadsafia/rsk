@@ -1,34 +1,47 @@
-import { Button } from '@components/ui';
 import { cn } from '@utils';
 
-import { ChevronsLeft, MenuIcon, XIcon } from 'lucide-react';
+import { AlignJustify, Menu, X } from 'lucide-react';
 
 type DashboardSidebarDrawerProps = {
   collapse: boolean;
   onCollapse: () => void;
   className?: string;
-  iconSize?: number;
   variant?: 'mobile' | 'desktop';
 };
 
 function MobileSidebarDrawer(props: DashboardSidebarDrawerProps) {
   return (
-    <Button size="icon" variant="icon" className={cn('md:hidden', props.className)} onClick={props.onCollapse}>
-      {props.collapse ? <XIcon /> : <MenuIcon />}
-    </Button>
+    <button
+      type="button"
+      className={cn('flex size-11 items-center justify-center text-foreground md:hidden', props.className)}
+      onClick={props.onCollapse}
+      aria-label={props.collapse ? 'Close menu' : 'Open menu'}
+    >
+      {props.collapse ? <X className="size-5" /> : <Menu className="size-5" />}
+    </button>
   );
 }
 
 function DesktopSidebarDrawer(props: DashboardSidebarDrawerProps) {
   return (
-    <Button
-      size="icon"
-      variant="icon"
-      className={cn('absolute -end-5 top-1/2 z-50 hidden rounded-full md:inline-flex', props.className)}
+    <button
+      type="button"
+      className={cn(
+        'hidden size-11 shrink-0 cursor-pointer items-center justify-end md:flex',
+        props.className,
+      )}
       onClick={props.onCollapse}
+      aria-label={props.collapse ? 'Collapse sidebar' : 'Expand sidebar'}
     >
-      <ChevronsLeft size={props.iconSize ?? 20} className={cn('h-5 w-5', !props.collapse && 'rotate-180')} />
-    </Button>
+      <div className="flex items-center rounded bg-secondary-200 p-1">
+        <AlignJustify
+          className={cn(
+            'size-6 text-secondary-800 transition-transform duration-200',
+            !props.collapse && '-rotate-90',
+          )}
+        />
+      </div>
+    </button>
   );
 }
 

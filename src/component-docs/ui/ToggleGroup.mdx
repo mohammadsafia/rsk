@@ -1,0 +1,115 @@
+---
+id: toggle-group
+title: ToggleGroup
+section: Components
+category: UI
+description: 'Group of toggle buttons with multiple variants and sizes.'
+tags: [ui, toggle, input]
+---
+
+import { ToggleGroup } from '@components/ui';
+
+## Demo
+
+<div className="space-y-4">
+    <div>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">Variants</p>
+        <div className="space-y-3">
+            <ToggleGroup type="single" defaultValue="center" variant="default">
+                <ToggleGroup.Item value="left" aria-label="Align left">
+                    Left
+                </ToggleGroup.Item>
+                <ToggleGroup.Item value="center" aria-label="Align center">
+                    Center
+                </ToggleGroup.Item>
+                <ToggleGroup.Item value="right" aria-label="Align right">
+                    Right
+                </ToggleGroup.Item>
+            </ToggleGroup>
+
+            <ToggleGroup type="single" defaultValue="center" variant="outline">
+                <ToggleGroup.Item value="left" aria-label="Align left">
+                    Left
+                </ToggleGroup.Item>
+                <ToggleGroup.Item value="center" aria-label="Align center">
+                    Center
+                </ToggleGroup.Item>
+                <ToggleGroup.Item value="right" aria-label="Align right">
+                    Right
+                </ToggleGroup.Item>
+            </ToggleGroup>
+        </div>
+    </div>
+
+    <div>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">Sizes</p>
+        <div className="space-y-3">
+            <ToggleGroup type="single" defaultValue="center" size="sm">
+                <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
+                <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
+                <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
+            </ToggleGroup>
+
+            <ToggleGroup type="single" defaultValue="center" size="default">
+                <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
+                <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
+                <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
+            </ToggleGroup>
+
+            <ToggleGroup type="single" defaultValue="center" size="lg">
+                <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
+                <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
+                <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
+            </ToggleGroup>
+        </div>
+    </div>
+
+    <div>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">Multiple Selection</p>
+        <ToggleGroup type="multiple" defaultValue={['bold']}>
+            <ToggleGroup.Item value="bold" aria-label="Toggle bold">
+                Bold
+            </ToggleGroup.Item>
+            <ToggleGroup.Item value="italic" aria-label="Toggle italic">
+                Italic
+            </ToggleGroup.Item>
+            <ToggleGroup.Item value="underline" aria-label="Toggle underline">
+                Underline
+            </ToggleGroup.Item>
+        </ToggleGroup>
+    </div>
+
+</div>
+
+## Imports
+
+```tsx
+import { ToggleGroup } from '@components/ui/ToggleGroup';
+```
+
+## Code
+
+```tsx
+
+// Variants
+<ToggleGroup type="single" variant="default" defaultValue="center">
+  <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
+  <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
+  <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
+</ToggleGroup>
+
+<ToggleGroup type="single" variant="outline" defaultValue="center">
+  <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
+</ToggleGroup>
+
+// Sizes
+<ToggleGroup type="single" size="sm" defaultValue="center">...</ToggleGroup>
+<ToggleGroup type="single" size="default" defaultValue="center">...</ToggleGroup>
+<ToggleGroup type="single" size="lg" defaultValue="center">...</ToggleGroup>
+
+// Multiple Selection
+<ToggleGroup type="multiple" defaultValue={['bold']}>
+  <ToggleGroup.Item value="bold">Bold</ToggleGroup.Item>
+  <ToggleGroup.Item value="italic">Italic</ToggleGroup.Item>
+</ToggleGroup>
+```

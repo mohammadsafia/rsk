@@ -1,0 +1,26 @@
+---
+id: date-navigation
+title: DateNavigation
+section: Components
+category: Shared
+description: Navigation controls for dates with prev/next/today buttons.
+tags: [shared, date-navigation, date, navigation]
+---
+
+import { DateNavigationDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<DateNavigationDemo />
+
+## Imports
+
+```tsx
+import { DateNavigation } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<DateNavigation date={currentDate} onSetDate={setCurrentDate} handlePrevious={handlePrevious} handleNext={handleNext} />
+```

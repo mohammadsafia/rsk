@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type FieldValues, useController } from 'react-hook-form';
 
 import { Calendar, type CalendarProps, Popover } from '@components/ui';
@@ -19,6 +19,7 @@ type FormDatePickerProps<TFieldValues extends FieldValues> = ControlledFieldBase
 > & {
   placeholder?: string;
   dateFormat?: DateInputFormat;
+  formatDate?: (date: Date | undefined) => any;
 };
 
 function FormDatePicker<TFieldValues extends FieldValues>({
@@ -34,6 +35,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
   disabled,
   placeholder,
   dateFormat = DATE_INPUT_FORMATS.US_SLASH,
+  formatDate,
   ...props
 }: FormDatePickerProps<TFieldValues>) {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,19 +50,46 @@ function FormDatePicker<TFieldValues extends FieldValues>({
     rules,
   });
 
-  const date = value as Date | undefined;
+  const date = useMemo(() => {
+    if (!value) return undefined;
+    if (Object.prototype.toString.call(value) === '[object Date]') {
+      return value as Date;
+    }
+    if (typeof value === 'string') {
+      const parsed = new Date(value);
+      return isNaN(parsed.getTime()) ? undefined : parsed;
+    }
+    return undefined;
+  }, [value]);
+
   const isUserInputRef = useRef(false);
   const lastSyncedValueRef = useRef<number | null>(null);
+
+  const formatDateValue = useCallback(
+    (dateValue: Date | undefined) => {
+      if (formatDate) {
+        return formatDate(dateValue);
+      }
+      if (dateValue) {
+        const year = dateValue.getFullYear();
+        const month = String(dateValue.getMonth() + 1).padStart(2, '0');
+        const day = String(dateValue.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      }
+      return undefined;
+    },
+    [formatDate],
+  );
 
   const handleDateChange = useCallback(
     (newDate: Date | undefined) => {
       isUserInputRef.current = true;
-      onChange(newDate);
+      onChange(formatDateValue(newDate));
       if (newDate) {
         setCalendarMonth(newDate);
       }
     },
-    [onChange],
+    [onChange, formatDateValue],
   );
 
   const {
@@ -84,7 +113,8 @@ function FormDatePicker<TFieldValues extends FieldValues>({
       return;
     }
 
-    const valueKey = date?.getTime() ?? null;
+    const valueKey = date ? date.getTime() : null;
+
     if (lastSyncedValueRef.current === valueKey) {
       return;
     }
@@ -94,7 +124,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
     if (date) {
       setCalendarMonth(date);
     }
-  }, [date]);
+  }, [date, setFromDate]);
 
   useEffect(() => {
     if (parsedDate) {
@@ -103,7 +133,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
   }, [parsedDate]);
 
   const handleCalendarSelect = (selectedDate: Date | undefined) => {
-    onChange(selectedDate);
+    onChange(formatDateValue(selectedDate));
     setFromDate(selectedDate);
     if (selectedDate) {
       setCalendarMonth(selectedDate);
@@ -114,7 +144,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
   const handleClear = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    onChange(undefined);
+    onChange(formatDateValue(undefined));
     setFromDate(undefined);
   };
 
@@ -130,7 +160,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
     handleBlur();
     fieldOnBlur();
     if (!isValidInput) {
-      onChange(undefined);
+      onChange(formatDateValue(undefined));
       setFromDate(undefined);
     }
   };

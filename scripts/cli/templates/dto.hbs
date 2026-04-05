@@ -1,0 +1,15 @@
+{{{fileHeader}}}
+{{#each imports}}
+import type { {{name}} } from './{{from}}';
+{{/each}}
+
+export type {{name}} = {
+{{#each properties}}
+{{#if deprecated}}
+  /**
+   * @deprecated
+   */
+{{/if}}
+  {{#if readOnly}}readonly {{/if}}{{propName}}{{#if optional}}?{{/if}}: {{type}}{{#if nullable}} | null{{/if}};
+{{/each}}
+};

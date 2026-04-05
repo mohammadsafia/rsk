@@ -1,4 +1,4 @@
-import { type ButtonHTMLAttributes, forwardRef } from 'react';
+import { type ComponentProps, type FC, forwardRef } from 'react';
 
 import { Slot } from '@radix-ui/react-slot';
 
@@ -7,7 +7,7 @@ import { cn } from '@utils';
 
 export type ButtonVariants = VariantProps<typeof buttonVariants>;
 
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+export type ButtonProps = ComponentProps<'button'> &
   ButtonVariants & {
     asChild?: boolean;
   };
@@ -32,11 +32,13 @@ export const buttonVariants = cva(
         ghost: 'text-foreground hover:not-disabled:text-primary',
         'ghost-muted': 'text-foreground hover:not-disabled:text-primary hover:not-disabled:bg-muted-200',
         'ghost-destructive': 'text-foreground hover:not-disabled:text-destructive',
+        'ghost-muted-primary': 'text-muted-400 hover:not-disabled:text-primary-900',
         'ghost-muted-destructive': 'text-muted-400 hover:not-disabled:text-destructive',
         outline:
           'border border-primary-400 text-primary-400 bg-background shadow-xs hover:not-disabled:border-primary-600 hover:not-disabled:text-primary-600',
         'outline-destructive': 'border border-destructive text-destructive bg-destructive-200 hover:not-disabled:bg-destructive-200/80',
         'outline-success': 'border border-success text-success bg-success-200 hover:not-disabled:bg-success-200/80',
+        unstyled: '',
       },
       size: {
         default: 'px-3 py-2',
@@ -55,7 +57,7 @@ export const buttonVariants = cva(
   },
 );
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(({ className, variant, size, asChild = false, ...props }, ref) => {
+const Button: FC<ButtonProps> = ({ ref, className, variant, size, asChild = false, ...props }) => {
   const Btn = asChild ? Slot : 'button';
 
   return (
@@ -67,8 +69,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({ className, variant,
       {...props}
     />
   );
-});
+};
 
-Button.displayName = 'Button';
-
-export default Button;
+// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
+export default forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => Button({ ...props, ref }));

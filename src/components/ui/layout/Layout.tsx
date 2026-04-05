@@ -2,6 +2,7 @@ import { createContext, type FC, type HTMLAttributes, Suspense, useContext, useE
 import { Outlet } from 'react-router-dom';
 
 import { PrimeLoader } from '@components/shared';
+
 import { cn } from '@utils';
 
 type LayoutState = {

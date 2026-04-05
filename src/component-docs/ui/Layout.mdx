@@ -1,0 +1,52 @@
+---
+id: layout
+title: Layout
+section: Components
+category: UI
+description: 'Flexible page layout with header, sidebar, content, and footer sections.'
+tags: [ui, layout, page]
+---
+
+import { Layout } from '@components/ui';
+
+## Demo
+
+<div className="border rounded-md overflow-hidden h-48">
+  <Layout>
+    <Layout.Header>
+      <div className="bg-muted p-2 text-xs font-medium">Header</div>
+    </Layout.Header>
+
+    <Layout.Content>
+      <div className="p-4 text-sm text-muted-foreground">Main content area</div>
+    </Layout.Content>
+
+    <Layout.Footer>
+      <div className="bg-muted p-2 text-xs font-medium">Footer</div>
+    </Layout.Footer>
+  </Layout>
+</div>
+
+## Imports
+
+```tsx
+import { Layout } from '@components/ui';
+```
+
+## Code
+
+```tsx
+// Basic layout
+<Layout>
+  <Layout.Header>Header</Layout.Header>
+  <Layout.Content>Content</Layout.Content>
+  <Layout.Footer>Footer</Layout.Footer>
+</Layout>
+
+// With sticky header and sidebar
+<Layout fixed>
+  <Layout.Header sticky>Header</Layout.Header>
+  <Layout.Sidebar>Sidebar</Layout.Sidebar>
+  <Layout.Content>Content</Layout.Content>
+</Layout>
+```

@@ -19,7 +19,7 @@ function DataTableContent<TData>({ onRowClick, getRowClassName, className, empty
   const isEmpty = !table.getRowModel().rows?.length && !isLoading;
 
   return (
-    <div data-slot="data-table-content" className={cn('flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl shadow', className)}>
+    <div data-slot="data-table-content" className={cn('flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg shadow', className)}>
       <Table>
         <Table.Header>
           {table.getHeaderGroups().map((headerGroup) => (
