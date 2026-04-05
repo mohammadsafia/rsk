@@ -24,7 +24,7 @@ export const buttonVariants = cva(
       variant: {
         default: 'bg-primary text-primary-foreground hover:not-disabled:bg-primary-600',
         secondary: 'bg-secondary text-secondary-foreground hover:not-disabled:bg-secondary-600',
-        muted: 'bg-muted-400 text-muted-foreground hover:not-disabled:bg-muted',
+        muted: 'bg-muted text-foreground hover:not-disabled:bg-muted-400',
         destructive: 'text-destructive-foreground bg-destructive hover:not-disabled:bg-destructive/80',
         success: 'bg-success text-success-foreground hover:not-disabled:bg-success/80',
         link: 'text-primary underline-offset-4 hover:not-disabled:underline',
@@ -32,8 +32,8 @@ export const buttonVariants = cva(
         ghost: 'text-foreground hover:not-disabled:text-primary',
         'ghost-muted': 'text-foreground hover:not-disabled:text-primary hover:not-disabled:bg-muted-200',
         'ghost-destructive': 'text-foreground hover:not-disabled:text-destructive',
-        'ghost-muted-primary': 'text-muted-400 hover:not-disabled:text-primary-900',
-        'ghost-muted-destructive': 'text-muted-400 hover:not-disabled:text-destructive',
+        'ghost-muted-primary': 'text-muted-foreground hover:not-disabled:text-foreground',
+        'ghost-muted-destructive': 'text-muted-foreground hover:not-disabled:text-destructive',
         outline:
           'border border-primary-400 text-primary-400 bg-background shadow-xs hover:not-disabled:border-primary-600 hover:not-disabled:text-primary-600',
         'outline-destructive': 'border border-destructive text-destructive bg-destructive-200 hover:not-disabled:bg-destructive-200/80',
