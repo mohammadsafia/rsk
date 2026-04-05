@@ -1,4 +1,4 @@
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 
 import { AuthGuard, AuthLayout, DashboardLayout, ErrorBoundary } from '@layouts';
@@ -17,7 +17,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomePage />,
+        element: <Suspense><HomePage /></Suspense>,
       },
     ],
   },

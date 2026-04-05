@@ -5,8 +5,7 @@ import { ArrowRight, ExternalLink } from 'lucide-react';
 /*  Animation helper                                                          */
 /* -------------------------------------------------------------------------- */
 
-function useFadeUp(delay = 0) {
-  const prefersReduced = useReducedMotion();
+function getFadeUp(prefersReduced: boolean | null, delay = 0) {
   if (prefersReduced) return {};
   return {
     initial: { opacity: 0, y: 20 },
@@ -223,8 +222,9 @@ function Navbar() {
 /* -------------------------------------------------------------------------- */
 
 function Hero() {
-  const fade = useFadeUp();
-  const fadeRight = useFadeUp(0.15);
+  const pr = useReducedMotion();
+  const fade = getFadeUp(pr);
+  const fadeRight = getFadeUp(pr,0.15);
 
   return (
     <section className="mx-auto max-w-[1200px] px-6 pt-32 pb-20 lg:px-8 lg:pt-40 lg:pb-28">
@@ -275,7 +275,7 @@ function Hero() {
           {...fadeRight}
         >
           {STATS.map((stat) => {
-            const f = useFadeUp(0.1);
+            const f = getFadeUp(pr,0.1);
             return (
               <motion.div key={stat.label} {...f}>
                 <p
@@ -301,7 +301,8 @@ function Hero() {
 /* -------------------------------------------------------------------------- */
 
 function TechStack() {
-  const fade = useFadeUp();
+  const pr = useReducedMotion();
+  const fade = getFadeUp(pr);
 
   return (
     <motion.section
@@ -326,18 +327,19 @@ function TechStack() {
 /* -------------------------------------------------------------------------- */
 
 function Features() {
+  const pr = useReducedMotion();
   return (
     <section id="features" className="mx-auto max-w-[1200px] px-6 py-20 lg:px-8 lg:py-28">
       <motion.p
         className="mb-8 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#b8a080]"
-        {...useFadeUp()}
+        {...getFadeUp(pr)}
       >
         WHAT&apos;S INSIDE
       </motion.p>
 
       <div className="grid gap-4 md:grid-cols-3 md:grid-rows-2">
         {FEATURES.map((feature, i) => {
-          const fade = useFadeUp(i * 0.08);
+          const fade = getFadeUp(pr,i * 0.08);
           return (
             <motion.div
               key={feature.title}
@@ -368,8 +370,9 @@ function Features() {
 /* -------------------------------------------------------------------------- */
 
 function ComponentShowcase() {
-  const fadeLeft = useFadeUp();
-  const fadeRight = useFadeUp(0.15);
+  const pr = useReducedMotion();
+  const fadeLeft = getFadeUp(pr);
+  const fadeRight = getFadeUp(pr,0.15);
 
   return (
     <section className="mx-auto max-w-[1200px] px-6 py-20 lg:px-8 lg:py-28">
@@ -491,8 +494,9 @@ function ComponentShowcase() {
 /* -------------------------------------------------------------------------- */
 
 function CliSection() {
-  const fadeLeft = useFadeUp();
-  const fadeRight = useFadeUp(0.15);
+  const pr = useReducedMotion();
+  const fadeLeft = getFadeUp(pr);
+  const fadeRight = getFadeUp(pr,0.15);
 
   return (
     <section className="mx-auto max-w-[1200px] px-6 py-20 lg:px-8 lg:py-28">
@@ -555,8 +559,9 @@ function CliSection() {
 /* -------------------------------------------------------------------------- */
 
 function Architecture() {
-  const fadeLeft = useFadeUp();
-  const fadeRight = useFadeUp(0.15);
+  const pr = useReducedMotion();
+  const fadeLeft = getFadeUp(pr);
+  const fadeRight = getFadeUp(pr,0.15);
 
   return (
     <section className="mx-auto max-w-[1200px] px-6 py-20 lg:px-8 lg:py-28">
@@ -612,7 +617,8 @@ function Architecture() {
 /* -------------------------------------------------------------------------- */
 
 function GettingStarted() {
-  const fade = useFadeUp();
+  const pr = useReducedMotion();
+  const fade = getFadeUp(pr);
 
   return (
     <section id="getting-started" className="bg-[#f5f0eb] py-20 lg:py-28">
@@ -630,7 +636,7 @@ function GettingStarted() {
 
         <div className="grid gap-6 md:grid-cols-3">
           {GETTING_STARTED_STEPS.map((step, i) => {
-            const f = useFadeUp(i * 0.1);
+            const f = getFadeUp(pr,i * 0.1);
             return (
               <motion.div key={step.title} {...f}>
                 <p
