@@ -4,7 +4,7 @@ import type { Column } from '@tanstack/react-table';
 
 import { cn } from '@utils';
 
-import { SortIcon } from 'assets/icons';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 
 type DataTableColumnHeaderProps<TData, TValue> = {
   column: Column<TData, TValue>;
@@ -38,7 +38,13 @@ function DataTableColumnHeader<TData, TValue>({ column, title, className }: Data
     >
       {title}
 
-      <SortIcon direction={sortDirection} />
+      {sortDirection === 'asc' ? (
+        <ArrowUp className="size-3.5" />
+      ) : sortDirection === 'desc' ? (
+        <ArrowDown className="size-3.5" />
+      ) : (
+        <ArrowUpDown className="text-muted-foreground size-3.5" />
+      )}
     </button>
   );
 }

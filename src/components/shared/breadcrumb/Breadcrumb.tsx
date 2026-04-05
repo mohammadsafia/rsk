@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Conditional } from '@components/utils';
 
 import { cn } from '@utils';
-import { ROUTES_PATH } from '@routes';
+import { FULL_ROUTES_PATH } from '@routes';
 
 import { ChevronRight } from 'lucide-react';
 
@@ -23,7 +23,7 @@ const Breadcrumb = ({ className, links, separator, withRoot = true }: Breadcrumb
   if (links.length === 0 && !withRoot) return null;
 
   const finalLinks = withRoot
-    ? [{ title: 'Dashboard', href: ROUTES_PATH.HOME.INDEX }, ...links.filter((link) => link.href !== ROUTES_PATH.HOME.INDEX)]
+    ? [{ title: 'Dashboard', href: FULL_ROUTES_PATH.HOME.INDEX }, ...links.filter((link) => link.href !== FULL_ROUTES_PATH.HOME.INDEX)]
     : links;
 
   return (
@@ -35,16 +35,16 @@ const Breadcrumb = ({ className, links, separator, withRoot = true }: Breadcrumb
 
             return (
               <li key={`${title}-${idx}`} className="text-muted-400 text-xs leading-none">
-                <Conditional.If condition={(!!href || href === ROUTES_PATH.HOME.INDEX) && !isLastItem}>
+                <Conditional.If condition={(!!href || href === FULL_ROUTES_PATH.HOME.INDEX) && !isLastItem}>
                   <Link
                     className="hover:text-primary transition-colors"
-                    to={href === ROUTES_PATH.HOME.INDEX || href === ROUTES_PATH.ROOT.INDEX ? href : `/${href}`}
+                    to={href === FULL_ROUTES_PATH.HOME.INDEX || href === FULL_ROUTES_PATH.ROOT.INDEX ? href : `/${href}`}
                   >
                     {title}
                   </Link>
                 </Conditional.If>
 
-                <Conditional.If condition={!href && href !== ROUTES_PATH.HOME.INDEX}>
+                <Conditional.If condition={!href && href !== FULL_ROUTES_PATH.HOME.INDEX}>
                   <span>{title}</span>
                 </Conditional.If>
 

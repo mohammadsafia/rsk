@@ -1,47 +1,47 @@
+import { Button } from '@components/ui';
 import { cn } from '@utils';
 
-import { AlignJustify, Menu, X } from 'lucide-react';
+import { ChevronsLeft, Menu, X } from 'lucide-react';
 
 type DashboardSidebarDrawerProps = {
   collapse: boolean;
   onCollapse: () => void;
   className?: string;
+  iconSize?: number;
   variant?: 'mobile' | 'desktop';
 };
 
 function MobileSidebarDrawer(props: DashboardSidebarDrawerProps) {
   return (
-    <button
-      type="button"
-      className={cn('flex size-11 items-center justify-center text-foreground md:hidden', props.className)}
+    <Button
+      size="icon"
+      variant="ghost"
+      className={cn('text-sidebar-foreground hover:bg-sidebar-accent h-9 w-9 md:hidden', props.className)}
       onClick={props.onCollapse}
       aria-label={props.collapse ? 'Close menu' : 'Open menu'}
     >
-      {props.collapse ? <X className="size-5" /> : <Menu className="size-5" />}
-    </button>
+      {props.collapse ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+    </Button>
   );
 }
 
 function DesktopSidebarDrawer(props: DashboardSidebarDrawerProps) {
   return (
-    <button
-      type="button"
+    <Button
+      size="icon"
+      variant="ghost"
       className={cn(
-        'hidden size-11 shrink-0 cursor-pointer items-center justify-end md:flex',
+        'bg-background border-border text-muted-foreground hover:bg-accent hover:text-foreground absolute -inset-e-4 top-20 z-50 hidden h-8 w-8 rounded-full border shadow-sm transition-all duration-200 hover:scale-110 md:inline-flex',
         props.className,
       )}
       onClick={props.onCollapse}
-      aria-label={props.collapse ? 'Collapse sidebar' : 'Expand sidebar'}
+      aria-label={props.collapse ? 'Expand sidebar' : 'Collapse sidebar'}
     >
-      <div className="flex items-center rounded bg-secondary-200 p-1">
-        <AlignJustify
-          className={cn(
-            'size-6 text-secondary-800 transition-transform duration-200',
-            !props.collapse && '-rotate-90',
-          )}
-        />
-      </div>
-    </button>
+      <ChevronsLeft
+        size={props.iconSize ?? 14}
+        className={cn('transition-transform duration-200 rtl:scale-x-[-1]', !props.collapse && 'rotate-180')}
+      />
+    </Button>
   );
 }
 

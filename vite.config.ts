@@ -3,12 +3,6 @@ import type { Plugin as VitePlugin } from 'vite';
 import path from 'path';
 import react from '@vitejs/plugin-react-swc';
 import tailwindcss from '@tailwindcss/vite';
-import { sentryVitePlugin } from '@sentry/vite-plugin';
-
-const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN;
-const sentryOrg = process.env.SENTRY_ORG;
-const sentryProject = process.env.SENTRY_PROJECT;
-const sentryRelease = process.env.SENTRY_RELEASE;
 
 import mdx from '@mdx-js/rollup';
 import remarkFrontmatter from 'remark-frontmatter';
@@ -23,7 +17,10 @@ const mdxPlugin = Object.assign(
       [
         rehypePrettyCode,
         {
-          theme: 'github-light',
+          theme: {
+            light: 'github-light',
+            dark: 'github-dark',
+          },
           keepBackground: false,
         },
       ],
@@ -33,32 +30,7 @@ const mdxPlugin = Object.assign(
 );
 
 export default defineConfig({
-  plugins: [
-    mdxPlugin,
-    react(),
-    tailwindcss(),
-
-    // IMPORTANT: keep Sentry plugin LAST
-    ...(sentryAuthToken
-      ? [
-          sentryVitePlugin({
-            org: sentryOrg,
-            project: sentryProject,
-            authToken: sentryAuthToken,
-            release: {
-              name: sentryRelease,
-            },
-            // Optional but recommended
-            sourcemaps: {
-              filesToDeleteAfterUpload: ['./dist/**/*.map'],
-            },
-          }),
-        ]
-      : []),
-  ],
-
-  base: '/med-legal/',
-
+  plugins: [mdxPlugin, react(), tailwindcss()],
   server: {
     port: 3000,
     open: true,
@@ -66,27 +38,6 @@ export default defineConfig({
 
   resolve: {
     alias: [
-      // ✅ EXISTING path aliases (backward compatibility - DO NOT REMOVE)
-      { find: 'App', replacement: path.resolve(__dirname, './src/App') },
-      { find: 'api', replacement: path.resolve(__dirname, './src/api') },
-      { find: 'app-constants', replacement: path.resolve(__dirname, './src/app-constants') },
-      { find: 'assets', replacement: path.resolve(__dirname, './src/assets') },
-      { find: 'components', replacement: path.resolve(__dirname, './src/components') },
-      { find: 'config', replacement: path.resolve(__dirname, './src/config') },
-      { find: 'context', replacement: path.resolve(__dirname, './src/context') },
-      { find: 'hooks', replacement: path.resolve(__dirname, './src/hooks') },
-      { find: 'layout', replacement: path.resolve(__dirname, './src/layout') },
-      { find: 'lib', replacement: path.resolve(__dirname, './src/lib') },
-      { find: 'locales', replacement: path.resolve(__dirname, './src/locales') },
-      { find: 'pages', replacement: path.resolve(__dirname, './src/pages') },
-      { find: 'router', replacement: path.resolve(__dirname, './src/router') },
-      { find: 'schemas', replacement: path.resolve(__dirname, './src/schemas') },
-      { find: 'stores', replacement: path.resolve(__dirname, './src/stores') },
-      { find: 'themes', replacement: path.resolve(__dirname, './src/themes') },
-      { find: 'types', replacement: path.resolve(__dirname, './src/types') },
-      { find: 'utils', replacement: path.resolve(__dirname, './src/utils') },
-
-      // ✅ NEW @ prefix aliases (for template/new code)
       { find: '@api', replacement: path.resolve(__dirname, 'src/api') },
       { find: '@assets', replacement: path.resolve(__dirname, 'src/assets') },
       { find: '@app-config', replacement: path.resolve(__dirname, 'src/app-config') },
@@ -95,7 +46,7 @@ export default defineConfig({
       { find: '@constants', replacement: path.resolve(__dirname, 'src/lib/constants') },
       { find: '@utils', replacement: path.resolve(__dirname, 'src/lib/utils') },
       { find: '@hoc', replacement: path.resolve(__dirname, 'src/lib/hoc') },
-      { find: '@components', replacement: path.resolve(__dirname, 'src/components_v2') },
+      { find: '@components', replacement: path.resolve(__dirname, 'src/components') },
       { find: '@pages', replacement: path.resolve(__dirname, 'src/pages') },
       { find: '@views', replacement: path.resolve(__dirname, 'src/views') },
       { find: '@layouts', replacement: path.resolve(__dirname, 'src/layouts') },
@@ -104,8 +55,5 @@ export default defineConfig({
       { find: '@locales', replacement: path.resolve(__dirname, 'src/locales') },
       { find: '@component-docs', replacement: path.resolve(__dirname, 'src/component-docs') },
     ],
-  },
-  build: {
-    sourcemap: sentryAuthToken ? 'hidden' : false,
   },
 });

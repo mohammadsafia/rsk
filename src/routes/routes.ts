@@ -1,6 +1,6 @@
 import type { ElementType } from 'react';
 
-import { constructPlainRoutes } from '@utils';
+import { LayoutDashboard, Component, Settings } from 'lucide-react';
 
 export type AppMenu = {
   id: string;
@@ -26,11 +26,31 @@ export const FULL_ROUTES_PATH = {
     INDEX: '/components',
     DETAIL: '/components/:id',
   },
+  SETTINGS: {
+    INDEX: '/settings',
+  },
   ROOT: {
     INDEX: '..',
   },
 } as const;
 
-export const ROUTES_PATH = constructPlainRoutes(FULL_ROUTES_PATH);
-
-export const APP_MENU: AppMenu[] = [];
+export const APP_MENU: AppMenu[] = [
+  {
+    id: 'dashboard',
+    path: FULL_ROUTES_PATH.HOME.DASHBOARD,
+    name: 'Dashboard',
+    icon: LayoutDashboard,
+  },
+  {
+    id: 'components',
+    path: FULL_ROUTES_PATH.COMPONENTS.INDEX,
+    name: 'Components',
+    icon: Component,
+  },
+  {
+    id: 'settings',
+    path: FULL_ROUTES_PATH.SETTINGS.INDEX,
+    name: 'Settings',
+    icon: Settings,
+  },
+];

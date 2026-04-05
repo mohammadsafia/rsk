@@ -35,3 +35,8 @@ temp-api-types/
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+/docs
+.idea
+.superpowers/
+/dist

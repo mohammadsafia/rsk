@@ -12,7 +12,7 @@ import {
   useEnsureActiveCategoryExists,
 } from '@component-docs/gallery';
 import { getComponentDocsRegistry, normalizeCategoryKey } from '@component-docs/registry';
-import { FULL_ROUTES_PATH } from '@routes/routes';
+import { FULL_ROUTES_PATH } from '@routes';
 
 import { mdxComponents } from '@component-docs/gallery/utils';
 import { MDXProvider } from '@mdx-js/react';
@@ -183,25 +183,15 @@ const ComponentsGalleryPage = () => {
 
         {/* Category Tabs */}
         <Tabs value={activeCategoryKey} onValueChange={handleCategoryChange} className="mb-8">
-          <Tabs.List variant="plain" className="gap-0 border-b border-muted-200 p-0">
+          <Tabs.List variant="underline">
             {categoryTabOptions.map((tab) => {
-              const isActive = tab.key === activeCategoryKey;
               const count =
                 tab.key === ALL_CATEGORY_KEY
                   ? Array.from(docsByCategoryFiltered.values()).flat().length
                   : (docsByCategoryFiltered.get(tab.key) ?? []).length;
 
               return (
-                <Tabs.Trigger
-                  key={tab.key}
-                  value={tab.key}
-                  variant="fitContent"
-                  className={`rounded-none border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'border-foreground text-foreground bg-transparent'
-                      : 'border-transparent text-muted-400 hover:text-foreground bg-transparent'
-                  }`}
-                >
+                <Tabs.Trigger key={tab.key} value={tab.key} variant="underline">
                   {tab.label}
                   <span className="ml-1.5 text-xs opacity-60">{count}</span>
                 </Tabs.Trigger>

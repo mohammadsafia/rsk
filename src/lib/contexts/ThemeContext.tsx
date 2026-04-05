@@ -22,13 +22,13 @@ export const THEME_TYPES = {
 } satisfies Readonly<Record<string, Theme>>;
 
 const initialState: ThemeState = {
-  theme: THEME_TYPES.SYSTEM,
+  theme: THEME_TYPES.DARK,
   setTheme: () => null,
 };
 
 const DEFAULT_STORAGE_KEY = 'vite-ui-theme';
 
-export function ThemeProvider({ children, defaultTheme = THEME_TYPES.SYSTEM, storageKey = DEFAULT_STORAGE_KEY, ...props }: ThemeProps) {
+export function ThemeProvider({ children, defaultTheme = THEME_TYPES.DARK, storageKey = DEFAULT_STORAGE_KEY, ...props }: ThemeProps) {
   const [storageTheme, setStorageTheme] = useStorage<Theme, Theme>(storageKey, defaultTheme);
 
   const [theme, setTheme] = useState<Theme>(storageTheme);

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { type DateRange } from 'react-day-picker';
-import { CalendarIcon, Check, ChevronsUpDown, Circle, Square, Star, StarOffIcon, Trash2, X } from 'lucide-react';
+import { CalendarIcon, Check, CheckSquare, CircleCheck, ChevronsUpDown, Circle, Square, Star, StarOffIcon, Trash2, X } from 'lucide-react';
 import { Button, Calendar, CheckboxGroup, Command, Popover, RadioGroup, TimePicker } from '@components/ui';
 import { Dialog } from '@components/ui/dialog';
 import {
@@ -23,11 +23,10 @@ import {
 import { ConfirmDialog, DateNavigation, FacetedFilter, PrimeDialog, TooltipButton } from '@components/shared';
 
 import { useToast } from '@hooks/shared';
-import { LookupService } from 'api';
 
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CheckCircleFilled, CheckSquareFilled } from 'assets/icons';
+import { LookupHandler } from '@api/handlers';
 
 // ---------- Demo components (hooks must be used inside components) ----------
 export function DialogDemo() {
@@ -41,7 +40,7 @@ export function DialogDemo() {
       <Dialog.Panel>
         <Dialog.Close
           aria-label="Close"
-          className="absolute end-4 top-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
+          className="absolute inset-e-4 top-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
         >
           <X size={18} />
         </Dialog.Close>
@@ -94,12 +93,12 @@ export function CommandAutocompleteDemo() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
+        <Button variant="outline" role="combobox" aria-expanded={open} className="w-50 justify-between">
           {selectedFramework ? selectedFramework.label : 'Select framework...'}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </Popover.Trigger>
-      <Popover.Content className="w-[200px] p-0">
+      <Popover.Content className="w-50 p-0">
         <Command>
           <Command.Input placeholder="Search framework..." />
           <Command.List>
@@ -381,7 +380,7 @@ export function FormComboboxAsyncDemo() {
         name="userId"
         control={form.control}
         label="User (Async with Infinite Scroll)"
-        options={LookupService.users.request}
+        options={LookupHandler.users.request}
         getOptionLabel={(o) => o?.name ?? ''}
         getOptionValue={(o) => o?.id ?? ''}
         placeholder="Search users..."
@@ -409,7 +408,7 @@ export function FormMultiComboboxAsyncDemo() {
         name="userIds"
         control={form.control}
         label="Users (Async Multi-select with Infinite Scroll)"
-        options={LookupService.users.request}
+        options={LookupHandler.users.request}
         getOptionLabel={(o) => o?.name ?? ''}
         getOptionValue={(o) => o?.id ?? ''}
         placeholder="Search and select users..."
@@ -614,7 +613,7 @@ export function ConfirmDialogDemo() {
 
       {/* Controlled + custom actions */}
       <ConfirmDialog
-        className="md:min-w-[450px]"
+        className="md:min-w-112.5"
         open={open}
         onOpenChange={setOpen}
         variant="warning"
@@ -947,7 +946,7 @@ export function CalendarDemo() {
         <p className="text-muted mb-2 text-xs font-medium">Single Date Selection</p>
         <Popover>
           <Popover.Trigger asChild>
-            <Button variant="outline" className="w-[280px] justify-start text-left font-normal">
+            <Button variant="outline" className="w-70 justify-start text-left font-normal">
               <CalendarIcon className="mr-2 h-4 w-4" />
               {date ? date.toLocaleDateString() : 'Pick a date'}
             </Button>
@@ -964,7 +963,7 @@ export function CalendarDemo() {
         <p className="text-muted mb-2 text-xs font-medium">Date Range Selection</p>
         <Popover>
           <Popover.Trigger asChild>
-            <Button variant="outline" className="w-[280px] justify-start text-left font-normal">
+            <Button variant="outline" className="w-70 justify-start text-left font-normal">
               <CalendarIcon className="mr-2 h-4 w-4" />
               {dateRange?.from ? (
                 dateRange.to ? (
@@ -1029,7 +1028,7 @@ export function RadioGroupDemo() {
               Option 1
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
+              <CircleCheck className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
               <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
@@ -1038,7 +1037,7 @@ export function RadioGroupDemo() {
               Option 2
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
+              <CircleCheck className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
               <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
@@ -1052,7 +1051,7 @@ export function RadioGroupDemo() {
               Option 1
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
+              <CircleCheck className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
               <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
@@ -1061,7 +1060,7 @@ export function RadioGroupDemo() {
               Option 2
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
+              <CircleCheck className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
               <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
@@ -1075,7 +1074,7 @@ export function RadioGroupDemo() {
               Checked Disabled
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
+              <CircleCheck className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
               <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
@@ -1084,7 +1083,7 @@ export function RadioGroupDemo() {
               Unchecked Disabled
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
+              <CircleCheck className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
               <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
@@ -1098,7 +1097,7 @@ export function RadioGroupDemo() {
               Checked Disabled
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
+              <CircleCheck className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
               <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
@@ -1107,7 +1106,7 @@ export function RadioGroupDemo() {
               Unchecked Disabled
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
+              <CircleCheck className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
               <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
@@ -1196,7 +1195,7 @@ export function CheckboxGroupDemo() {
               Option 1
             </span>
             <CheckboxGroup.Indicator>
-              <CheckSquareFilled className="text-secondary hidden group-data-[state=checked]/checkbox-item:block" />
+              <CheckSquare className="text-secondary hidden group-data-[state=checked]/checkbox-item:block" />
               <Square
                 size={24}
                 strokeWidth={1.5}
@@ -1209,7 +1208,7 @@ export function CheckboxGroupDemo() {
               Option 2
             </span>
             <CheckboxGroup.Indicator>
-              <CheckSquareFilled className="text-secondary hidden group-data-[state=checked]/checkbox-item:block" />
+              <CheckSquare className="text-secondary hidden group-data-[state=checked]/checkbox-item:block" />
               <Square
                 size={24}
                 strokeWidth={1.5}
@@ -1227,7 +1226,7 @@ export function CheckboxGroupDemo() {
               Checked Disabled
             </span>
             <CheckboxGroup.Indicator>
-              <CheckSquareFilled className="text-secondary group-disabled/checkbox-item:text-muted-400 hidden group-data-[state=checked]/checkbox-item:block" />
+              <CheckSquare className="text-secondary group-disabled/checkbox-item:text-muted-400 hidden group-data-[state=checked]/checkbox-item:block" />
               <Square
                 size={24}
                 strokeWidth={1.5}
@@ -1240,7 +1239,7 @@ export function CheckboxGroupDemo() {
               Unchecked Disabled
             </span>
             <CheckboxGroup.Indicator>
-              <CheckSquareFilled className="text-secondary group-disabled/checkbox-item:text-muted-400 hidden group-data-[state=checked]/checkbox-item:block" />
+              <CheckSquare className="text-secondary group-disabled/checkbox-item:text-muted-400 hidden group-data-[state=checked]/checkbox-item:block" />
               <Square
                 size={24}
                 strokeWidth={1.5}

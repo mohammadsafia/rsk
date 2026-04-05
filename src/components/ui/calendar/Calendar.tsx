@@ -79,7 +79,7 @@ function CalendarMonthsDropdown({ options, value, onChange, disabled }: Dropdown
             disabled={options.find((o) => String(o.value) === option.id)?.disabled}
             className="justify-center text-center"
           >
-            {option.name}
+            <Select.Text>{option.name}</Select.Text>
           </Select.Item>
         ))}
       </Select.Content>

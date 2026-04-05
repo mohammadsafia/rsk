@@ -1,2 +1,2 @@
-export * from 'api/core';
-export * from 'api/services';
+export * from './config';
+export * from './handlers';

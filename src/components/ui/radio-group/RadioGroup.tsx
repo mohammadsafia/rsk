@@ -37,9 +37,9 @@ const Indicator = ({ className, children, ...props }: RadioGroupIndicatorProps) 
     data-slot="radio-group-indicator"
     className={cn(
       'border-muted-200 bg-muted-50 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-[color,box-shadow] outline-none',
-      'data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground',
+      'data-[state=checked]:border-accent data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground',
       'group-hover/radio-item:border-primary-200 group-hover/radio-item:ring-primary/40 group-hover/radio-item:ring',
-      'data-[state=checked]:group-hover/radio-item:border-primary data-[state=checked]:group-hover/radio-item:ring-primary/40',
+      'data-[state=checked]:group-hover/radio-item:border-accent data-[state=checked]:group-hover/radio-item:ring-accent/40',
       'group-disabled/radio-item:opacity-50',
       className,
     )}

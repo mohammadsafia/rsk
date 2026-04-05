@@ -15,13 +15,14 @@ type TabsComponent = FC<TabsProps> & {
   Content: FC<TabsContentProps>;
 };
 
-const tabsListVariants = cva('flex items-center rounded-2xl p-1 gap-1 overflow-x-auto', {
+const tabsListVariants = cva('flex items-center overflow-x-auto', {
   variants: {
     variant: {
-      default: 'bg-background text-foreground w-full border border-muted-200',
-      compact: 'w-fit bg-background border border-muted-200 text-foreground',
-      plain: 'text-foreground bg-transparent',
-      compactPlain: 'w-fit text-foreground bg-transparent',
+      default: 'bg-background text-foreground w-full rounded-2xl border border-muted-200 p-1 gap-1',
+      compact: 'w-fit bg-background rounded-2xl border border-muted-200 text-foreground p-1 gap-1',
+      plain: 'text-foreground bg-transparent rounded-2xl p-1 gap-1',
+      compactPlain: 'w-fit text-foreground bg-transparent rounded-2xl p-1 gap-1',
+      underline: 'text-foreground bg-transparent border-b border-muted-200 rounded-none p-0 gap-0',
     },
   },
   defaultVariants: {
@@ -30,16 +31,17 @@ const tabsListVariants = cva('flex items-center rounded-2xl p-1 gap-1 overflow-x
 });
 
 const tabsTriggerVariants = cva(
-  `
-  inline-flex cursor-pointer items-center justify-center rounded-[inherit] px-3 py-2 text-sm font-medium whitespace-nowrap ${TRANSITION_DEFAULT}
-  ${FOCUS_RING} disabled:pointer-events-none disabled:opacity-50
-  data-[state=active]:bg-primary data-[state=active]:font-bold data-[state=active]:text-surface hover:bg-primary-15 hover:text-foreground
-  `,
+  `inline-flex cursor-pointer items-center justify-center text-sm font-medium whitespace-nowrap ${TRANSITION_DEFAULT} ${FOCUS_RING} disabled:pointer-events-none disabled:opacity-50`,
   {
     variants: {
       variant: {
-        default: 'grow flex gap-1',
-        fitContent: '',
+        default: `grow flex gap-1 rounded-[inherit] px-3 py-2
+          data-[state=active]:bg-primary data-[state=active]:font-bold data-[state=active]:text-primary-foreground hover:bg-primary-15 hover:text-foreground`,
+        fitContent: `rounded-[inherit] px-3 py-2
+          data-[state=active]:bg-primary data-[state=active]:font-bold data-[state=active]:text-primary-foreground hover:bg-primary-15 hover:text-foreground`,
+        underline: `px-4 py-2.5 rounded-none border-b-2 border-transparent text-muted-400
+          data-[state=active]:border-foreground data-[state=active]:text-foreground data-[state=active]:font-semibold
+          hover:text-foreground`,
       },
     },
     defaultVariants: {

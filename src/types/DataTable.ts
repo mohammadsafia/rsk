@@ -3,7 +3,13 @@ import '@tanstack/react-table';
 import type { RowData, ColumnSort } from '@tanstack/react-table';
 
 import type { AsyncOptionsFn } from '@hooks/shared';
-import type { Pagination } from 'types/api';
+
+type Pagination = {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPage: number;
+}
 
 export type ExtendedSortingState<TData extends Record<string, unknown>> = Array<
   Omit<ColumnSort, 'id'> & { id: Extract<keyof TData, string> }

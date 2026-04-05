@@ -2,13 +2,12 @@ import { Link } from 'react-router-dom';
 
 import { Collapsible } from '@components/ui';
 
-import { useAuthorization } from '@hooks/shared';
 import { useRouteUtils } from '@hooks/utils';
 import { cn } from '@utils';
-import { type AppMenu, ROUTES_PATH } from '@routes';
+import { type AppMenu, FULL_ROUTES_PATH } from '@routes';
 
 import { ChevronDown } from 'lucide-react';
-import { AuthorizationWrapper } from 'components/permissions';
+
 type SidebarLinkProps = {
   route: AppMenu;
   collapse: boolean;
@@ -17,30 +16,15 @@ type SidebarLinkProps = {
 };
 
 const LINK_BASE_STYLES =
-  'group relative flex w-full cursor-pointer items-center gap-2 px-6 h-11 text-sm font-medium transition-colors duration-150';
+  'group relative flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-200';
 
-const LINK_DEFAULT_STYLES = 'text-foreground hover:bg-primary-25 hover:border-l-2 hover:border-primary';
+const LINK_DEFAULT_STYLES = 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground';
 
-const LINK_ACTIVE_STYLES = 'bg-primary-15 border-l-2 border-primary font-bold text-foreground';
+const LINK_ACTIVE_STYLES =
+  'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm before:absolute before:start-0 before:top-1/2 before:h-5 before:-translate-y-1/2 before:w-[3px] before:rounded-full rounded-sm before:bg-primary';
 
 export function SidebarSubLink({ route, collapse }: SidebarLinkProps) {
   const { isAnyRouteActive } = useRouteUtils();
-  const { hasPermission, hasAnyPermission, hasAnyRole } = useAuthorization();
-
-  const hasAccessToSubmenu =
-    route.submenu?.some((subRoute) => {
-      if (subRoute.roles && subRoute.roles.length > 0 && !hasAnyRole(subRoute.roles)) return false;
-
-      if (subRoute.permission) return hasPermission(subRoute.permission);
-
-      if (subRoute.permissions) return hasAnyPermission(subRoute.permissions);
-
-      return true;
-    }) ?? false;
-
-  if (!hasAccessToSubmenu) {
-    return null;
-  }
 
   const childPaths = route.submenu?.map((sub) => sub.path) ?? [];
   const isActive = isAnyRouteActive([route.path, ...childPaths]);
@@ -48,21 +32,19 @@ export function SidebarSubLink({ route, collapse }: SidebarLinkProps) {
   return (
     <Collapsible defaultOpen={isActive}>
       <Collapsible.Trigger className={cn(LINK_BASE_STYLES, isActive ? LINK_ACTIVE_STYLES : LINK_DEFAULT_STYLES)}>
-        <route.icon className="text-foreground size-6 shrink-0" />
+        <route.icon className="h-5 w-5 shrink-0" />
 
-        <span className="flex-1 truncate text-left">{route.name}</span>
+        <span className="flex-1 truncate text-start">{route.name}</span>
 
-        <ChevronDown className='size-4 shrink-0 transition-transform duration-200 group-data-[state="open"]:-rotate-180' />
+        <ChevronDown className='h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state="open"]:-rotate-180' />
       </Collapsible.Trigger>
 
       <Collapsible.Content asChild>
-        <ul className="mt-1 flex flex-col gap-1">
+        <ul className="mt-1 space-y-1 ps-8">
           {route.submenu!.map((subRoute) => (
-            <AuthorizationWrapper key={subRoute.id} permissions={subRoute.permission ? [subRoute.permission] : []}>
-              <li>
-                <DashboardSidebarLink route={subRoute} subLink collapse={collapse} />
-              </li>
-            </AuthorizationWrapper>
+            <li key={subRoute.id}>
+              <DashboardSidebarLink route={subRoute} subLink collapse={collapse} />
+            </li>
           ))}
         </ul>
       </Collapsible.Content>
@@ -72,25 +54,10 @@ export function SidebarSubLink({ route, collapse }: SidebarLinkProps) {
 
 function DashboardSidebarLink({ route, collapse, subLink, onExpandSidebar }: SidebarLinkProps) {
   const { isActiveLink, isAnyRouteActive } = useRouteUtils();
-  const { hasPermission, hasAnyPermission, hasAnyRole } = useAuthorization();
-
-  const hasAccess = () => {
-    if (route.roles && route.roles.length > 0 && !hasAnyRole(route.roles)) return false;
-
-    if (route.permission) return hasPermission(route.permission);
-
-    if (route.permissions) return hasAnyPermission(route.permissions);
-
-    return true;
-  };
-
-  if (!hasAccess()) {
-    return null;
-  }
 
   const childPaths = route.submenu?.map((sub) => sub.path) ?? [];
   const isActive = onExpandSidebar ? isAnyRouteActive([route.path, ...childPaths]) : isActiveLink(route.path);
-  const linkPath = route.path === ROUTES_PATH.HOME.INDEX || route.path === ROUTES_PATH.ROOT.INDEX ? route.path : `/${route.path}`;
+  const linkPath = route.path === FULL_ROUTES_PATH.HOME.INDEX || route.path === FULL_ROUTES_PATH.ROOT.INDEX ? route.path : `/${route.path}`;
 
   if (onExpandSidebar && collapse) {
     return (
@@ -98,10 +65,9 @@ function DashboardSidebarLink({ route, collapse, subLink, onExpandSidebar }: Sid
         type="button"
         title={route.name ?? route.path}
         onClick={onExpandSidebar}
-        className={cn(LINK_BASE_STYLES, isActive ? LINK_ACTIVE_STYLES : LINK_DEFAULT_STYLES)}
+        className={cn(LINK_BASE_STYLES, isActive ? LINK_ACTIVE_STYLES : LINK_DEFAULT_STYLES, 'justify-center')}
       >
-        <route.icon className="text-foreground size-6 shrink-0" />
-        <span className="truncate">{route.name ?? route.path}</span>
+        <route.icon className="h-5 w-5 shrink-0" />
       </button>
     );
   }
@@ -109,14 +75,15 @@ function DashboardSidebarLink({ route, collapse, subLink, onExpandSidebar }: Sid
   return (
     <Link
       title={route.name ?? route.path}
-      to={linkPath}
+      to={route.path}
       className={cn(LINK_BASE_STYLES, isActive ? LINK_ACTIVE_STYLES : LINK_DEFAULT_STYLES, {
-        'h-auto py-2 pl-14 text-sm font-medium': subLink,
+        'justify-center': collapse && !subLink,
+        'rounded-none border-s-2 ps-4': subLink,
       })}
     >
-      {!subLink && <route.icon className="text-foreground size-6 shrink-0" />}
+      <route.icon className="h-5 w-5 shrink-0" />
 
-      <span className="truncate">{route.name ?? route.path}</span>
+      <span className={cn('truncate', { 'sr-only': collapse && !subLink })}>{route.name ?? route.path}</span>
     </Link>
   );
 }

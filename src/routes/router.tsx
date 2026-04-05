@@ -55,6 +55,10 @@ export const router = createBrowserRouter([
             path: FULL_ROUTES_PATH.COMPONENTS.DETAIL,
             element: <ComponentDetailPage />,
           },
+          {
+            path: FULL_ROUTES_PATH.SETTINGS.INDEX,
+            element: <div className="p-6">Settings</div>,
+          },
         ],
       },
     ],

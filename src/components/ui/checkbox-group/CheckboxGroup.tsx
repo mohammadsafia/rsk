@@ -37,9 +37,9 @@ const Indicator = ({ className, children, ...props }: CheckboxGroupIndicatorProp
     data-slot="checkbox-group-indicator"
     className={cn(
       'border-muted-200 bg-muted-50 flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-[color,box-shadow] outline-none',
-      'data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground',
+      'data-[state=checked]:border-accent data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground',
       'group-hover/checkbox-item:border-primary-200 group-hover/checkbox-item:ring-primary/40 group-hover/checkbox-item:ring',
-      'data-[state=checked]:group-hover/checkbox-item:border-primary data-[state=checked]:group-hover/checkbox-item:ring-primary/40',
+      'data-[state=checked]:group-hover/checkbox-item:border-accent data-[state=checked]:group-hover/checkbox-item:ring-accent/40',
       'group-disabled/checkbox-item:opacity-50',
       className,
     )}

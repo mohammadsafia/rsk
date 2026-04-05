@@ -19,6 +19,5 @@ export * from './form-submit-buttons';
 export * from './action-panel';
 export * from './combobox';
 export * from './grid-card';
-export * from './stepper';
 export * from './field-section';
 export * from './composed-components';

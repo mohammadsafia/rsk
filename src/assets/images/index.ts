@@ -1,17 +1,1 @@
-export { default as ForbiddenImage } from './403.webp';
-export { default as ApproveImage } from './approve.svg';
-export { default as BackdropLoaderImage } from './backdrop-loader.webp';
-export { default as DaisyBillImage } from './daisy-bill.webp';
-export { default as DialogCancelImage } from './dialog-cancel-image.webp';
-export { default as DialogConfirmImage } from './dialog-confirm-image.webp';
-export { default as GoogleButtonImage } from './google-button.svg';
-export { default as LoginBgImage } from './login-bg.png';
-export { default as LoginImage } from './login.webp';
-export { default as LogoImage } from './logo.png';
-export { default as LogoSvgImage } from './logo.svg';
-export { default as MedEvalLogoImage } from './med-eval-logo.png';
-export { default as MicrosoftButtonImage } from './microsoft-button.svg';
-export { default as MobileBgImage } from './mobile-bg.jpeg';
-export { default as NotFoundImage } from './not-found.webp';
-export { default as ServerErrorImage } from './server-error.webp';
-export { default as ZeroStateImage } from './zero-state.webp';
+export {}

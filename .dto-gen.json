@@ -2,13 +2,8 @@
   "endpoints": [
     {
       "name": "v1",
-      "url": "https://dev-api.qlinica.app/med-legal/swagger/v1/swagger.json",
+      "url": "swagger.json",
       "outputDir": "src/types/api"
-    },
-    {
-      "name": "v2",
-      "url": "https://dev-api.qlinica.app/med-legal/swagger/v2/swagger.json",
-      "outputDir": "src/types/api-v2"
     }
   ],
   "enumStrategy": "type-literal",
