@@ -5,6 +5,7 @@ import { AuthGuard, AuthLayout, DashboardLayout, ErrorBoundary } from '@layouts'
 
 import { FULL_ROUTES_PATH } from './routes';
 
+const HomePage = lazy(() => import('@pages/home/HomePage'));
 const ComponentsGalleryPage = lazy(() => import('@pages/components/ComponentsGalleryPage'));
 const ComponentDetailPage = lazy(() => import('@pages/components/ComponentDetailPage'));
 
@@ -16,7 +17,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <div className="flex h-dvh items-center justify-center">Home (Public)</div>,
+        element: <HomePage />,
       },
     ],
   },
