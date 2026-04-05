@@ -1,5 +1,3 @@
-export type { CategoryTab, SidebarPanelProps, DocPanelProps } from './types';
-export { SidebarPanel } from './sidebar-panel';
-export { DocPanel } from './doc-panel';
+export type { CategoryTab } from './types';
 export * from './hooks';
-export { buildCategoryTabOptions } from './utils';
+export { buildCategoryTabOptions, ALL_CATEGORY_KEY } from './utils';

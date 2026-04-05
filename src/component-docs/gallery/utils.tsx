@@ -6,6 +6,8 @@ import type { MDXComponents } from 'mdx/types';
 import type { ComponentDocEntry } from '@component-docs/registry';
 import type { CategoryTab, PreProps } from '@component-docs/gallery/types';
 
+export const ALL_CATEGORY_KEY = 'ALL';
+
 export function formatCategoryLabel(key: string | undefined | null): string {
   return normalizeCategoryKey(key);
 }
@@ -26,6 +28,9 @@ export function buildCategoryTabOptions(docs: ReadonlyArray<Readonly<ComponentDo
     const [ui] = categoryTabs.splice(uiTabIndex, 1);
     categoryTabs.unshift(ui);
   }
+
+  // Prepend "All" tab
+  categoryTabs.unshift({ key: 'ALL', label: 'All' });
 
   return categoryTabs;
 }
