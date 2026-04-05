@@ -1,0 +1,35 @@
+---
+id: faceted-filter
+title: FacetedFilter
+section: Components
+category: Shared
+description: 'Filter component with multiple variants: text, select, multi-select, date-range.'
+tags: [shared, faceted-filter, filter, form]
+---
+
+import { FacetedFilterDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FacetedFilterDemo />
+
+## Imports
+
+```tsx
+import { FacetedFilter } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<FacetedFilter
+  name="status"
+  title="Status"
+  control={form.control}
+  filterVariant="multi-select"
+  filterOptions={[
+    { label: 'Active', value: 'active' },
+    { label: 'Inactive', value: 'inactive' },
+  ]}
+/>
+```

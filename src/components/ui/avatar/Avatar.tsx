@@ -18,13 +18,13 @@ type AvatarComponent = FC<AvatarProps> & {
 };
 
 const Image: FC<ImageProps> = ({ className, ...props }) => (
-  <AvatarPrimitive.Image data-slot="avatar-image" className={cn('aspect-square size-full', className)} {...props} />
+  <AvatarPrimitive.Image data-slot="avatar-iamge" className={cn('aspect-square h-full w-full', className)} {...props} />
 );
 
 const Fallback: FC<FallbackProps> = ({ className, ...props }) => (
   <AvatarPrimitive.Fallback
     data-slot="avatar-fallback"
-    className={cn('flex size-full items-center justify-center rounded-full', className)}
+    className={cn('bg-background flex h-full w-full items-center justify-center rounded-full', className)}
     {...props}
   />
 );
@@ -32,7 +32,7 @@ const Fallback: FC<FallbackProps> = ({ className, ...props }) => (
 const Avatar: AvatarComponent = ({ className, ...props }) => (
   <AvatarPrimitive.Root
     data-slot="avatar"
-    className={cn('border-primary relative flex size-8 shrink-0 overflow-hidden rounded-full border', className)}
+    className={cn('relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full', className)}
     {...props}
   />
 );

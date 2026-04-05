@@ -1,0 +1,47 @@
+---
+id: file-uploader
+title: FileUploader
+section: Components
+category: Shared
+description: 'Drag-and-drop file upload with preview, file list, and download actions.'
+tags: [shared, file, upload, dropzone]
+---
+
+import {FileUploader} from '@components/shared';
+
+## Demo
+
+<div className="w-96">
+    <FileUploader>
+        <FileUploader.DropzoneGroup>
+            <FileUploader.Dropzone accept=".pdf,.doc,.docx" placeholder="Drop files here or click to browse"/>
+        </FileUploader.DropzoneGroup>
+    </FileUploader>
+</div>
+
+## Imports
+
+```tsx
+import { FileUploader } from '@components/shared';
+```
+
+## Code
+
+```tsx
+// Basic dropzone
+<FileUploader name="document" value={file} onChange={setFile}>
+  <FileUploader.DropzoneGroup>
+    <FileUploader.Dropzone accept=".pdf,.doc" placeholder="Drop file here" />
+    <FileUploader.Actions />
+  </FileUploader.DropzoneGroup>
+</FileUploader>
+
+// With file list and image preview
+<FileUploader name="files" value={files} onChange={setFiles} multiple>
+  <FileUploader.DropzoneGroup>
+    <FileUploader.Dropzone accept="image/*" />
+  </FileUploader.DropzoneGroup>
+  <FileUploader.FileList />
+  <FileUploader.ImagePreview />
+</FileUploader>
+```

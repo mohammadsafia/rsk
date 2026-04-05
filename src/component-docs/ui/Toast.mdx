@@ -1,0 +1,52 @@
+---
+id: toast
+title: Toast
+section: Components
+category: UI
+description: 'Notification toasts with multiple variants: default, success, and destructive.'
+tags: [ui, toast, notification]
+---
+
+import { ToastDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<ToastDemo />
+
+## Imports
+
+```tsx
+import { useToast } from '@hooks/shared';
+import { Toaster } from '@components/shared';
+```
+
+## Code
+
+```tsx
+// In your App root
+<Toaster />;
+
+// In your component
+const { toast } = useToast();
+
+// Default toast
+toast({
+  title: 'Default Toast',
+  description: 'This is a default toast notification.',
+  variant: 'default',
+});
+
+// Success toast
+toast({
+  title: 'Success!',
+  description: 'Operation completed successfully.',
+  variant: 'success',
+});
+
+// Destructive toast
+toast({
+  title: 'Error',
+  description: 'Something went wrong.',
+  variant: 'destructive',
+});
+```

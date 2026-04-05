@@ -1,0 +1,37 @@
+---
+id: prime-dialog
+title: PrimeDialog
+section: Components
+category: Shared
+description: 'Enhanced dialog with automatic mode labels (Create/Update/View) and styled header.'
+tags: [shared, prime-dialog, dialog, modal]
+---
+
+import { PrimeDialogDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<PrimeDialogDemo />
+
+## Imports
+
+```tsx
+import { PrimeDialog } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<PrimeDialog dialogMode="Create">
+  <PrimeDialog.Trigger asChild>
+    <Button>Open</Button>
+  </PrimeDialog.Trigger>
+  <PrimeDialog.Container>
+    <PrimeDialog.Header>
+      <PrimeDialog.Title>User</PrimeDialog.Title>
+    </PrimeDialog.Header>
+    <PrimeDialog.Content>Content</PrimeDialog.Content>
+    <PrimeDialog.Actions />
+  </PrimeDialog.Container>
+</PrimeDialog>
+```

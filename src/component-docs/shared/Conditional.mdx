@@ -1,0 +1,47 @@
+---
+id: conditional
+title: Conditional
+section: Components
+category: Shared
+description: Declarative conditional rendering helper.
+tags: [shared, conditional, utility]
+---
+
+import { Conditional } from '@components/utils';
+
+## Demo
+
+<div className="space-y-2">
+  <Conditional>
+    <Conditional.If condition={true}>
+      <div className="text-green-600">✓ Condition is true</div>
+    </Conditional.If>
+    <Conditional.Else>
+      <div className="text-red-600">✗ Condition is false</div>
+    </Conditional.Else>
+  </Conditional>
+
+  <Conditional>
+    <Conditional.If condition={false}>
+      <div className="text-green-600">✓ This won't show</div>
+    </Conditional.If>
+    <Conditional.Else>
+      <div className="text-muted">→ Fallback content</div>
+    </Conditional.Else>
+  </Conditional>
+</div>
+
+## Imports
+
+```tsx
+import { Conditional } from '@components/utils';
+```
+
+## Code
+
+```tsx
+<Conditional>
+  <Conditional.If condition={true}>Content</Conditional.If>
+  <Conditional.Else>Fallback</Conditional.Else>
+</Conditional>
+```

@@ -1,0 +1,45 @@
+---
+id: toaster
+title: Toaster
+section: Components
+category: Shared
+description: 'Toast notification renderer for displaying alerts with title, description, and actions.'
+tags: [shared, toast, notification]
+---
+
+import { Toaster } from '@components/shared';
+
+## Demo
+
+<p className="text-sm text-muted-foreground">
+  The Toaster component renders at the root level and displays notifications triggered via the <code>useToast</code> hook.
+  It is typically placed once in the app layout.
+</p>
+
+## Imports
+
+```tsx
+import { Toaster } from '@components/shared';
+import { useToast } from 'hooks/useToast';
+```
+
+## Code
+
+```tsx
+// Place once in app layout
+<Toaster />
+
+// Trigger toasts via hook
+const { toast } = useToast();
+
+toast({
+  title: 'Success',
+  description: 'Your changes have been saved.',
+});
+
+toast({
+  variant: 'destructive',
+  title: 'Error',
+  description: 'Something went wrong.',
+});
+```

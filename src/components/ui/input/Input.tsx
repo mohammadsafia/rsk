@@ -1,28 +1,23 @@
-import { type InputHTMLAttributes, forwardRef } from 'react';
+import { type ComponentProps, type FC, forwardRef } from 'react';
 
-import { cn } from '@utils';
+import { cn, DISABLED_STYLES, FOCUS_RING, TRANSITION_DEFAULT } from '@utils';
 
-type InputProps = InputHTMLAttributes<HTMLInputElement> & {
-  className?: string;
-};
+type InputProps = ComponentProps<'input'>;
 
-const Input = forwardRef<HTMLInputElement, InputProps>(({ className, ...props }, ref) => {
-  return (
-    <input
-      data-slot="input"
-      className={cn(
-        'border-accent bg-background flex w-full rounded-md disabled:cursor-not-allowed disabled:opacity-50',
-        'border px-3 py-2 text-sm shadow-xs transition-colors',
-        'file:border-0 file:bg-transparent file:text-sm file:font-medium',
-        'hover:ring-accent focus-visible:ring-accent hover:ring focus-visible:ring focus-visible:outline-none',
-        className,
-      )}
-      ref={ref}
-      {...props}
-    />
-  );
-});
+const Input: FC<InputProps> = ({ ref, className, ...props }) => (
+  <input
+    data-slot="input"
+    ref={ref}
+    className={cn(
+      `border-muted-200 bg-muted-50 flex w-full rounded-md border p-3 text-sm shadow-xs ${TRANSITION_DEFAULT} ${FOCUS_RING}`,
+      'placeholder:text-muted file:border-0 file:bg-transparent file:text-sm file:font-medium',
+      'hover:not-disabled:border-primary-200 hover:not-disabled:ring-primary/40 hover:not-disabled:ring',
+      `disabled:bg-muted-50 disabled:text-muted-300 disabled:placeholder:text-muted-300 ${DISABLED_STYLES}`,
+      className,
+    )}
+    {...props}
+  />
+);
 
-Input.displayName = 'Input';
-
-export default Input;
+// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
+export default forwardRef<HTMLInputElement, InputProps>((props, ref) => Input({ ...props, ref }));

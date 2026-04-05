@@ -1,0 +1,70 @@
+---
+id: loading-button
+title: LoadingButton
+section: Components
+category: Shared
+description: 'Button with loading spinner state. Supports all Button variants and sizes.'
+tags: [ui, button, loading]
+---
+
+import {LoadingButton} from '@components/shared';
+
+## Demo
+
+<div className="space-y-4">
+    <div>
+        <p className="text-muted mb-2 text-xs font-medium">Variants</p>
+        <div className="flex flex-wrap gap-2">
+            <LoadingButton variant="default">Default</LoadingButton>
+            <LoadingButton variant="secondary">Secondary</LoadingButton>
+            <LoadingButton variant="destructive">Destructive</LoadingButton>
+            <LoadingButton variant="outline">Outline</LoadingButton>
+            <LoadingButton variant="ghost">Ghost</LoadingButton>
+            <LoadingButton variant="link">Link</LoadingButton>
+        </div>
+    </div>
+
+    <div>
+        <p className="text-muted mb-2 text-xs font-medium">Loading States</p>
+        <div className="flex flex-wrap gap-2">
+            <LoadingButton variant="default">Normal</LoadingButton>
+            <LoadingButton variant="default" loading>Loading...</LoadingButton>
+            <LoadingButton variant="secondary" loading>Processing</LoadingButton>
+            <LoadingButton variant="destructive" loading>Deleting</LoadingButton>
+        </div>
+    </div>
+
+    <div>
+        <p className="text-muted mb-2 text-xs font-medium">Sizes</p>
+        <div className="flex flex-wrap items-center gap-2">
+            <LoadingButton size="sm" loading>Small</LoadingButton>
+            <LoadingButton size="default" loading>Default</LoadingButton>
+            <LoadingButton size="lg" loading>Large</LoadingButton>
+        </div>
+    </div>
+
+</div>
+
+## Imports
+
+```tsx
+import { LoadingButton } from '@components/shared';
+```
+
+## Code
+
+```tsx
+// Variants
+<LoadingButton variant="default">Default</LoadingButton>
+<LoadingButton variant="secondary">Secondary</LoadingButton>
+<LoadingButton variant="destructive">Destructive</LoadingButton>
+<LoadingButton variant="outline">Outline</LoadingButton>
+
+// Loading States
+<LoadingButton loading={isLoading}>Submit</LoadingButton>
+<LoadingButton variant="secondary" loading>Processing</LoadingButton>
+
+// Sizes
+<LoadingButton size="sm" loading>Small</LoadingButton>
+<LoadingButton size="lg" loading>Large</LoadingButton>
+```

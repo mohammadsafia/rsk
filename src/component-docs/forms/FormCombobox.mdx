@@ -1,0 +1,43 @@
+---
+id: form-combobox
+title: FormCombobox (Searchable Select)
+section: Components
+category: Forms
+description: Searchable dropdown with autocomplete.
+tags: [forms, combobox, search]
+---
+
+import { FormComboboxDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormComboboxDemo />
+
+## Imports
+
+```tsx
+import { FormContainer, FormCombobox } from '@components/forms';
+import { useForm } from 'react-hook-form';
+```
+
+## Code
+
+```tsx
+const form = useForm();
+const options = [
+  { id: 'us', name: 'United States' },
+  { id: 'uk', name: 'United Kingdom' },
+];
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormCombobox
+    name="country"
+    control={form.control}
+    label="Country"
+    options={options}
+    getOptionLabel={(o) => o.name}
+    getOptionValue={(o) => o.id}
+    placeholder="Search country..."
+  />
+</FormContainer>;
+```

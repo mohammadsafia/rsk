@@ -1,0 +1,42 @@
+---
+id: select
+title: Select
+section: Components
+category: UI
+description: 'Single select dropdown.'
+tags: [ui, input, select]
+---
+
+import { Select } from '@components/ui';
+
+## Demo
+
+<Select defaultValue="apple">
+  <Select.Trigger className="w-48">
+    <Select.Value />
+  </Select.Trigger>
+  <Select.Content>
+    <Select.Item value="apple">Apple</Select.Item>
+    <Select.Item value="orange">Orange</Select.Item>
+    <Select.Item value="banana">Banana</Select.Item>
+  </Select.Content>
+</Select>
+
+## Imports
+
+```tsx
+import { Select } from '@components/ui';
+```
+
+## Code
+
+```tsx
+<Select defaultValue="apple">
+  <Select.Trigger>
+    <Select.Value />
+  </Select.Trigger>
+  <Select.Content>
+    <Select.Item value="apple">Apple</Select.Item>
+  </Select.Content>
+</Select>
+```

@@ -7,14 +7,16 @@ import { cn } from '@utils';
 
 import { Asterisk } from 'lucide-react';
 
-const labelVariants = cva('inline-block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70');
-
 type FormLabelProps = ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &
   VariantProps<typeof labelVariants> & {
     error?: FieldError;
     required?: boolean;
     hidden?: boolean;
   };
+
+const labelVariants = cva(
+  'text-muted inline-block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+);
 
 const FormLabel: FC<FormLabelProps> = ({ className, error, children, required, hidden, ...props }) => {
   if (hidden) return null;
@@ -23,7 +25,7 @@ const FormLabel: FC<FormLabelProps> = ({ className, error, children, required, h
     <LabelPrimitive.Root data-slot="form-label" className={cn(labelVariants(), error && 'text-destructive', className)} {...props}>
       {children}
 
-      {required && <Asterisk className="ml-0.5 inline-block align-text-top text-red-500" size={10} />}
+      {required && <Asterisk className="ml-0.5 inline-block align-text-top text-inherit" size={10} />}
     </LabelPrimitive.Root>
   );
 };

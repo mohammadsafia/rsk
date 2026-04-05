@@ -1,0 +1,36 @@
+---
+id: form-date
+title: FormDatePicker
+section: Components
+category: Forms
+description: 'Single date picker field with validation, disabled states, and default values support.'
+tags: [forms, date, picker]
+---
+
+import { FormDatePickerDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormDatePickerDemo />
+
+## Imports
+
+```tsx
+import { FormContainer, FormDatePicker } from '@components/forms';
+import { useForm } from 'react-hook-form';
+import { Button } from '@components/ui';
+```
+
+## Code
+
+```tsx
+const form = useForm({ defaultValues: { dateWithDefault: new Date() } });
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormDatePicker name="date" control={form.control} label="Basic Date Picker" placeholder="Select a date" />
+  <FormDatePicker name="dateRequired" control={form.control} label="Required Date" required placeholder="Select a date (required)" />
+  <FormDatePicker name="dateWithDefault" control={form.control} label="Date with Default Value" placeholder="Select a date" />
+  <FormDatePicker name="date" control={form.control} label="Disabled Date Picker" disabled placeholder="Select a date" />
+  <Button type="submit">Submit</Button>
+</FormContainer>
+```

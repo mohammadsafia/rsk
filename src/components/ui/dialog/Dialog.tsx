@@ -1,43 +1,37 @@
-import { type ComponentPropsWithoutRef, type FC, type HTMLAttributes } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type HTMLAttributes } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+
 import { cn } from '@utils';
 
-import { X } from 'lucide-react';
-
-type DialogTriggerProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Trigger>;
 type DialogPortalProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Portal>;
-type DialogCloseProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Close>;
-type DialogOverlayProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>;
-type DialogContentProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Content>;
+type DialogOverlayProps = ComponentProps<typeof DialogPrimitive.Overlay>;
+type DialogTriggerProps = ComponentProps<typeof DialogPrimitive.Trigger>;
+type DialogPanelProps = ComponentProps<typeof DialogPrimitive.Content>;
+type DialogCloseProps = ComponentProps<typeof DialogPrimitive.Close>;
 type DialogHeaderProps = HTMLAttributes<HTMLDivElement>;
-type DialogFooterProps = HTMLAttributes<HTMLDivElement>;
 type DialogTitleProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Title>;
 type DialogDescriptionProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Description>;
+type DialogContentProps = HTMLAttributes<HTMLElement>;
+type DialogFooterProps = HTMLAttributes<HTMLDivElement>;
 
 type DialogProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Root>;
 
 type DialogComponent = FC<DialogProps> & {
-  Trigger: FC<DialogTriggerProps>;
   Portal: FC<DialogPortalProps>;
-  Close: FC<DialogCloseProps>;
   Overlay: FC<DialogOverlayProps>;
-  Content: FC<DialogContentProps>;
+  Trigger: FC<DialogTriggerProps>;
+  Panel: FC<DialogPanelProps>;
+  Close: FC<DialogCloseProps>;
   Header: FC<DialogHeaderProps>;
-  Footer: FC<DialogFooterProps>;
   Title: FC<DialogTitleProps>;
   Description: FC<DialogDescriptionProps>;
+  Content: FC<DialogContentProps>;
+  Footer: FC<DialogFooterProps>;
 };
 
-const DialogClose: FC<DialogCloseProps> = ({ className, ...props }) => {
-  return <DialogPrimitive.Close data-slot="dialog-close" className={cn(className)} {...props} />;
-};
-
-const DialogTrigger: FC<DialogTriggerProps> = ({ className, ...props }) => {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" className={cn(className)} {...props} />;
-};
-
-const Overlay: FC<DialogOverlayProps> = ({ className, ...props }) => (
+const DialogOverlay: FC<DialogOverlayProps> = ({ ref, className, ...props }) => (
   <DialogPrimitive.Overlay
+    ref={ref}
     data-slot="dialog-overlay"
     className={cn(
       'bg-foreground/20 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50',
@@ -47,72 +41,88 @@ const Overlay: FC<DialogOverlayProps> = ({ className, ...props }) => (
   />
 );
 
-const Content: FC<DialogContentProps> = ({ className, children, ...props }) => (
+const DialogTrigger: FC<DialogTriggerProps> = ({ ref, className, ...props }) => (
+  <DialogPrimitive.Trigger ref={ref} data-slot="dialog-trigger" className={cn(className)} {...props} />
+);
+
+const DialogPanel: FC<DialogPanelProps> = ({ ref, className, children, ...props }) => (
   <DialogPrimitive.Portal>
-    <Overlay />
+    <Dialog.Overlay />
 
     <DialogPrimitive.Content
-      data-slot="dialog-content"
+      ref={ref}
+      onWheel={(e) => e.stopPropagation()}
+      data-slot="dialog-panel"
       className={cn(
-        `border-accent bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0`,
-        'data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+        'bg-background grid w-full max-w-lg gap-6 rounded-2xl py-6 shadow-lg',
+        'fixed inset-s-1/2 top-1/2 z-50 translate-x-[-50%] translate-y-[-50%] duration-200',
+        'focus:outline-none',
+        'data-[state=open]:animate-in data-[state=closed]:animate-out',
+        'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+        'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
         'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-top',
-        'fixed start-1/2 top-1/2 z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border px-3 py-6 shadow-lg duration-200 sm:rounded-lg md:w-full md:px-6',
         className,
       )}
       {...props}
     >
       {children}
-
-      <DialogClose
-        aria-label="Close"
-        className="data-[state=open]:bg-accent data-[state=open]:text-accent-foreground absolute end-4 top-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none"
-      >
-        <X size={16} />
-      </DialogClose>
     </DialogPrimitive.Content>
   </DialogPrimitive.Portal>
 );
 
-const Header: FC<HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
-  <header data-slot="dialog-header" className={cn('flex flex-col space-y-1.5 text-center sm:text-start', className)} {...props} />
+const DialogClose: FC<DialogCloseProps> = ({ ref, className, ...props }) => (
+  <DialogPrimitive.Close ref={ref} data-slot="dialog-close" className={cn(className)} {...props} />
 );
 
-const Footer: FC<HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
-  <footer data-slot="dialog-footer" className={cn('space-x-2 text-center md:text-end', className)} {...props} />
+const DialogHeader: FC<HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
+  <header data-slot="dialog-header" className={cn('px-6', className)} {...props} />
 );
 
-const Title: FC<ComponentPropsWithoutRef<typeof DialogPrimitive.Title>> = ({ className, ...props }) => (
+const DialogHeaderTitle: FC<ComponentPropsWithoutRef<typeof DialogPrimitive.Title>> = ({ className, ...props }) => (
   <DialogPrimitive.Title
     data-slot="dialog-title"
-    className={cn('text-lg leading-none font-semibold tracking-tight', className)}
+    className={cn('text-foreground text-xl leading-none font-semibold', className)}
     {...props}
   />
 );
 
-const Description: FC<ComponentPropsWithoutRef<typeof DialogPrimitive.Description>> = ({ className, ...props }) => (
-  <DialogPrimitive.Description data-slot="dialog-description" className={cn('text-muted-foreground text-sm', className)} {...props} />
+const DialogHeaderDescription: FC<ComponentPropsWithoutRef<typeof DialogPrimitive.Description>> = ({ className, ...props }) => (
+  <DialogPrimitive.Description data-slot="dialog-description" className={cn('text-muted text-sm', className)} {...props} />
 );
 
-const Dialog: DialogComponent = ({ ...props }) => {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />;
-};
+const DialogContent: FC<DialogContentProps> = ({ className, ...props }) => (
+  <section data-slot="dialog-content" className={cn('px-6', className)} {...props} />
+);
+
+const DialogFooter: FC<HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
+  <footer data-slot="dialog-footer" className={cn('px-6', className)} {...props} />
+);
+
+const Dialog = DialogPrimitive.Root as unknown as DialogComponent;
 
 Dialog.Portal = DialogPrimitive.Portal;
-Dialog.Overlay = Overlay;
-Dialog.Trigger = DialogTrigger;
-Dialog.Close = DialogClose;
-Dialog.Content = Content;
-Dialog.Header = Header;
-Dialog.Footer = Footer;
-Dialog.Title = Title;
-Dialog.Description = Description;
+// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
+Dialog.Overlay = forwardRef<HTMLDivElement, DialogOverlayProps>((props, ref) => DialogOverlay({ ...props, ref }));
+// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
+Dialog.Trigger = forwardRef<HTMLButtonElement, DialogTriggerProps>((props, ref) => DialogTrigger({ ...props, ref }));
+// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
+Dialog.Panel = forwardRef<HTMLDivElement, DialogPanelProps>((props, ref) => DialogPanel({ ...props, ref }));
+// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
+Dialog.Close = forwardRef<HTMLButtonElement, DialogCloseProps>((props, ref) => DialogClose({ ...props, ref }));
+Dialog.Header = DialogHeader;
+Dialog.Title = DialogHeaderTitle;
+Dialog.Description = DialogHeaderDescription;
+Dialog.Content = DialogContent;
+Dialog.Footer = DialogFooter;
 
-Overlay.displayName = DialogPrimitive.Overlay.displayName;
-Content.displayName = DialogPrimitive.Content.displayName;
-Title.displayName = DialogPrimitive.Title.displayName;
-Description.displayName = DialogPrimitive.Description.displayName;
-Header.displayName = 'DialogHeader';
-Footer.displayName = 'DialogFooter';
+Dialog.Overlay.displayName = DialogPrimitive.Overlay.displayName;
+Dialog.Trigger.displayName = 'DialogTrigger';
+Dialog.Panel.displayName = 'DialogPanel';
+Dialog.Close.displayName = 'DialogClose';
+DialogHeader.displayName = 'DialogHeader';
+DialogHeaderTitle.displayName = DialogPrimitive.Title.displayName;
+DialogHeaderDescription.displayName = DialogPrimitive.Description.displayName;
+DialogContent.displayName = 'DialogContent';
+DialogFooter.displayName = 'DialogFooter';
 
 export default Dialog;

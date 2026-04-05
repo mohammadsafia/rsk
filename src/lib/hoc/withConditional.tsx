@@ -8,11 +8,11 @@
  * <ConditionalComponentName condition={Condition as Boolean} />
  */
 
-import type { ComponentType } from "react";
+import type { ComponentType } from 'react';
 
 function withConditional<TProps extends object>(WrappedComponent: ComponentType<TProps>) {
   return ({ condition, ...props }: TProps & { condition?: boolean }) => {
-    if (!condition) return null;
+    if (condition === false) return null;
 
     return <WrappedComponent {...(props as TProps)} />;
   };

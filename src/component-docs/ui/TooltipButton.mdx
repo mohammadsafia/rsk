@@ -1,0 +1,86 @@
+---
+id: tooltip-button
+title: TooltipButton
+section: Components
+category: UI
+description: 'Button with integrated tooltip. Supports all Button variants and sizes.'
+tags: [ui, button, tooltip]
+---
+
+import { TooltipButton } from '@components/shared';
+
+## Demo
+
+<div className="space-y-4">
+    <div>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">Variants</p>
+        <div className="flex flex-wrap gap-2">
+            <TooltipButton title="Default button tooltip" variant="default">
+                Default
+            </TooltipButton>
+            <TooltipButton title="Secondary button tooltip" variant="secondary">
+                Secondary
+            </TooltipButton>
+            <TooltipButton title="Destructive button tooltip" variant="destructive">
+                Destructive
+            </TooltipButton>
+            <TooltipButton title="Outline button tooltip" variant="outline">
+                Outline
+            </TooltipButton>
+            <TooltipButton title="Ghost button tooltip" variant="ghost">
+                Ghost
+            </TooltipButton>
+        </div>
+    </div>
+
+    <div>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">Sizes</p>
+        <div className="flex flex-wrap items-center gap-2">
+            <TooltipButton title="Small button" variant="default" size="sm">
+                Small
+            </TooltipButton>
+            <TooltipButton title="Default button" variant="default" size="default">
+                Default
+            </TooltipButton>
+            <TooltipButton title="Large button" variant="default" size="lg">
+                Large
+            </TooltipButton>
+        </div>
+    </div>
+
+    <div>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">With Loading</p>
+        <div className="flex flex-wrap gap-2">
+            <TooltipButton title="Loading button" variant="default" loading>
+                Loading
+            </TooltipButton>
+            <TooltipButton title="Processing" variant="secondary" loading>
+                Processing
+            </TooltipButton>
+        </div>
+    </div>
+
+</div>
+
+## Imports
+
+```tsx
+import { TooltipButton } from '@components/shared';
+```
+
+## Code
+
+```tsx
+// Variants
+<TooltipButton title="Tooltip text" variant="default">Default</TooltipButton>
+<TooltipButton title="Tooltip text" variant="secondary">Secondary</TooltipButton>
+<TooltipButton title="Tooltip text" variant="destructive">Destructive</TooltipButton>
+<TooltipButton title="Tooltip text" variant="outline">Outline</TooltipButton>
+
+// Sizes
+<TooltipButton title="Tooltip" size="sm">Small</TooltipButton>
+<TooltipButton title="Tooltip" size="lg">Large</TooltipButton>
+
+// With Loading
+<TooltipButton title="Loading" loading>Loading</TooltipButton>
+```

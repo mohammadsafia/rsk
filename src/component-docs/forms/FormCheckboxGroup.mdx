@@ -1,0 +1,45 @@
+---
+id: form-checkbox-group
+title: FormCheckboxGroup
+section: Components
+category: Forms
+description: 'Controlled checkbox group with card-style items, label, and validation support.'
+tags: [forms, checkbox, checkbox-group]
+---
+
+import { FormCheckboxGroupDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormCheckboxGroupDemo />
+
+## Imports
+
+```tsx
+import { FormContainer, FormCheckboxGroup } from '@components/forms';
+import { useForm } from 'react-hook-form';
+```
+
+## Code
+
+```tsx
+const form = useForm({ defaultValues: { features: ['dark-mode'] } });
+const features = [
+  { id: 'dark-mode', name: 'Dark Mode' },
+  { id: 'notifications', name: 'Notifications' },
+  { id: 'analytics', name: 'Analytics' },
+];
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormCheckboxGroup
+    name="features"
+    control={form.control}
+    label="Select Features"
+    required
+    options={features}
+    getOptionLabel={(o) => o.name}
+    getOptionValue={(o) => o.id}
+  />
+  <Button type="submit">Submit</Button>
+</FormContainer>
+```

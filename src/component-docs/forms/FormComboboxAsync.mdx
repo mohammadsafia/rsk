@@ -1,0 +1,42 @@
+---
+id: form-combobox-async
+title: FormCombobox (Async with Infinite Scroll)
+section: Components
+category: Forms
+description: Async options loading from backend API with infinite pagination and debounced search.
+tags: [forms, combobox, async, infinite-scroll, api]
+---
+
+import { FormComboboxAsyncDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormComboboxAsyncDemo />
+
+## Imports
+
+```tsx
+import { FormContainer, FormCombobox } from '@components/forms';
+import { useForm } from 'react-hook-form';
+```
+
+## Code
+
+```tsx
+const form = useForm();
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormCombobox
+    name="userId"
+    control={form.control}
+    label="User"
+    options={LookupService.users.request}
+    getOptionLabel={(o) => o.name || o.label || String(o)}
+    getOptionValue={(o) => o.id || String(o)}
+    placeholder="Search users..."
+    urlSearchParams={new URLSearchParams({ roles: 'admin,user' })}
+    debounceMs={500}
+    pageSize={20}
+  />
+</FormContainer>;
+```

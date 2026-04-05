@@ -1,30 +1,49 @@
-import { type ComponentProps, type RefCallback } from 'react';
+import { type ComponentProps, type FC, forwardRef } from 'react';
+
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 
-import { cn } from '@utils';
+import { cva, type VariantProps } from 'class-variance-authority';
+
+import { cn, DISABLED_STYLES, FOCUS_RING } from '@utils';
 
 import { Check } from 'lucide-react';
 
-type CheckboxProps = ComponentProps<typeof CheckboxPrimitive.Root> & {
-  ref?: RefCallback<HTMLButtonElement>;
-};
+type CheckboxProps = ComponentProps<typeof CheckboxPrimitive.Root> & VariantProps<typeof checkboxVariants>;
 
-const Checkbox = ({ ref, className, ...props }: CheckboxProps) => (
-  <CheckboxPrimitive.Root
-    ref={(el) => ref?.(el)}
-    data-slot="checkbox"
-    className={cn(
-      'peer border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-4 w-4',
-      'shrink-0 rounded-sm border shadow-sm focus-within:ring disabled:cursor-not-allowed disabled:opacity-50',
-      'hover:ring-accent focus-within:ring-accent focus-within:ring focus-within:outline-none hover:ring',
-      className,
-    )}
-    {...props}
-  >
-    <CheckboxPrimitive.Indicator data-slot="checkbox-indicator" className={cn('flex items-center justify-center text-current')}>
+const checkboxVariants = cva(
+  [
+    `border-muted-200 bg-muted-50 h-5 w-5 shrink-0 rounded border transition-[color,box-shadow] outline-none ${FOCUS_RING}`,
+    'hover:not-disabled:border-primary-200 hover:not-disabled:ring-primary/40 hover:not-disabled:ring',
+    `disabled:data-[state=checked]:bg-muted-400 disabled:data-[state=checked]:border-muted-400 ${DISABLED_STYLES}`,
+  ],
+  {
+    variants: {
+      variant: {
+        secondary: [
+          'data-[state=checked]:border-secondary data-[state=checked]:bg-secondary data-[state=checked]:text-secondary-foreground',
+          'data-[state=checked]:hover:not-disabled:border-secondary data-[state=checked]:hover:not-disabled:ring-secondary',
+        ],
+        primary: [
+          'data-[state=checked]:border-muted-400 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground',
+          'data-[state=checked]:hover:not-disabled:border-primary data-[state=checked]:hover:not-disabled:ring-primary',
+        ],
+      },
+    },
+    defaultVariants: {
+      variant: 'secondary',
+    },
+  },
+);
+
+const Checkbox: FC<CheckboxProps> = ({ ref, className, variant, ...props }) => (
+  <CheckboxPrimitive.Root ref={ref} data-slot="checkbox" className={cn(checkboxVariants({ variant }), className)} {...props}>
+    <CheckboxPrimitive.Indicator data-slot="checkbox-indicator" className="flex items-center justify-center text-inherit">
       <Check size={16} />
     </CheckboxPrimitive.Indicator>
   </CheckboxPrimitive.Root>
 );
 
-export default Checkbox;
+Checkbox.displayName = 'Checkbox';
+
+// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
+export default forwardRef<HTMLButtonElement, CheckboxProps>((props, ref) => Checkbox({ ...props, ref }));

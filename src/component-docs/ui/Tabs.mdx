@@ -1,0 +1,92 @@
+---
+id: tabs
+title: Tabs
+section: Components
+category: UI
+description: 'Switch between content panes with multiple list and trigger variants.'
+tags: [ui, tabs, navigation]
+---
+
+import { Tabs } from '@components/ui';
+
+## Demo
+
+<div className="space-y-6">
+    <div>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">List Variants</p>
+        <div className="space-y-4">
+            <Tabs defaultValue="account" className="w-80">
+                <Tabs.List variant="default">
+                    <Tabs.Trigger value="account">Account</Tabs.Trigger>
+                    <Tabs.Trigger value="password">Password</Tabs.Trigger>
+                </Tabs.List>
+                <Tabs.Content value="account">Default variant tab content</Tabs.Content>
+                <Tabs.Content value="password">Password tab content</Tabs.Content>
+            </Tabs>
+
+            <Tabs defaultValue="account" className="w-80">
+                <Tabs.List variant="compact">
+                    <Tabs.Trigger value="account">Account</Tabs.Trigger>
+                    <Tabs.Trigger value="password">Password</Tabs.Trigger>
+                </Tabs.List>
+                <Tabs.Content value="account">Compact variant tab content</Tabs.Content>
+                <Tabs.Content value="password">Password tab content</Tabs.Content>
+            </Tabs>
+
+            <Tabs defaultValue="account" className="w-80">
+                <Tabs.List variant="plain">
+                    <Tabs.Trigger value="account">Account</Tabs.Trigger>
+                    <Tabs.Trigger value="password">Password</Tabs.Trigger>
+                </Tabs.List>
+                <Tabs.Content value="account">Plain variant tab content</Tabs.Content>
+                <Tabs.Content value="password">Password tab content</Tabs.Content>
+            </Tabs>
+
+            <Tabs defaultValue="account" className="w-80">
+                <Tabs.List variant="compactPlain">
+                    <Tabs.Trigger value="account">Account</Tabs.Trigger>
+                    <Tabs.Trigger value="password">Password</Tabs.Trigger>
+                </Tabs.List>
+                <Tabs.Content value="account">Compact Plain variant tab content</Tabs.Content>
+                <Tabs.Content value="password">Password tab content</Tabs.Content>
+            </Tabs>
+        </div>
+    </div>
+
+    <div>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">Trigger Variants</p>
+        <Tabs defaultValue="account" className="w-80">
+            <Tabs.List>
+                <Tabs.Trigger value="account" variant="default">Default Trigger</Tabs.Trigger>
+                <Tabs.Trigger value="password" variant="fitContent">Fit Content</Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content value="account">Account tab content</Tabs.Content>
+            <Tabs.Content value="password">Password tab content</Tabs.Content>
+        </Tabs>
+    </div>
+
+</div>
+
+## Imports
+
+```tsx
+import { Tabs } from '@components/ui';
+```
+
+## Code
+
+```tsx
+// List Variants
+<Tabs defaultValue="account">
+  <Tabs.List variant="default">...</Tabs.List>
+  <Tabs.List variant="compact">...</Tabs.List>
+  <Tabs.List variant="plain">...</Tabs.List>
+  <Tabs.List variant="compactPlain">...</Tabs.List>
+</Tabs>
+
+// Trigger Variants
+<Tabs.List>
+  <Tabs.Trigger value="account" variant="default">Default</Tabs.Trigger>
+  <Tabs.Trigger value="password" variant="fitContent">Fit Content</Tabs.Trigger>
+</Tabs.List>
+```

@@ -1,0 +1,67 @@
+---
+id: card
+title: Card
+section: Components
+category: UI
+description: 'Container with header, content, and footer sections.'
+tags: [ui, layout, card]
+---
+
+import { Card, Button } from '@components/ui';
+
+## Demo
+
+<div className="space-y-4">
+  <Card className="w-full">
+    <Card.Header>
+      <Card.Title>Simple Card</Card.Title>
+      <Card.Description>Card with title and description</Card.Description>
+    </Card.Header>
+    <Card.Content>
+      <p className="text-sm">This is the card content area.</p>
+    </Card.Content>
+  </Card>
+
+  <Card className="w-full">
+    <Card.Header>
+      <Card.Title>Card with Footer</Card.Title>
+    </Card.Header>
+    <Card.Content>
+      <p className="text-sm">Content goes here.</p>
+    </Card.Content>
+    <Card.Footer className="flex justify-between">
+      <Button variant="outline" size="sm">
+        Cancel
+      </Button>
+      <Button size="sm">Save</Button>
+    </Card.Footer>
+  </Card>
+</div>
+
+## Imports
+
+```tsx
+import { Card, Button } from '@components/ui';
+```
+
+## Code
+
+```tsx
+// Basic Card
+<Card>
+  <Card.Header>
+    <Card.Title>Title</Card.Title>
+    <Card.Description>Description</Card.Description>
+  </Card.Header>
+  <Card.Content>Content</Card.Content>
+</Card>
+
+// With Footer
+<Card>
+  <Card.Header>
+    <Card.Title>Title</Card.Title>
+  </Card.Header>
+  <Card.Content>Content</Card.Content>
+  <Card.Footer>Footer content</Card.Footer>
+</Card>
+```

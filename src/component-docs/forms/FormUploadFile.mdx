@@ -1,0 +1,36 @@
+---
+id: form-upload-file
+title: FormUploadFile
+section: Components
+category: Forms
+description: File upload with preview and validation.
+tags: [forms, upload, file]
+---
+
+import { FormFileUploaderDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormFileUploaderDemo />
+
+## Imports
+
+```tsx
+import { FormContainer, FormUploadFile } from '@components/forms';
+import { useForm } from 'react-hook-form';
+```
+
+## Code
+
+```tsx
+const form = useForm();
+
+<FormContainer formContext={form} onSuccess={console.log}>
+  <FormUploadFile
+    name="document"
+    control={form.control}
+    label="Upload Document"
+    accept=".pdf,.doc,.docx"
+  />
+</FormContainer>
+```

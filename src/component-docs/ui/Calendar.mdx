@@ -1,0 +1,46 @@
+---
+id: calendar
+title: Calendar
+section: Components
+category: UI
+description: 'Date picker calendar with support for single, range, and dropdown caption layouts.'
+tags: [ui, calendar, date-picker]
+---
+
+import { Calendar } from '@components/ui';
+
+## Demo
+
+<div className="space-y-4">
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Single Date</p>
+    <Calendar mode="single" />
+  </div>
+
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">With Dropdown Navigation</p>
+    <Calendar mode="single" captionLayout="dropdown" />
+  </div>
+</div>
+
+## Imports
+
+```tsx
+import { Calendar } from '@components/ui';
+```
+
+## Code
+
+```tsx
+// Single date selection
+<Calendar mode="single" />
+
+// Range selection
+<Calendar mode="range" />
+
+// With dropdown month/year navigation
+<Calendar mode="single" captionLayout="dropdown" />
+
+// Custom button variant
+<Calendar mode="single" buttonVariant="outline" />
+```

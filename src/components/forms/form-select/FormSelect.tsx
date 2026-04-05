@@ -1,13 +1,16 @@
-import { type ComponentPropsWithoutRef } from 'react';
+import { type ComponentPropsWithoutRef, Fragment } from 'react';
 import { Controller, type FieldValues } from 'react-hook-form';
 
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
 import { Select } from '@components/ui';
+import { Conditional } from '@components/utils';
+import { TooltipButton } from '@components/shared';
+import { FormControl, FormLabel, FormMessage } from '@components/forms';
 
 import { cn } from '@utils';
 
-import type { ControlledFieldBaseProps, FormSelectOption } from '@app-types';
-import { Conditional } from '@components/shared';
+import { XIcon } from 'lucide-react';
+
+import type { ControlledFieldBaseProps, FormSelectOption, ResolvedOption } from '@app-types';
 
 type FormSelectProps<TFieldValues extends FieldValues, TOption = FormSelectOption> = ControlledFieldBaseProps<
   TFieldValues,
@@ -18,10 +21,9 @@ type FormSelectProps<TFieldValues extends FieldValues, TOption = FormSelectOptio
   placeholder?: string;
   valueType?: 'flat' | 'contain';
   noOptionsText?: string;
-  getOptionLabel(option: TOption): string;
-  getOptionValue(option: TOption): string;
-  getOptionGroup?(option: TOption): string;
-  optionMapper?(option: TOption): TOption;
+  getOptionLabel(option: ResolvedOption<TOption>): string;
+  getOptionValue(option: ResolvedOption<TOption>): string;
+  optionMapper?(option: ResolvedOption<TOption>): ResolvedOption<TOption>;
 };
 
 function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption>({
@@ -41,7 +43,6 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
   getOptionLabel,
   getOptionValue,
   optionMapper,
-  getOptionGroup,
   ...props
 }: FormSelectProps<TFieldValues, TOption>) {
   const mappedOptions = options.map((option) => (optionMapper ? optionMapper(option) : option));
@@ -49,16 +50,7 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
   const findOptionByValue = (value: string): TOption | undefined => {
     return options.find((option) => getOptionValue(option) === value);
   };
-  const groupedOptions = getOptionGroup
-    ? Array.from(
-        mappedOptions.reduce((acc, option) => {
-          const group = getOptionGroup!(option);
-          if (!acc.has(group)) acc.set(group, []);
-          acc.get(group)!.push(option);
-          return acc;
-        }, new Map<string, typeof mappedOptions>()),
-      )
-    : [];
+
   return (
     <Controller<TFieldValues>
       name={name}
@@ -71,6 +63,10 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
           onChange(valueType === 'contain' ? findOptionByValue(selectedValue) : selectedValue);
         };
 
+        const onClear = () => {
+          onChange(valueType === 'contain' ? null : '');
+        };
+
         return (
           <FormControl className={containerClassName}>
             <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={name} required={required}>
@@ -80,52 +76,49 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
             <div className="relative">
               <Select value={internalValue ?? ''} onValueChange={onValueChange} {...field} {...props}>
                 <Select.Trigger
-                  ref={(el) => ref(el)}
+                  ref={ref}
                   id={name}
                   className={cn(
-                    'aria-expanded:bg-accent/50 text-start',
-                    error && 'border-destructive hover:ring-destructive focus-visible:ring-destructive focus:ring-destructive ps-8',
+                    !!error &&
+                      'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive text-destructive ps-8',
                     className,
                   )}
+                  disabled={field.disabled || props.disabled}
                 >
                   <Select.Value placeholder={placeholder} />
+
+                  <Conditional.If condition={!!internalValue && !field.disabled && !props.disabled}>
+                    <TooltipButton
+                      asChild
+                      title="Clear"
+                      variant="ghost-muted-destructive"
+                      size="unstyled"
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        onClear();
+                      }}
+                    >
+                      <XIcon size={16} />
+                    </TooltipButton>
+                  </Conditional.If>
+
+                  <Select.Icon />
                 </Select.Trigger>
 
                 <Select.Content position="popper">
-                  <Select.Item
-                    aria-hidden="true"
-                    className={cn('cursor-pointer', mappedOptions.length > 0 && 'hidden')}
-                    value="none"
-                    disabled
-                  >
-                    {noOptionsText}
+                  <Select.Item className={cn(mappedOptions.length > 0 && 'hidden')} aria-hidden="true" value="none" disabled>
+                    <Select.Text>{noOptionsText}</Select.Text>
                   </Select.Item>
-                  <Conditional>
-                    <Conditional.If condition={!!getOptionGroup}>
-                      {groupedOptions.map(([group, options]) => (
-                        <Select.Group key={group}>
-                          <Select.Label>{group}</Select.Label>
-                          {options.map((option) => (
-                            <Select.Item key={getOptionValue(option)} value={getOptionValue(option)} className="cursor-pointer">
-                              {getOptionLabel(option)}
-                            </Select.Item>
-                          ))}
-                        </Select.Group>
-                      ))}
-                    </Conditional.If>
-                    <Conditional.If condition={mappedOptions.length > 0}>
-                      {mappedOptions.map((option) => (
-                        <Select.Item key={getOptionValue(option)} value={getOptionValue(option)} className="cursor-pointer">
-                          {getOptionLabel(option)}
-                        </Select.Item>
-                      ))}
-                    </Conditional.If>
-                    <Conditional.Else>
-                      <Select.Item disabled value="">
-                        {noOptionsText}
+
+                  {mappedOptions.map((option) => (
+                    <Fragment key={getOptionValue(option)}>
+                      <Select.Item value={getOptionValue(option)}>
+                        <Select.Text>{getOptionLabel(option)}</Select.Text>
                       </Select.Item>
-                    </Conditional.Else>
-                  </Conditional>
+                    </Fragment>
+                  ))}
                 </Select.Content>
               </Select>
 

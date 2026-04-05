@@ -17,12 +17,12 @@ type ToggleGroupProps = ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Roo
   };
 
 const toggleVariants = cva(
-  'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-primary focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground',
+  'inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors text-primary hover:bg-primary/40 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground [&>svg]:text-primary data-[state=on]:[&>svg]:text-primary-foreground',
   {
     variants: {
       variant: {
-        default: 'bg-transparent',
-        outline: 'border border-accent bg-transparent hover:bg-accent hover:text-accent-foreground',
+        default: 'bg-primary-25',
+        outline: 'border border-accent text-accent-foreground bg-transparent shadow-xs hover:bg-accent',
       },
       size: {
         default: 'h-10 px-3',
@@ -57,7 +57,7 @@ const Item: FC<ToggleGroupItemProps> = ({ className, children, variant, size, ..
 };
 
 const ToggleGroup: FC<ToggleGroupProps> & { Item: FC<ToggleGroupItemProps> } = ({ className, variant, size, children, ...props }) => (
-  <ToggleGroupPrimitive.Root data-slot="toggle-group" className={cn('flex items-center justify-center gap-0', className)} {...props}>
+  <ToggleGroupPrimitive.Root data-slot="toggle-group" className={cn('flex items-center justify-center gap-1', className)} {...props}>
     <ToggleGroupContext.Provider value={{ variant, size }}>{children}</ToggleGroupContext.Provider>
   </ToggleGroupPrimitive.Root>
 );

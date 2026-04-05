@@ -1,27 +1,37 @@
-import { Controller, type FieldValues } from 'react-hook-form';
+import { useState } from 'react';
 
+import { type FieldValues, useController } from 'react-hook-form';
+
+import { Combobox } from '@components/shared';
 import { FormControl, FormLabel, FormMessage } from '@components/forms';
-import { Button, Command, type CommandProps, Popover } from '@components/ui';
 
 import { cn } from '@utils';
 
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { type AsyncOptionsFn, useAsyncOptionsInfiniteQuery, useDebounce, useInfiniteScroll } from '@hooks/shared';
 
-import type { ControlledFieldBaseProps, FormSelectOption } from '@app-types';
+import type { ControlledFieldBaseProps, FormSelectOption, ResolvedOption } from '@app-types';
+
+type FormComboboxOwnProps<TOption> = {
+  options: TOption[] | AsyncOptionsFn<TOption>;
+  getOptionLabel: (option: TOption) => string;
+  getOptionValue: (option: TOption) => string;
+  getOptionDisabled?: (option: TOption) => boolean;
+  optionMapper?: (option: TOption) => TOption;
+  valueType?: 'flat' | 'contain';
+  onOptionChange?: (option: TOption | null) => void;
+  placeholder?: string;
+  noOptionsText?: string;
+  disabled?: boolean;
+  className?: string;
+  urlSearchParams?: URLSearchParams | string;
+  debounceMs?: number;
+  pageSize?: number;
+};
 
 type FormComboboxProps<TFieldValues extends FieldValues, TOption = FormSelectOption> = ControlledFieldBaseProps<
   TFieldValues,
-  CommandProps
-> & {
-  options: TOption[];
-  placeholder?: string;
-  noOptionsText?: string;
-  valueType?: 'flat' | 'contain';
-  getOptionLabel(option: TOption): string;
-  getOptionValue(option: TOption): string;
-  getOptionDisabled?(option: TOption): boolean;
-  optionMapper?(option: TOption): TOption;
-};
+  FormComboboxOwnProps<ResolvedOption<TOption>>
+>;
 
 function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOption>({
   name,
@@ -35,96 +45,157 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
   required,
   disabled,
   options,
-  placeholder = 'Select',
-  noOptionsText = 'No options',
-  valueType = 'flat',
   getOptionLabel,
   getOptionValue,
   getOptionDisabled,
   optionMapper,
-  ...props
+  onOptionChange,
+  valueType = 'flat',
+  placeholder = 'Select...',
+  noOptionsText = 'No options',
+  urlSearchParams,
+  debounceMs = 500,
+  pageSize = 20,
 }: FormComboboxProps<TFieldValues, TOption>) {
-  const mappedOptions = options.map((option) => (optionMapper ? optionMapper(option) : option));
+  const {
+    field: { ref, value, onChange, ...field },
+    fieldState: { error },
+  } = useController<TFieldValues>({ name, control, rules });
 
-  const findOptionByValue = (value: string): TOption | undefined => {
-    return options.find((option) => getOptionValue(option) === value);
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+
+  const debouncedSearch = useDebounce(search, debounceMs);
+
+  const isAsync = typeof options === 'function';
+
+  // Value resolution: flat (string) vs contain (full object)
+  const stringValue = (() => {
+    if (!value) return null;
+
+    if (valueType === 'contain') return getOptionValue(value as TOption);
+
+    return value as string | null;
+  })();
+
+  const selectedItemsIds = stringValue ? [stringValue] : [];
+  const hasValueToResolve = valueType === 'flat' && selectedItemsIds.length > 0;
+
+  const infiniteQuery = useAsyncOptionsInfiniteQuery({
+    queryKey: `${label}-${name}-combobox-options`,
+    fetchOptions: isAsync
+      ? (options as AsyncOptionsFn<TOption>)
+      : () => Promise.resolve({ data: [] as TOption[], pagination: { page: 1, total: 0, totalPage: 0, pageSize } }),
+    searchTerm: debouncedSearch,
+    selectedItemsIds,
+    urlSearchParams,
+    pageSize,
+    enabled: isAsync && (open || hasValueToResolve),
+  });
+
+  const { handleScroll } = useInfiniteScroll({ infiniteQuery, enabled: isAsync });
+
+  const allOptions = isAsync ? (infiniteQuery.data?.pages.flatMap((p) => p.data) ?? []) : (options as TOption[]);
+
+  const mappedOptions = optionMapper ? allOptions.map(optionMapper) : allOptions;
+
+  // Contain mode: value IS the full object — use directly. Flat mode: resolve from fetched options.
+  const selectedOption = (() => {
+    if (!stringValue) return undefined;
+
+    if (valueType === 'contain' && value) return value as TOption;
+
+    return allOptions.find((o) => getOptionValue(o) === stringValue);
+  })();
+
+  const onSelectChange = (optValue: string) => {
+    const option = allOptions.find((o) => getOptionValue(o) === optValue);
+
+    if (!option) return;
+
+    if (stringValue === optValue) {
+      onChange(null);
+      onOptionChange?.(null);
+    } else {
+      onChange(valueType === 'contain' ? option : optValue);
+      onOptionChange?.(option);
+    }
+
+    setOpen(false);
+  };
+
+  const onClear = () => {
+    onChange(null);
+    onOptionChange?.(null);
   };
 
   return (
-    <Controller<TFieldValues>
-      name={name}
-      control={control}
-      rules={rules}
-      render={({ field: { value, onChange, ...field }, fieldState: { error } }) => {
-        const internalValue = valueType === 'contain' ? getOptionValue(value as TOption) : value;
+    <FormControl className={containerClassName}>
+      <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={name} required={required}>
+        {label}
+      </FormLabel>
 
-        const selectedOption = internalValue ? findOptionByValue(internalValue) : undefined;
-        const displayValue = selectedOption ? getOptionLabel(selectedOption) : placeholder;
+      <div className="relative">
+        <Combobox open={open} onOpenChange={setOpen}>
+          <Combobox.Trigger
+            ref={ref}
+            id={name}
+            className={cn(
+              error &&
+                'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive text-destructive ps-8',
+              className,
+            )}
+            disabled={field.disabled || disabled}
+            onBlur={field.onBlur}
+          >
+            <Combobox.Value className="truncate" placeholder={placeholder}>
+              {selectedOption ? getOptionLabel(selectedOption) : undefined}
+            </Combobox.Value>
 
-        const onValueChange = (selectedValue: string) => {
-          onChange(internalValue === selectedValue ? null : valueType === 'contain' ? findOptionByValue(selectedValue) : selectedValue);
-        };
+            <Combobox.Clear when={!!stringValue && !field.disabled && !disabled} onClear={onClear} />
 
-        return (
-          <FormControl className={containerClassName}>
-            <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={name} required={required}>
-              {label}
-            </FormLabel>
+            <Combobox.Icon />
+          </Combobox.Trigger>
 
-            <div className="relative">
-              <Popover>
-                <Popover.Trigger asChild>
-                  <Button
-                    id={name}
-                    variant="outline"
-                    role="combobox"
-                    disabled={disabled}
-                    className={cn(
-                      'aria-expanded:bg-accent/50 w-full justify-between px-2',
-                      error &&
-                        'border-destructive hover:ring-destructive focus-within:ring-destructive border bg-transparent ps-8 focus-within:ring hover:bg-transparent hover:ring',
-                      className,
-                    )}
-                    {...field}
+          <Combobox.Content shouldFilter={!isAsync}>
+            <Combobox.Input placeholder={placeholder} {...(isAsync && { value: search, onValueChange: setSearch })}>
+              <Combobox.Loader when={isAsync && (infiniteQuery.isFetching || search !== debouncedSearch)} />
+            </Combobox.Input>
+
+            <Combobox.List onScroll={isAsync ? handleScroll : undefined}>
+              <Combobox.Empty
+                when={(!isAsync && mappedOptions.length === 0) || (isAsync && !infiniteQuery.isFetching && mappedOptions.length === 0)}
+              >
+                {noOptionsText}
+              </Combobox.Empty>
+
+              {mappedOptions.map((option) => {
+                const optValue = getOptionValue(option);
+                const isChecked = stringValue === optValue;
+
+                return (
+                  <Combobox.Item
+                    key={optValue}
+                    value={getOptionLabel(option)}
+                    disabled={getOptionDisabled?.(option)}
+                    data-checked={isChecked || undefined}
+                    onSelect={() => onSelectChange(optValue)}
                   >
-                    {displayValue}
+                    <Combobox.Indicator />
 
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </Popover.Trigger>
+                    {getOptionLabel(option)}
+                  </Combobox.Item>
+                );
+              })}
 
-                <Popover.Content className="w-full p-0" align="start">
-                  <Command {...props}>
-                    <Command.Input placeholder={placeholder} />
+              <Combobox.Loader when={isAsync && infiniteQuery.isFetchingNextPage} message="Loading more..." />
+            </Combobox.List>
+          </Combobox.Content>
+        </Combobox>
 
-                    <Command.List>
-                      <Command.Empty>{noOptionsText}</Command.Empty>
-
-                      <Command.Group>
-                        {mappedOptions.map((option) => (
-                          <Command.Item
-                            key={getOptionValue(option)}
-                            value={getOptionLabel(option)}
-                            disabled={getOptionDisabled?.(option)}
-                            onSelect={() => onValueChange(getOptionValue(option))}
-                            className="cursor-pointer"
-                          >
-                            <Check className={cn('mr-2 h-4 w-4', internalValue === getOptionValue(option) ? 'opacity-100' : 'opacity-0')} />
-                            {getOptionLabel(option)}
-                          </Command.Item>
-                        ))}
-                      </Command.Group>
-                    </Command.List>
-                  </Command>
-                </Popover.Content>
-              </Popover>
-
-              <FormMessage className={errorClassName} hidden={!error} error={error!} />
-            </div>
-          </FormControl>
-        );
-      }}
-    />
+        <FormMessage className={errorClassName} hidden={!error} error={error!} />
+      </div>
+    </FormControl>
   );
 }
 

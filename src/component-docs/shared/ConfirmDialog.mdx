@@ -1,0 +1,35 @@
+---
+id: confirm-dialog
+title: ConfirmDialog
+section: Components
+category: Shared
+description: Confirmation dialog with async action support and optional reason input.
+tags: [shared, confirm-dialog, dialog, modal]
+---
+
+import { ConfirmDialogDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<ConfirmDialogDemo />
+
+## Imports
+
+```tsx
+import { ConfirmDialog } from '@components/shared';
+import { Button } from '@components/ui/button';
+```
+
+## Code
+
+```tsx
+<ConfirmDialog
+  title="Confirm Action"
+  description="Are you sure?"
+  open={open}
+  onOpenChange={setOpen}
+  onConfirm={() => console.log('Confirmed')}
+>
+  <Button variant="destructive">Delete</Button>
+</ConfirmDialog>
+```

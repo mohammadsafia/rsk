@@ -1,26 +1,17 @@
 import type { PropsWithChildren } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
-import { Loader } from '@components/shared';
-import { useAuth, useRoles } from '@hooks/shared';
+import { PrimeLoader } from '@components/shared';
+import { useAuth } from '@hooks/shared';
 
-import { ROUTES_PATH } from '@routes';
+import { FULL_ROUTES_PATH } from '@routes';
 
-import { ROLES } from '@app-types';
-
-type AuthGuardProps = PropsWithChildren<{
-  roles: ROLES[];
-}>;
+type AuthGuardProps = PropsWithChildren;
 
 function AuthGuard(props: AuthGuardProps) {
-  const { isAuthed, isPending } = useAuth();
-  const { isAllowed, returnURL } = useRoles();
+  const { isAuthed } = useAuth();
 
-  if (isPending) return <Loader />;
-
-  if (!isAuthed) return <Navigate to={ROUTES_PATH.HOME.INDEX} replace />;
-
-  if (!isAllowed(props.roles)) return <Navigate to={returnURL} replace />;
+  if (!isAuthed) return <Navigate to={FULL_ROUTES_PATH.AUTH.LOGIN} replace />;
 
   return props.children ?? <Outlet />;
 }

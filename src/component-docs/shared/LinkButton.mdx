@@ -1,0 +1,29 @@
+---
+id: link-button
+title: LinkButton
+section: Components
+category: Shared
+description: 'Button that navigates using React Router.'
+tags: [shared, link, button, navigation]
+---
+
+import { LinkButton } from '@components/shared';
+
+## Demo
+
+<div className="flex gap-2">
+  <LinkButton to="/" textContent="Go Home" variant="default" withContainer={false} />
+  <LinkButton to="/components" textContent="Components" variant="secondary" withContainer={false} />
+</div>
+
+## Imports
+
+```tsx
+import { LinkButton } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<LinkButton to="/path" textContent="Label" variant="default" withContainer={false} />
+```

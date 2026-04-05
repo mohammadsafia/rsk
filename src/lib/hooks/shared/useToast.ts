@@ -1,7 +1,7 @@
 import { type ReactElement, type ReactNode, useEffect, useState } from 'react';
 import type { Toast, ToastProps } from '@components/ui';
 
-const TOAST_LIMIT = 1; 
+const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1e4;
 
 type ToasterToast = ToastProps & {
@@ -9,7 +9,6 @@ type ToasterToast = ToastProps & {
   title?: ReactNode;
   description?: ReactNode;
   action?: ReactElement<typeof Toast.Action>;
-  persistent?: boolean;
 };
 
 type ActionType = typeof ACTION_TYPES;
@@ -55,8 +54,8 @@ const genId = () => {
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
-const addToRemoveQueue = (toastId: string, persistent?: boolean) => {
-  if (persistent || toastTimeouts.has(toastId)) return;
+const addToRemoveQueue = (toastId: string) => {
+  if (toastTimeouts.has(toastId)) return;
 
   const timeout = setTimeout(() => {
     toastTimeouts.delete(toastId);
@@ -84,22 +83,18 @@ const reducer = (state: ToastState, action: Action): ToastState => {
     case 'DISMISS_TOAST': {
       const { toastId } = action;
 
-      if (toastId) {
-        const toast = state.toasts.find((t) => t.id === toastId);
-        if (!toast?.persistent) addToRemoveQueue(toastId, toast?.persistent);
-      } else {
+      // Side effects - This could be extracted into a dismissToast() action,
+      // but I'll keep it here for simplicity
+      if (toastId) addToRemoveQueue(toastId);
+      else {
         state.toasts.forEach((toast) => {
-          if (!toast.persistent) addToRemoveQueue(toast.id, toast.persistent);
+          addToRemoveQueue(toast.id);
         });
       }
 
       return {
         ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === toastId || toastId === undefined
-            ? { ...t, open: !!t.persistent }
-            : t
-        ),
+        toasts: state.toasts.map((t) => (t.id === toastId || toastId === undefined ? { ...t, open: false } : t)),
       };
     }
     case 'REMOVE_TOAST':
@@ -122,7 +117,7 @@ function dispatch(action: Action) {
   listeners.forEach((listener) => listener(memoryState));
 }
 
-const toast = (props: Toast & { persistent?: boolean }) => {
+export const toast = (props: Toast) => {
   const id = genId();
 
   const update = (props: ToasterToast) => dispatch({ type: 'UPDATE_TOAST', toast: { ...props, id } });
@@ -135,9 +130,8 @@ const toast = (props: Toast & { persistent?: boolean }) => {
       ...props,
       id,
       open: true,
-      persistent: props.persistent || false,
       onOpenChange: (open) => {
-        if (!open && !props.persistent) dismiss();
+        if (!open) dismiss();
       },
     },
   });
@@ -160,7 +154,7 @@ export const useToast = () => {
 
       if (index > -1) listeners.splice(index, 1);
     };
-  }, [state]);
+  }, []);
 
   return {
     ...state,

@@ -5,7 +5,7 @@
   "semi": true,
   "singleQuote": true,
   "printWidth": 140,
-  "endOfLine": "crlf",
+  "endOfLine": "lf",
   "arrowParens": "always",
   "plugins": [ "prettier-plugin-tailwindcss" ]
 }

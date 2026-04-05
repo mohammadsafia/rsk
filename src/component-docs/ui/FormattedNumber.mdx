@@ -1,0 +1,51 @@
+---
+id: formatted-number
+title: FormattedNumber
+section: Components
+category: UI
+description: 'Numeric input with formatting, step buttons, and value constraints.'
+tags: [ui, input, number]
+---
+
+import { FormattedNumber } from '@components/ui';
+
+## Demo
+
+<div className="space-y-4">
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Basic</p>
+    <FormattedNumber placeholder="Enter a number" />
+  </div>
+
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">With Step Buttons</p>
+    <FormattedNumber showStepButtons min={0} max={100} stepper={5} placeholder="0" />
+  </div>
+
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Currency</p>
+    <FormattedNumber prefix="$" thousandSeparator decimalScale={2} placeholder="$0.00" />
+  </div>
+</div>
+
+## Imports
+
+```tsx
+import { FormattedNumber } from '@components/ui';
+```
+
+## Code
+
+```tsx
+// Basic
+<FormattedNumber placeholder="Enter a number" />
+
+// With step buttons and constraints
+<FormattedNumber showStepButtons min={0} max={100} stepper={5} />
+
+// Currency formatting
+<FormattedNumber prefix="$" thousandSeparator decimalScale={2} />
+
+// With suffix
+<FormattedNumber suffix="%" max={100} />
+```

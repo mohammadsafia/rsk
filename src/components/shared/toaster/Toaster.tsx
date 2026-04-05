@@ -6,24 +6,30 @@ function Toaster() {
   const { toasts } = useToast();
 
   return (
-    <Toast.Provider>
+    <Toast.Provider duration={5000}>
       {toasts.map(({ id, title, description, action, ...props }) => {
         return (
           <Toast key={id} {...props}>
-            <div className="grid gap-1 w-full">
-              {title && <Toast.Title className="text-center">{title}</Toast.Title>}
+            <div className="grid grid-cols-[35px_1fr] items-center gap-0.5">
+              <Toast.Icon />
 
-              {description && <Toast.Description>{description}</Toast.Description>}
+              {title && <Toast.Title>{title}</Toast.Title>}
+
+              {description && <Toast.Description className="col-start-2">{description}</Toast.Description>}
             </div>
 
-            {action}
+            {action && (
+              <Toast.Action asChild altText={title ?? 'Toast Action'}>
+                {action}
+              </Toast.Action>
+            )}
 
             <Toast.Close />
           </Toast>
         );
       })}
 
-      <Toast.Viewport />
+      <Toast.Viewport position={toasts[0]?.position} />
     </Toast.Provider>
   );
 }

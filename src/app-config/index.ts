@@ -1,2 +1,2 @@
-export { default as AppConfig } from './AppConfig';
-export * from './DataTableConfig';
+export * from './appConfig';
+export * from './initialize';

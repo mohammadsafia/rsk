@@ -1,0 +1,81 @@
+---
+id: button
+title: Button
+section: Components
+category: UI
+description: 'Primary action button with multiple variants, sizes, and states.'
+tags: [ui, button, actions]
+---
+
+import { Button } from '@components/ui';
+
+## Demo
+
+<div className="space-y-4">
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Variants</p>
+    <div className="flex flex-wrap gap-2">
+      <Button variant="default">Default</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="muted">Muted</Button>
+      <Button variant="destructive">Destructive</Button>
+      <Button variant="success">Success</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="outline-destructive">Outline Destructive</Button>
+      <Button variant="link">Link</Button>
+      <Button variant="icon">Icon</Button>
+    </div>
+  </div>
+
+<div>
+  <p className="text-muted-foreground mb-2 text-xs font-medium">Sizes</p>
+  <div className="flex flex-wrap items-center gap-2">
+    <Button size="sm">Small</Button>
+    <Button size="default">Default</Button>
+    <Button size="lg">Large</Button>
+    <Button size="icon">⚙</Button>
+    <Button size="full">Full Width</Button>
+  </div>
+</div>
+
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">States</p>
+    <div className="flex flex-wrap gap-2">
+      <Button>Normal</Button>
+      <Button disabled>Disabled</Button>
+    </div>
+  </div>
+</div>
+
+## Imports
+
+```tsx
+import { Button } from '@components/ui';
+```
+
+## Code
+
+```tsx
+// Variants
+<Button variant="default">Default</Button>
+<Button variant="secondary">Secondary</Button>
+<Button variant="muted">Muted</Button>
+<Button variant="destructive">Destructive</Button>
+<Button variant="success">Success</Button>
+<Button variant="outline">Outline</Button>
+<Button variant="outline-destructive">Outline Destructive</Button>
+<Button variant="ghost">Ghost</Button>
+<Button variant="link">Link</Button>
+<Button variant="icon">Icon</Button>
+
+// Sizes
+<Button size="sm">Small</Button>
+<Button size="default">Default</Button>
+<Button size="lg">Large</Button>
+<Button size="icon">Icon</Button>
+<Button size="full">Full Width</Button>
+
+// States
+<Button disabled>Disabled</Button>
+```

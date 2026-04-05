@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom';
 
-import { Collapsible, DropdownMenu } from '@components/ui';
+import { Collapsible } from '@components/ui';
 
-import { useRoles } from '@hooks/shared';
 import { useRouteUtils } from '@hooks/utils';
 import { cn } from '@utils';
-import { type AppMenu, ROUTES_PATH } from '@routes';
+import { type AppMenu, FULL_ROUTES_PATH } from '@routes';
 
 import { ChevronDown } from 'lucide-react';
 
@@ -13,64 +12,37 @@ type SidebarLinkProps = {
   route: AppMenu;
   collapse: boolean;
   subLink?: boolean;
-  dropdownOption?: boolean;
+  onExpandSidebar?: () => void;
 };
 
-export function SidebarSubLinkDropdown({ route, collapse }: SidebarLinkProps) {
-  const { isActiveSubLink } = useRouteUtils();
+const LINK_BASE_STYLES =
+  'group relative flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-200';
 
-  return (
-    <DropdownMenu>
-      <DropdownMenu.Trigger asChild>
-        <div
-          role="button"
-          title={route.name ?? route.path}
-          className={cn(
-            'group text-primary hover:bg-primary hover:text-primary-foreground relative mt-3 flex w-full cursor-pointer items-center justify-normal overflow-clip px-3 py-2 text-sm transition-colors duration-300',
-            isActiveSubLink(route.path) && 'bg-primary text-background font-bold',
-          )}
-        >
-          {<route.icon />}
-        </div>
-      </DropdownMenu.Trigger>
+const LINK_DEFAULT_STYLES = 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground';
 
-      <DropdownMenu.Content side="right" align="start" sideOffset={4}>
-        <DropdownMenu.Label className="text-primary">{route.name}</DropdownMenu.Label>
-
-        <DropdownMenu.Separator />
-
-        {route.submenu!.map((subRoute) => (
-          <DropdownMenu.Item key={subRoute.id} asChild>
-            <DashboardSidebarLink route={subRoute} collapse={collapse} dropdownOption />
-          </DropdownMenu.Item>
-        ))}
-      </DropdownMenu.Content>
-    </DropdownMenu>
-  );
-}
+const LINK_ACTIVE_STYLES =
+  'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm before:absolute before:start-0 before:top-1/2 before:h-5 before:-translate-y-1/2 before:w-[3px] before:rounded-full rounded-sm before:bg-primary';
 
 export function SidebarSubLink({ route, collapse }: SidebarLinkProps) {
-  const { isActiveLink, isActiveSubLink } = useRouteUtils();
+  const { isAnyRouteActive } = useRouteUtils();
+
+  const childPaths = route.submenu?.map((sub) => sub.path) ?? [];
+  const isActive = isAnyRouteActive([route.path, ...childPaths]);
 
   return (
-    <Collapsible defaultOpen={isActiveLink(route.path)}>
-      <Collapsible.Trigger
-        className={cn(
-          'group text-primary hover:bg-primary hover:text-primary-foreground mt-3 flex w-full cursor-pointer items-center overflow-clip px-3 py-2 text-sm transition-colors duration-300',
-          isActiveSubLink(route.path) && 'bg-primary text-background font-bold',
-        )}
-      >
-        <div className="mr-2">{<route.icon />}</div>
+    <Collapsible defaultOpen={isActive}>
+      <Collapsible.Trigger className={cn(LINK_BASE_STYLES, isActive ? LINK_ACTIVE_STYLES : LINK_DEFAULT_STYLES)}>
+        <route.icon className="h-5 w-5 shrink-0" />
 
-        {route.name}
+        <span className="flex-1 truncate text-start">{route.name}</span>
 
-        <ChevronDown className='ml-auto transition-all group-data-[state="open"]:-rotate-180' />
+        <ChevronDown className='h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state="open"]:-rotate-180' />
       </Collapsible.Trigger>
 
       <Collapsible.Content asChild>
-        <ul>
+        <ul className="mt-1 space-y-1 ps-8">
           {route.submenu!.map((subRoute) => (
-            <li key={subRoute.id} className="my-1 ml-8">
+            <li key={subRoute.id}>
               <DashboardSidebarLink route={subRoute} subLink collapse={collapse} />
             </li>
           ))}
@@ -80,33 +52,38 @@ export function SidebarSubLink({ route, collapse }: SidebarLinkProps) {
   );
 }
 
-function DashboardSidebarLink({ route, collapse, subLink, dropdownOption }: SidebarLinkProps) {
-  const { isAllowed } = useRoles();
-  const { isActiveLink } = useRouteUtils();
+function DashboardSidebarLink({ route, collapse, subLink, onExpandSidebar }: SidebarLinkProps) {
+  const { isActiveLink, isAnyRouteActive } = useRouteUtils();
+
+  const childPaths = route.submenu?.map((sub) => sub.path) ?? [];
+  const isActive = onExpandSidebar ? isAnyRouteActive([route.path, ...childPaths]) : isActiveLink(route.path);
+  const linkPath = route.path === FULL_ROUTES_PATH.HOME.INDEX || route.path === FULL_ROUTES_PATH.ROOT.INDEX ? route.path : `/${route.path}`;
+
+  if (onExpandSidebar && collapse) {
+    return (
+      <button
+        type="button"
+        title={route.name ?? route.path}
+        onClick={onExpandSidebar}
+        className={cn(LINK_BASE_STYLES, isActive ? LINK_ACTIVE_STYLES : LINK_DEFAULT_STYLES, 'justify-center')}
+      >
+        <route.icon className="h-5 w-5 shrink-0" />
+      </button>
+    );
+  }
 
   return (
     <Link
       title={route.name ?? route.path}
-      to={route.path === ROUTES_PATH.HOME.INDEX || route.path === ROUTES_PATH.ROOT.INDEX ? route.path : `/${route.path}`}
-      className={cn(
-        'group text-primary hover:bg-primary hover:text-primary-foreground mt-3 flex cursor-pointer items-center overflow-clip px-3 py-2 transition-colors duration-300',
-        {
-          hidden: !isAllowed(route.roles),
-          'bg-primary text-background font-bold': isActiveLink(route.path),
-          'text-nowrap lg:rounded-none': collapse,
-          'h-10 w-full border-l border-l-slate-500 px-2': subLink,
-        },
-      )}
+      to={route.path}
+      className={cn(LINK_BASE_STYLES, isActive ? LINK_ACTIVE_STYLES : LINK_DEFAULT_STYLES, {
+        'justify-center': collapse && !subLink,
+        'rounded-none border-s-2 ps-4': subLink,
+      })}
     >
-      <span>{<route.icon />}</span>
+      <route.icon className="h-5 w-5 shrink-0" />
 
-      <span
-        className={cn('block ps-4 text-sm tracking-wide', {
-          'opacity-0 transition-all': collapse && !dropdownOption,
-        })}
-      >
-        {route.name ?? route.path}
-      </span>
+      <span className={cn('truncate', { 'sr-only': collapse && !subLink })}>{route.name ?? route.path}</span>
     </Link>
   );
 }

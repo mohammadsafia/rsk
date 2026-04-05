@@ -1,0 +1,47 @@
+---
+id: radio-group
+title: RadioGroup
+section: Components
+category: UI
+description: 'Single selection control with card-style radio items.'
+tags: [ui, radio, input]
+---
+
+import { RadioGroupDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<RadioGroupDemo />
+
+## Imports
+
+```tsx
+import { RadioGroup } from '@components/ui';
+import { CheckCircleFilled } from '@assets/icons';
+import { Circle } from 'lucide-react';
+```
+
+## Code
+
+```tsx
+<RadioGroup value={value} onValueChange={setValue}>
+  <RadioGroup.Item value="option1">
+    <span className="...">Option 1</span>
+    <RadioGroup.Indicator>
+      <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
+      <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+    </RadioGroup.Indicator>
+  </RadioGroup.Item>
+</RadioGroup>
+
+// Custom Icons
+<RadioGroup value={value} onValueChange={setValue}>
+  <RadioGroup.Item value="option1">
+    <span className="...">Option 1</span>
+    <RadioGroup.Indicator>
+      <Star size={20} className="text-yellow-500 hidden fill-yellow-500 group-data-[state=checked]/radio-item:block" />
+      <Star size={20} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+    </RadioGroup.Indicator>
+  </RadioGroup.Item>
+</RadioGroup>
+```

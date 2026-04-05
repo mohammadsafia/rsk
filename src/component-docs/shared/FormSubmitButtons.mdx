@@ -1,0 +1,28 @@
+---
+id: form-submit-buttons
+title: FormSubmitButtons
+section: Components
+category: Shared
+description: 'Sticky footer with Cancel and Submit buttons for forms.'
+tags: [shared, form-submit-buttons, form, buttons]
+---
+
+import { FormSubmitButtons } from '@components/shared';
+
+## Demo
+
+<div className="relative h-32 rounded-md border">
+  <FormSubmitButtons defaultPrimaryText="Save Changes" />
+</div>
+
+## Imports
+
+```tsx
+import { FormSubmitButtons } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<FormSubmitButtons defaultPrimaryText="Save" defaultPrimaryLoading={false} align="end" />
+```

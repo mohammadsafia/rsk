@@ -1,0 +1,36 @@
+---
+id: dialog
+title: Dialog
+section: Components
+category: UI
+description: 'Modal dialog overlay.'
+tags: [ui, dialog, modal]
+---
+
+import { DialogDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<DialogDemo />
+
+## Imports
+
+```tsx
+import { Dialog, Button } from '@components/ui';
+```
+
+## Code
+
+```tsx
+<Dialog open={open} onOpenChange={setOpen}>
+  <Dialog.Trigger asChild>
+    <Button>Open</Button>
+  </Dialog.Trigger>
+  <Dialog.Content>
+    <Dialog.Header>
+      <Dialog.Title>Title</Dialog.Title>
+    </Dialog.Header>
+    Content here
+  </Dialog.Content>
+</Dialog>
+```

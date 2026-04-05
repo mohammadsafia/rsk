@@ -1,0 +1,49 @@
+---
+id: divider
+title: Divider (Separator)
+section: Components
+category: UI
+description: 'Visual separator line.'
+tags: [ui, divider, separator]
+---
+
+import { Divider } from '@components/ui';
+
+## Demo
+
+<div className="w-full space-y-4">
+    <div>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">Horizontal</p>
+        <div className="space-y-1">
+            <div className="text-sm">Section 1</div>
+            <Divider/>
+            <div className="text-sm">Section 2</div>
+        </div>
+    </div>
+
+    <div>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">Vertical</p>
+        <div className="flex h-12 items-center space-x-2">
+            <div className="text-sm">Left</div>
+            <Divider orientation="vertical"/>
+            <div className="text-sm">Right</div>
+        </div>
+    </div>
+
+</div>
+
+## Imports
+
+```tsx
+import { Divider } from '@components/ui';
+```
+
+## Code
+
+```tsx
+// Horizontal
+<Divider />
+
+// Vertical
+<Divider orientation="vertical" />
+```

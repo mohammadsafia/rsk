@@ -1,36 +1,69 @@
-import { type FC, type HTMLAttributes } from 'react';
+import { type ComponentPropsWithoutRef, type FC } from 'react';
+
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
-type CardComponent = FC<HTMLAttributes<HTMLDivElement>> & {
-  Header: FC<HTMLAttributes<HTMLDivElement>>;
-  Title: FC<HTMLAttributes<HTMLHeadingElement>>;
-  Description: FC<HTMLAttributes<HTMLParagraphElement>>;
-  Content: FC<HTMLAttributes<HTMLDivElement>>;
-  Footer: FC<HTMLAttributes<HTMLDivElement>>;
+type CardHeaderProps = ComponentPropsWithoutRef<'header'>;
+type CardTitleProps = ComponentPropsWithoutRef<'h3'>;
+type CardDescriptionProps = ComponentPropsWithoutRef<'p'>;
+type CardContentProps = ComponentPropsWithoutRef<'section'>;
+type CardFooterProps = ComponentPropsWithoutRef<'footer'>;
+
+export type CardVariants = VariantProps<typeof cardVariants>;
+
+export type CardProps = ComponentPropsWithoutRef<'article'> & CardVariants;
+
+type CardComponent = FC<CardProps> & {
+  Header: FC<CardHeaderProps>;
+  Title: FC<CardTitleProps>;
+  Description: FC<CardDescriptionProps>;
+  Content: FC<CardContentProps>;
+  Footer: FC<CardFooterProps>;
 };
 
-const Header: FC<HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
-  <header data-slot="card-header" className={cn('flex flex-col space-y-1.5 px-3 py-6 md:px-6', className)} {...props} />
+export const cardVariants = cva('rounded-2xl bg-background', {
+  variants: {
+    shadow: {
+      none: 'shadow-none',
+      default: 'shadow',
+      sm: 'shadow-sm',
+      md: 'shadow-md',
+      lg: 'shadow-lg',
+      xl: 'shadow-xl',
+      deep: 'shadow-deep',
+      'shadow-boundary': 'shadow-boundary',
+      'shadow-boundary-ghost': 'shadow-boundary-ghost',
+      'shadow-spread': 'shadow-spread',
+      'shadow-inner': 'shadow-inner',
+    },
+  },
+  defaultVariants: {
+    shadow: 'default',
+  },
+});
+
+const Header: FC<CardHeaderProps> = ({ className, ...props }) => (
+  <header data-slot="card-header" className={cn('px-6 py-4', className)} {...props} />
 );
 
-const Title: FC<HTMLAttributes<HTMLHeadingElement>> = ({ className, ...props }) => (
-  <h3 data-slot="card-title" className={cn('text-2xl leading-none font-semibold tracking-tight', className)} {...props} />
+const Title: FC<CardTitleProps> = ({ className, ...props }) => (
+  <h3 data-slot="card-title" className={cn('text-xl leading-none font-bold', className)} {...props} />
 );
 
-const Description: FC<HTMLAttributes<HTMLParagraphElement>> = ({ className, ...props }) => (
-  <p data-slot="card-description" className={cn('text-primary text-sm', className)} {...props} />
+const Description: FC<CardDescriptionProps> = ({ className, ...props }) => (
+  <p data-slot="card-description" className={cn('text-muted-400 text-xs', className)} {...props} />
 );
 
-const Content: FC<HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
-  <section data-slot="card-content" className={cn('px-3 pb-6 md:px-6', className)} {...props} />
+const Content: FC<CardContentProps> = ({ className, ...props }) => (
+  <section data-slot="card-content" className={cn('px-6 py-4', className)} {...props} />
 );
 
-const Footer: FC<HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
-  <footer data-slot="card-footer" className={cn('flex items-center px-3 pb-6 md:px-6', className)} {...props} />
+const Footer: FC<CardFooterProps> = ({ className, ...props }) => (
+  <footer data-slot="card-footer" className={cn('px-6 py-4', className)} {...props} />
 );
 
-const Card: CardComponent = ({ className, ...props }) => (
-  <div data-slot="card" className={cn('border-accent bg-background text-foreground rounded-lg border shadow-sm', className)} {...props} />
+const Card: CardComponent = ({ className, shadow, ...props }) => (
+  <article data-slot="card" className={cn(cardVariants({ shadow }), className)} {...props} />
 );
 
 Card.Header = Header;

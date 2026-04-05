@@ -1,0 +1,52 @@
+---
+id: field-section
+title: FieldSection
+section: Components
+category: Shared
+description: 'Sectioned form container with titled header and styled backgrounds.'
+tags: [shared, section, form, layout]
+---
+
+import { FieldSection } from '@components/shared';
+
+## Demo
+
+<div className="space-y-4">
+  <FieldSection>
+    <FieldSection.Header>
+      <p className="text-sm font-medium">Default Section</p>
+    </FieldSection.Header>
+
+    <FieldSection.Content>
+      <p className="text-sm text-muted-foreground">Section content goes here.</p>
+    </FieldSection.Content>
+  </FieldSection>
+
+  <FieldSection variant="subtle">
+    <FieldSection.Header>
+      <p className="text-sm font-medium">Subtle Variant</p>
+    </FieldSection.Header>
+
+    <FieldSection.Divider />
+
+    <FieldSection.Content>
+      <p className="text-sm text-muted-foreground">Content with a divider above.</p>
+    </FieldSection.Content>
+  </FieldSection>
+</div>
+
+## Imports
+
+```tsx
+import { FieldSection } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<FieldSection variant="default">
+  <FieldSection.Header>Header</FieldSection.Header>
+  <FieldSection.Divider />
+  <FieldSection.Content>Content</FieldSection.Content>
+</FieldSection>
+```

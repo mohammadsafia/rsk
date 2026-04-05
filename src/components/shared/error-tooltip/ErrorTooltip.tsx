@@ -15,13 +15,13 @@ function ErrorTooltip({ className, message, ...props }: ErrorTooltipProps) {
       <Tooltip>
         <Tooltip.Trigger
           className={cn(
-            'bg-destructive text-destructive-foreground absolute start-2 top-1/2 z-10 mb-0 flex -translate-y-1/2 cursor-help items-center justify-center rounded-full',
+            'bg-destructive text-destructive-foreground absolute inset-s-2 inset-bs-1/2 z-10 mb-0 flex -translate-y-1/2 cursor-help items-center justify-center rounded-full',
             className,
           )}
           asChild
           {...props}
         >
-          <InfoIcon size={16} />
+          <InfoIcon size={20} />
         </Tooltip.Trigger>
 
         <Tooltip.Content className="bg-destructive text-destructive-foreground text-sm">

@@ -1,0 +1,35 @@
+---
+id: form-label
+title: FormLabel
+section: Components
+category: Forms
+description: 'Styled form label with optional required indicator and error state.'
+tags: [forms, label]
+---
+
+import { FormLabel } from '@components/forms';
+
+## Demo
+
+<div className="space-y-2">
+  <FormLabel>Default Label</FormLabel>
+
+  <FormLabel required>Required Label</FormLabel>
+
+  <FormLabel error={{ message: 'Error', type: 'required' }}>Error Label</FormLabel>
+</div>
+
+## Imports
+
+```tsx
+import { FormLabel } from '@components/forms';
+```
+
+## Code
+
+```tsx
+<FormLabel>Default</FormLabel>
+<FormLabel required>Required Field</FormLabel>
+<FormLabel error={fieldError}>With Error</FormLabel>
+<FormLabel hidden>Hidden Label</FormLabel>
+```

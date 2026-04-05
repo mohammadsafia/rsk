@@ -1,5 +1,5 @@
 import { AxiosError, type AxiosRequestConfig, type AxiosResponse } from 'axios';
-import { AxiosInstance } from '@api/config';
+import AxiosInstance from './AxiosInstance';
 
 type HttpClientRequestConfig<TConfig = any> = AxiosRequestConfig<TConfig>;
 type HttpClientResponse<TData = any> = AxiosResponse<TData>;
@@ -15,7 +15,6 @@ export type HttpClient = {
 
 const BASE_CONFIG: HttpClientRequestConfig = {
   withToken: true,
-  withTenantKey: true,
 };
 
 const responseBody = <T>(response: HttpClientResponse<T>) => response.data;
@@ -26,7 +25,7 @@ const responseError = <T>(error: HttpClientError | T) => {
   throw error;
 };
 
-const httpClient: HttpClient = {
+export const httpClient: HttpClient = {
   async get<T, D = any>(url: string, config: HttpClientRequestConfig<D> = BASE_CONFIG) {
     return await AxiosInstance.get<T>(url, { ...BASE_CONFIG, ...config })
       .then(responseBody)
@@ -53,5 +52,3 @@ const httpClient: HttpClient = {
       .catch(responseError);
   },
 };
-
-export default httpClient;

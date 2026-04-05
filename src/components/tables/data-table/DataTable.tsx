@@ -1,70 +1,61 @@
-import { Row, type Table as TanstackTable, flexRender } from '@tanstack/react-table';
-import type * as React from 'react';
+import { createContext, type PropsWithChildren, type ReactNode, useContext, useMemo } from 'react';
 
-import { cn, getCommonPinningStyles } from '@utils';
-import { Table } from '@components/ui';
-import { DataTablePagination } from '@components/tables';
-import { Conditional } from '@components/shared';
+import type { Table as TanstackTable } from '@tanstack/react-table';
 
-interface DataTableProps<TData> extends React.ComponentProps<'div'> {
+import { DataTableContent, DataTablePagination, DataTableToolbar } from '@components/tables';
+
+import { cn } from '@utils';
+
+type DataTableRootProps<TData> = PropsWithChildren<{
   table: TanstackTable<TData>;
-  actionBar?: React.ReactNode;
+  className?: string;
   isLoading?: boolean;
-  getRowClassName?: (row: Row<TData>) => string;
-}
+  emptyState?: { title?: string; description?: string };
+}>;
 
-export default function DataTable<TData>({ table, actionBar, children, className,getRowClassName, isLoading, ...props }: DataTableProps<TData>) {
+type DataTableComponents = (<TData>(props: DataTableRootProps<TData>) => ReactNode) & {
+  Toolbar: typeof DataTableToolbar;
+  Content: typeof DataTableContent;
+  Pagination: typeof DataTablePagination;
+};
+
+type DataTableContextValue<TData> = {
+  table: TanstackTable<TData>;
+  isLoading: boolean;
+};
+
+const DataTableContext = createContext<DataTableContextValue<unknown> | null>(null);
+
+export const useDataTableContext = <TData = unknown,>() => {
+  const context = useContext(DataTableContext) as DataTableContextValue<TData> | null;
+
+  if (!context) throw new Error('useDataTableContext must be used within a <DataTable /> provider');
+
+  return context;
+};
+
+function DataTableRoot<TData>({ table, isLoading = false, children, className }: DataTableRootProps<TData>) {
+  const contextValue = useMemo<DataTableContextValue<unknown>>(
+    () => ({
+      table: table as TanstackTable<unknown>,
+      isLoading,
+    }),
+    [table, isLoading],
+  );
+
   return (
-    <div className={cn('flex w-full flex-col gap-2.5 overflow-auto', className)} {...props}>
-      {children}
-      <div className="border-accent relative overflow-x-auto overflow-y-hidden rounded-md border">
-        <Table>
-          <Table.Header>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Table.Row key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <Table.Head
-                    className='font-bold'
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    style={{
-                      ...getCommonPinningStyles({ column: header.column }),
-                    }}
-                  >
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </Table.Head>
-                ))}
-              </Table.Row>
-            ))}
-          </Table.Header>
-          <Table.Body>
-            <Table.Loader isLoading={isLoading} colSpan={table.getAllColumns().length} rows={10} />
-
-            <Table.Empty colSpan={table.getAllColumns().length} when={!table.getRowModel().rows?.length && !isLoading} />
-
-            <Conditional.If condition={!!table.getRowModel().rows?.length && !isLoading}>
-              {table.getRowModel().rows.map((row) => (
-                <Table.Row key={row.id} data-state={row.getIsSelected() && 'selected'}  className={getRowClassName?.(row) ?? ''}>
-                  {row.getVisibleCells().map((cell) => (
-                    <Table.Cell
-                      key={cell.id}
-                      style={{
-                        ...getCommonPinningStyles({ column: cell.column }),
-                      }}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </Table.Cell>
-                  ))}
-                </Table.Row>
-              ))}
-            </Conditional.If>
-          </Table.Body>
-        </Table>
+    <DataTableContext.Provider value={contextValue}>
+      <div data-slot="data-table" className={cn('flex h-full w-full flex-col gap-3', className)}>
+        {children}
       </div>
-      <div className="flex flex-col gap-2.5">
-        <DataTablePagination table={table} />
-        {actionBar && table.getFilteredSelectedRowModel().rows.length > 0 && actionBar}
-      </div>
-    </div>
+    </DataTableContext.Provider>
   );
 }
+
+const DataTable = DataTableRoot as DataTableComponents;
+
+DataTable.Toolbar = DataTableToolbar;
+DataTable.Content = DataTableContent;
+DataTable.Pagination = DataTablePagination;
+
+export default DataTable;

@@ -1,0 +1,40 @@
+---
+id: form-message
+title: FormMessage
+section: Components
+category: Forms
+description: 'Error message renderer with inline or tooltip display modes.'
+tags: [forms, message, error, validation]
+---
+
+import { FormMessage } from '@components/forms';
+
+## Demo
+
+<div className="space-y-4">
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Inline Error</p>
+    <FormMessage error={{ message: 'This field is required', type: 'required' }} errorType="inline" />
+  </div>
+
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Tooltip Error</p>
+    <FormMessage error={{ message: 'Invalid email address', type: 'pattern' }} errorType="tooltip" />
+  </div>
+</div>
+
+## Imports
+
+```tsx
+import { FormMessage } from '@components/forms';
+```
+
+## Code
+
+```tsx
+// Inline error
+<FormMessage error={fieldError} errorType="inline" />
+
+// Tooltip error (default)
+<FormMessage error={fieldError} errorType="tooltip" />
+```

@@ -15,6 +15,7 @@ export default function ScrollSelector({ options, value, maxHeight = 140, onSele
 
   const container = useRef<HTMLDivElement>(null);
   const elRef = useRef<HTMLDivElement>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (elRef.current) setElHeight(elRef.current.clientHeight);
@@ -40,10 +41,25 @@ export default function ScrollSelector({ options, value, maxHeight = 140, onSele
     }
   }, [enabledOptions.length]);
 
-  const onScrollEnd = (ev: React.UIEvent<HTMLDivElement, UIEvent>) => {
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const onScroll = (ev: React.UIEvent<HTMLDivElement, UIEvent>) => {
     if (!elHeight) return;
-    const scroll = (ev.target as HTMLDivElement).scrollTop;
-    setOnIdx(Math.round(scroll / elHeight));
+
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+
+    scrollTimeoutRef.current = setTimeout(() => {
+      const scroll = (ev.target as HTMLDivElement).scrollTop;
+      setOnIdx(Math.round(scroll / elHeight));
+    }, 100);
   };
 
   const manualSelect = (idx: number, behavior: 'instant' | 'smooth' = 'smooth') => {
@@ -55,7 +71,7 @@ export default function ScrollSelector({ options, value, maxHeight = 140, onSele
   return (
     <div
       className="no-scrollbar flex snap-y snap-mandatory flex-col overflow-y-scroll"
-      onScrollEnd={onScrollEnd}
+      onScroll={onScroll}
       ref={container}
       style={{ maxHeight }}
     >
@@ -65,8 +81,8 @@ export default function ScrollSelector({ options, value, maxHeight = 140, onSele
         <div
           key={option.value}
           className={cn('cursor-pointer snap-center p-1 transition-all', {
-            'scale-y-[85%] opacity-50': Math.abs(i - onIdx) === 1,
-            'scale-y-[70%] opacity-20': Math.abs(i - onIdx) > 1,
+            'scale-y-85 opacity-50': Math.abs(i - onIdx) === 1,
+            'scale-y-70 opacity-20': Math.abs(i - onIdx) > 1,
           })}
           onClick={() => manualSelect(i)}
         >

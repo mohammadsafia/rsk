@@ -1,0 +1,31 @@
+---
+id: form-container
+title: FormContainer
+section: Components
+category: Forms
+description: 'React Hook Form wrapper that provides form context and handles submission.'
+tags: [forms, container, provider]
+---
+
+import { FormBasicDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormBasicDemo />
+
+## Imports
+
+```tsx
+import { FormContainer } from '@components/forms';
+import { useForm } from 'react-hook-form';
+```
+
+## Code
+
+```tsx
+const form = useForm({ defaultValues: { name: '' } });
+
+<FormContainer formContext={form} onSuccess={(data) => console.log(data)}>
+  {/* Form fields go here */}
+</FormContainer>
+```

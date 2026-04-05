@@ -1,79 +1,76 @@
-import { lazy } from 'react';
-import { createBrowserRouter, redirect } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { createBrowserRouter } from 'react-router-dom';
 
-import App from '../App';
-import DashboardLayout from '@layouts/dashboard-layout';
-import AuthLayout from '@layouts/auth-layout';
-import ErrorBoundary from '@layouts/error-boundary';
-import NotFound from '@layouts/not-found';
-import AuthGuard from '@layouts/auth-guard';
+import { AuthGuard, AuthLayout, DashboardLayout, ErrorBoundary } from '@layouts';
 
 import { FULL_ROUTES_PATH } from './routes';
-import { ROLES } from '@app-types';
 
-const UsersPage = lazy(() => import('@pages/users/UsersPage'));
-const ComponentsGalleryPage = lazy(() => import('@pages/components/ComponentsGalleryPage'));
 const HomePage = lazy(() => import('@pages/home/HomePage'));
+const ComponentsGalleryPage = lazy(() => import('@pages/components/ComponentsGalleryPage'));
+const ComponentDetailPage = lazy(() => import('@pages/components/ComponentDetailPage'));
 
-export const router = createBrowserRouter(
-  [
-    // Public routes
-    {
-      path: FULL_ROUTES_PATH.HOME.INDEX,
-      element: <App />,
-      children: [
-        { index: true, element: <ComponentsGalleryPage /> },
-        { path: FULL_ROUTES_PATH.DOCS.INDEX, element: <ComponentsGalleryPage /> },
-        { path: FULL_ROUTES_PATH.HOME.HOME, element: <HomePage /> },
-      ],
-    },
-
-    // Auth routes
-    {
-      path: FULL_ROUTES_PATH.AUTH.INDEX,
-      element: <AuthLayout />,
-      children: [
-        {
-          index: true,
-          loader: () => redirect(FULL_ROUTES_PATH.HOME.INDEX),
-        },
-        {
-          path: FULL_ROUTES_PATH.AUTH.SIGN_IN,
-          element: <h1>SIGN IN</h1>,
-        },
-      ],
-    },
-
-    // Dashboard routes
-    {
-      element: <AuthGuard roles={[ROLES.ALL]} />,
-      errorElement: <ErrorBoundary />,
-      children: [
-        {
-          element: <DashboardLayout />,
-          children: [
-            {
-              path: FULL_ROUTES_PATH.USERS.INDEX,
-              children: [{ index: true, element: <UsersPage /> }],
-            },
-          ],
-        },
-      ],
-    },
-
-    // Catch-all route
-    {
-      element: <AuthGuard roles={[ROLES.ALL]} />,
-      children: [
-        {
-          path: '*',
-          element: <NotFound />,
-        },
-      ],
-    },
-  ],
-
+export const router = createBrowserRouter([
+  // Public routes
   {
-    future: { v7_relativeSplatPath: true },
+    path: FULL_ROUTES_PATH.HOME.INDEX,
+    errorElement: <ErrorBoundary />,
+    children: [
+      {
+        index: true,
+        element: <Suspense><HomePage /></Suspense>,
+      },
+    ],
   },
-);
+
+  // Auth routes (login, register, etc.) — redirects to dashboard if already authenticated
+  {
+    path: FULL_ROUTES_PATH.AUTH.INDEX,
+    element: <AuthLayout />,
+    errorElement: <ErrorBoundary />,
+    children: [
+      {
+        path: FULL_ROUTES_PATH.AUTH.LOGIN,
+        element: <div>Login Page</div>,
+      },
+    ],
+  },
+
+  // Dashboard routes — protected by AuthGuard
+  {
+    element: <AuthGuard />,
+    errorElement: <ErrorBoundary />,
+    children: [
+      {
+        element: <DashboardLayout />,
+        children: [
+          {
+            path: FULL_ROUTES_PATH.HOME.DASHBOARD,
+            element: <div className="p-6">Dashboard</div>,
+          },
+          {
+            path: FULL_ROUTES_PATH.COMPONENTS.INDEX,
+            element: <ComponentsGalleryPage />,
+          },
+          {
+            path: FULL_ROUTES_PATH.COMPONENTS.DETAIL,
+            element: <ComponentDetailPage />,
+          },
+          {
+            path: FULL_ROUTES_PATH.SETTINGS.INDEX,
+            element: <div className="p-6">Settings</div>,
+          },
+        ],
+      },
+    ],
+  },
+
+  // Catch-all 404
+  {
+    path: '*',
+    element: (
+      <div className="text-muted-foreground flex h-dvh items-center justify-center text-lg">
+        404 — Page not found
+      </div>
+    ),
+  },
+]);

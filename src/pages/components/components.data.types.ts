@@ -10,4 +10,3 @@ export type ComponentDoc = {
   imports?: string;
   props?: Array<{ name: string; type?: string; required?: boolean; description?: string }>;
 };
-

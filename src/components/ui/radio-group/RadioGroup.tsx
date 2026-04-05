@@ -1,27 +1,65 @@
-import * as React from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef } from 'react';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
-import { CircleIcon } from 'lucide-react';
-import { cn } from '@utils';
 
-function RadioGroup({ className, ...props }: React.ComponentProps<typeof RadioGroupPrimitive.Root>) {
-  return <RadioGroupPrimitive.Root data-slot="radio-group" className={cn('grid gap-3', className)} {...props} />;
-}
+import { cn, FOCUS_RING } from '@utils';
 
-function RadioGroupItem({ className, ...props }: React.ComponentProps<typeof RadioGroupPrimitive.Item>) {
-  return (
-    <RadioGroupPrimitive.Item
-      data-slot="radio-group-item"
-      className={cn(
-        'border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
-        className,
-      )}
-      {...props}
-    >
-      <RadioGroupPrimitive.Indicator data-slot="radio-group-indicator" className="relative flex items-center justify-center">
-        <CircleIcon className="fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2" />
-      </RadioGroupPrimitive.Indicator>
-    </RadioGroupPrimitive.Item>
-  );
-}
+type RadioGroupItemProps = ComponentProps<typeof RadioGroupPrimitive.Item>;
 
-export { RadioGroup, RadioGroupItem };
+type RadioGroupIndicatorProps = ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Indicator>;
+
+type RadioGroupProps = ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>;
+
+type RadioGroupComponent = FC<RadioGroupProps> & {
+  Item: FC<RadioGroupItemProps>;
+  Indicator: FC<RadioGroupIndicatorProps>;
+};
+
+const Item: FC<RadioGroupItemProps> = ({ ref, className, children, ...props }) => (
+  <RadioGroupPrimitive.Item
+    ref={ref}
+    data-slot="radio-group-item"
+    className={cn(
+      'group/radio-item border-muted-200 bg-muted-50 flex cursor-pointer items-center gap-5 rounded-md border p-3 transition-[color,box-shadow]',
+      'data-[state=checked]:border-primary-200 data-[state=checked]:bg-primary-15',
+      `hover:border-primary-200 hover:ring-primary/40 ${FOCUS_RING} hover:ring`,
+      'data-[state=checked]:hover:border-primary-200 data-[state=checked]:hover:ring-primary/40',
+      'disabled:opacity-50 disabled:pointer-events-none',
+      className,
+    )}
+    {...props}
+  >
+    {children}
+  </RadioGroupPrimitive.Item>
+);
+
+const Indicator = ({ className, children, ...props }: RadioGroupIndicatorProps) => (
+  <RadioGroupPrimitive.Indicator
+    data-slot="radio-group-indicator"
+    className={cn(
+      'border-muted-200 bg-muted-50 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-[color,box-shadow] outline-none',
+      'data-[state=checked]:border-accent data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground',
+      'group-hover/radio-item:border-primary-200 group-hover/radio-item:ring-primary/40 group-hover/radio-item:ring',
+      'data-[state=checked]:group-hover/radio-item:border-accent data-[state=checked]:group-hover/radio-item:ring-accent/40',
+      'group-disabled/radio-item:opacity-50',
+      className,
+    )}
+    forceMount
+    {...props}
+  >
+    {children}
+  </RadioGroupPrimitive.Indicator>
+);
+
+const RadioGroup: RadioGroupComponent = ({ className, ...props }) => (
+  <RadioGroupPrimitive.Root data-slot="radio-group" className={cn('grid w-full gap-3', className)} {...props} />
+);
+
+// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
+RadioGroup.Item = forwardRef<HTMLButtonElement, RadioGroupItemProps>((props, ref) => Item({ ...props, ref }));
+RadioGroup.Indicator = Indicator;
+
+RadioGroup.displayName = 'RadioGroup';
+RadioGroup.Item.displayName = 'RadioGroupItem';
+Indicator.displayName = 'RadioGroupIndicator';
+
+export default RadioGroup;

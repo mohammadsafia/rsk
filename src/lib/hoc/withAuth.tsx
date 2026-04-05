@@ -9,23 +9,24 @@
  */
 
 import { type ComponentType, type PropsWithChildren } from 'react';
-import { useAuth } from '@hooks/shared';
-import { ROLES } from '@app-types';
 
 type WithAuthProps = PropsWithChildren<{
   permissions?: string[];
-  roles?: ROLES[];
+  roles?: string[];
 }>;
 
 function withAuth<TProps extends object>(WrappedComponent: ComponentType<TProps>) {
   return ({ permissions, roles, ...props }: TProps & WithAuthProps) => {
-    const { isAuthed } = useAuth();
+    const { hasAccess, hasRoles } = {
+      hasAccess: true,
+      hasRoles: true,
+    };
 
     if (!permissions && !roles) return <WrappedComponent {...(props as TProps)} />;
 
-    if (roles && roles.length > 0 && !isAuthed) return null;
+    if (roles && roles.length > 0 && !hasRoles) return null;
 
-    if (!isAuthed) return null;
+    if (!hasAccess && !hasRoles) return null;
 
     return <WrappedComponent {...(props as TProps)} />;
   };

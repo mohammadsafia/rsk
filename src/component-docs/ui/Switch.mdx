@@ -1,0 +1,99 @@
+---
+id: switch
+title: Switch
+section: Components
+category: UI
+description: 'Binary on/off control with multiple variants and sizes.'
+tags: [ui, input]
+---
+
+import { Switch } from '@components/ui';
+
+## Demo
+
+<div className="space-y-4">
+    <div>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">Variants</p>
+        <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-col gap-2">
+                <span className="text-xs">Default</span>
+                <Switch variant="default" defaultChecked/>
+            </div>
+            <div className="flex flex-col gap-2">
+                <span className="text-xs">Success</span>
+                <Switch variant="success" defaultChecked/>
+            </div>
+            <div className="flex flex-col gap-2">
+                <span className="text-xs">Destructive</span>
+                <Switch variant="destructive" defaultChecked/>
+            </div>
+            <div className="flex flex-col gap-2">
+                <span className="text-xs">Secondary</span>
+                <Switch variant="secondary" defaultChecked/>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">Sizes</p>
+        <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-col gap-2">
+                <span className="text-xs">Small</span>
+                <Switch size="sm" defaultChecked/>
+            </div>
+            <div className="flex flex-col gap-2">
+                <span className="text-xs">Medium</span>
+                <Switch size="md" defaultChecked/>
+            </div>
+            <div className="flex flex-col gap-2">
+                <span className="text-xs">Large</span>
+                <Switch size="lg" defaultChecked/>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">States</p>
+        <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-col gap-2">
+                <span className="text-xs">Unchecked</span>
+                <Switch/>
+            </div>
+            <div className="flex flex-col gap-2">
+                <span className="text-xs">Checked</span>
+                <Switch defaultChecked/>
+            </div>
+            <div className="flex flex-col gap-2">
+                <span className="text-xs">Disabled</span>
+                <Switch disabled/>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+## Imports
+
+```tsx
+import { Switch } from '@components/ui';
+```
+
+## Code
+
+```tsx
+// Variants
+<Switch variant="default" defaultChecked />
+<Switch variant="success" defaultChecked />
+<Switch variant="destructive" defaultChecked />
+<Switch variant="secondary" defaultChecked />
+
+// Sizes
+<Switch size="sm" defaultChecked />
+<Switch size="md" defaultChecked />
+<Switch size="lg" defaultChecked />
+
+// States
+<Switch />
+<Switch defaultChecked />
+<Switch disabled />
+```

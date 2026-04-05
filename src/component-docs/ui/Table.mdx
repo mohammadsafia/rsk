@@ -1,0 +1,144 @@
+---
+id: table
+title: Table
+section: Components
+category: UI
+description: 'Styled data table, body rows, chips, empty & loading states. Matches Figma table design system.'
+tags: [ui, table, data, chip]
+---
+
+import { Table, Chip } from '@components/ui';
+
+## Demo
+
+<div className="border-muted-200 w-full overflow-hidden rounded-2xl border">
+  <Table>
+    <Table.Header>
+      <Table.Row>
+        <Table.Head>Patient Name</Table.Head>
+        <Table.Head>Date of Service</Table.Head>
+        <Table.Head>Type</Table.Head>
+        <Table.Head>Provider</Table.Head>
+        <Table.Head>Status</Table.Head>
+      </Table.Row>
+    </Table.Header>
+    <Table.Body>
+      <Table.Row>
+        <Table.Cell>Alejandro Gomez</Table.Cell>
+        <Table.Cell>01/15/2025</Table.Cell>
+        <Table.Cell>
+          <Chip variant="default">Initial Evaluation</Chip>
+        </Table.Cell>
+        <Table.Cell>Dr. Smith</Table.Cell>
+        <Table.Cell>
+          <Chip variant="success">Completed</Chip>
+        </Table.Cell>
+      </Table.Row>
+
+      <Table.Row>
+        <Table.Cell>Maria Rodriguez</Table.Cell>
+        <Table.Cell>01/18/2025</Table.Cell>
+        <Table.Cell>
+          <Chip variant="accent">Re Evaluation</Chip>
+        </Table.Cell>
+        <Table.Cell>Dr. Johnson</Table.Cell>
+        <Table.Cell>
+          <Chip variant="warning">Pending</Chip>
+        </Table.Cell>
+      </Table.Row>
+
+      <Table.Row>
+        <Table.Cell>James Wilson</Table.Cell>
+        <Table.Cell>01/20/2025</Table.Cell>
+        <Table.Cell>
+          <Chip variant="destructive">Deposition</Chip>
+        </Table.Cell>
+        <Table.Cell>Dr. Lee</Table.Cell>
+        <Table.Cell>
+          <Chip variant="muted">Scheduled</Chip>
+        </Table.Cell>
+      </Table.Row>
+
+      <Table.Row>
+        <Table.Cell>Sarah Thompson</Table.Cell>
+        <Table.Cell>01/22/2025</Table.Cell>
+        <Table.Cell>
+          <Chip variant="default">Initial Evaluation</Chip>
+        </Table.Cell>
+        <Table.Cell>Dr. Smith</Table.Cell>
+        <Table.Cell>
+          <Chip variant="success">Completed</Chip>
+        </Table.Cell>
+      </Table.Row>
+
+      <Table.Row>
+        <Table.Cell>Robert Chen</Table.Cell>
+        <Table.Cell>01/25/2025</Table.Cell>
+        <Table.Cell>
+          <Chip variant="accent">Re Evaluation</Chip>
+        </Table.Cell>
+        <Table.Cell>Dr. Johnson</Table.Cell>
+        <Table.Cell>
+          <Chip variant="destructive">Cancelled</Chip>
+        </Table.Cell>
+      </Table.Row>
+    </Table.Body>
+
+  </Table>
+</div>
+
+## Imports
+
+```tsx
+import { Table, Chip } from '@components/ui';
+```
+
+## Code
+
+```tsx
+<div className="border-muted-200 overflow-hidden rounded-2xl border">
+  <Table>
+    <Table.Header>
+      <Table.Row>
+        <Table.Head>Patient Name</Table.Head>
+        <Table.Head>Date of Service</Table.Head>
+        <Table.Head>Type</Table.Head>
+        <Table.Head>Provider</Table.Head>
+        <Table.Head>Status</Table.Head>
+      </Table.Row>
+    </Table.Header>
+
+    <Table.Body>
+      <Table.Row>
+        <Table.Cell>Alejandro Gomez</Table.Cell>
+        <Table.Cell>01/15/2025</Table.Cell>
+        <Table.Cell>
+          <Chip variant="default">Initial Evaluation</Chip>
+        </Table.Cell>
+        <Table.Cell>Dr. Smith</Table.Cell>
+        <Table.Cell>
+          <Chip variant="success">Completed</Chip>
+        </Table.Cell>
+      </Table.Row>
+    </Table.Body>
+  </Table>
+</div>;
+
+{
+  /* Empty state */
+}
+<Table>
+  <Table.Body>
+    <Table.Empty when={true} colSpan={5} message="No records found" />
+  </Table.Body>
+</Table>;
+
+{
+  /* Loading state */
+}
+<Table>
+  <Table.Body>
+    <Table.Loader isLoading={true} colSpan={5} rows={3} />
+  </Table.Body>
+</Table>;
+```

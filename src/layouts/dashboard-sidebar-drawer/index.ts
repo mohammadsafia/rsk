@@ -1,1 +1,1 @@
-export { default } from './DashboardSidebarDrawer';
+export { default as DashboardSidebarDrawer } from './DashboardSidebarDrawer';

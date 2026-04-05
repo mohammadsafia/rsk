@@ -1,8 +1,8 @@
-import { type ComponentPropsWithoutRef, type KeyboardEvent, type RefCallback } from 'react';
+import { type ComponentPropsWithoutRef, type FC, forwardRef, type KeyboardEvent, type Ref } from 'react';
 import { type NumberFormatValues, NumericFormat } from 'react-number-format';
 
 import { Button } from '@components/ui';
-import { Conditional } from '@components/shared';
+import { Conditional } from '@components/utils';
 
 import { cn } from '@utils';
 
@@ -16,21 +16,21 @@ const clampValue = (value: number, min?: number, max?: number) => {
 };
 
 export type FormattedNumberProps = Omit<ComponentPropsWithoutRef<typeof NumericFormat>, 'value' | 'onChange' | 'onValueChange'> & {
-  ref?: RefCallback<HTMLDivElement>;
+  ref?: Ref<HTMLInputElement>;
   value?: number | null;
-  onChange?: (value: number | null) => void;
   min?: number;
   max?: number;
+  decimalScale?: number;
   stepper?: number;
-  showStepButtons?: boolean;
   prefix?: string;
   suffix?: string;
-  decimalScale?: number;
-  isDecimal?: boolean;
   thousandSeparator?: string;
+  showStepButtons?: boolean;
+  isDecimal?: boolean;
+  onChange?: (value: number | null) => void;
 };
 
-export const FormattedNumber = ({
+const FormattedNumber: FC<FormattedNumberProps> = ({
   ref,
   className,
   onChange,
@@ -68,13 +68,14 @@ export const FormattedNumber = ({
           <NumericFormat
             data-slot="formatted-number-input"
             className={cn(
-              'border-accent bg-background hover:ring-accent focus-visible:ring-accent',
-              'rounded-md border px-3 py-2 text-sm shadow-xs transition-colors',
-              'hover:ring focus-visible:ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
-              'flex w-full items-center justify-around gap-2',
+              'border-muted-200 bg-muted-50 flex w-full rounded-md border p-3 text-sm shadow-xs transition-[color,box-shadow] outline-none',
+              'placeholder:text-muted',
+              'hover:not-disabled:border-primary hover:not-disabled:ring-primary hover:not-disabled:ring',
+              'focus-visible:ring-primary focus-visible:border-primary focus-visible:ring',
+              'disabled:bg-muted-50 disabled:text-muted-300 disabled:placeholder:text-muted-300 disabled:pointer-events-none',
               className,
             )}
-            getInputRef={(el: HTMLInputElement) => ref?.(el)}
+            getInputRef={ref}
             value={value}
             thousandSeparator={thousandSeparator}
             decimalScale={isDecimal ? decimalScale : 0}
@@ -92,25 +93,25 @@ export const FormattedNumber = ({
           />
 
           <Conditional.If condition={!showStepButtons}>
-            <div className="absolute end-0.5 top-1/2 z-10 flex h-fit -translate-y-1/2 flex-col justify-center">
+            <div className="absolute inset-e-2 inset-bs-1/2 z-10 flex h-fit -translate-y-1/2 flex-col justify-center">
               <Button
                 type="button"
-                variant="ghost"
-                className="bg-accent h-fit rounded-none rounded-t-md p-0"
+                variant="ghost-muted"
+                className="bg-background h-fit rounded-none rounded-t-md p-0"
                 onClick={onIncrement}
                 disabled={props.disabled || isIncrementDisabled}
               >
-                <ChevronUp size={14} />
+                <ChevronUp size={16} />
               </Button>
 
               <Button
                 type="button"
-                variant="ghost"
-                className="bg-accent h-fit rounded-none rounded-b-md p-0"
+                variant="ghost-muted"
+                className="bg-background h-fit rounded-none rounded-b-md p-0"
                 onClick={onDecrement}
                 disabled={props.disabled || isDecrementDisabled}
               >
-                <ChevronDown size={14} />
+                <ChevronDown size={16} />
               </Button>
             </div>
           </Conditional.If>
@@ -122,4 +123,5 @@ export const FormattedNumber = ({
 
 FormattedNumber.displayName = 'FormattedNumber';
 
-export default FormattedNumber;
+// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
+export default forwardRef<HTMLInputElement, FormattedNumberProps>((props, ref) => FormattedNumber({ ...props, ref }));

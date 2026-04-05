@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Loader } from '@components/shared';
+import { PrimeLoader } from '@components/shared';
 
 const App = () => {
   return (
-    <Suspense fallback={<Loader />}>
+    <Suspense fallback={<PrimeLoader displayLogo={false} />}>
       <Outlet />
     </Suspense>
   );

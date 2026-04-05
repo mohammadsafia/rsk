@@ -1,0 +1,14 @@
+{
+  "endpoints": [
+    {
+      "name": "v1",
+      "url": "swagger.json",
+      "outputDir": "src/types/api"
+    }
+  ],
+  "enumStrategy": "type-literal",
+  "formatting": {
+    "prettier": true,
+    "eslint": true
+  }
+}

@@ -1,0 +1,30 @@
+---
+id: error-tooltip
+title: ErrorTooltip
+section: Components
+category: Shared
+description: Tooltip displaying error messages with icon indicator.
+tags: [shared, error-tooltip, error, validation]
+---
+
+import { ErrorTooltip } from '@components/shared';
+import { Input } from '@components/ui';
+
+## Demo
+
+<div className="relative flex h-16 w-64 items-center justify-center rounded-md border">
+  <Input placeholder="Field with error" className="pl-8" />
+  <ErrorTooltip message="This field is required" />
+</div>
+
+## Imports
+
+```tsx
+import { ErrorTooltip } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<ErrorTooltip message="Error message" />
+```

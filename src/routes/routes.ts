@@ -1,15 +1,14 @@
 import type { ElementType } from 'react';
 
-import { ROLES } from '@app-types';
-
-import { LayoutDashboard, Users, Book } from 'lucide-react';
-import { constructPlainRoutes } from '@utils';
+import { LayoutDashboard, Component, Settings } from 'lucide-react';
 
 export type AppMenu = {
   id: string;
   path: string;
   name?: string;
-  roles: ROLES[];
+  permission?: string;
+  permissions?: string[];
+  roles?: string[];
   icon: ElementType;
   submenu?: AppMenu[];
 };
@@ -17,59 +16,41 @@ export type AppMenu = {
 export const FULL_ROUTES_PATH = {
   HOME: {
     INDEX: '/',
-    HOME: 'home',
+    DASHBOARD: '/dashboard',
   },
   AUTH: {
-    INDEX: 'auth',
-    SIGN_IN: 'sign-in',
-    SIGNUP: 'sign-up',
-    FORGOT_PASSWORD: 'forgot-password',
-    INVITED_USER: 'invite',
+    INDEX: '/auth',
+    LOGIN: '/auth/login',
   },
-  USERS: {
-    INDEX: 'users',
-    PROFILE: ':userId',
-    CREATE: 'create',
-    UPDATE: 'update/:userId',
-    PERSONAL_PROFILE: 'profile/:userId',
-    PERSONAL_UPDATE: 'profile/update/:userId',
+  COMPONENTS: {
+    INDEX: '/components',
+    DETAIL: '/components/:id',
   },
-  DOCS: {
-    INDEX: 'components',
-  },
-  ERRORS: {
-    NOT_FOUND: '404',
-    UNAUTHORIZED: '401',
-    MAINTENANCE: '503',
-    SERVER_ERROR: '500',
+  SETTINGS: {
+    INDEX: '/settings',
   },
   ROOT: {
     INDEX: '..',
   },
 } as const;
 
-export const ROUTES_PATH = constructPlainRoutes(FULL_ROUTES_PATH);
-
 export const APP_MENU: AppMenu[] = [
   {
-    id: '1',
-    path: FULL_ROUTES_PATH.HOME.INDEX,
+    id: 'dashboard',
+    path: FULL_ROUTES_PATH.HOME.DASHBOARD,
+    name: 'Dashboard',
     icon: LayoutDashboard,
-    name: 'Home',
-    roles: [ROLES.ALL],
   },
   {
-    id: '5',
-    path: FULL_ROUTES_PATH.USERS.INDEX,
-    icon: Users,
-    name: 'Team',
-    roles: [ROLES.ALL],
-  },
-  {
-    id: '6',
-    path: FULL_ROUTES_PATH.DOCS.INDEX,
-    icon: Book,
+    id: 'components',
+    path: FULL_ROUTES_PATH.COMPONENTS.INDEX,
     name: 'Components',
-    roles: [ROLES.ALL],
+    icon: Component,
+  },
+  {
+    id: 'settings',
+    path: FULL_ROUTES_PATH.SETTINGS.INDEX,
+    name: 'Settings',
+    icon: Settings,
   },
 ];
