@@ -8,6 +8,7 @@ import { FULL_ROUTES_PATH } from './routes';
 const HomePage = lazy(() => import('@pages/home/HomePage'));
 const ComponentsGalleryPage = lazy(() => import('@pages/components/ComponentsGalleryPage'));
 const ComponentDetailPage = lazy(() => import('@pages/components/ComponentDetailPage'));
+const DashboardPage = lazy(() => import('@pages/dashboard/DashboardPage'));
 
 export const router = createBrowserRouter([
   // Public routes
@@ -45,7 +46,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: FULL_ROUTES_PATH.HOME.DASHBOARD,
-            element: <div className="p-6">Dashboard</div>,
+            element: <DashboardPage />,
           },
           {
             path: FULL_ROUTES_PATH.COMPONENTS.INDEX,
