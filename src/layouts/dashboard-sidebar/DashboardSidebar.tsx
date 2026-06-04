@@ -63,7 +63,7 @@ function DashboardSidebar() {
   return (
     <aside
       className={cn(
-        'bg-sidebar border-border z-50 w-full shrink-0 rounded-2xl border shadow-sm transition-[width] duration-300 ease-in-out md:relative md:h-full',
+        'bg-sidebar border-border z-50 w-full shrink-0 rounded-2xl border shadow-spread transition-[width] duration-300 ease-in-out md:relative md:h-full',
         collapse ? 'md:w-17' : 'md:w-65',
       )}
     >
