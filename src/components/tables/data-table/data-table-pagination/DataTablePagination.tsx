@@ -50,7 +50,7 @@ const DataTablePagination: FC<PaginationProps> = ({ pageSizeOptions = [30, 50, 1
   return (
     <div
       data-slot="data-table-pagination"
-      className={cn('bg-background flex w-full items-center justify-end gap-4 overflow-hidden rounded-2xl px-7 py-2 shadow', className)}
+      className={cn('bg-secondary flex w-full items-center justify-end gap-4 overflow-hidden rounded-2xl px-7 py-2 shadow', className)}
     >
       <div className="bg-muted-50 flex items-center gap-2 rounded-full px-3 py-2">
         <span className="text-muted-400 text-xs font-normal whitespace-nowrap">Rows per page</span>

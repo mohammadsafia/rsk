@@ -68,7 +68,7 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
               placeholder={placeholder ?? 'Search Here'}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              className="w-60 border-none px-2 py-0 text-sm shadow-none [&:hover,&:focus]:not-disabled:border-none [&:hover,&:focus]:not-disabled:ring-0"
+              className="w-60 border-none px-2 py-0 text-sm shadow-none [&:hover,&:focus]:not-disabled:border-none [&:hover,&:focus]:not-disabled:ring-0 bg-transparent"
             />
           </div>
         </Conditional.If>
