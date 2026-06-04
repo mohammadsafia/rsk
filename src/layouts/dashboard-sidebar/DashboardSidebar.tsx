@@ -11,6 +11,8 @@ import { cn } from '@utils';
 import { APP_MENU, type AppMenu } from '@routes';
 import { APP_CONFIGURATIONS } from '@app-config';
 
+import { ChevronsLeft, ChevronsRight } from 'lucide-react';
+
 const DEFAULT_GROUP = 'Main';
 
 type MenuGroup = { label: string; items: AppMenu[] };
@@ -68,18 +70,47 @@ function DashboardSidebar() {
       )}
     >
       <div className={cn('flex h-full flex-col', showMenu && 'h-svh')}>
-        {/* Brand */}
-        <header className="flex h-14 shrink-0 items-center justify-between px-4 md:h-16">
-          <div className={cn('flex items-center gap-2.5 overflow-hidden transition-all duration-300', collapse && 'md:w-full md:justify-center')}>
+        {/* Brand + desktop collapse toggle */}
+        <header className="flex h-14 shrink-0 items-center justify-between gap-2 px-4 md:h-16">
+          {/* Expanded: brand mark + wordmark */}
+          <div className={cn('flex items-center gap-2.5 overflow-hidden', collapse && 'md:hidden')}>
             <span className="bg-primary text-primary-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold">
               {APP_CONFIGURATIONS.APP_NAME.charAt(0)}
             </span>
 
-            <span className={cn('text-foreground truncate text-sm font-bold transition-all duration-300', collapse && 'md:hidden')}>
-              {APP_CONFIGURATIONS.APP_NAME}
-            </span>
+            <span className="text-foreground truncate text-sm font-bold">{APP_CONFIGURATIONS.APP_NAME}</span>
           </div>
 
+          {/* Collapsed (desktop): brand mark doubles as the expand button */}
+          <button
+            type="button"
+            onClick={handleToggleCollapse}
+            title="Expand sidebar"
+            aria-label="Expand sidebar"
+            className={cn('group relative mx-auto hidden h-8 w-8 shrink-0 items-center justify-center', collapse ? 'md:flex' : 'md:hidden')}
+          >
+            <span className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold transition-opacity group-hover:opacity-0">
+              {APP_CONFIGURATIONS.APP_NAME.charAt(0)}
+            </span>
+
+            <ChevronsRight className="text-foreground absolute h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100 rtl:scale-x-[-1]" />
+          </button>
+
+          {/* Expanded (desktop): collapse toggle */}
+          <button
+            type="button"
+            onClick={handleToggleCollapse}
+            title="Collapse sidebar"
+            aria-label="Collapse sidebar"
+            className={cn(
+              'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hidden h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors',
+              collapse ? 'md:hidden' : 'md:inline-flex',
+            )}
+          >
+            <ChevronsLeft className="h-4 w-4 rtl:scale-x-[-1]" />
+          </button>
+
+          {/* Mobile menu toggle */}
           <DashboardSidebarDrawer variant="mobile" collapse={showMenu} onCollapse={handleToggleMenu} />
         </header>
 
@@ -129,9 +160,6 @@ function DashboardSidebar() {
             </div>
           </div>
         </div>
-
-        {/* Collapse toggle */}
-        <DashboardSidebarDrawer collapse={!collapse} onCollapse={handleToggleCollapse} />
       </div>
     </aside>
   );
