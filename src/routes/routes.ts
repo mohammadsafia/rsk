@@ -6,6 +6,7 @@ export type AppMenu = {
   id: string;
   path: string;
   name?: string;
+  group?: string;
   permission?: string;
   permissions?: string[];
   roles?: string[];
@@ -39,18 +40,21 @@ export const APP_MENU: AppMenu[] = [
     id: 'dashboard',
     path: FULL_ROUTES_PATH.HOME.DASHBOARD,
     name: 'Dashboard',
+    group: 'Main',
     icon: LayoutDashboard,
   },
   {
     id: 'components',
     path: FULL_ROUTES_PATH.COMPONENTS.INDEX,
     name: 'Components',
+    group: 'Main',
     icon: Component,
   },
   {
     id: 'settings',
     path: FULL_ROUTES_PATH.SETTINGS.INDEX,
     name: 'Settings',
+    group: 'Account',
     icon: Settings,
   },
 ];
