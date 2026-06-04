@@ -1,38 +1,28 @@
-import { Button, DropdownMenu } from '@components/ui';
+import { Button } from '@components/ui';
 
 import { THEME_TYPES, useTheme } from '@contexts';
 
-import { cn } from '@utils';
-
-import { Check, Moon, Sun } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 
 function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
 
+  const isDark = theme === THEME_TYPES.DARK;
+
+  const toggleTheme = () => setTheme(isDark ? THEME_TYPES.LIGHT : THEME_TYPES.DARK);
+
   return (
-    <DropdownMenu>
-      <DropdownMenu.Trigger asChild>
-        <Button variant="outline" size="icon" className="border-primary !bg-primary !text-background rounded-full transition-none">
-          <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenu.Trigger>
-
-      <DropdownMenu.Content align="end">
-        <DropdownMenu.Item onClick={() => setTheme(THEME_TYPES.LIGHT)}>
-          Light <Check size={14} className={cn('ms-auto', theme !== THEME_TYPES.LIGHT && 'hidden')} />
-        </DropdownMenu.Item>
-
-        <DropdownMenu.Item onClick={() => setTheme(THEME_TYPES.DARK)}>
-          Dark <Check size={14} className={cn('ms-auto', theme !== THEME_TYPES.DARK && 'hidden')} />
-        </DropdownMenu.Item>
-
-        <DropdownMenu.Item onClick={() => setTheme(THEME_TYPES.SYSTEM)}>
-          System <Check size={14} className={cn('ms-auto', theme !== THEME_TYPES.SYSTEM && 'hidden')} />
-        </DropdownMenu.Item>
-      </DropdownMenu.Content>
-    </DropdownMenu>
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleTheme}
+      aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+      className="text-muted-foreground hover:text-foreground relative h-9 w-9"
+    >
+      <Sun className="h-4 w-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+      <Moon className="absolute h-4 w-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+      <span className="sr-only">Toggle theme</span>
+    </Button>
   );
 }
 
