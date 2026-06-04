@@ -9,6 +9,7 @@ const HomePage = lazy(() => import('@pages/home/HomePage'));
 const ComponentsGalleryPage = lazy(() => import('@pages/components/ComponentsGalleryPage'));
 const ComponentDetailPage = lazy(() => import('@pages/components/ComponentDetailPage'));
 const DashboardPage = lazy(() => import('@pages/dashboard/DashboardPage'));
+const MembersPage = lazy(() => import('@pages/members/MembersPage'));
 
 export const router = createBrowserRouter([
   // Public routes
@@ -55,6 +56,10 @@ export const router = createBrowserRouter([
           {
             path: FULL_ROUTES_PATH.COMPONENTS.DETAIL,
             element: <ComponentDetailPage />,
+          },
+          {
+            path: FULL_ROUTES_PATH.MEMBERS.INDEX,
+            element: <MembersPage />,
           },
           {
             path: FULL_ROUTES_PATH.SETTINGS.INDEX,

@@ -1,6 +1,6 @@
 import type { ElementType } from 'react';
 
-import { LayoutDashboard, Component, Settings } from 'lucide-react';
+import { LayoutDashboard, Component, Settings, Users } from 'lucide-react';
 
 export type AppMenu = {
   id: string;
@@ -30,6 +30,9 @@ export const FULL_ROUTES_PATH = {
   SETTINGS: {
     INDEX: '/settings',
   },
+  MEMBERS: {
+    INDEX: '/members',
+  },
   ROOT: {
     INDEX: '..',
   },
@@ -52,6 +55,13 @@ export const APP_MENU: AppMenu[] = [
     name: 'Components',
     group: 'Main',
     icon: Component,
+  },
+  {
+    id: 'members',
+    path: FULL_ROUTES_PATH.MEMBERS.INDEX,
+    name: 'Members',
+    group: 'Main',
+    icon: Users,
   },
   {
     id: 'settings',
