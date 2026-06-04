@@ -52,7 +52,7 @@ const Body = ({ className, ...props }: TableBodyProps) => (
 );
 
 const Footer = ({ className, ...props }: TableFooterProps) => (
-  <tfoot data-slot="table-footer" className={cn('bg-surface text-primary-900 font-medium', className)} {...props} />
+  <tfoot data-slot="table-footer" className={cn('bg-secondary text-primary-900 font-medium', className)} {...props} />
 );
 
 const Row = ({ className, ...props }: TableRowProps) => (

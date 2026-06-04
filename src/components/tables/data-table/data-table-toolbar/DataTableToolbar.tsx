@@ -50,7 +50,7 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
 
   return (
     <div data-slot="data-table-toolbar" className={cn('flex w-full flex-col rounded-2xl shadow', className)}>
-      <div className={cn('bg-surface flex items-stretch gap-6 rounded-2xl ps-6 transition-all', showFilters && 'rounded-es-none')}>
+      <div className={cn('bg-secondary flex items-stretch gap-6 rounded-2xl ps-6 transition-all', showFilters && 'rounded-es-none')}>
         <div className="flex flex-1 items-center py-3">
           <Conditional.If condition={totalCount !== undefined}>
             <span className="text-muted-400 text-xs font-medium whitespace-nowrap">
