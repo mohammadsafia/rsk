@@ -12,7 +12,7 @@ const TooltipButton: FC<TooltipButtonProps> = ({ ref, title, className, children
     <Tooltip.Provider>
       <Tooltip>
         <Tooltip.Trigger asChild>
-          <LoadingButton ref={ref} className={cn('', className)} {...props}>
+          <LoadingButton ref={ref} className={cn(className)} {...props}>
             {children}
           </LoadingButton>
         </Tooltip.Trigger>

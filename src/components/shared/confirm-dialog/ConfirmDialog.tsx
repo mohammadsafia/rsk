@@ -37,7 +37,7 @@ export type ConfirmDialogProps = {
    * */
   dismissible?: boolean;
   /** Supports async — return a `Promise` for auto-spinner and auto-close on resolve. */
-  onConfirm?: () => void | Promise<void>;
+  onConfirm?: () => void | Promise<unknown>;
 };
 
 const confirmDialogVariantToIconsMapping: Record<ConfirmDialogVariant, typeof AlertTriangle> = {
@@ -179,6 +179,7 @@ function ConfirmDialog({
         className={cn(confirmDialogVariants({ variant }), className)}
         onInteractOutside={(e) => !dismissible && e.preventDefault()}
         onEscapeKeyDown={(e) => !dismissible && e.preventDefault()}
+        aria-describedby={undefined}
       >
         <Dialog.Close
           aria-label="Close"

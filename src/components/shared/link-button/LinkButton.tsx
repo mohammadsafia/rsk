@@ -13,7 +13,7 @@ type LinkButtonProps = ButtonProps & {
 
 function LinkButton({ to, textContent, className, containerClassName, withContainer = true, ...props }: LinkButtonProps) {
   const child = (
-    <Button asChild className={cn('', className)} {...props}>
+    <Button asChild className={cn(className)} {...props}>
       <Link to={to}>{textContent}</Link>
     </Button>
   );

@@ -40,3 +40,5 @@ temp-api-types/
 .idea
 .superpowers/
 /dist
+# Playwright MCP artifacts
+.playwright-mcp/

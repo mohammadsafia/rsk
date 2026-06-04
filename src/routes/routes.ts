@@ -35,6 +35,9 @@ export const FULL_ROUTES_PATH = {
   },
 } as const;
 
+/** Flattened route map used by breadcrumb/navigation helpers. */
+export const PLAIN_ROUTES = FULL_ROUTES_PATH;
+
 export const APP_MENU: AppMenu[] = [
   {
     id: 'dashboard',

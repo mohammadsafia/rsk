@@ -27,6 +27,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
   rules,
   control,
   label,
+  tooltip,
   containerClassName,
   labelClassName,
   className,
@@ -169,7 +170,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
 
   return (
     <FormControl className={containerClassName}>
-      <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={name} required={required}>
+      <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
         {label}
       </FormLabel>
 
@@ -182,7 +183,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
               'transition-colors focus-within:outline-none',
               {
                 'border-muted-200 hover:border-muted-300 focus-within:border-primary focus-within:ring-primary focus-within:ring-1': !error,
-                'border-destructive focus-within:border-destructive focus-within:ring-destructive focus-within:ring-1': !!error,
+                'border-destructive focus-within:border-destructive focus-within:ring-destructive ps-8 focus-within:ring-1': !!error,
                 'pointer-events-none cursor-not-allowed opacity-50': disabled,
               },
               className,

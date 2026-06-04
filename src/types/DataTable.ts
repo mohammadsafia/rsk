@@ -42,6 +42,7 @@ declare module '@tanstack/table-core' {
   interface ColumnMeta<TData extends RowData, TValue> {
     label?: string;
     filterMeta?: DataTableFilterMeta;
+    disableRowClick?: boolean;
     // TODO: this will be removed after the migration to the new component
     autoComplete?: {
       queryKey: string[];

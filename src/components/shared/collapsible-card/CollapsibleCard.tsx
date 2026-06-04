@@ -1,11 +1,12 @@
 import { type ComponentPropsWithoutRef, createContext, type FC, type SVGProps, useContext } from 'react';
 
 import { Card, Collapsible } from '@components/ui';
+import { PrimeTooltip, type PrimeTooltipProps } from '@components/shared';
 
 import { cva, VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Info } from 'lucide-react';
 
 type CollapsibleCardContextValue = VariantProps<typeof collapsibleCardVariants>;
 
@@ -14,6 +15,7 @@ type CollapsibleCardHeaderLeadingProps = ComponentPropsWithoutRef<'div'>;
 type CollapsibleCardTitleProps = ComponentPropsWithoutRef<typeof Card.Title>;
 type CollapsibleCardTriggerProps = ComponentPropsWithoutRef<typeof Collapsible.Trigger>;
 type CollapsibleCardTriggerIconProps = SVGProps<SVGSVGElement>;
+type CollapsibleCardTooltipProps = PrimeTooltipProps;
 type CollapsibleCardDescriptionProps = ComponentPropsWithoutRef<typeof Card.Description>;
 type CollapsibleCardContentProps = ComponentPropsWithoutRef<typeof Card.Content> & VariantProps<typeof collapsibleCardVariants>;
 type CollapsibleCardFooterProps = ComponentPropsWithoutRef<typeof Card.Footer>;
@@ -28,6 +30,7 @@ type CollapsibleCardComponent = FC<CollapsibleCardProps> & {
   Title: FC<CollapsibleCardTitleProps>;
   Trigger: FC<CollapsibleCardTriggerProps>;
   TriggerIcon: FC<CollapsibleCardTriggerIconProps>;
+  Tooltip: FC<CollapsibleCardTooltipProps>;
   Description: FC<CollapsibleCardDescriptionProps>;
   Content: FC<CollapsibleCardContentProps>;
   Footer: FC<CollapsibleCardFooterProps>;
@@ -117,7 +120,7 @@ const CollapsibleCardHeaderLeading: FC<CollapsibleCardHeaderLeadingProps> = ({ c
 );
 
 const CollapsibleCardTitle: FC<CollapsibleCardTitleProps> = ({ className, children, ...props }) => (
-  <Card.Title className={cn(className)} {...props}>
+  <Card.Title className={cn('flex items-center gap-2', className)} {...props}>
     {children}
   </Card.Title>
 );
@@ -139,6 +142,16 @@ const CollapsibleCardTriggerIcon: FC<CollapsibleCardTriggerIconProps> = ({ class
     )
   );
 };
+
+const CollapsibleCardTooltip: FC<CollapsibleCardTooltipProps> = ({ children, ...props }) => (
+  <PrimeTooltip align="start" {...props}>
+    <PrimeTooltip.Trigger type="button">
+      <Info size={20} className="text-muted-400 inline-block cursor-help" />
+    </PrimeTooltip.Trigger>
+
+    <PrimeTooltip.Item>{children}</PrimeTooltip.Item>
+  </PrimeTooltip>
+);
 
 const CollapsibleCardDescription: FC<CollapsibleCardDescriptionProps> = ({ className, children, ...props }) => (
   <Card.Description className={cn(className)} {...props}>
@@ -186,6 +199,7 @@ CollapsibleCard.Leading = CollapsibleCardHeaderLeading;
 CollapsibleCard.Title = CollapsibleCardTitle;
 CollapsibleCard.Trigger = CollapsibleCardTrigger;
 CollapsibleCard.TriggerIcon = CollapsibleCardTriggerIcon;
+CollapsibleCard.Tooltip = CollapsibleCardTooltip;
 CollapsibleCard.Description = CollapsibleCardDescription;
 CollapsibleCard.Content = CollapsibleCardContent;
 CollapsibleCard.Footer = CollapsibleCardFooter;

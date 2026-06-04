@@ -99,7 +99,7 @@ const FileUploaderDropzoneGroup: FC<FileUploaderDropzoneGroupProps> = ({ classNa
     <div
       data-slot="file-uploader-dropzone-group"
       className={cn(
-        'border-muted-200 bg-muted-50 text-muted-400 relative flex items-center gap-2 rounded-lg border border-dashed p-3 text-sm transition-[color,box-shadow] outline-none',
+        'border-muted-200 bg-background text-muted-400 relative flex items-center gap-2 rounded-lg border border-dashed p-3 text-sm transition-[color,box-shadow] outline-none',
         !disabled && 'hover:border-primary',
         disabled && 'bg-muted-50 text-muted-300',
         isUploading && 'pointer-events-none',

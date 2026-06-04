@@ -13,11 +13,13 @@ type FormInputProps<TFieldValues extends FieldValues> = Omit<InputHTMLAttributes
 function FormInput<TFieldValues extends FieldValues>({
   name,
   label,
+  tooltip,
   className,
   containerClassName,
   labelClassName,
   errorClassName,
   required,
+  rules,
   ...props
 }: FormInputProps<TFieldValues>) {
   const { register } = useFormContext<TFieldValues>();
@@ -28,7 +30,7 @@ function FormInput<TFieldValues extends FieldValues>({
 
   return (
     <FormControl className={containerClassName}>
-      <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={id} required={required}>
+      <FormLabel className={labelClassName} htmlFor={id} tooltip={tooltip} required={required} hidden={!label} error={error!}>
         {label}
       </FormLabel>
 
@@ -41,7 +43,7 @@ function FormInput<TFieldValues extends FieldValues>({
               'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive placeholder:text-destructive ps-8',
             className,
           )}
-          {...register(name)}
+          {...register(name, rules)}
           {...props}
         />
 

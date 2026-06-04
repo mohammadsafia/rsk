@@ -6,7 +6,7 @@ import { cn } from '@utils';
 
 export type BadgeProps = ComponentPropsWithoutRef<'div'> & VariantProps<typeof badgeVariants>;
 
-export const badgeVariants = cva('inline-flex items-center gap-1 font-normal text-muted-foreground', {
+export const badgeVariants = cva('inline-flex items-center gap-1 font-normal text-muted', {
   variants: {
     size: {
       default: 'p-0 text-xs',
@@ -20,9 +20,9 @@ export const badgeVariants = cva('inline-flex items-center gap-1 font-normal tex
       success: `**:data-[slot=badge-dot]:text-success`,
       destructive: `**:data-[slot=badge-dot]:text-destructive`,
       warning: `**:data-[slot=badge-dot]:text-warning`,
-      muted: `**:data-[slot=badge-dot]:text-muted-400`,
-      secondary: `**:data-[slot=badge-dot]:text-secondary-600`,
-      neutral: `**:data-[slot=badge-dot]:text-muted-foreground`,
+      muted: `**:data-[slot=badge-dot]:text-muted`,
+      secondary: `**:data-[slot=badge-dot]:text-secondary`,
+      neutral: `**:data-[slot=badge-dot]:text-primary-900`,
       accent: `**:data-[slot=badge-dot]:text-accent`,
     },
   },

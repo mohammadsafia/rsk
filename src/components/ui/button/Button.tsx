@@ -3,7 +3,7 @@ import { type ComponentProps, type FC, forwardRef } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn, FOCUS_RING, TRANSITION_DEFAULT } from '@utils';
+import { cn } from '@utils';
 
 export type ButtonVariants = VariantProps<typeof buttonVariants>;
 
@@ -15,7 +15,7 @@ export type ButtonProps = ComponentProps<'button'> &
 export const buttonVariants = cva(
   `
     inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background
-    ${TRANSITION_DEFAULT} ${FOCUS_RING} cursor-pointer
+    transition-colors duration-300 ease-in-out focus-visible:outline-none cursor-pointer
     disabled:pointer-events-none disabled:opacity-50
     aria-disabled:pointer-events-none aria-disabled:opacity-50
   `,
@@ -24,24 +24,31 @@ export const buttonVariants = cva(
       variant: {
         default: 'bg-primary text-primary-foreground hover:not-disabled:bg-primary-600',
         secondary: 'bg-secondary text-secondary-foreground hover:not-disabled:bg-secondary-600',
-        muted: 'bg-muted text-foreground hover:not-disabled:bg-muted-400',
+        muted: 'bg-muted-400 text-muted-foreground hover:not-disabled:bg-muted',
         destructive: 'text-destructive-foreground bg-destructive hover:not-disabled:bg-destructive/80',
         success: 'bg-success text-success-foreground hover:not-disabled:bg-success/80',
         link: 'text-primary underline-offset-4 hover:not-disabled:underline',
         icon: 'bg-primary-600 text-primary-foreground hover:not-disabled:bg-primary',
+        'soft-primary': 'bg-primary-15 text-primary hover:not-disabled:bg-primary-25',
+        'soft-muted': 'bg-muted-50 text-muted hover:not-disabled:bg-muted-100',
         ghost: 'text-foreground hover:not-disabled:text-primary',
-        'ghost-muted': 'text-foreground hover:not-disabled:text-primary hover:not-disabled:bg-muted-200',
+        'ghost-primary': 'text-primary hover:not-disabled:text-primary-700',
+        'ghost-muted': 'text-muted hover:not-disabled:text-primary hover:not-disabled:bg-muted-200',
         'ghost-destructive': 'text-foreground hover:not-disabled:text-destructive',
-        'ghost-muted-primary': 'text-muted-foreground hover:not-disabled:text-foreground',
-        'ghost-muted-destructive': 'text-muted-foreground hover:not-disabled:text-destructive',
+        'ghost-muted-primary': 'text-muted-400 hover:not-disabled:text-primary',
+        'ghost-muted-destructive': 'text-muted-400 hover:not-disabled:text-destructive',
+        'quiet-primary': 'text-primary hover:not-disabled:bg-primary hover:not-disabled:text-primary-foreground',
+        'surface-primary': 'border border-primary-50 bg-background text-primary shadow-xs hover:not-disabled:bg-primary-15',
         outline:
           'border border-primary-400 text-primary-400 bg-background shadow-xs hover:not-disabled:border-primary-600 hover:not-disabled:text-primary-600',
+        'outline-muted': 'border border-muted-200 text-muted bg-background shadow-xs hover:not-disabled:bg-muted-50',
         'outline-destructive': 'border border-destructive text-destructive bg-destructive-200 hover:not-disabled:bg-destructive-200/80',
         'outline-success': 'border border-success text-success bg-success-200 hover:not-disabled:bg-success-200/80',
         unstyled: '',
       },
       size: {
         default: 'px-3 py-2',
+        xs: 'rounded-md text-xs px-2 py-1',
         sm: 'rounded-md px-3 py-1',
         lg: 'rounded-md px-8 py-2.5',
         icon: 'h-8 w-8 rounded-full',

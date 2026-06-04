@@ -1,7 +1,7 @@
 import { type ComponentPropsWithoutRef, type FC, type HTMLAttributes } from 'react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 
-import { cn, TRANSITION_DEFAULT } from '@utils';
+import { cn } from '@utils';
 
 import { Check, ChevronRight, Circle } from 'lucide-react';
 
@@ -41,7 +41,7 @@ type DropdownMenuComponent = FC<DropdownMenuProps> & {
 const DropdownMenuTrigger: FC<DropdownMenuTriggerProps> = ({ className, ...props }) => (
   <DropdownMenuPrimitive.Trigger
     data-slot="dropdown-trigger"
-    className={cn('inline-flex items-center justify-center text-sm font-medium outline-none', className)}
+    className={cn('flex items-center justify-center text-sm font-medium outline-none', className)}
     {...props}
   />
 );
@@ -111,7 +111,7 @@ const Item: FC<DropdownMenuItemProps> = ({ className, inset, ...props }) => (
   <DropdownMenuPrimitive.Item
     data-slot="dropdown-item"
     className={cn(
-      `hover:bg-primary hover:text-primary-foreground text-primary-900 relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-xs ${TRANSITION_DEFAULT}`,
+      'hover:bg-primary hover:text-primary-foreground text-foreground relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors',
       'outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50',
       inset && 'ps-8',
       className,

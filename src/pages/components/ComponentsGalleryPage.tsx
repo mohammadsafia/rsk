@@ -183,7 +183,7 @@ const ComponentsGalleryPage = () => {
 
         {/* Category Tabs */}
         <Tabs value={activeCategoryKey} onValueChange={handleCategoryChange} className="mb-8">
-          <Tabs.List variant="underline">
+          <Tabs.List variant="plain">
             {categoryTabOptions.map((tab) => {
               const count =
                 tab.key === ALL_CATEGORY_KEY
@@ -191,7 +191,7 @@ const ComponentsGalleryPage = () => {
                   : (docsByCategoryFiltered.get(tab.key) ?? []).length;
 
               return (
-                <Tabs.Trigger key={tab.key} value={tab.key} variant="underline">
+                <Tabs.Trigger key={tab.key} value={tab.key}>
                   {tab.label}
                   <span className="ms-1.5 text-xs opacity-60">{count}</span>
                 </Tabs.Trigger>

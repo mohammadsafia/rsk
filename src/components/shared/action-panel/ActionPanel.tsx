@@ -43,7 +43,7 @@ const ActionPanelBack: FC<BackButtonProps> = ({ className, onClick, ...props }) 
   };
 
   return (
-    <Button size="icon-sm" variant="ghost-muted" className={cn('', className)} aria-label="Go back" onClick={handleClick} {...props}>
+    <Button size="icon-sm" variant="ghost-muted" className={cn(className)} aria-label="Go back" onClick={handleClick} {...props}>
       <ChevronLeft size={20} />
     </Button>
   );

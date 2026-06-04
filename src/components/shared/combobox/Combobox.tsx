@@ -13,6 +13,7 @@ type ComboboxValueProps = ComponentPropsWithoutRef<'span'> & { placeholder?: str
 
 type ComboboxClearProps = {
   when: boolean;
+  title?: string;
   onClear: () => void;
 };
 
@@ -80,13 +81,13 @@ const ComboboxValue: FC<ComboboxValueProps> = ({ placeholder, children, classNam
   </span>
 );
 
-const ComboboxClear: FC<ComboboxClearProps> = ({ when, onClear }) => {
+const ComboboxClear: FC<ComboboxClearProps> = ({ when, title = 'Clear', onClear }) => {
   if (!when) return null;
 
   return (
     <TooltipButton
       asChild
-      title="Clear"
+      title={title}
       variant="ghost-muted-destructive"
       size="unstyled"
       onPointerDown={(e) => e.stopPropagation()}

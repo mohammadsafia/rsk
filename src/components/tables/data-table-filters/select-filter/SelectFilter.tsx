@@ -72,7 +72,7 @@ function SelectFilter<TData>({ column, filterMeta }: SelectFilterProps<TData>) {
 
   return (
     <Combobox open={open} onOpenChange={setOpen}>
-      <Combobox.Trigger className="hover:not-disabled:border-primary-25 hover:not-disabled:ring-primary-25 w-auto gap-1 px-2 py-1 text-xs">
+      <Combobox.Trigger className="hover:not-disabled:border-primary-25 hover:not-disabled:ring-primary-25 w-auto gap-1 rounded-sm px-2 py-1 text-xs">
         {filterMeta.label}
 
         <ChevronDown size={16} className="text-muted-400" />

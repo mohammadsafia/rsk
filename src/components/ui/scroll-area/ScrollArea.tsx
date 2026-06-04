@@ -7,6 +7,7 @@ type ScrollBarProps = ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Scroll
 
 type ScrollAreaProps = ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
   orientation?: 'vertical' | 'horizontal';
+  viewportClassName?: string;
 };
 
 type ScrollAreaComponent = FC<ScrollAreaProps> & {
@@ -30,13 +31,13 @@ const Bar: FC<ScrollBarProps> = ({ className, orientation = 'vertical', ...props
   </ScrollAreaPrimitive.ScrollAreaScrollbar>
 );
 
-const ScrollArea: ScrollAreaComponent = ({ orientation = 'vertical', className, children, ...props }) => (
+const ScrollArea: ScrollAreaComponent = ({ orientation = 'vertical', className, viewportClassName, children, ...props }) => (
   <ScrollAreaPrimitive.Root
     data-slot="scroll-area"
     className={cn('relative overflow-hidden', orientation === 'vertical' && '[&>[data-slot=scroll-area-viewport]>div]:block!', className)}
     {...props}
   >
-    <ScrollAreaPrimitive.Viewport data-slot="scroll-area-viewport" className="h-full w-full rounded-[inherit]">
+    <ScrollAreaPrimitive.Viewport data-slot="scroll-area-viewport" className={cn('h-full w-full rounded-[inherit]', viewportClassName)}>
       {children}
     </ScrollAreaPrimitive.Viewport>
 

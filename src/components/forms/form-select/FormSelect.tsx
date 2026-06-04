@@ -21,6 +21,7 @@ type FormSelectProps<TFieldValues extends FieldValues, TOption = FormSelectOptio
   placeholder?: string;
   valueType?: 'flat' | 'contain';
   noOptionsText?: string;
+  clearable?: boolean;
   getOptionLabel(option: ResolvedOption<TOption>): string;
   getOptionValue(option: ResolvedOption<TOption>): string;
   optionMapper?(option: ResolvedOption<TOption>): ResolvedOption<TOption>;
@@ -31,6 +32,7 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
   rules,
   control,
   label,
+  tooltip,
   containerClassName,
   labelClassName,
   className,
@@ -40,6 +42,7 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
   placeholder = 'Select',
   noOptionsText = 'No Options',
   valueType = 'flat',
+  clearable = true,
   getOptionLabel,
   getOptionValue,
   optionMapper,
@@ -64,12 +67,12 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
         };
 
         const onClear = () => {
-          onChange(valueType === 'contain' ? null : '');
+          onChange(null);
         };
 
         return (
           <FormControl className={containerClassName}>
-            <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={name} required={required}>
+            <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
               {label}
             </FormLabel>
 
@@ -87,7 +90,7 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
                 >
                   <Select.Value placeholder={placeholder} />
 
-                  <Conditional.If condition={!!internalValue && !field.disabled && !props.disabled}>
+                  <Conditional.If condition={!!internalValue && !field.disabled && !props.disabled && clearable}>
                     <TooltipButton
                       asChild
                       title="Clear"

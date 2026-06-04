@@ -25,6 +25,7 @@ function FormRadioGroup<TFieldValues extends FieldValues, TOption = FormSelectOp
   rules,
   control,
   label,
+  tooltip,
   containerClassName,
   labelClassName,
   className,
@@ -44,7 +45,7 @@ function FormRadioGroup<TFieldValues extends FieldValues, TOption = FormSelectOp
       rules={rules}
       render={({ field, fieldState: { error } }) => (
         <FormControl className={cn(containerClassName)}>
-          <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={name} required={required}>
+          <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
             {label}
           </FormLabel>
 

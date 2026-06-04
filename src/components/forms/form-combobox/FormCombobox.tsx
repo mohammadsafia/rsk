@@ -38,6 +38,7 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
   rules,
   control,
   label,
+  tooltip,
   containerClassName,
   labelClassName,
   className,
@@ -85,7 +86,7 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
     queryKey: `${label}-${name}-combobox-options`,
     fetchOptions: isAsync
       ? (options as AsyncOptionsFn<TOption>)
-      : () => Promise.resolve({ data: [] as TOption[], pagination: { page: 1, total: 0, totalPage: 0, pageSize } }),
+      : () => Promise.resolve({ data: [] as TOption[], pagination: { page: 1, total: 0, totalPages: 0, pageSize } }),
     searchTerm: debouncedSearch,
     selectedItemsIds,
     urlSearchParams,
@@ -131,7 +132,7 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
 
   return (
     <FormControl className={containerClassName}>
-      <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={name} required={required}>
+      <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
         {label}
       </FormLabel>
 

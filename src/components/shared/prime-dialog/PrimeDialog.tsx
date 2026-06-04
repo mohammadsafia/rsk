@@ -66,7 +66,7 @@ const Trigger: FC<TriggerProps> = ({ children, ...props }) => (
 
 const Panel: FC<PanelProps> = ({ dismissible = false, className, children, ...props }) => (
   <Dialog.Panel
-    className={cn('py-0 md:max-w-200', className)}
+    className={cn('flex max-h-[90dvh] flex-col overflow-clip py-0 md:max-w-200', className)}
     aria-describedby={undefined}
     onInteractOutside={(e) => !dismissible && e.preventDefault()}
     onEscapeKeyDown={(e) => !dismissible && e.preventDefault()}
@@ -84,7 +84,7 @@ const Panel: FC<PanelProps> = ({ dismissible = false, className, children, ...pr
 );
 
 const Header: FC<HeaderProps> = ({ className, children, ...props }) => (
-  <Dialog.Header className={cn('bg-primary/5 border-primary/20 border-b py-6', className)} {...props}>
+  <Dialog.Header className={cn('bg-primary/5 border-primary/20 shrink-0 border-b py-6', className)} {...props}>
     {children}
   </Dialog.Header>
 );
@@ -93,20 +93,20 @@ const Title: FC<TitleProps> = ({ className, children, dialogMode, ...props }) =>
   const context = useContext(PrimeDialogContext);
 
   return (
-    <Dialog.Title className={cn('', className)} {...props}>
+    <Dialog.Title className={cn(className)} {...props}>
       {dialogMode ?? getDialogModeText(context.dialogMode)} {children}
     </Dialog.Title>
   );
 };
 
 const Description: FC<DescriptionProps> = ({ className, children, ...props }) => (
-  <Dialog.Description className={cn('', className)} {...props}>
+  <Dialog.Description className={cn(className)} {...props}>
     {children}
   </Dialog.Description>
 );
 
 const Content: FC<ContentProps> = ({ className, children, ...props }) => (
-  <Dialog.Content className={cn('last:pb-6', className)} {...props}>
+  <Dialog.Content className={cn('min-h-0 flex-1 overflow-y-auto last:pb-6', className)} {...props}>
     {children}
   </Dialog.Content>
 );

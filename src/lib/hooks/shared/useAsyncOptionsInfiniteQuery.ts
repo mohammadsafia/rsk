@@ -1,8 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 
-import type { PaginatedDataTable } from './useDataTableQuery';
+import type { PaginatedDataTable } from '@app-types';
 
-export type AsyncOptionsFn<TOption> = (queryParams: string) => Promise<PaginatedDataTable<TOption>>;
+export type AsyncOptionsFn<TOption> = (queryParams: string) => Promise<TOption[] | PaginatedDataTable<TOption>>;
 
 type UseAsyncOptionsInfiniteQueryOptions<TOption> = {
   /**
@@ -91,7 +91,13 @@ export function useAsyncOptionsInfiniteQuery<TOption>({
         queryParams.append('selectedItemsIds', id);
       });
 
-      return fetchOptions(queryParams.toString());
+      const response = await fetchOptions(queryParams.toString());
+
+      if (Array.isArray(response)) {
+        return { data: response, pagination: { page: 1, pageSize: response.length, total: response.length, totalPages: 1 } };
+      }
+
+      return response;
     },
     getNextPageParam: (lastPage, pages) => {
       const totalLoaded = pages.length * pageSize;
@@ -99,6 +105,7 @@ export function useAsyncOptionsInfiniteQuery<TOption>({
     },
     enabled,
     keepPreviousData: true,
-    staleTime: Infinity,
+    staleTime: 0,
+    cacheTime: 0,
   });
 }
