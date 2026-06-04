@@ -1,0 +1,336 @@
+---
+id: use-row-editing
+title: useRowEditing
+section: Hooks
+category: Hooks
+description: 'Per-row inline-editing state for tables built on useFieldArray + useDataTable. Owns editing state, snapshots, and save/cancel mechanics — composes with the existing DataTable pattern.'
+tags: [hooks, useRowEditing, useFieldArray, useDataTable, table, form, inline-edit]
+---
+
+import { useMemo } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+import { Button } from '@components/ui';
+import { DataTable } from '@components/tables';
+import { CollapsibleCard, ConfirmDialog } from '@components/shared';
+import { FormContainer, FormInput, FormSelect } from '@components/forms';
+
+import { RowEditingProvider, useDataTable, useRowEditing, useRowEditingContext } from '@hooks/utils';
+
+import { Check, Edit, FileCode2, PlusCircle, Trash, X } from 'lucide-react';
+
+## Overview
+
+`useRowEditing` is a small headless hook that owns four things:
+
+1. **Per-row status** — `idle | editing | creating | saving | error` (one entry per row, retrievable via `getStatus(rowId)`)
+2. **Per-row snapshots for cancel** (deep-cloned via `structuredClone`, held in a ref, no re-renders)
+3. **Stable callbacks** for `enterEdit` / `exitEdit` / `save(rowId, persist)` / `cancel` / `addRow` / `removeRow`
+4. **Index resolution at call time** — never cached, so `move`/`swap` reorders cannot point actions at the wrong row
+
+It composes with the existing patterns: `useForm` + `useFieldArray` own the data, `useDataTable` + `DataTable` own the rendering. Cells read editing state from `useRowEditingContext`. Nothing else.
+
+> **Why this replaces `EditableGrid`** — the older component fused form, field array, editing state, table, and rendering into one black box. That tangle was why cancel/save had to relearn (twice) that `methods.setValue` does not refresh `fieldArray.fields`. Splitting the concerns makes that bug structurally impossible.
+
+## Imports
+
+```tsx
+import { RowEditingProvider, useRowEditing, useRowEditingContext, useDataTable } from '@hooks/utils';
+import { DataTable } from '@components/tables';
+import { FormContainer, FormInput, FormSelect } from '@components/forms';
+import { useFieldArray, useForm } from 'react-hook-form';
+```
+
+## Wire-up recipe
+
+```tsx
+const form = useForm({ resolver: zodResolver(schema), defaultValues: { lines: [] } });
+const fieldArray = useFieldArray({ control: form.control, name: 'lines', keyName: '__rhfKey' });
+const edit = useRowEditing({ form, fieldArray, arrayName: 'lines' });
+
+const { table } = useDataTable({
+  data: fieldArray.fields,
+  columns,
+  pageCount: 1,
+  getRowId: (row) => row._rowId,
+});
+
+return (
+  <FormContainer formContext={form} onSuccess={handleSubmit}>
+    <RowEditingProvider edit={edit}>
+      <CollapsibleCard>
+        <CollapsibleCard.Header>
+          <CollapsibleCard.Leading>
+            <FileCode2 className="text-primary size-5" />
+            <CollapsibleCard.Title>Billable Lines</CollapsibleCard.Title>
+          </CollapsibleCard.Leading>
+
+          <div className="flex items-center gap-2">
+            <AddRowButton />
+            <CollapsibleCard.Trigger>
+              <CollapsibleCard.TriggerIcon />
+            </CollapsibleCard.Trigger>
+          </div>
+        </CollapsibleCard.Header>
+
+        <CollapsibleCard.Content className="p-0">
+          <DataTable table={table}>
+            <DataTable.Content className="rounded-t-none" emptyState={{ title: 'No lines' }} />
+          </DataTable>
+        </CollapsibleCard.Content>
+      </CollapsibleCard>
+    </RowEditingProvider>
+  </FormContainer>
+);
+```
+
+> **`_rowId` vs `id`** — `_rowId` is a stable client-side key the hook tracks edit state by (generated on `addRow` via `crypto.randomUUID`, carried through your `save` mapping). `id` is the business id assigned by your backend after save. Keep them separate so row identity does not shift mid-edit.
+>
+> **`keyName: '__rhfKey'`** — RHF's default `keyName` is `'id'`, which would overwrite your row's business id on `fieldArray.fields`. Setting `keyName: '__rhfKey'` preserves both `_rowId` and `id` on `fieldArray.fields`.
+
+## Demo
+
+Add a row, edit fields inline, save validates the single row, cancel restores via `fieldArray.update` (not `setValue`).
+
+export const procedureCodes = [
+  { id: '99213', label: '99213 - Office Visit' },
+  { id: '99214', label: '99214 - Detailed Visit' },
+  { id: '99215', label: '99215 - Comprehensive Visit' },
+  { id: '20610', label: '20610 - Joint Aspiration' },
+];
+
+export const modifiers = [
+  { id: '25', label: '25 - Significant E/M' },
+  { id: '59', label: '59 - Distinct' },
+  { id: 'LT', label: 'LT - Left' },
+  { id: 'RT', label: 'RT - Right' },
+];
+
+export const lineSchema = z.object({
+  _rowId: z.string(),
+  id: z.string().optional(),
+  procedureCodeId: z.string().min(1, 'Required'),
+  modifierId: z.string().nullable().optional(),
+  units: z.string().min(1, 'Required'),
+  charge: z.string().optional(),
+});
+
+export const formSchema = z.object({
+  lines: z.array(lineSchema),
+});
+
+export const localPersist = async (row) => row;
+
+export const RowActions = ({ row }) => {
+  const { isEditing, isAnyEditing, enterEdit, save, cancel, removeRow } = useRowEditingContext();
+  const rowId = row.original._rowId;
+  if (isEditing(rowId)) {
+    return (
+      <div className="flex gap-1">
+        <Button variant="ghost" size="icon" onClick={() => save(rowId, localPersist)} aria-label="Save">
+          <Check className="text-success size-4" />
+        </Button>
+
+        <Button type="button" variant="ghost" size="icon" onClick={() => cancel(rowId)} aria-label="Cancel">
+          <X className="text-muted size-4" />
+        </Button>
+      </div>
+    );
+  }
+  return (
+    <div className="flex gap-1">
+      <Button type="button" variant="ghost" size="icon" disabled={isAnyEditing} onClick={() => enterEdit(rowId)} aria-label="Edit">
+        <Edit className="size-4" />
+      </Button>
+
+      <ConfirmDialog
+        variant="destructive"
+        title="Delete this row?"
+        description="This will remove the line from the table. This action cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={() => removeRow(rowId)}
+      >
+        <Button type="button" variant="ghost" size="icon" disabled={isAnyEditing} aria-label="Delete">
+          <Trash className="text-destructive size-4" />
+        </Button>
+      </ConfirmDialog>
+    </div>
+  );
+};
+
+export const ProcedureCodeCell = ({ row }) => {
+  const { isEditing } = useRowEditingContext();
+  if (isEditing(row.original._rowId)) {
+    return (
+      <FormSelect
+        name={`lines.${row.index}.procedureCodeId`}
+        options={procedureCodes}
+        getOptionLabel={(o) => o.label}
+        getOptionValue={(o) => o.id}
+        placeholder="Select"
+      />
+    );
+  }
+  return procedureCodes.find((o) => o.id === row.original.procedureCodeId)?.label ?? '—';
+};
+
+export const ModifierCell = ({ row }) => {
+  const { isEditing } = useRowEditingContext();
+  if (isEditing(row.original._rowId)) {
+    return (
+      <FormSelect
+        name={`lines.${row.index}.modifierId`}
+        options={modifiers}
+        getOptionLabel={(o) => o.label}
+        getOptionValue={(o) => o.id}
+        placeholder="Select"
+      />
+    );
+  }
+  return modifiers.find((o) => o.id === row.original.modifierId)?.label ?? '—';
+};
+
+export const UnitsCell = ({ row }) => {
+  const { isEditing } = useRowEditingContext();
+  if (isEditing(row.original._rowId)) return <FormInput name={`lines.${row.index}.units`} placeholder="Type here" />;
+  return row.original.units ?? '—';
+};
+
+export const ChargeCell = ({ row }) => {
+  const { isEditing } = useRowEditingContext();
+  if (isEditing(row.original._rowId)) return <FormInput name={`lines.${row.index}.charge`} placeholder="0.00" />;
+  return row.original.charge ?? '—';
+};
+
+export const AddRowButton = () => {
+  const { isAnyEditing, addRow } = useRowEditingContext();
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      disabled={isAnyEditing}
+      onClick={() => addRow({ units: '', charge: '' })}
+    >
+      <PlusCircle className="size-5" />
+      Add diagnosis code
+    </Button>
+  );
+};
+
+
+export const columns = [
+  { id: 'procedureCode', header: 'Procedure Code', cell: ProcedureCodeCell },
+  { id: 'modifier', header: 'Modifier', cell: ModifierCell },
+  { id: 'units', header: 'Units', cell: UnitsCell },
+  { id: 'charge', header: 'Charge', cell: ChargeCell },
+  { id: 'actions', header: '', cell: RowActions },
+];
+
+export const Demo = () => {
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      lines: [
+        { _rowId: 'row-1', id: '1', procedureCodeId: '99213', modifierId: '25', units: '1', charge: '120.00' },
+        { _rowId: 'row-2', id: '2', procedureCodeId: '20610', modifierId: 'LT', units: '2', charge: '450.00' },
+      ],
+    },
+  });
+  const fieldArray = useFieldArray({ control: form.control, name: 'lines', keyName: '__rhfKey' });
+  const edit = useRowEditing({ form, fieldArray, arrayName: 'lines' });
+  const { table } = useDataTable({
+    data: fieldArray.fields,
+    columns,
+    pageCount: 1,
+    getRowId: (row) => row._rowId,
+  });
+  return (
+    <FormContainer formContext={form} onSuccess={(v) => console.log('submit', v)}>
+      <RowEditingProvider edit={edit}>
+        <CollapsibleCard>
+          <CollapsibleCard.Header>
+            <CollapsibleCard.Leading>
+              <FileCode2 className="text-primary size-5" aria-hidden="true" />
+
+              <CollapsibleCard.Title>Billable Lines</CollapsibleCard.Title>
+
+            </CollapsibleCard.Leading>
+
+            <div className="flex items-center gap-2">
+              <AddRowButton />
+
+              <CollapsibleCard.Trigger>
+                <CollapsibleCard.TriggerIcon />
+              </CollapsibleCard.Trigger>
+            </div>
+          </CollapsibleCard.Header>
+
+          <CollapsibleCard.Content className="p-0">
+            <DataTable table={table}>
+              <DataTable.Content
+                className="rounded-t-none"
+                emptyState={{ title: 'No lines yet', description: 'Click "Add diagnosis code" to start.' }}
+              />
+            </DataTable>
+          </CollapsibleCard.Content>
+        </CollapsibleCard>
+      </RowEditingProvider>
+    </FormContainer>
+  );
+};
+
+<Demo />
+
+## API
+
+### `useRowEditing(options)`
+
+| Option | Type | Default | Notes |
+|---|---|---|---|
+| `form` | `UseFormReturn<TForm>` | — | The parent form |
+| `fieldArray` | `UseFieldArrayReturn<TForm, ArrayPath<TForm>>` | — | The array controller |
+| `arrayName` | `ArrayPath<TForm>` | — | Path to the array in the form |
+| `mode` | `'single' \| 'multi'` | `'single'` | `'single'` blocks entering a 2nd row while one is editing |
+| `rowIdKey` | `keyof TRow & string` | `'id'` | Field on each row used as the stable identifier |
+| `generateRowId` | `() => string` | `crypto.randomUUID` | Override for non-crypto contexts |
+
+### Return
+
+| Member | Type | Notes |
+|---|---|---|
+| `editingRowIds` | `ReadonlySet<string>` | Live set of row ids in edit mode |
+| `isEditing(rowId)` | `(rowId: string) => boolean` | Convenience |
+| `isAnyEditing` | `boolean` | Convenience |
+| `enterEdit(rowId)` | `(rowId) => void` | Captures a `structuredClone` snapshot of the row's form values and sets status to `editing` |
+| `exitEdit(rowId)` | `(rowId) => void` | Commit-in-place (no validation) |
+| `save(rowId, persist)` | `(rowId, PersistFn<TRow>) => Promise<void>` | Validates the row, sets status to `saving`, calls `persist(row, { isNew, index, rowId })`, commits the returned mapped row via `fieldArray.update` (or leaves it unchanged if `persist` returns `void`), then exits. Sets status to `error` on validation failure or thrown error so the row can show inline error/spinner |
+| `getStatus(rowId)` | `(rowId) => RowStatus` | One of `'idle' \| 'editing' \| 'creating' \| 'saving' \| 'error'` — drive spinners and inline errors from this |
+| `cancel(rowId)` | `(rowId) => void` | Restores snapshot via `fieldArray.update` |
+| `addRow(defaults?)` | `(defaults?) => string` | Synchronously generates a new `_rowId` via `crypto.randomUUID`, appends `{ ...defaults, _rowId }` to the field array, seeds status as `creating`, and returns the new `_rowId` |
+| `removeRow(rowId)` | `(rowId) => void` | Removes + clears edit state |
+
+### `RowEditingProvider`
+
+Wrap the table with `<RowEditingProvider edit={edit}>...`. Required so cells can call `useRowEditingContext()`. The TanStack `table` instance is intentionally **not** included in the context — cells that need it can read it directly from `useDataTable` or table meta; bundling it here would couple every cell re-render to table identity.
+
+### `useRowEditingContext<TRow>()`
+
+Inside cells. Returns `{ table, ...edit }`. Always read state through context — closing over the hook's return value from a memoised column array creates stale-closure traps.
+
+## Rules of thumb
+
+1. **`keyName: '__rhfKey'`** on `useFieldArray` — otherwise RHF's synthetic `id` overwrites your row's `_rowId` and `id`.
+2. **`getRowId: (row) => row._rowId`** on `useDataTable` — TanStack row ids must be stable for editing to survive renders, and `_rowId` survives BE save (unlike `id`, which only exists after persistence).
+3. **Always use `fieldArray.update`, not `methods.setValue`**, when writing back row values — `setValue` does NOT refresh `fieldArray.fields`, causing stale display data. Both `save` and `cancel` inside the hook go through `fieldArray.update` for this reason. The rule matters if you write custom save logic outside the hook.
+4. **Cells read state from `useRowEditingContext`** — never close over the hook return from a memoised column array.
+5. **Per-row `save` validates only** — it does not submit the form. Outer-form save runs `form.handleSubmit` which validates the whole array.
+6. **Single-row mode is the default**; edit/delete buttons should be `disabled={isAnyEditing}` so the user commits before moving on.
+
+## See also
+
+- [`DataTable`](/component-docs/data-table) — the headless table primitive
+- [`FormContainer`](/component-docs/form-container) — the form wrapper
+- Design spec: `docs/superpowers/specs/2026-05-19-use-row-editing-design.md`

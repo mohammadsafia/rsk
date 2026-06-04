@@ -1,27 +1,37 @@
-import { Children, type ComponentProps, type FC, isValidElement, type ReactNode } from 'react';
+import { Children, type ComponentPropsWithoutRef, type FC, isValidElement, type ReactNode } from 'react';
 
 import { Card } from '@components/ui';
+import { PrimeTooltip, type PrimeTooltipProps } from '@components/shared';
 import { Conditional } from '@components/utils';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
-type PrimeCardHeaderProps = ComponentProps<typeof Card.Header>;
+import { Info } from 'lucide-react';
 
-type PrimeCardTitleProps = ComponentProps<typeof Card.Title>;
+type PrimeCardHeaderProps = ComponentPropsWithoutRef<typeof Card.Header>;
+type PrimeCardHeaderLeadingProps = ComponentPropsWithoutRef<'div'>;
+type PrimeCardTitleProps = ComponentPropsWithoutRef<typeof Card.Title>;
+type PrimeCardTooltipProps = PrimeTooltipProps;
+type PrimeCardDescriptionProps = ComponentPropsWithoutRef<typeof Card.Description>;
 
-type PrimeCardContentProps = ComponentProps<typeof Card.Content>;
+type PrimeCardContentProps = ComponentPropsWithoutRef<typeof Card.Content>;
 
-type PrimeCardProps = ComponentProps<typeof Card> &
+type PrimeCardProps = ComponentPropsWithoutRef<typeof Card> &
   VariantProps<typeof primeCardVariants> & {
     title?: ReactNode;
+    tooltip?: ReactNode;
+    description?: ReactNode;
     icon?: ReactNode;
     children: ReactNode | ReactNode[];
   };
 
 type CardComponent = FC<PrimeCardProps> & {
   Header: FC<PrimeCardHeaderProps>;
+  Leading: FC<PrimeCardHeaderLeadingProps>;
   Title: FC<PrimeCardTitleProps>;
+  Tooltip: FC<PrimeCardTooltipProps>;
+  Description: FC<PrimeCardDescriptionProps>;
   Content: FC<PrimeCardContentProps>;
 };
 
@@ -47,25 +57,43 @@ const primeCardVariants = cva('', {
   },
 });
 
-const PrimeCardHeader: FC<PrimeCardHeaderProps> = ({ children, className, ...props }) => (
-  <Card.Header className={cn('bg-background border-primary-25 rounded-ss-[inherit] rounded-se-[inherit] border-b', className)} {...props}>
-    {children}
-  </Card.Header>
+const PrimeCardHeader: FC<PrimeCardHeaderProps> = ({ className, ...props }) => (
+  <Card.Header className={cn('bg-background border-primary-25 rounded-ss-[inherit] rounded-se-[inherit] border-b', className)} {...props} />
 );
 
-const PrimeCardTitle: FC<PrimeCardHeaderProps> = ({ children, className, ...props }) => (
-  <Card.Title className={cn('flex items-center gap-3', className)} {...props}>
+const PrimeCardHeaderLeading: FC<PrimeCardHeaderLeadingProps> = ({ className, children, ...props }) => (
+  <div
+    data-slot="prime-card-header-leading"
+    className={cn('grid grid-cols-[auto_1fr] items-center gap-x-2', '*:data-[slot=card-description]:col-start-2', className)}
+    {...props}
+  >
     {children}
-  </Card.Title>
+  </div>
 );
 
-const PrimeCardContent: FC<PrimeCardContentProps> = ({ children, className, ...props }) => (
-  <Card.Content className={cn('', className)} {...props}>
-    {children}
-  </Card.Content>
+const PrimeCardTitle: FC<PrimeCardHeaderProps> = ({ className, ...props }) => (
+  <Card.Title className={cn('flex items-center gap-2', className)} {...props} />
 );
 
-const PrimeCard: CardComponent = ({ className, variant, title, icon, children, ...props }) => {
+const PrimeCardTooltip: FC<PrimeCardTooltipProps> = ({ className, children, ...props }) => {
+  return (
+    <PrimeTooltip align="start" {...props}>
+      <PrimeTooltip.Trigger type="button">
+        <Info size={20} className="text-muted-400 inline-block cursor-help" />
+      </PrimeTooltip.Trigger>
+
+      <PrimeTooltip.Item>{children}</PrimeTooltip.Item>
+    </PrimeTooltip>
+  );
+};
+
+const PrimeCardDescription: FC<PrimeCardDescriptionProps> = ({ className, ...props }) => (
+  <Card.Description className={cn(className)} {...props} />
+);
+
+const PrimeCardContent: FC<PrimeCardContentProps> = ({ className, ...props }) => <Card.Content className={cn(className)} {...props} />;
+
+const PrimeCard: CardComponent = ({ className, variant, title, icon, tooltip, description, children, ...props }) => {
   const childArray = Children.toArray(children);
 
   const headerChild = childArray.find((child) => isValidElement(child) && child.type === PrimeCardHeader);
@@ -83,13 +111,23 @@ const PrimeCard: CardComponent = ({ className, variant, title, icon, children, .
 
         <Conditional.Else>
           <PrimeCardHeader>
-            <PrimeCardTitle>
+            <PrimeCardHeaderLeading className={cn(!icon && 'contents')}>
               <Conditional.If condition={!!icon}>
                 <span className="text-primary-900">{icon}</span>
               </Conditional.If>
 
-              {title}
-            </PrimeCardTitle>
+              <PrimeCardTitle>
+                {title}
+
+                <Conditional.If condition={!!tooltip}>
+                  <PrimeCardTooltip>{tooltip}</PrimeCardTooltip>
+                </Conditional.If>
+              </PrimeCardTitle>
+
+              <Conditional.If condition={!!description}>
+                <PrimeCardDescription>{description}</PrimeCardDescription>
+              </Conditional.If>
+            </PrimeCardHeaderLeading>
           </PrimeCardHeader>
         </Conditional.Else>
       </Conditional>
@@ -106,7 +144,10 @@ const PrimeCard: CardComponent = ({ className, variant, title, icon, children, .
 };
 
 PrimeCard.Header = PrimeCardHeader;
+PrimeCard.Leading = PrimeCardHeaderLeading;
 PrimeCard.Title = PrimeCardTitle;
+PrimeCard.Tooltip = PrimeCardTooltip;
+PrimeCard.Description = PrimeCardDescription;
 PrimeCard.Content = PrimeCardContent;
 
 export default PrimeCard;

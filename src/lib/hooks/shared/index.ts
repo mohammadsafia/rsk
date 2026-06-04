@@ -5,6 +5,7 @@ export * from './useDate';
 export * from './useDateMask';
 export * from './useInfiniteScroll';
 export * from './useAsyncOptionsInfiniteQuery';
+export * from './useComboboxOptions';
 export * from './useTime';
 export * from './useAuth';
 export * from './useDataTableQuery';

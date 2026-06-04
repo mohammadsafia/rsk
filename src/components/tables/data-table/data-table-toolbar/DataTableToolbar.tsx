@@ -8,7 +8,7 @@ import { useDebounce } from '@hooks/shared';
 
 import { cn } from '@utils';
 
-import { Minus, Plus, Search, X } from 'lucide-react';
+import { Minus, Plus, Search } from 'lucide-react';
 
 type ToolbarProps = PropsWithChildren<{
   totalCount?: number;
@@ -23,7 +23,7 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
   const [search, setSearch] = useState(table.getState().globalFilter ?? '');
   const [showFilters, setShowFilters] = useState(false);
 
-  const debouncedSearch = useDebounce(search, 300);
+  const debouncedSearch = useDebounce(search, 500);
 
   const filterableColumns = useMemo(
     () => table.getAllColumns().filter((column) => column.getCanFilter() && column.columnDef.meta?.filterMeta),
@@ -34,11 +34,11 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
 
   const isFiltered = activeFilterCount > 0;
 
-  const handleToggleFilters = useCallback(() => {
+  const onToggleFilters = useCallback(() => {
     setShowFilters((prev) => !prev);
   }, []);
 
-  const handleReset = useCallback(() => {
+  const onReset = useCallback(() => {
     table.resetColumnFilters();
     table.resetGlobalFilter();
     setSearch('');
@@ -50,8 +50,8 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
 
   return (
     <div data-slot="data-table-toolbar" className={cn('flex w-full flex-col rounded-2xl shadow', className)}>
-      <div className={cn('bg-surface flex items-stretch gap-6 rounded-2xl pl-6 transition-all', showFilters && 'rounded-bl-none')}>
-        <div className="flex flex-1 items-center py-2">
+      <div className={cn('bg-secondary flex items-stretch gap-6 rounded-2xl ps-6 transition-all', showFilters && 'rounded-es-none')}>
+        <div className="flex flex-1 items-center py-3">
           <Conditional.If condition={totalCount !== undefined}>
             <span className="text-muted-400 text-xs font-medium whitespace-nowrap">
               Total: {totalCount} {totalLabel}
@@ -60,15 +60,15 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
         </div>
 
         <Conditional.If condition={!!table?.options?.enableGlobalFilter}>
-          <div className="flex items-center gap-2 py-3">
-            <Search className="text-muted-400 size-6 shrink-0" />
+          <div className="flex items-center py-3">
+            <Search size={16} className="text-primary" />
 
             <Input
               name="data-table-search"
               placeholder={placeholder ?? 'Search Here'}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              className="h-auto w-40 border-0 bg-transparent px-0 text-sm shadow-none focus-visible:ring-0"
+              className="w-60 border-none px-2 py-0 text-sm shadow-none [&:hover,&:focus]:not-disabled:border-none [&:hover,&:focus]:not-disabled:ring-0 bg-transparent"
             />
           </div>
         </Conditional.If>
@@ -79,23 +79,22 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
           <button
             type="button"
             className={cn(
-              'border-muted-200 relative flex cursor-pointer items-center gap-2 border-l px-6 text-sm font-normal',
-              'rounded-tr-2xl',
-              showFilters ? 'bg-primary-25' : 'rounded-br-2xl',
+              'border-muted-200 text-muted relative flex cursor-pointer items-center gap-2 rounded-se-2xl border-s px-6 text-sm font-normal',
+              showFilters ? 'bg-primary-25' : 'rounded-ee-2xl',
             )}
-            onClick={handleToggleFilters}
+            onClick={onToggleFilters}
           >
             <Conditional>
               <Conditional.If condition={showFilters}>
-                <Minus className="text-primary-900 size-5" />
+                <Minus size={16} />
               </Conditional.If>
 
               <Conditional.Else>
-                <Plus className="text-primary-900 size-5" />
+                <Plus size={16} />
               </Conditional.Else>
             </Conditional>
             Filter
-            <span className={cn('bg-secondary invisible absolute top-2.5 right-3.5 size-3 rounded-full', isFiltered && 'visible')} />
+            <span className={cn('bg-secondary invisible absolute inset-e-3.5 inset-bs-2.5 size-2 rounded-full', isFiltered && 'visible')} />
           </button>
         </Conditional.If>
       </div>
@@ -120,14 +119,7 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
             </div>
 
             <Conditional.If condition={isFiltered}>
-              <Button
-                aria-label="Clear all filters"
-                variant="ghost"
-                size="sm"
-                className="text-error-500 hover:bg-error-50 hover:text-error-600 h-8 shrink-0 gap-1 px-3 text-xs font-medium"
-                onClick={handleReset}
-              >
-                <X className="h-3 w-3" />
+              <Button variant="ghost-primary" size="xs" aria-label="Clear all filters" onClick={onReset}>
                 Clear All
               </Button>
             </Conditional.If>

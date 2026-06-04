@@ -19,12 +19,22 @@ type AlertComponent = FC<AlertProps> & {
 };
 
 const alertVariants = cva(
-  'relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:-translate-y-0.75 [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground',
+  `
+  grid w-full grid-cols-[auto_1fr] items-center gap-y-1 rounded-lg p-4
+  has-[>svg]:gap-x-3 *:data-[slot=alert-title]:col-start-2 *:data-[slot=alert-description]:col-start-2 [&:has(>[data-slot=alert-description])>svg]:row-span-2
+  `,
   {
     variants: {
       variant: {
-        default: 'bg-background text-foreground',
-        destructive: 'border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive',
+        default: 'bg-muted-50 text-muted border border-muted-200 [&>svg]:text-muted',
+        info: 'bg-primary-15 text-primary border border-primary-25 [&>svg]:text-primary',
+        destructive: 'bg-destructive-200 text-destructive border border-destructive-300 [&>svg]:text-destructive',
+        warning: 'bg-warning-200 text-warning border border-warning-300 [&>svg]:text-warning',
+        success: 'bg-success-200 text-success border border-success-300 [&>svg]:text-success',
+        outline: 'border border-primary-400 text-primary [&>svg]:text-primary',
+        'outline-info': 'border border-muted-400 bg-background text-foreground [&>svg]:text-foreground',
+        'outline-destructive': 'border border-destructive-400 text-destructive [&>svg]:text-destructive',
+        'outline-success': 'border border-success-400 text-success [&>svg]:text-success',
       },
     },
     defaultVariants: {
@@ -34,7 +44,7 @@ const alertVariants = cva(
 );
 
 function Title({ className, ...props }: TitleProps) {
-  return <h5 data-slot="alert-title" className={cn('mb-1 leading-none font-medium tracking-tight', className)} {...props} />;
+  return <h5 data-slot="alert-title" className={cn('mb-0.5 leading-none font-medium tracking-tight', className)} {...props} />;
 }
 
 function Description({ className, ...props }: DescriptionProps) {

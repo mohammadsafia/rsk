@@ -13,28 +13,77 @@ import { Button } from '@components/ui';
 
 <div className="space-y-4">
   <div>
-    <p className="text-muted-foreground mb-2 text-xs font-medium">Variants</p>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Solid</p>
     <div className="flex flex-wrap gap-2">
       <Button variant="default">Default</Button>
-      <Button variant="outline">Outline</Button>
+      <Button variant="secondary">Secondary</Button>
       <Button variant="muted">Muted</Button>
       <Button variant="destructive">Destructive</Button>
       <Button variant="success">Success</Button>
-      <Button variant="ghost">Ghost</Button>
-      <Button variant="secondary">Secondary</Button>
-      <Button variant="outline-destructive">Outline Destructive</Button>
-      <Button variant="link">Link</Button>
       <Button variant="icon">Icon</Button>
     </div>
   </div>
 
 <div>
+  <p className="text-muted-foreground mb-2 text-xs font-medium">Soft</p>
+  <div className="flex flex-wrap gap-2">
+    <Button variant="soft-primary">Soft Primary</Button>
+    <Button variant="soft-muted">Soft Muted</Button>
+  </div>
+</div>
+
+<div>
+  <p className="text-muted-foreground mb-2 text-xs font-medium">Ghost</p>
+  <div className="flex flex-wrap gap-2">
+    <Button variant="ghost">Ghost</Button>
+    <Button variant="ghost-primary">Ghost Primary</Button>
+    <Button variant="ghost-muted">Ghost Muted</Button>
+    <Button variant="ghost-destructive">Ghost Destructive</Button>
+    <Button variant="ghost-muted-primary">Ghost Muted Primary</Button>
+    <Button variant="ghost-muted-destructive">Ghost Muted Destructive</Button>
+  </div>
+</div>
+
+<div>
+  <p className="text-muted-foreground mb-2 text-xs font-medium">Quiet</p>
+  <div className="flex flex-wrap gap-2">
+    <Button variant="quiet-primary">Quiet Primary</Button>
+  </div>
+</div>
+
+<div>
+  <p className="text-muted-foreground mb-2 text-xs font-medium">Surface</p>
+  <div className="flex flex-wrap gap-2">
+    <Button variant="surface-primary">Surface Primary</Button>
+  </div>
+</div>
+
+<div>
+  <p className="text-muted-foreground mb-2 text-xs font-medium">Outline</p>
+  <div className="flex flex-wrap gap-2">
+    <Button variant="outline">Outline</Button>
+    <Button variant="outline-muted">Outline Muted</Button>
+    <Button variant="outline-destructive">Outline Destructive</Button>
+    <Button variant="outline-success">Outline Success</Button>
+  </div>
+</div>
+
+<div>
+  <p className="text-muted-foreground mb-2 text-xs font-medium">Link</p>
+  <div className="flex flex-wrap gap-2">
+    <Button variant="link">Link</Button>
+  </div>
+</div>
+
+<div>
   <p className="text-muted-foreground mb-2 text-xs font-medium">Sizes</p>
   <div className="flex flex-wrap items-center gap-2">
+    <Button size="xs">Extra Small</Button>
     <Button size="sm">Small</Button>
     <Button size="default">Default</Button>
     <Button size="lg">Large</Button>
     <Button size="icon">⚙</Button>
+    <Button size="icon-sm">⚙</Button>
     <Button size="full">Full Width</Button>
   </div>
 </div>
@@ -48,6 +97,47 @@ import { Button } from '@components/ui';
   </div>
 </div>
 
+## When to use which variant
+
+The variants form an emphasis ladder. Pick by how much attention the action should command, then by intent (primary / destructive / etc).
+
+- **Solid** (`default`, `secondary`, `muted`, `destructive`, `success`) — loudest. Use for the single most important action in a view.
+- **Soft** (`soft-primary`, `soft-muted`) — tinted fill, no border. Low-emphasis filled buttons. Use when an action should be visible but shouldn't compete with a solid primary.
+- **Ghost** (`ghost`, `ghost-primary`, `ghost-muted`, `ghost-destructive`, `ghost-muted-primary`, `ghost-muted-destructive`) — transparent at rest, subtle hover. Use for tertiary actions, toolbar buttons, and dense UIs.
+- **Quiet** (`quiet-primary`) — visually subdued at rest, fills with the full primary color on hover. Use for navigation rails, menu items, and dropdown items where many actions coexist and only the hovered one should pop.
+- **Surface** (`surface-primary`) — bordered, neutral background, primary text. Use when a primary action needs definition (e.g. sitting on a tinted card) without going full solid.
+- **Outline** (`outline`, `outline-muted`, `outline-destructive`, `outline-success`) — bordered with a colored stroke. Use for secondary actions that need a clear hit target without a filled background.
+- **Link** — text-only with underline on hover. Use for inline navigation, not for actions.
+
+### Surface vs Outline Muted
+
+These two sit visually close — both bordered, both `bg-background`, both `shadow-xs`. The intentional difference:
+
+- `surface-primary` — primary action presented quietly. Text is `text-primary`, border is neutral. Use when the action is _important but quiet_.
+- `outline-muted` — neutral action. Text is `text-muted`, border is neutral. Use when the action is _neutral and quiet_.
+
+If the action conveys "primary intent", use `surface-primary`. If it's a generic neutral action, use `outline-muted`.
+
+### Soft variants: no borders, no shadows
+
+Soft variants are intentionally borderless and shadow-free — the tinted fill is what defines them, and "soft" is the low-emphasis filled tier (adding weight contradicts the intent). If a soft button needs more definition (e.g. it sits on a background that competes with its tint), reach for `surface-primary` — it's the canonical "quiet primary action with definition."
+
+## Styling rules
+
+The Button is a design-system component. **Its styles are not meant to be overridden at the call site.** Do not pass `className` (or inline styles) to change colors, borders, backgrounds, shadows, or any other visual properties — the variant you choose is the contract.
+
+**Why this matters at the library level:**
+
+- Overrides drift from theme tokens. A `className="bg-primary-100"` looks fine until `--primary-100` changes, then it breaks invisibly across the codebase.
+- Overrides are contagious. One override gets copied across teams, and within months the variant system is decorative — the real styling lives in scattered className strings nobody owns.
+- Overrides hide demand signals. If a use case repeats, the right response is to promote it to a variant after design review, not to scatter the same override in 40 places.
+
+**What to do instead:**
+
+1. **Find the variant that matches your intent.** Most cases are already covered. Use the _intent_ (primary, quiet, destructive, neutral) to navigate, not the appearance.
+2. **If no variant fits, file a request.** Don't reach for `className`. A missing variant is a design-system gap that needs to be filled centrally — not patched locally.
+3. **The only acceptable `className` use** is for layout concerns the component cannot know about: width, alignment within a parent, margin/positioning. Never for visual properties of the button itself.
+
 ## Imports
 
 ```tsx
@@ -57,23 +147,48 @@ import { Button } from '@components/ui';
 ## Code
 
 ```tsx
-// Variants
+// Solid
 <Button variant="default">Default</Button>
 <Button variant="secondary">Secondary</Button>
 <Button variant="muted">Muted</Button>
 <Button variant="destructive">Destructive</Button>
 <Button variant="success">Success</Button>
-<Button variant="outline">Outline</Button>
-<Button variant="outline-destructive">Outline Destructive</Button>
-<Button variant="ghost">Ghost</Button>
-<Button variant="link">Link</Button>
 <Button variant="icon">Icon</Button>
 
+// Soft
+<Button variant="soft-primary">Soft Primary</Button>
+<Button variant="soft-muted">Soft Muted</Button>
+
+// Ghost
+<Button variant="ghost">Ghost</Button>
+<Button variant="ghost-primary">Ghost Primary</Button>
+<Button variant="ghost-muted">Ghost Muted</Button>
+<Button variant="ghost-destructive">Ghost Destructive</Button>
+<Button variant="ghost-muted-primary">Ghost Muted Primary</Button>
+<Button variant="ghost-muted-destructive">Ghost Muted Destructive</Button>
+
+// Quiet
+<Button variant="quiet-primary">Quiet Primary</Button>
+
+// Surface
+<Button variant="surface-primary">Surface Primary</Button>
+
+// Outline
+<Button variant="outline">Outline</Button>
+<Button variant="outline-muted">Outline Muted</Button>
+<Button variant="outline-destructive">Outline Destructive</Button>
+<Button variant="outline-success">Outline Success</Button>
+
+// Link
+<Button variant="link">Link</Button>
+
 // Sizes
+<Button size="xs">Extra Small</Button>
 <Button size="sm">Small</Button>
 <Button size="default">Default</Button>
 <Button size="lg">Large</Button>
 <Button size="icon">Icon</Button>
+<Button size="icon-sm">Icon Small</Button>
 <Button size="full">Full Width</Button>
 
 // States

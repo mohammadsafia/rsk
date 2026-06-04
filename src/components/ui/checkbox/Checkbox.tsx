@@ -4,7 +4,7 @@ import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { cn, DISABLED_STYLES, FOCUS_RING } from '@utils';
+import { cn } from '@utils';
 
 import { Check } from 'lucide-react';
 
@@ -12,9 +12,9 @@ type CheckboxProps = ComponentProps<typeof CheckboxPrimitive.Root> & VariantProp
 
 const checkboxVariants = cva(
   [
-    `border-muted-200 bg-muted-50 h-5 w-5 shrink-0 rounded border transition-[color,box-shadow] outline-none ${FOCUS_RING}`,
-    'hover:not-disabled:border-primary-200 hover:not-disabled:ring-primary/40 hover:not-disabled:ring',
-    `disabled:data-[state=checked]:bg-muted-400 disabled:data-[state=checked]:border-muted-400 ${DISABLED_STYLES}`,
+    'border-muted-200 bg-background h-5 w-5 shrink-0 rounded border transition-[color,box-shadow] outline-none',
+    'hover:not-disabled:border-primary hover:not-disabled:ring-primary hover:not-disabled:ring',
+    'disabled:data-[state=checked]:bg-muted-400 disabled:data-[state=checked]:border-muted-400 disabled:pointer-events-none',
   ],
   {
     variants: {

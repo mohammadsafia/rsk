@@ -5,7 +5,9 @@ import type { ControllerProps, FieldValues, Path } from 'react-hook-form';
 export type FieldBaseProps<TFieldValues extends FieldValues = FieldValues> = {
   name: Path<TFieldValues>;
   label?: ReactNode;
+  tooltip?: ReactNode;
   required?: boolean;
+  rules?: ControllerProps<TFieldValues>['rules'];
   containerClassName?: string;
   labelClassName?: string;
   errorClassName?: string;

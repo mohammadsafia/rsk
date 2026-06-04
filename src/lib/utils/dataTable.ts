@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, MouseEvent } from 'react';
 
 import type { Column, ColumnSort } from '@tanstack/react-table';
 import { createParser } from 'nuqs';
@@ -6,6 +6,33 @@ import { createParser } from 'nuqs';
 import type { AsyncOptionsFn } from '@hooks/shared';
 
 import type { DataTableFilterMeta } from '@app-types';
+
+const INTERACTIVE_SELECTOR = [
+  'button',
+  'a',
+  'input',
+  'select',
+  'textarea',
+  'label',
+  '[role="button"]',
+  '[role="link"]',
+  '[role="menuitem"]',
+  '[role="checkbox"]',
+  '[role="radio"]',
+  '[role="tab"]',
+  '[role="switch"]',
+  '[data-disable-row-click]',
+].join(',');
+
+/**
+ * Detects whether a row-level click originated from an interactive element.
+ * Mark non-semantic clickable elements with `data-disable-row-click`.
+ */
+export const isInteractiveClick = (event: MouseEvent<HTMLElement>): boolean => {
+  const target = event.target as HTMLElement | null;
+
+  return !!target?.closest(INTERACTIVE_SELECTOR);
+};
 
 /**
  * Returns CSS styles for pinned (sticky) columns.

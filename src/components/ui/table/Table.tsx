@@ -52,7 +52,7 @@ const Body = ({ className, ...props }: TableBodyProps) => (
 );
 
 const Footer = ({ className, ...props }: TableFooterProps) => (
-  <tfoot data-slot="table-footer" className={cn('bg-primary text-primary-foreground font-medium', className)} {...props} />
+  <tfoot data-slot="table-footer" className={cn('bg-secondary text-primary-900 font-medium', className)} {...props} />
 );
 
 const Row = ({ className, ...props }: TableRowProps) => (
@@ -70,7 +70,7 @@ const Head = ({ className, ...props }: TableHeadProps) => (
   <th
     data-slot="table-head"
     className={cn(
-      'bg-primary-25 text-primary-900 h-10.5 px-6 py-3 text-start align-middle text-xs leading-4.5 font-bold [&:has([role=checkbox])]:pe-0',
+      'bg-primary-25 text-primary px-6 py-3 text-start align-middle text-xs font-bold [&:has([role=checkbox])]:pe-0',
       className,
     )}
     {...props}
@@ -78,11 +78,7 @@ const Head = ({ className, ...props }: TableHeadProps) => (
 );
 
 const Cell = ({ className, ...props }: TableCellProps) => (
-  <td
-    data-slot="table-cell"
-    className={cn('text-primary-900 h-18 px-6 py-2 align-middle text-xs whitespace-nowrap [&:has([role=checkbox])]:pe-0', className)}
-    {...props}
-  />
+  <td data-slot="table-cell" className={cn('h-18 px-6 py-3 align-middle text-xs [&:has([role=checkbox])]:pe-0', className)} {...props} />
 );
 
 const Caption = ({ className, ...props }: TableCaptionProps) => (

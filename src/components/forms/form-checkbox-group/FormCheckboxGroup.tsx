@@ -25,6 +25,7 @@ function FormCheckboxGroup<TFieldValues extends FieldValues, TOption = FormSelec
   rules,
   control,
   label,
+  tooltip,
   containerClassName,
   labelClassName,
   className,
@@ -52,7 +53,7 @@ function FormCheckboxGroup<TFieldValues extends FieldValues, TOption = FormSelec
 
         return (
           <FormControl className={containerClassName}>
-            <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={name} required={required}>
+            <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
               {label}
             </FormLabel>
 

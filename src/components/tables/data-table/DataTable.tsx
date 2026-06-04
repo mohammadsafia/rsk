@@ -1,6 +1,6 @@
 import { createContext, type PropsWithChildren, type ReactNode, useContext, useMemo } from 'react';
 
-import type { Table as TanstackTable } from '@tanstack/react-table';
+import type { Row, Table as TanstackTable } from '@tanstack/react-table';
 
 import { DataTableContent, DataTablePagination, DataTableToolbar } from '@components/tables';
 
@@ -10,7 +10,8 @@ type DataTableRootProps<TData> = PropsWithChildren<{
   table: TanstackTable<TData>;
   className?: string;
   isLoading?: boolean;
-  emptyState?: { title?: string; description?: string };
+  onRowClick?: (row: Row<TData>) => void;
+  getRowClassName?: (row: Row<TData>) => string;
 }>;
 
 type DataTableComponents = (<TData>(props: DataTableRootProps<TData>) => ReactNode) & {
@@ -22,6 +23,8 @@ type DataTableComponents = (<TData>(props: DataTableRootProps<TData>) => ReactNo
 type DataTableContextValue<TData> = {
   table: TanstackTable<TData>;
   isLoading: boolean;
+  onRowClick?: (row: Row<TData>) => void;
+  getRowClassName?: (row: Row<TData>) => string;
 };
 
 const DataTableContext = createContext<DataTableContextValue<unknown> | null>(null);
@@ -34,18 +37,20 @@ export const useDataTableContext = <TData = unknown,>() => {
   return context;
 };
 
-function DataTableRoot<TData>({ table, isLoading = false, children, className }: DataTableRootProps<TData>) {
+function DataTableRoot<TData>({ table, isLoading = false, onRowClick, getRowClassName, children, className }: DataTableRootProps<TData>) {
   const contextValue = useMemo<DataTableContextValue<unknown>>(
     () => ({
       table: table as TanstackTable<unknown>,
       isLoading,
+      onRowClick: onRowClick as DataTableContextValue<unknown>['onRowClick'],
+      getRowClassName: getRowClassName as DataTableContextValue<unknown>['getRowClassName'],
     }),
-    [table, isLoading],
+    [table, isLoading, onRowClick, getRowClassName],
   );
 
   return (
     <DataTableContext.Provider value={contextValue}>
-      <div data-slot="data-table" className={cn('flex h-full w-full flex-col gap-3', className)}>
+      <div data-slot="data-table" className={cn('flex h-full min-h-0 w-full flex-col gap-3', className)}>
         {children}
       </div>
     </DataTableContext.Provider>

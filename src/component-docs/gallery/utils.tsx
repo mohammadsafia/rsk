@@ -6,8 +6,6 @@ import type { MDXComponents } from 'mdx/types';
 import type { ComponentDocEntry } from '@component-docs/registry';
 import type { CategoryTab, PreProps } from '@component-docs/gallery/types';
 
-export const ALL_CATEGORY_KEY = 'ALL';
-
 export function formatCategoryLabel(key: string | undefined | null): string {
   return normalizeCategoryKey(key);
 }
@@ -29,8 +27,11 @@ export function buildCategoryTabOptions(docs: ReadonlyArray<Readonly<ComponentDo
     categoryTabs.unshift(ui);
   }
 
-  // Prepend "All" tab
-  categoryTabs.unshift({ key: 'ALL', label: 'All' });
+  const calendarTabIndex = categoryTabs.findIndex((categoryTab) => categoryTab.key === 'CALENDAR');
+  if (calendarTabIndex >= 0 && calendarTabIndex < categoryTabs.length - 1) {
+    const [calendar] = categoryTabs.splice(calendarTabIndex, 1);
+    categoryTabs.push(calendar);
+  }
 
   return categoryTabs;
 }

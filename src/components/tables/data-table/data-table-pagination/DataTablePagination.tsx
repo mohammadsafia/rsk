@@ -50,13 +50,20 @@ const DataTablePagination: FC<PaginationProps> = ({ pageSizeOptions = [30, 50, 1
   return (
     <div
       data-slot="data-table-pagination"
-      className={cn('bg-background flex w-full items-center justify-end gap-4 overflow-hidden rounded-2xl px-7 py-2.5 shadow', className)}
+      className={cn('bg-secondary flex w-full items-center justify-end gap-4 overflow-hidden rounded-2xl px-7 py-2 shadow', className)}
     >
-      <div className="bg-primary-25/30 flex items-center gap-2 rounded-full px-3 py-1">
+      <div className="bg-muted-50 flex items-center gap-2 rounded-full px-3 py-2">
         <span className="text-muted-400 text-xs font-normal whitespace-nowrap">Rows per page</span>
 
         <Select value={`${table.getState().pagination.pageSize}`} onValueChange={handlePageSizeChange}>
-          <Select.Trigger className="h-7 w-14 border-0 bg-transparent px-1 py-0 text-xs font-normal shadow-none focus-visible:ring-0 data-size:h-7">
+          <Select.Trigger
+            className={cn(
+              'border-0 bg-transparent px-1 py-0 text-xs font-normal shadow-none',
+              'data-[state=open]:border-none data-[state=open]:ring-0',
+              'hover:not-disabled:border-none hover:not-disabled:ring-0',
+              'focus-visible:border-none focus-visible:ring-0',
+            )}
+          >
             <Select.Value placeholder={table.getState().pagination.pageSize} />
 
             <Select.Icon />

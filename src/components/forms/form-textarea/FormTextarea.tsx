@@ -12,11 +12,13 @@ type FormTextareaProps<TFieldValues extends FieldValues> = TextareaHTMLAttribute
 function FormTextarea<TFieldValues extends FieldValues>({
   name,
   label,
+  tooltip,
   className,
   containerClassName,
   labelClassName,
   errorClassName,
   required,
+  rules,
   ...props
 }: FormTextareaProps<TFieldValues>) {
   const { register } = useFormContext<TFieldValues>();
@@ -27,7 +29,7 @@ function FormTextarea<TFieldValues extends FieldValues>({
 
   return (
     <FormControl className={containerClassName}>
-      <FormLabel className={labelClassName} error={error!} hidden={!label} htmlFor={id} required={required}>
+      <FormLabel className={labelClassName} htmlFor={id} tooltip={tooltip} required={required} hidden={!label} error={error!}>
         {label}
       </FormLabel>
 
@@ -36,7 +38,7 @@ function FormTextarea<TFieldValues extends FieldValues>({
           id={id}
           data-slot="textarea"
           className={cn(
-            'border-muted-200 bg-muted-50 flex field-sizing-content w-full resize-y rounded-md border p-3 text-sm shadow-xs transition-[color,box-shadow] outline-none',
+            'border-muted-200 bg-background flex field-sizing-content w-full resize-y rounded-md border p-3 text-sm shadow-xs transition-[color,box-shadow] outline-none',
             'placeholder:text-muted',
             'hover:not-disabled:border-primary hover:not-disabled:ring-primary hover:not-disabled:ring',
             'focus-visible:ring-primary focus-visible:border-primary focus-visible:ring',
@@ -45,7 +47,7 @@ function FormTextarea<TFieldValues extends FieldValues>({
               'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive placeholder:text-destructive ps-8',
             className,
           )}
-          {...register(name)}
+          {...register(name, rules)}
           {...props}
         />
 

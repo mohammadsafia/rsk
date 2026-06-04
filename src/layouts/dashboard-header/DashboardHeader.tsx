@@ -4,15 +4,17 @@ import { Avatar, Button, DropdownMenu } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { ThemeSwitcher } from '@components/shared';
 
+import { useCommandPalette } from '@contexts';
 import { useAuth } from '@hooks/shared';
 
 import { FULL_ROUTES_PATH } from '@routes';
 
-import { Bell, HelpCircle, LogOut, Settings, User } from 'lucide-react';
+import { Bell, LogOut, Search, Settings, User } from 'lucide-react';
 
 function DashboardHeader() {
   const navigate = useNavigate();
   const { currentUser, removeCurrentUser } = useAuth();
+  const { toggle } = useCommandPalette();
 
   const handleNavigateToProfile = () => {
     if (!currentUser?.userId) return;
@@ -20,20 +22,28 @@ function DashboardHeader() {
   };
 
   return (
-    <header className="bg-background/80 supports-backdrop-filter:bg-background/60 sticky top-0 z-40 flex h-14 w-full shrink-0 items-center justify-between border-b border-muted-200 px-4 backdrop-blur-xl md:px-6 lg:px-8">
-      {/* Left Section */}
-      <div className="flex flex-1 items-center gap-3 overflow-hidden" />
+    <header className="bg-background/80 supports-backdrop-filter:bg-background/60 border-muted-200 sticky top-0 z-40 flex h-14 w-full shrink-0 items-center justify-between gap-3 border-b px-4 backdrop-blur-xl md:px-6">
+      {/* Command palette trigger */}
+      <button
+        type="button"
+        onClick={toggle}
+        aria-label="Open command palette"
+        className="text-muted-foreground bg-secondary border-border hover:bg-accent hover:text-foreground flex h-9 w-full max-w-xs items-center gap-2 rounded-lg border px-3 text-sm transition-colors"
+      >
+        <Search className="h-4 w-4 shrink-0" />
+
+        <span className="flex-1 text-start">Search or jump to…</span>
+
+        <kbd className="bg-background text-muted-foreground border-border pointer-events-none hidden rounded border px-1.5 font-mono text-[10px] sm:inline-block">
+          ⌘K
+        </kbd>
+      </button>
 
       {/* Right Section: Actions */}
       <div className="flex items-center gap-1">
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground relative h-9 w-9" aria-label="Notifications">
           <Bell className="h-4 w-4" />
-        </Button>
-
-        {/* Help/Support */}
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-9 w-9" aria-label="Help">
-          <HelpCircle className="h-4 w-4" />
         </Button>
 
         {/* Theme Switcher */}

@@ -1,0 +1,383 @@
+---
+id: data-table
+title: DataTable
+section: Components
+category: Tables
+description: 'Full-featured data table with toolbar, pagination, filtering, and scrollable content. Powered by TanStack Table.'
+tags: [tables, data-table, tanstack, pagination, toolbar, filtering]
+---
+
+## Overview
+
+DataTable is a compound component that provides a complete table experience: toolbar with search and filters, scrollable content with pinned columns, and pagination.
+
+It uses `h-full min-h-0` internally, so it fills whatever height its parent provides and the table body scrolls within that constraint.
+
+## Usage Patterns
+
+There are two ways to compose DataTable with page-level elements like ActionPanel.
+
+### Pattern 1: ActionPanel inside DataTable (Preferred)
+
+Place ActionPanel as a direct child of DataTable. Since DataTable is the page root, it inherits the full page height directly. No wrapper needed, no extra `h-full` to manage.
+
+```tsx
+<DataTable table={table} isLoading={isFetching}>
+  <ActionPanel>
+    <ActionPanel.Header>
+      <ActionPanel.Title>Doctors</ActionPanel.Title>
+    </ActionPanel.Header>
+
+    <ActionPanel.Actions>
+      <ActionPanel.Action onClick={handleCreate}>
+        <AddCircle />
+        Add Doctor
+      </ActionPanel.Action>
+    </ActionPanel.Actions>
+  </ActionPanel>
+
+  <DataTable.Toolbar totalCount={totalCount} totalLabel="Doctors" />
+
+  <DataTable.Content />
+
+  <DataTable.Pagination />
+</DataTable>
+```
+
+**Why this works:** DataTable's root is `flex h-full min-h-0 flex-col`. It takes the page container's height directly. ActionPanel gets its natural height, and `DataTable.Content` (which is `flex-1 min-h-0`) fills the remaining space with a scrollable table body.
+
+### Pattern 2: ActionPanel outside DataTable
+
+When ActionPanel needs to be a sibling (e.g. different layout requirements), wrap both in a flex container **with `h-full`**:
+
+```tsx
+<div className="flex h-full w-full flex-col gap-3">
+  <ActionPanel>
+    <ActionPanel.Header>
+      <ActionPanel.Title>Doctors</ActionPanel.Title>
+    </ActionPanel.Header>
+
+    <ActionPanel.Actions>
+      <ActionPanel.Action onClick={handleCreate}>
+        <AddCircle />
+        Add Doctor
+      </ActionPanel.Action>
+    </ActionPanel.Actions>
+  </ActionPanel>
+
+  <DataTable table={table} isLoading={isFetching}>
+    <DataTable.Toolbar totalCount={totalCount} totalLabel="Doctors" />
+
+    <DataTable.Content />
+
+    <DataTable.Pagination />
+  </DataTable>
+</div>
+```
+
+**Why `h-full` is required on the wrapper:** DataTable uses `h-full` to fill its parent. If the wrapper is `height: auto` (the default), `h-full` resolves to nothing and the table expands to its full content height instead of constraining to a scrollable area. The wrapper must pass through the height chain from the page container.
+
+**Why no page scroll:** DataTable has `min-h-0`, which allows it to shrink below its content size in a flex container. This means ActionPanel takes its natural height and DataTable takes the rest, without pushing the total beyond 100%.
+
+### Why Pattern 1 is preferred
+
+- No wrapper div needed, less markup
+- No need to remember `h-full` on the wrapper
+- The height chain is unbroken: page container -> DataTable -> Content
+- DataTable's `flex-col gap-3` already handles the spacing between ActionPanel and table sub-components
+
+## Column Sizing
+
+DataTable uses `table-auto` with `max-w-0` on non-pinned body cells. The `size` property on columns is an **exact width hint**, not a proportional weight. Columns without `size` fit their header text.
+
+### Sizing rules
+
+| Setting                  | Behavior                                                              |
+| ------------------------ | --------------------------------------------------------------------- |
+| `size: N` on a column    | Column rendered at ~N pixels                                          |
+| No `size`                | Column fits its header text width                                     |
+| Pinned column            | Width set by `getCommonPinningStyles`, drives sticky positioning      |
+| Sum of widths < viewport | Table fills viewport via `min-w-full`; columns stretch proportionally |
+| Sum of widths > viewport | Table grows via `w-max`; ScrollArea engages horizontal scroll         |
+
+### Example
+
+```tsx
+const columns: ColumnDef<Doctor>[] = [
+  { id: 'flag', header: '', size: 40 }, // narrow (icon)
+  { header: 'Name', accessorKey: 'fullName' }, // fits header text
+  { header: 'Email', accessorKey: 'email', size: 300 }, // exact 300px
+  { header: 'Status', accessorKey: 'isLocked' }, // fits header text
+  { id: 'actions', header: '', size: 80 }, // narrow (dropdown)
+];
+```
+
+### Suggested sizes
+
+| Column type                | Suggested size |
+| -------------------------- | -------------- |
+| Icon/flag only             | 40-60          |
+| Actions (dropdown)         | 60-100         |
+| Short text (status, badge) | 100-150        |
+| Medium text (name, title)  | 150-250        |
+| Long text (email, URL)     | 250-400        |
+| Numeric                    | 80-120         |
+
+Set `size` only when the header text alone won't produce a usable column width. Most text columns work fine without it.
+
+## Cell Truncation
+
+DataTable automatically truncates body cell text with ellipsis. This is applied by DataTableContent, not the Table primitive.
+
+### What happens
+
+- All body cells get `truncate` (= `whitespace-nowrap` + `overflow-hidden` + `text-ellipsis`)
+- Hovering a cell shows the full value via native `title` tooltip (from `cell.getValue()`)
+- Header cells have `whitespace-nowrap` (never wrap) but no truncation (sized to fit)
+
+### Why
+
+With `table-auto + max-w-0` on body cells, column widths are driven by header text. Long body content (emails, names) inevitably exceeds the column width and would overflow into adjacent cells without truncation. `truncate` clips it; `title` shows the full value on hover.
+
+### Difference from Table primitive
+
+Neither `Table.Cell` nor `Table.Head` primitives have `whitespace-nowrap` or truncation. This is intentional (IoC). Consumers using these primitives outside DataTable may want text to wrap naturally in both cells and headers (e.g., narrow columns with multiline headers).
+
+DataTableContent enforces the text policy:
+
+- **Header cells**: `whitespace-nowrap` (never wrap — guarantees stable column widths)
+- **Body cells**: `truncate` + `max-w-0` (nowrap + overflow-hidden + ellipsis; max-w-0 stops the cell from contributing to column-width calc)
+
+### The rule
+
+> If `whitespace-nowrap` is set, you MUST also set `overflow-hidden` + `text-ellipsis`, AND add a `title` tooltip. Otherwise text overflows silently.
+>
+> If `whitespace-nowrap` is NOT set, text wraps naturally and none of the above is needed.
+
+## Sorting
+
+DataTable's sort policy is **opt-in per column**. Sort is disabled by default; enable it on individual columns where the BE supports sorting.
+
+### Enabling sort on a column
+
+Add `enableSorting: true` to the column definition:
+
+```tsx
+columns: [
+  { header: 'Name', accessorKey: 'fullName' }, // not sortable
+  { header: 'Email', accessorKey: 'email', enableSorting: true }, // sortable
+  { header: 'Date of Service', accessorKey: 'dateOfService', enableSorting: true, sortDescFirst: true }, // sortable, starts desc
+];
+```
+
+Sortable columns automatically render:
+
+- A `SortIcon` next to the header text
+- `cursor-pointer` and `select-none` on the header
+- `aria-sort` reflecting the current sort state
+- A click handler that cycles through sort directions
+
+### Wiring the sort handler
+
+The consumer passes `onSortingChange` and `state` from `tableUtils` (returned by the query hook):
+
+```tsx
+const { data, tableUtils, isFetching } = useReportsAnalyticsListQuery();
+
+const { table } = useDataTable({
+  rowCount: tableUtils.totalCount,
+  pageCount: tableUtils.totalPages,
+  data,
+  columns,
+  state: tableUtils.state,
+  onColumnFiltersChange: tableUtils.setColumnFilters,
+  onGlobalFilterChange: tableUtils.setGlobalFilter,
+  onPaginationChange: tableUtils.setPagination,
+  onSortingChange: tableUtils.setSorting, // ← sort wiring
+});
+```
+
+If `onSortingChange` isn't wired, sort UI appears but clicks do nothing.
+
+### Sort cycle
+
+By default, sortable columns cycle:
+
+```
+null → asc → desc → null → asc → desc → null → ...
+```
+
+Three states (no sort, ascending, descending). The "null" state means the column has no entry in the sorting array — the URL has no `sorts` parameter and the BE returns unsorted data.
+
+For columns where descending should be the first state (date columns showing "latest first"), set `sortDescFirst: true`:
+
+```tsx
+{
+  header: 'Date of Service',
+  accessorKey: 'dateOfService',
+  enableSorting: true,
+  sortDescFirst: true,
+}
+// Cycle: null → desc → asc → null → ...
+```
+
+### Enabling sort table-wide
+
+For pages where every column the BE supports should be sortable by default, override the default at the table level:
+
+```tsx
+useDataTable({
+  ...,
+  defaultColumn: { enableSorting: true },   // every column sortable unless overridden
+})
+```
+
+Per-column `enableSorting: false` still wins for opting individual columns out.
+
+### URL and request format
+
+Sort state syncs to the URL as `sorting=<JSON>` (the in-app shape). The outgoing request to the BE uses `sorts=<colId>_<dir>,<colId>_<dir>,...`:
+
+```
+URL:     ?sorting=[{"id":"dateOfService","desc":true}]
+Request: GET /reports-analytics?sorts=dateOfService_desc&pageNumber=1&pageSize=10
+```
+
+The mapping happens inside `useDataTableQuery`'s `queryFn`. Consumers don't see the `sorts=` format directly.
+
+### When BE doesn't support sort on a column
+
+Don't add `enableSorting: true` to that column. The header will be plain text with no icon and no click behavior — matching reality on the wire.
+
+If sort gets shipped on a column the BE silently drops, the user will see a clickable header that does nothing functional (still toggles the icon, but BE returns the same rows). The opt-in policy is specifically to prevent this.
+
+## Row Click Navigation
+
+DataTable supports row click navigation via `onRowClick` on the root component:
+
+```tsx
+<DataTable table={table} isLoading={isFetching} onRowClick={(row) => navigate(`/profile/${row.original.id}`)}>
+  ...
+</DataTable>
+```
+
+**`row` is automatically typed** as `Row<YourDataType>` — no manual type annotation needed, thanks to TypeScript inference from the `table` prop.
+
+### Preferred pattern: action icons
+
+**For most cases, prefer the action-icon pattern over row click**:
+
+```tsx
+{
+  id: 'actions',
+  header: '',
+  meta: { disableRowClick: true },
+  cell: ({ row }) => (
+    <PrimeDropdown>
+      <Button variant="ghost-muted" size="icon-sm">
+        <More size={20} />
+      </Button>
+      <PrimeDropdown.Item icon={<Eye size={16} />} onSelect={() => navigate(`/profile/${row.original.id}`)}>
+        View Profile
+      </PrimeDropdown.Item>
+    </PrimeDropdown>
+  ),
+}
+```
+
+**Why action icons are better:**
+
+- Explicit intent (visible icon vs invisible row click)
+- Full keyboard accessibility
+- Cmd/Ctrl+click opens in new tab (with `<Link>` wrapping)
+- Right-click "Open in new tab" works
+- Supports multiple actions per row (view, edit, delete)
+
+Use `onRowClick` only when the table is a simple "list of things to open" and none of the above matters.
+
+### Automatic propagation filtering
+
+When you use `onRowClick`, DataTable automatically detects clicks on interactive elements and bypasses the row click. Covers:
+
+- `<button>`, `<a>`, `<input>`, `<select>`, `<textarea>`, `<label>`
+- ARIA roles: `role="button"`, `role="link"`, `role="menuitem"`, `role="checkbox"`, etc.
+- Portal-based Radix components (`PrimeDropdown`, `PrimeTooltip`, `ConfirmDialog`) — the trigger button is caught automatically
+
+**You don't need to call `stopPropagation()`** on interactive elements as long as they use semantic HTML.
+
+### Opting out specific columns: `meta.disableRowClick`
+
+For action columns or any column that should never trigger row click, add `meta: { disableRowClick: true }` to the column definition:
+
+```tsx
+{
+  id: 'actions',
+  header: '',
+  meta: { disableRowClick: true },  // ← opt out
+  cell: ({ row }) => <ActionsMenu row={row} />,
+}
+```
+
+This applies `data-disable-row-click` to the column's `<td>`, bypassing row click for all its clicks.
+
+### Opting out arbitrary elements: `data-disable-row-click`
+
+For edge cases (non-semantic clickables, non-portal overlays), use the `data-disable-row-click` attribute:
+
+```tsx
+// Option 1: Pass as a prop (if the component forwards unknown props)
+cell: ({ row }) => (
+  <CustomWidget data-disable-row-click onClick={...} />
+)
+
+// Option 2: Wrap with a div (last resort for external components)
+cell: ({ row }) => (
+  <div data-disable-row-click>
+    <ThirdPartyWidget onClick={...} />
+  </div>
+)
+```
+
+### Cursor pointer
+
+When `onRowClick` is set, clickable cells automatically get `cursor-pointer`. Disabled cells (with `meta.disableRowClick`) keep the default cursor for accurate visual feedback.
+
+### Limitations
+
+1. **Best-effort only** — relies on semantic HTML. `<div onClick>` without the hatch won't be detected.
+2. **No Cmd/Ctrl+click for new tab** — `onClick` doesn't interpret modifier keys. Use `<Link>` in cell content if needed.
+3. **No right-click menu** — browser "Open in new tab" requires `<a href>`, not a click handler.
+4. **No keyboard navigation** — row click is mouse-only. Use explicit buttons for full accessibility.
+
+For all the above, prefer the action-icon pattern.
+
+## Sub-components
+
+| Sub-component          | Description                                                                                            |
+| ---------------------- | ------------------------------------------------------------------------------------------------------ |
+| `DataTable.Toolbar`    | Search bar, total count, filter toggle. Accepts `totalCount`, `totalLabel`, `placeholder`.             |
+| `DataTable.Content`    | Scrollable table body with pinned header. Accepts `className`, `emptyState`.                           |
+| `DataTable.Pagination` | Page navigation and rows-per-page selector. Accepts `pageSizeOptions` (default: `[30, 50, 100, 200]`). |
+
+> **Note on `onRowClick` and `getRowClassName`:** these live on the `<DataTable>` root, not on `<DataTable.Content>`. They take generic `Row<TData>` parameters, and TypeScript generics don't propagate through React Context — only the root has the `table` prop from which `TData` is inferred. See [Row Click Navigation](#row-click-navigation) for the API.
+
+## Imports
+
+```tsx
+import { DataTable } from '@components/tables';
+import { ActionPanel } from '@components/shared';
+```
+
+## Height Constraint Explained
+
+DataTable's root is:
+
+```
+flex h-full min-h-0 w-full flex-col gap-3
+```
+
+- **`h-full`** -- Takes 100% of the parent's height. Works in block, grid, and flex contexts.
+- **`min-h-0`** -- Allows shrinking below content size in flex parents. Without this, a flex child defaults to `min-height: auto` (content size), which would cause page overflow when siblings exist.
+- **`flex-col gap-3`** -- Stacks sub-components vertically. `DataTable.Content` uses `flex-1 min-h-0` to fill remaining space with a scrollable area.
+
+The key rule: **every ancestor between the page container and DataTable must have an explicit height** (`h-full`, `flex-1`, etc.). A single `height: auto` div in the chain breaks `h-full` resolution and the table loses its fixed height.

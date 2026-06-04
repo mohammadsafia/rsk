@@ -1,0 +1,81 @@
+---
+id: count-tooltip
+title: CountTooltip
+section: Components
+category: Shared
+description: 'Tooltip with count badge trigger for displaying overflow items in a list.'
+tags: [shared, count-tooltip, tooltip, count]
+---
+
+import { CountTooltip } from '@components/shared';
+import { Button } from '@components/ui';
+import { FileText, User } from 'lucide-react';
+
+## Default
+
+<div className="flex items-center gap-2">
+  <span className="text-sm">John Doe</span>
+
+  <CountTooltip count={3}>
+    <CountTooltip.Trigger />
+    <CountTooltip.Item icon={<User size={14} />}>Jane Smith</CountTooltip.Item>
+    <CountTooltip.Item icon={<User size={14} />}>Bob Wilson</CountTooltip.Item>
+    <CountTooltip.Item icon={<User size={14} />}>Alice Brown</CountTooltip.Item>
+  </CountTooltip>
+</div>
+
+## Custom Trigger Styling
+
+<div className="flex items-center gap-2">
+  <span className="text-sm">3 Errors</span>
+
+  <CountTooltip count={3}>
+    <CountTooltip.Trigger className="bg-destructive-100 text-destructive" />
+    <CountTooltip.Item className="border-s-destructive">Network timeout</CountTooltip.Item>
+    <CountTooltip.Item className="border-s-destructive">Auth failed</CountTooltip.Item>
+    <CountTooltip.Item className="border-s-destructive">Rate limited</CountTooltip.Item>
+  </CountTooltip>
+</div>
+
+## Custom Trigger Children
+
+Override the default `+{count}` text by passing children to `CountTooltip.Trigger`.
+
+<div className="flex items-center gap-2">
+  <span className="text-sm">Documents</span>
+
+  <CountTooltip count={2}>
+    <CountTooltip.Trigger>View all</CountTooltip.Trigger>
+    <CountTooltip.Item icon={<FileText size={14} />}>report_v1.pdf</CountTooltip.Item>
+    <CountTooltip.Item icon={<FileText size={14} />}>report_v2.pdf</CountTooltip.Item>
+  </CountTooltip>
+</div>
+
+## Custom Trigger Element
+
+Skip `CountTooltip.Trigger` to use any element as the trigger. First child becomes the trigger, rest become content.
+
+<div className="flex items-center gap-2">
+  <span className="text-sm">report_v1.pdf</span>
+
+  <CountTooltip count={2}>
+    <Button variant="ghost" size="sm">+2 files</Button>
+    <CountTooltip.Item icon={<FileText size={14} />}>report_v2.pdf</CountTooltip.Item>
+    <CountTooltip.Item icon={<FileText size={14} />}>report_v3.pdf</CountTooltip.Item>
+  </CountTooltip>
+</div>
+
+## Imports
+
+```tsx
+import { CountTooltip } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<CountTooltip count={3}>
+  <CountTooltip.Trigger />
+  <CountTooltip.Item icon={<Icon />}>Item text</CountTooltip.Item>
+</CountTooltip>
+```

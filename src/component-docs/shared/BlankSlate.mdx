@@ -1,0 +1,172 @@
+---
+id: blank-slate
+title: BlankSlate
+section: Components
+category: Shared
+description: 'Feedback component for empty states, no-data, and placeholder content.'
+tags: [shared, blank-slate, empty-state, placeholder, feedback]
+---
+
+import { BlankSlate } from '@components/shared';
+import { Card } from '@components/ui';
+import { Calendar, FolderOpen, PlusCircle, Upload } from 'lucide-react';
+
+## Simple Mode
+
+Pass `title` and `description` props. Default icon renders automatically. The `when` prop controls visibility.
+
+<div className="bg-muted-50 h-80 rounded-lg border">
+  <BlankSlate
+    when
+    title="Page List Is Empty"
+    description="There are no appointments available at the moment, start add the first appointment."
+  />
+</div>
+
+## With Action
+
+Actions support `condition` and `permissions` props via `ComposedTooltipButton`.
+
+<div className="bg-muted-50 h-80 rounded-lg border">
+  <BlankSlate when title="No Appointments" description="There are no appointments available at the moment.">
+    <BlankSlate.Actions>
+      <BlankSlate.Action>
+        <PlusCircle size={18} />
+        Add First
+      </BlankSlate.Action>
+    </BlankSlate.Actions>
+  </BlankSlate>
+</div>
+
+## Size Variants
+
+Use `size="xs" | "sm" | "md" | "lg"` to scale the icon, text, and spacing together. Default is `md`.
+
+### Extra Small
+
+<div className="bg-muted-50 h-48 rounded-lg border">
+  <BlankSlate when size="xs" title="No Records" description="Try adjusting your filters." />
+</div>
+
+### Small
+
+<div className="bg-muted-50 h-64 rounded-lg border">
+  <BlankSlate when size="sm" title="No Records" description="Try adjusting your filters." />
+</div>
+
+### Medium (default)
+
+<div className="bg-muted-50 h-80 rounded-lg border">
+  <BlankSlate when title="No Records" description="Try adjusting your filters." />
+</div>
+
+### Large
+
+<div className="bg-muted-50 h-96 rounded-lg border">
+  <BlankSlate when size="lg" title="No Records" description="Try adjusting your filters." />
+</div>
+
+## Custom Icon
+
+Pass `icon` prop to replace the default icon. Sizing is inherited from the size variant — no need to specify.
+
+<div className="bg-muted-50 h-80 rounded-lg border">
+  <BlankSlate
+    when
+    icon={<Calendar strokeWidth={1} />}
+    title="No Events Scheduled"
+    description="Your calendar is empty. Create your first event to get started."
+  />
+</div>
+
+## Multiple Actions
+
+<div className="rounded-lg border bg-muted-50 h-80">
+  <BlankSlate when icon={<FolderOpen strokeWidth={1} />} title="No Documents" description="Upload or create your first document.">
+    <BlankSlate.Actions>
+      <BlankSlate.Action>
+        <PlusCircle size={18} />
+        Create New
+      </BlankSlate.Action>
+
+      <BlankSlate.Action variant="ghost">
+        <Upload size={18} />
+        Import
+      </BlankSlate.Action>
+    </BlankSlate.Actions>
+
+  </BlankSlate>
+</div>
+
+## Fully Composable
+
+Override any slot for full control. Sub-components inherit the size variant from context.
+
+<div className="rounded-lg border bg-muted-50 h-80">
+  <BlankSlate when size="lg">
+    <BlankSlate.Icon className="text-primary-200">
+      <Calendar strokeWidth={1} />
+    </BlankSlate.Icon>
+
+    <BlankSlate.Title className="text-primary-600">Schedule Your First Appointment</BlankSlate.Title>
+
+    <BlankSlate.Description>Pick a date and time that works best for you and your patient.</BlankSlate.Description>
+
+    <BlankSlate.Actions>
+      <BlankSlate.Action>
+        <PlusCircle size={18} />
+        Schedule Now
+      </BlankSlate.Action>
+    </BlankSlate.Actions>
+
+  </BlankSlate>
+</div>
+
+## Inside a Card
+
+Fills parent container — works in cards, panels, or full pages.
+
+<Card className="h-60">
+  <BlankSlate when title="No Records Found" description="Try adjusting your search or filters." />
+</Card>
+
+## Imports
+
+```tsx
+import { BlankSlate } from '@components/shared';
+```
+
+## Code
+
+```tsx
+{
+  /* Simple */
+}
+<BlankSlate when title="No Data" description="Nothing to show yet." />;
+
+{
+  /* With size variant */
+}
+<BlankSlate when size="lg" title="No Data" description="Get started by adding your first item.">
+  <BlankSlate.Actions>
+    <BlankSlate.Action condition={canAdd} permissions={['items.create']}>
+      <PlusCircle size={18} />
+      Add First
+    </BlankSlate.Action>
+  </BlankSlate.Actions>
+</BlankSlate>;
+
+{
+  /* Fully composable — sub-components inherit size from context */
+}
+<BlankSlate when size="md">
+  <BlankSlate.Icon>
+    <CustomIcon strokeWidth={1} />
+  </BlankSlate.Icon>
+  <BlankSlate.Title>Custom Title</BlankSlate.Title>
+  <BlankSlate.Description>Custom description.</BlankSlate.Description>
+  <BlankSlate.Actions>
+    <BlankSlate.Action>Action</BlankSlate.Action>
+  </BlankSlate.Actions>
+</BlankSlate>;
+```

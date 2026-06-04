@@ -68,7 +68,7 @@ const FormattedNumber: FC<FormattedNumberProps> = ({
           <NumericFormat
             data-slot="formatted-number-input"
             className={cn(
-              'border-muted-200 bg-muted-50 flex w-full rounded-md border p-3 text-sm shadow-xs transition-[color,box-shadow] outline-none',
+              'border-muted-200 bg-background flex w-full rounded-md border p-3 text-sm shadow-xs transition-[color,box-shadow] outline-none',
               'placeholder:text-muted',
               'hover:not-disabled:border-primary hover:not-disabled:ring-primary hover:not-disabled:ring',
               'focus-visible:ring-primary focus-visible:border-primary focus-visible:ring',

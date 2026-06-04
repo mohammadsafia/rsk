@@ -1,11 +1,12 @@
 import type { ElementType } from 'react';
 
-import { LayoutDashboard, Component, Settings } from 'lucide-react';
+import { LayoutDashboard, Component, Settings, Users } from 'lucide-react';
 
 export type AppMenu = {
   id: string;
   path: string;
   name?: string;
+  group?: string;
   permission?: string;
   permissions?: string[];
   roles?: string[];
@@ -29,28 +30,44 @@ export const FULL_ROUTES_PATH = {
   SETTINGS: {
     INDEX: '/settings',
   },
+  MEMBERS: {
+    INDEX: '/members',
+  },
   ROOT: {
     INDEX: '..',
   },
 } as const;
+
+/** Flattened route map used by breadcrumb/navigation helpers. */
+export const PLAIN_ROUTES = FULL_ROUTES_PATH;
 
 export const APP_MENU: AppMenu[] = [
   {
     id: 'dashboard',
     path: FULL_ROUTES_PATH.HOME.DASHBOARD,
     name: 'Dashboard',
+    group: 'Main',
     icon: LayoutDashboard,
   },
   {
     id: 'components',
     path: FULL_ROUTES_PATH.COMPONENTS.INDEX,
     name: 'Components',
+    group: 'Main',
     icon: Component,
+  },
+  {
+    id: 'members',
+    path: FULL_ROUTES_PATH.MEMBERS.INDEX,
+    name: 'Members',
+    group: 'Main',
+    icon: Users,
   },
   {
     id: 'settings',
     path: FULL_ROUTES_PATH.SETTINGS.INDEX,
     name: 'Settings',
+    group: 'Account',
     icon: Settings,
   },
 ];

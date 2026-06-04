@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { type FieldValues, useController } from 'react-hook-form';
+import { type FC, type RefCallback, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import { type DateRange } from 'react-day-picker';
+import { type FieldError, type FieldPath, type FieldValues, useController } from 'react-hook-form';
 
 import { Calendar, type CalendarProps, Popover } from '@components/ui';
 import { TooltipButton } from '@components/shared';
@@ -14,19 +15,68 @@ import { CalendarIcon, XIcon } from 'lucide-react';
 
 import type { ControlledFieldBaseProps } from '@app-types';
 
-type FormDateRangeProps<TFieldValues extends FieldValues> = ControlledFieldBaseProps<
-  TFieldValues,
-  Omit<CalendarProps, 'mode' | 'selected'>
+type FormDateRangeBaseProps<TFieldValues extends FieldValues> = Omit<
+  ControlledFieldBaseProps<TFieldValues, Omit<CalendarProps, 'mode' | 'selected'>>,
+  'name'
 > & {
   placeholder?: string;
   dateFormat?: DateInputFormat;
+  formatDateValue?: (date: Date | undefined) => unknown;
 };
 
-function FormDateRange<TFieldValues extends FieldValues>({
+type FormDateRangeCompositeProps<TFieldValues extends FieldValues> = FormDateRangeBaseProps<TFieldValues> & {
+  name: FieldPath<TFieldValues>;
+  fromName?: never;
+  toName?: never;
+};
+
+type FormDateRangeFlatProps<TFieldValues extends FieldValues> = FormDateRangeBaseProps<TFieldValues> & {
+  name?: never;
+  fromName: FieldPath<TFieldValues>;
+  toName: FieldPath<TFieldValues>;
+};
+
+export type FormDateRangeProps<TFieldValues extends FieldValues> =
+  | FormDateRangeCompositeProps<TFieldValues>
+  | FormDateRangeFlatProps<TFieldValues>;
+
+type FormDateRangeCoreProps = FormDateRangeBaseProps<FieldValues> & {
+  name: string;
+  dateRange: DateRange | undefined;
+  onRangeChange: (range: DateRange | undefined) => void;
+  onBlur: () => void;
+  inputRef: RefCallback<HTMLInputElement> | undefined;
+  error: FieldError | undefined;
+};
+
+const parseDateValue = (value: unknown): Date | undefined => {
+  if (!value) return undefined;
+  if (value instanceof Date) return isNaN(value.getTime()) ? undefined : value;
+  if (typeof value === 'string') {
+    const parsed = new Date(value);
+    return isNaN(parsed.getTime()) ? undefined : parsed;
+  }
+  return undefined;
+};
+
+const parseCompositeValue = (value: unknown): DateRange | undefined => {
+  if (!value) return undefined;
+  const obj = value as { from?: unknown; to?: unknown };
+  const from = parseDateValue(obj.from);
+  const to = parseDateValue(obj.to);
+  if (!from && !to) return undefined;
+  return { from, to };
+};
+
+const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
   name,
-  rules,
-  control,
+  dateRange,
+  onRangeChange,
+  onBlur,
+  inputRef,
+  error,
   label,
+  tooltip,
   containerClassName,
   labelClassName,
   className,
@@ -36,30 +86,20 @@ function FormDateRange<TFieldValues extends FieldValues>({
   placeholder,
   dateFormat = DATE_INPUT_FORMATS.US_SLASH,
   ...props
-}: FormDateRangeProps<TFieldValues>) {
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState<Date | undefined>(undefined);
 
-  const {
-    field: { onChange, value, ref, onBlur: fieldOnBlur, ...field },
-    fieldState: { error },
-  } = useController({
-    name,
-    control,
-    rules,
-  });
-
-  const dateRange = value as DateRange | undefined;
   const isUserInputRef = useRef(false);
   const lastSyncedValueRef = useRef<string | null>(null);
 
   const handleRangeChange = useCallback((newRange: { from?: Date; to?: Date } | undefined) => {
     isUserInputRef.current = true;
     if (!newRange) {
-      onChange(undefined);
+      onRangeChange(undefined);
       return;
     }
-    onChange({ from: newRange.from, to: newRange.to } as DateRange);
+    onRangeChange({ from: newRange.from, to: newRange.to });
     if (newRange.from) {
       setCalendarMonth(newRange.from);
     } else if (newRange.to) {
@@ -114,7 +154,7 @@ function FormDateRange<TFieldValues extends FieldValues>({
   }, [parsedRange.from, parsedRange.to]);
 
   const handleCalendarSelect = (selectedRange: DateRange | undefined) => {
-    onChange(selectedRange);
+    onRangeChange(selectedRange);
     if (selectedRange) {
       setFromDateRange({ from: selectedRange.from, to: selectedRange.to });
       if (selectedRange.from) {
@@ -126,7 +166,7 @@ function FormDateRange<TFieldValues extends FieldValues>({
   const handleClear = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    onChange(undefined);
+    onRangeChange(undefined);
     setFromDateRange(undefined);
   };
 
@@ -140,7 +180,7 @@ function FormDateRange<TFieldValues extends FieldValues>({
 
   const handleInputBlur = () => {
     handleBlur();
-    fieldOnBlur();
+    onBlur();
   };
 
   const displayPlaceholder = placeholder || maskPlaceholder;
@@ -148,7 +188,7 @@ function FormDateRange<TFieldValues extends FieldValues>({
 
   return (
     <FormControl className={containerClassName}>
-      <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={name} required={required}>
+      <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
         {label}
       </FormLabel>
 
@@ -161,7 +201,7 @@ function FormDateRange<TFieldValues extends FieldValues>({
               'transition-colors focus-within:outline-none',
               {
                 'border-muted-200 hover:border-muted-300 focus-within:border-primary focus-within:ring-primary focus-within:ring-1': !error,
-                'border-destructive focus-within:border-destructive focus-within:ring-destructive focus-within:ring-1': !!error,
+                'border-destructive focus-within:border-destructive focus-within:ring-destructive ps-8 focus-within:ring-1': !!error,
                 'pointer-events-none cursor-not-allowed opacity-50': disabled,
               },
               className,
@@ -190,7 +230,7 @@ function FormDateRange<TFieldValues extends FieldValues>({
               </Popover.Trigger>
 
               <input
-                ref={ref}
+                ref={inputRef}
                 id={name}
                 type="text"
                 inputMode="numeric"
@@ -207,7 +247,6 @@ function FormDateRange<TFieldValues extends FieldValues>({
                   'text-primary-900': !!inputValue && isValidInput,
                   'text-destructive': !!inputValue && !isValidInput,
                 })}
-                {...field}
               />
             </div>
 
@@ -239,6 +278,96 @@ function FormDateRange<TFieldValues extends FieldValues>({
       </div>
     </FormControl>
   );
+};
+
+function FormDateRangeComposite<TFieldValues extends FieldValues>({
+  name,
+  rules,
+  control,
+  formatDateValue,
+  ...rest
+}: FormDateRangeCompositeProps<TFieldValues>) {
+  const {
+    field: { onChange, value, ref, onBlur },
+    fieldState: { error },
+  } = useController({ name, control, rules });
+
+  const dateRange = useMemo(() => parseCompositeValue(value), [value]);
+
+  const onRangeChange = (range: DateRange | undefined) => {
+    if (!formatDateValue) {
+      onChange(range);
+      return;
+    }
+    onChange(range ? { from: formatDateValue(range.from), to: formatDateValue(range.to) } : undefined);
+  };
+
+  return (
+    <FormDateRangeCore
+      {...rest}
+      name={name}
+      dateRange={dateRange}
+      onRangeChange={onRangeChange}
+      onBlur={onBlur}
+      inputRef={ref}
+      error={error}
+    />
+  );
+}
+
+function FormDateRangeFlat<TFieldValues extends FieldValues>({
+  fromName,
+  toName,
+  rules,
+  control,
+  formatDateValue,
+  ...rest
+}: FormDateRangeFlatProps<TFieldValues>) {
+  const fromController = useController({ name: fromName, control, rules });
+  const toController = useController({ name: toName, control, rules });
+
+  const fromValue = fromController.field.value;
+  const toValue = toController.field.value;
+
+  const dateRange = useMemo<DateRange | undefined>(() => {
+    const from = parseDateValue(fromValue);
+    const to = parseDateValue(toValue);
+    if (!from && !to) return undefined;
+    return { from, to };
+  }, [fromValue, toValue]);
+
+  const onRangeChange = (range: DateRange | undefined) => {
+    const fromOut = formatDateValue ? formatDateValue(range?.from) : range?.from;
+    const toOut = formatDateValue ? formatDateValue(range?.to) : range?.to;
+    fromController.field.onChange(fromOut ?? null);
+    toController.field.onChange(toOut ?? null);
+  };
+
+  const onBlur = () => {
+    fromController.field.onBlur();
+    toController.field.onBlur();
+  };
+
+  const error = fromController.fieldState.error ?? toController.fieldState.error;
+
+  return (
+    <FormDateRangeCore
+      {...rest}
+      name={fromName}
+      dateRange={dateRange}
+      onRangeChange={onRangeChange}
+      onBlur={onBlur}
+      inputRef={fromController.field.ref}
+      error={error}
+    />
+  );
+}
+
+function FormDateRange<TFieldValues extends FieldValues>(props: FormDateRangeProps<TFieldValues>) {
+  if ('fromName' in props && props.fromName) {
+    return <FormDateRangeFlat {...(props as FormDateRangeFlatProps<TFieldValues>)} />;
+  }
+  return <FormDateRangeComposite {...(props as FormDateRangeCompositeProps<TFieldValues>)} />;
 }
 
 FormDateRange.displayName = 'FormDateRange';

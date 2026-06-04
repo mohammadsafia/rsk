@@ -1,0 +1,511 @@
+---
+id: calendar-picker
+title: CalendarPicker
+section: Components
+category: Calendar
+description: 'Library-grade date picker compound: single-mode and range-mode with discriminated props, popover-driven trigger + content, slot overrides for full custom UI.'
+tags: [calendar, calendar-picker, date-picker, range-picker, popover, compound, single, range]
+---
+
+import { useState } from 'react';
+
+import { Button, Calendar } from '@components/ui';
+import { CalendarPicker } from '@components/calendar';
+
+import { useDate } from '@hooks/shared';
+
+import { CalendarRange, Filter, X } from 'lucide-react';
+
+## Default — single mode (zero config)
+
+The bare picker. TooltipButton with a calendar icon as the default trigger; clicking opens a single-mode Calendar; clicking a day fires `onChange(iso)` and auto-closes.
+
+export const SingleDefaultDemo = () => {
+  const [iso, setIso] = useState(null);
+  return (
+    <div className="flex items-center gap-3">
+      <CalendarPicker value={iso} onChange={setIso} />
+
+      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+    </div>
+  );
+};
+
+<SingleDefaultDemo />
+
+---
+
+## Shorthand props — trigger icon, tooltip, popover placement
+
+Tweak the default trigger icon, tooltip text, and popover side/align/offset without overriding any slot.
+
+export const ShorthandDemo = () => {
+  const [iso, setIso] = useState(null);
+  return (
+    <div className="flex items-center gap-3">
+      <CalendarPicker
+        value={iso}
+        onChange={setIso}
+        triggerIcon={<CalendarRange size={20} />}
+        triggerTooltip="Pick a date"
+        popoverSide="bottom"
+        popoverAlign="start"
+        popoverSideOffset={8}
+      />
+
+      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+    </div>
+  );
+};
+
+<ShorthandDemo />
+
+---
+
+## Range mode — two-click range selection
+
+`mode="range"` switches to two-click range selection. `onChange` fires only when BOTH `from` and `to` are picked; the popover stays open during partial selection and closes after the range completes.
+
+export const RangeDemo = () => {
+  const [range, setRange] = useState(null);
+  return (
+    <div className="flex items-center gap-3">
+      <CalendarPicker
+        mode="range"
+        value={range}
+        onChange={setRange}
+        closeOn="never"
+        triggerTooltip="Pick a date range"
+      />
+
+      <span className="text-muted text-sm">
+        {range ? `${range.from} → ${range.to}` : 'No range picked'}
+      </span>
+    </div>
+  );
+};
+
+<RangeDemo />
+
+---
+
+## Range visualization in single mode
+
+Pass a range-shaped `selected` to a single-mode picker — the inner Calendar highlights the range via CSS modifiers, but click semantics stay single (one click → navigate + close). Used by the CalendarGrid wrapper for week/month-view jump-to-date.
+
+export const RangeVisualizationDemo = () => {
+  const [iso, setIso] = useState(null);
+  const weekRange = { from: '2026-05-04', to: '2026-05-10' };
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-3">
+        <CalendarPicker
+          value={iso}
+          selected={weekRange}
+          onChange={setIso}
+          triggerTooltip="Jump to date"
+        />
+
+        <span className="text-muted text-sm">Highlighted week: {weekRange.from} → {weekRange.to}</span>
+      </div>
+
+      <span className="text-muted text-xs">Picked: {iso ?? 'None'} (single date — week is decoration only)</span>
+    </div>
+  );
+};
+
+<RangeVisualizationDemo />
+
+---
+
+## Trigger override — plain JSX
+
+Replace the default trigger with any clickable element. Click handling wires automatically via `Popover.Trigger asChild`.
+
+export const TriggerPlainDemo = () => {
+  const [iso, setIso] = useState(null);
+  return (
+    <CalendarPicker value={iso} onChange={setIso}>
+      <CalendarPicker.Trigger>
+        <Button variant="outline">
+          <Filter size={16} className="me-2" />
+
+          {iso ?? 'Pick a date'}
+        </Button>
+      </CalendarPicker.Trigger>
+    </CalendarPicker>
+  );
+};
+
+<TriggerPlainDemo />
+
+---
+
+## Trigger override — function-children (read state)
+
+The function form gives the consumer access to `value`, formatted `label`, and `isOpen` from the picker context — useful for `aria-expanded`, conditional styling, or showing the formatted date inline.
+
+export const TriggerFunctionDemo = () => {
+  const [iso, setIso] = useState(null);
+  return (
+    <CalendarPicker value={iso} onChange={setIso}>
+      <CalendarPicker.Trigger>
+        {({ value, label, isOpen }) => (
+          <Button aria-expanded={isOpen} variant={value ? 'outline' : 'ghost'}>
+            {label || 'Pick a date'}
+          </Button>
+        )}
+      </CalendarPicker.Trigger>
+    </CalendarPicker>
+  );
+};
+
+<TriggerFunctionDemo />
+
+---
+
+## Content override — function-children with picker API
+
+Render a custom calendar UI inside the popover. The function receives `selected`, `mode`, `onSelect`, and `close` — call `onSelect(value)` to fire `onChange`, then `close()` when ready.
+
+export const ContentFunctionDemo = () => {
+  const [iso, setIso] = useState(null);
+  const presets = ['2026-05-01', '2026-05-15', '2026-06-01'];
+  return (
+    <div className="flex items-center gap-3">
+      <CalendarPicker value={iso} onChange={setIso}>
+        <CalendarPicker.Content side="bottom" align="start">
+          {({ selected, onSelect, close }) => (
+            <div className="flex flex-col gap-2 p-3">
+              <span className="text-muted text-xs">Currently picked: {String(selected ?? 'none')}</span>
+
+              <div className="flex flex-col gap-1">
+                {presets.map((date) => (
+                  <Button
+                    key={date}
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      onSelect(date);
+                      close();
+                    }}
+                  >
+                    {date}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+        </CalendarPicker.Content>
+      </CalendarPicker>
+
+      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+    </div>
+  );
+};
+
+<ContentFunctionDemo />
+
+---
+
+## Controlled open state
+
+Manage popover open/close from the consumer side via `open` + `onOpenChange`. Useful when an external control needs to drive the picker, or when the consumer needs to suppress auto-close (combine with `closeOn="never"`).
+
+The toggle button below is mounted as `<CalendarPicker.Trigger>` (with function-children to read `isOpen`) so Radix manages the click natively — clicking the button outside the trigger scope while the popover is open would race with Radix's outside-click handler and reopen the popover.
+
+export const ControlledOpenDemo = () => {
+  const [iso, setIso] = useState(null);
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex items-center gap-3">
+      <CalendarPicker value={iso} onChange={setIso} open={open} onOpenChange={setOpen}>
+        <CalendarPicker.Trigger>
+          {({ isOpen }) => (
+            <Button size="sm" variant="outline">
+              {isOpen ? 'Close picker' : 'Open picker'}
+            </Button>
+          )}
+        </CalendarPicker.Trigger>
+      </CalendarPicker>
+
+      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+    </div>
+  );
+};
+
+<ControlledOpenDemo />
+
+---
+
+## Non-dismissable popup (`dismissable={false}`)
+
+Disables Radix's auto-dismiss behaviors — clicking outside the popover or pressing `Esc` no longer closes it. Only the trigger button (or any consumer-controlled action like a toggle / X button / Apply button) drives open/close. Pair with controlled `open` + `closeOn='never'` for full consumer control of the open/close lifecycle.
+
+Use cases: date+time pickers requiring explicit Apply, multi-step UIs that mustn't lose state on outside-click, modal-style pickers where the popover stays open until the consumer explicitly dismisses it.
+
+export const NonDismissableDemo = () => {
+  const [iso, setIso] = useState(null);
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex items-center gap-3">
+      <CalendarPicker
+        value={iso}
+        onChange={setIso}
+        open={open}
+        onOpenChange={setOpen}
+        dismissable={false}
+        closeOn="never"
+      >
+        <CalendarPicker.Trigger>
+          {({ isOpen }) => (
+            <Button size="sm" variant="outline">
+              {isOpen ? 'Close picker' : 'Open picker'}
+            </Button>
+          )}
+        </CalendarPicker.Trigger>
+      </CalendarPicker>
+
+      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+    </div>
+  );
+};
+
+<NonDismissableDemo />
+
+Try clicking outside the popover or pressing `Esc` — the popover stays open. Only the toggle button dismisses it.
+
+---
+
+## Calendar passthrough props — `numberOfMonths`, `captionLayout`, etc.
+
+Pass any inner Calendar prop via `calendarProps`. Picker manages mode/selected/onSelect/required/modifiers; everything else (defaultMonth, numberOfMonths, captionLayout, autoFocus, disabled, month/onMonthChange, weekStartsOn, etc.) is consumer-controlled.
+
+export const CalendarPropsDemo = () => {
+  const [range, setRange] = useState(null);
+  return (
+    <CalendarPicker
+      mode="range"
+      value={range}
+      onChange={setRange}
+      triggerTooltip="Pick a date range"
+      calendarProps={{ numberOfMonths: 2, captionLayout: 'dropdown' }}
+    />
+  );
+};
+
+<CalendarPropsDemo />
+
+---
+
+## `closeOn` — defer auto-close
+
+`closeOn="never"` keeps the popover open after `onChange` fires. Useful when the consumer wants to make further selections (date + time) or compose multiple actions before dismissing. Combine with controlled `open` / `onOpenChange` for explicit close control.
+
+export const CloseOnNeverDemo = () => {
+  const [iso, setIso] = useState(null);
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex items-center gap-3">
+      <CalendarPicker
+        value={iso}
+        onChange={setIso}
+        open={open}
+        onOpenChange={setOpen}
+        closeOn="never"
+        triggerTooltip="Stays open after pick"
+      />
+
+      <Button size="sm" variant="outline" onClick={() => setOpen(false)}>
+        Done
+      </Button>
+
+      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+    </div>
+  );
+};
+
+<CloseOnNeverDemo />
+
+---
+
+## Both slots overridden — full custom UI in range mode
+
+Override both Trigger and Content for a fully custom shape. Range mode here uses preset buttons inside the popover.
+
+export const BothSlotsRangeDemo = () => {
+  const [range, setRange] = useState(null);
+  const presets = [
+    { label: 'This week', range: { from: '2026-05-04', to: '2026-05-10' } },
+    { label: 'Next week', range: { from: '2026-05-11', to: '2026-05-17' } },
+    { label: 'This month', range: { from: '2026-05-01', to: '2026-05-31' } },
+  ];
+  return (
+    <div className="flex items-center gap-3">
+      <CalendarPicker mode="range" value={range} onChange={setRange}>
+        <CalendarPicker.Trigger>
+          <Button variant="outline">
+            {range ? `${range.from} → ${range.to}` : 'Pick range'}
+          </Button>
+        </CalendarPicker.Trigger>
+
+        <CalendarPicker.Content side="bottom" align="start">
+          {({ onSelect, close }) => (
+            <div className="flex flex-col gap-1 p-3">
+              {presets.map((preset) => (
+                <Button
+                  key={preset.label}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    onSelect(preset.range);
+                    close();
+                  }}
+                >
+                  {preset.label}
+                </Button>
+              ))}
+            </div>
+          )}
+        </CalendarPicker.Content>
+      </CalendarPicker>
+
+      <span className="text-muted text-sm">{range ? `${range.from} → ${range.to}` : 'No range picked'}</span>
+    </div>
+  );
+};
+
+<BothSlotsRangeDemo />
+
+---
+
+## Filter — single date with clear
+
+Filter use-case: pick a date, clear via consumer-side state setter (no picker API change needed — picker is fully controlled, so `setState(null)` re-renders empty).
+
+export const FilterSingleClearDemo = () => {
+  const [filterDate, setFilterDate] = useState(null);
+  return (
+    <div className="flex items-center gap-3">
+      <CalendarPicker
+        value={filterDate}
+        onChange={setFilterDate}
+        triggerIcon={<Filter size={20} />}
+        triggerTooltip="Filter by date"
+      />
+
+      {filterDate && (
+        <Button size="sm" variant="ghost" onClick={() => setFilterDate(null)}>
+          <X size={14} className="me-1" />
+
+          Clear
+        </Button>
+      )}
+
+      <span className="text-muted text-sm">{filterDate ? `Filtering: ${filterDate}` : 'No filter applied'}</span>
+    </div>
+  );
+};
+
+<FilterSingleClearDemo />
+
+---
+
+## Filter — date range with clear
+
+Same pattern for range. Clear by setting state to null.
+
+export const FilterRangeClearDemo = () => {
+  const [range, setRange] = useState(null);
+  return (
+    <div className="flex items-center gap-3">
+      <CalendarPicker
+        mode="range"
+        value={range}
+        onChange={setRange}
+        closeOn="never"
+        triggerIcon={<Filter size={20} />}
+        triggerTooltip="Filter by date range"
+        calendarProps={{ numberOfMonths: 2 }}
+      />
+
+      {range && (
+        <Button size="sm" variant="ghost" onClick={() => setRange(null)}>
+          <X size={14} className="me-1" />
+
+          Clear
+        </Button>
+      )}
+
+      <span className="text-muted text-sm">
+        {range ? `Filtering: ${range.from} → ${range.to}` : 'No range filter'}
+      </span>
+    </div>
+  );
+};
+
+<FilterRangeClearDemo />
+
+---
+
+## Date + time picker — custom Content with deferred close
+
+Picks a date AND a time before committing. Uses `closeOn="never"` + controlled `open` so the popover stays open while the user picks both, then an Apply button consolidates the value and closes via `close()` from the slot API.
+
+export const DateTimePickerDemo = () => {
+  const { toBoundaryDate, toDate } = useDate();
+  const [dateTime, setDateTime] = useState(null);
+  const [pendingDate, setPendingDate] = useState(null);
+  const [pendingTime, setPendingTime] = useState('12:00');
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex items-center gap-3">
+      <CalendarPicker
+        value={pendingDate}
+        onChange={setPendingDate}
+        open={open}
+        onOpenChange={setOpen}
+        closeOn="never"
+        triggerTooltip="Pick date + time"
+      >
+        <CalendarPicker.Content side="bottom" align="start">
+          {({ close }) => (
+            <div className="flex flex-col gap-3 p-3">
+              <Calendar
+                mode="single"
+                selected={pendingDate ? toBoundaryDate(pendingDate) : undefined}
+                defaultMonth={pendingDate ? toBoundaryDate(pendingDate) : undefined}
+                onSelect={(d) => d && setPendingDate(toDate(d))}
+              />
+
+              <div className="flex items-center gap-2 px-1">
+                <span className="text-muted text-xs">Time</span>
+
+                <input
+                  type="time"
+                  value={pendingTime}
+                  onChange={(e) => setPendingTime(e.target.value)}
+                  className="border-muted-200 rounded-md border px-2 py-1 text-sm"
+                />
+              </div>
+
+              <Button
+                size="sm"
+                onClick={() => {
+                  if (pendingDate) setDateTime(`${pendingDate}T${pendingTime}:00`);
+                  close();
+                }}
+              >
+                Apply
+              </Button>
+            </div>
+          )}
+        </CalendarPicker.Content>
+      </CalendarPicker>
+
+      <span className="text-muted text-sm">{dateTime ?? 'Not set'}</span>
+    </div>
+  );
+};
+
+<DateTimePickerDemo />

@@ -1,8 +1,10 @@
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import { DayButton, DayPicker, type DropdownProps, getDefaultClassNames } from 'react-day-picker';
+import { type DateRange, DayButton, DayPicker, type DropdownProps, getDefaultClassNames } from 'react-day-picker';
 import { Button, buttonVariants, Select } from '@components/ui';
 import { cn } from '@utils';
 import { type ChangeEvent, type ComponentProps, useEffect, useRef } from 'react';
+
+export type CalendarRange = DateRange;
 
 export type CalendarProps = ComponentProps<typeof DayPicker> & {
   buttonVariant?: ComponentProps<typeof Button>['variant'];
@@ -22,7 +24,7 @@ function CalendarDayButton({ className, day, modifiers, ...props }: ComponentPro
 
   return (
     <Button
-      variant="ghost"
+      variant="unstyled"
       size="icon"
       data-day={day.date.toLocaleDateString()}
       data-selected-single={isSelected}
@@ -33,7 +35,7 @@ function CalendarDayButton({ className, day, modifiers, ...props }: ComponentPro
       data-range-middle={modifiers.range_middle}
       className={cn(
         // Today styling (only when not selected)
-        isTodayOnly && 'bg-accent text-accent-foreground rounded-md',
+        isTodayOnly && 'bg-primary-400 text-primary-foreground rounded-md',
         // Selected date styling
         isSelected && 'bg-primary text-primary-foreground rounded-md',
         // Range styling
@@ -61,16 +63,20 @@ function CalendarMonthsDropdown({ options, value, onChange, disabled }: Dropdown
 
   const handleValueChange = (newValue: string) => {
     const numericValue = Number(newValue);
+
     if (onChange) {
       onChange({ target: { value: String(numericValue) } } as ChangeEvent<HTMLSelectElement>);
     }
   };
 
   return (
-    <Select value={value ? String(value) : ''} onValueChange={handleValueChange} disabled={disabled}>
+    <Select value={value !== null ? String(value) : ''} onValueChange={handleValueChange} disabled={disabled}>
       <Select.Trigger className="h-8 justify-center text-xs">
         <Select.Value className="text-center" />
+
+        <Select.Icon />
       </Select.Trigger>
+
       <Select.Content position="popper">
         {selectOptions.map((option) => (
           <Select.Item
@@ -103,7 +109,7 @@ function CalendarYearsDropdown({ options, value, onChange, disabled }: DropdownP
   };
 
   return (
-    <Select value={value ? String(value) : ''} onValueChange={handleValueChange} disabled={disabled}>
+    <Select value={value !== null ? String(value) : ''} onValueChange={handleValueChange} disabled={disabled}>
       <Select.Trigger className="h-8 justify-center text-xs">
         <Select.Value className="text-center" />
 

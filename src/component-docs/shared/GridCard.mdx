@@ -3,37 +3,84 @@ id: grid-card
 title: GridCard
 section: Components
 category: Shared
-description: 'Flexible grid layout wrapper for card-based layouts with consistent spacing.'
+description: 'Flexible grid layout wrapper for card-based layouts with consistent spacing, scrollable overflow, and truncated text support.'
 tags: [shared, grid, card, layout]
 ---
 
 import { GridCard } from '@components/shared';
+import { BillIcon, DoctorIcon, GenderIcon, SmsIcon } from '@assets/icons';
 
 ## Demo
 
-<GridCard.List className="grid-cols-2 gap-4">
-  <GridCard.Item>
-    <GridCard.Header>
-      <GridCard.Title>Card 1</GridCard.Title>
-      <GridCard.Description>First card description</GridCard.Description>
-    </GridCard.Header>
+### Default (equal-width cards with auto scroll)
 
-    <GridCard.Content>
-      <p className="text-sm text-muted-foreground">Content area</p>
-    </GridCard.Content>
-  </GridCard.Item>
+<GridCard>
+  <GridCard.List>
+    <GridCard.Item>
+      <GridCard.Header>
+        <DoctorIcon />
+        <GridCard.Title>Doctor Name</GridCard.Title>
+      </GridCard.Header>
 
-  <GridCard.Item>
-    <GridCard.Header>
-      <GridCard.Title>Card 2</GridCard.Title>
-      <GridCard.Description>Second card description</GridCard.Description>
-    </GridCard.Header>
+      <GridCard.Content>
+        <GridCard.TruncatedText>Abbie Austin Ankunding</GridCard.TruncatedText>
+      </GridCard.Content>
+    </GridCard.Item>
 
-    <GridCard.Content>
-      <p className="text-sm text-muted-foreground">Content area</p>
-    </GridCard.Content>
-  </GridCard.Item>
-</GridCard.List>
+    <GridCard.Item>
+      <GridCard.Header>
+        <BillIcon />
+        <GridCard.Title>Suffix</GridCard.Title>
+      </GridCard.Header>
+
+      <GridCard.Content>JRA</GridCard.Content>
+    </GridCard.Item>
+
+    <GridCard.Item>
+      <GridCard.Header>
+        <SmsIcon />
+        <GridCard.Title>Email Address</GridCard.Title>
+      </GridCard.Header>
+
+      <GridCard.Content>
+        <GridCard.TruncatedText>doctor.abbieankunding.415943@meccasoft.com</GridCard.TruncatedText>
+      </GridCard.Content>
+    </GridCard.Item>
+
+    <GridCard.Item>
+      <GridCard.Header>
+        <GenderIcon />
+        <GridCard.Title>Gender</GridCard.Title>
+      </GridCard.Header>
+
+      <GridCard.Content>Male</GridCard.Content>
+    </GridCard.Item>
+
+  </GridCard.List>
+</GridCard>
+
+### Primary variant
+
+<GridCard>
+  <GridCard.List variant="primary">
+    <GridCard.Item>
+      <GridCard.Header>
+        <GridCard.Title>Total</GridCard.Title>
+      </GridCard.Header>
+
+      <GridCard.Content>120</GridCard.Content>
+    </GridCard.Item>
+
+    <GridCard.Item>
+      <GridCard.Header>
+        <GridCard.Title>Active</GridCard.Title>
+      </GridCard.Header>
+
+      <GridCard.Content>98</GridCard.Content>
+    </GridCard.Item>
+
+  </GridCard.List>
+</GridCard>
 
 ## Imports
 
@@ -44,14 +91,19 @@ import { GridCard } from '@components/shared';
 ## Code
 
 ```tsx
-<GridCard.List className="grid-cols-3 gap-4">
-  <GridCard.Item>
-    <GridCard.Header>
-      <GridCard.Title>Title</GridCard.Title>
-      <GridCard.Description>Description</GridCard.Description>
-    </GridCard.Header>
-    <GridCard.Content>Content</GridCard.Content>
-    <GridCard.Footer>Footer</GridCard.Footer>
-  </GridCard.Item>
-</GridCard.List>
+<GridCard>
+  <GridCard.List>
+    <GridCard.Item>
+      <GridCard.Header>
+        <GridCard.Title>Title</GridCard.Title>
+      </GridCard.Header>
+
+      <GridCard.Content>
+        <GridCard.TruncatedText>Long text that will truncate with a tooltip</GridCard.TruncatedText>
+      </GridCard.Content>
+
+      <GridCard.Footer>Footer</GridCard.Footer>
+    </GridCard.Item>
+  </GridCard.List>
+</GridCard>
 ```

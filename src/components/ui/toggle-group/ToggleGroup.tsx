@@ -17,7 +17,12 @@ type ToggleGroupProps = ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Roo
   };
 
 const toggleVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors text-primary hover:bg-primary/40 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground [&>svg]:text-primary data-[state=on]:[&>svg]:text-primary-foreground',
+  `
+  inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors text-primary cursor-pointer
+  hover:bg-primary-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+  disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground
+  [&>svg]:text-primary data-[state=on]:[&>svg]:text-primary-foreground
+  `,
   {
     variants: {
       variant: {

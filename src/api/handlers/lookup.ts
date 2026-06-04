@@ -6,7 +6,7 @@ const MOCK_USERS = Array.from({ length: 30 }, (_, i) => ({
 function getUsers() {
   return Promise.resolve({
     data: MOCK_USERS,
-    pagination: { page: 1, pageSize: 30, total: MOCK_USERS.length, totalPage: 1 },
+    pagination: { page: 1, pageSize: 30, total: MOCK_USERS.length, totalPages: 1 },
   });
 }
 

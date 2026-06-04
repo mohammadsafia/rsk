@@ -25,6 +25,7 @@ function FormFileUploader<TFieldValues extends FieldValues>({
   rules,
   control,
   label,
+  tooltip,
   containerClassName,
   labelClassName,
   className,
@@ -47,7 +48,14 @@ function FormFileUploader<TFieldValues extends FieldValues>({
       rules={rules}
       render={({ field: { ref, value, onChange, onBlur, ...field }, fieldState: { error } }) => (
         <FormControl className={containerClassName}>
-          <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={`${name}-file-upload`} required={required}>
+          <FormLabel
+            className={labelClassName}
+            htmlFor={`${name}-file-upload`}
+            tooltip={tooltip}
+            required={required}
+            hidden={!label}
+            error={error!}
+          >
             {label}
           </FormLabel>
 

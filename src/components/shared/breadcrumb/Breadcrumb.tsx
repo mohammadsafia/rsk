@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Conditional } from '@components/utils';
 
 import { cn } from '@utils';
-import { FULL_ROUTES_PATH } from '@routes';
+import { PLAIN_ROUTES } from '@routes';
 
 import { ChevronRight } from 'lucide-react';
 
@@ -19,15 +19,15 @@ export type BreadcrumbProps = {
   withRoot?: boolean;
 };
 
-const Breadcrumb = ({ className, links, separator, withRoot = true }: BreadcrumbProps) => {
+const Breadcrumb = ({ className, links, separator, withRoot = false }: BreadcrumbProps) => {
   if (links.length === 0 && !withRoot) return null;
 
   const finalLinks = withRoot
-    ? [{ title: 'Dashboard', href: FULL_ROUTES_PATH.HOME.INDEX }, ...links.filter((link) => link.href !== FULL_ROUTES_PATH.HOME.INDEX)]
+    ? [{ title: 'Dashboard', href: PLAIN_ROUTES.HOME.INDEX }, ...links.filter((link) => link.href !== PLAIN_ROUTES.HOME.INDEX)]
     : links;
 
   return (
-    <div className={cn('', className)}>
+    <div className={cn(className)}>
       <nav aria-label="breadcrumb">
         <ol className="flex">
           {finalLinks.map(({ title, href }, idx) => {
@@ -35,16 +35,16 @@ const Breadcrumb = ({ className, links, separator, withRoot = true }: Breadcrumb
 
             return (
               <li key={`${title}-${idx}`} className="text-muted-400 text-xs leading-none">
-                <Conditional.If condition={(!!href || href === FULL_ROUTES_PATH.HOME.INDEX) && !isLastItem}>
+                <Conditional.If condition={(!!href || href === PLAIN_ROUTES.HOME.INDEX) && !isLastItem}>
                   <Link
                     className="hover:text-primary transition-colors"
-                    to={href === FULL_ROUTES_PATH.HOME.INDEX || href === FULL_ROUTES_PATH.ROOT.INDEX ? href : `/${href}`}
+                    to={href === PLAIN_ROUTES.HOME.INDEX || href === PLAIN_ROUTES.ROOT.INDEX ? href : `/${href}`}
                   >
                     {title}
                   </Link>
                 </Conditional.If>
 
-                <Conditional.If condition={!href && href !== FULL_ROUTES_PATH.HOME.INDEX}>
+                <Conditional.If condition={!href && href !== PLAIN_ROUTES.HOME.INDEX}>
                   <span>{title}</span>
                 </Conditional.If>
 

@@ -26,11 +26,6 @@ import { useForm } from 'react-hook-form';
 const form = useForm();
 
 <FormContainer formContext={form} onSuccess={console.log}>
-  <FormUploadFile
-    name="document"
-    control={form.control}
-    label="Upload Document"
-    accept=".pdf,.doc,.docx"
-  />
-</FormContainer>
+  <FormUploadFile name="document" control={form.control} label="Upload Document" accept=".pdf,.doc,.docx" />
+</FormContainer>;
 ```

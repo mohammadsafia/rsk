@@ -72,7 +72,7 @@ const TimePickerClear: FC<TimePickerClearProps> = ({ onClear, disabled, hasValue
   };
 
   return (
-    <TooltipButton title="Clear" variant="ghost-muted-destructive" size="unstyled" onClick={handleClear}>
+    <TooltipButton asChild title="Clear" variant="ghost-muted-destructive" size="unstyled" onClick={handleClear}>
       <XIcon size={16} />
     </TooltipButton>
   );

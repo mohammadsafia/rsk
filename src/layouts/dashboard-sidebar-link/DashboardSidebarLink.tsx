@@ -20,8 +20,7 @@ const LINK_BASE_STYLES =
 
 const LINK_DEFAULT_STYLES = 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground';
 
-const LINK_ACTIVE_STYLES =
-  'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm before:absolute before:start-0 before:top-1/2 before:h-5 before:-translate-y-1/2 before:w-[3px] before:rounded-full rounded-sm before:bg-primary';
+const LINK_ACTIVE_STYLES = 'bg-primary text-primary-foreground shadow-sm';
 
 export function SidebarSubLink({ route, collapse }: SidebarLinkProps) {
   const { isAnyRouteActive } = useRouteUtils();

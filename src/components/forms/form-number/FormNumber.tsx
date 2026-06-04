@@ -15,6 +15,7 @@ function FormNumber<TFieldValues extends FieldValues>({
   rules,
   control,
   label,
+  tooltip,
   containerClassName,
   labelClassName,
   className,
@@ -32,7 +33,14 @@ function FormNumber<TFieldValues extends FieldValues>({
       render={({ field, fieldState: { error } }) => {
         return (
           <FormControl className={containerClassName}>
-            <FormLabel className={labelClassName} hidden={!label} error={error!} htmlFor={`${id}-${name}`} required={required}>
+            <FormLabel
+              className={labelClassName}
+              htmlFor={`${id}-${name}`}
+              tooltip={tooltip}
+              required={required}
+              hidden={!label}
+              error={error!}
+            >
               {label}
             </FormLabel>
 

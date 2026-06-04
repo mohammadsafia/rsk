@@ -77,7 +77,7 @@ const Content: FC<ContentProps> = ({ className, children, ...props }) => {
   const { fixed } = useLayoutContext();
 
   return (
-    <main data-slot="layout.content" className={cn('relative p-2 md:px-10 md:py-4', fixed && '', className)} {...props}>
+    <main data-slot="layout.content" className={cn('relative p-2 md:px-10 md:py-4', fixed && className)} {...props}>
       <Suspense fallback={<PrimeLoader />}>{children || <Outlet />}</Suspense>
     </main>
   );
@@ -86,7 +86,7 @@ const Content: FC<ContentProps> = ({ className, children, ...props }) => {
 const Footer: FC<FooterProps> = ({ className, ...props }) => {
   const { fixed } = useLayoutContext();
 
-  return <footer data-slot="layout.footer" className={cn('', fixed && '', className)} {...props} />;
+  return <footer data-slot="layout.footer" className={cn(fixed && '', className)} {...props} />;
 };
 
 const Layout: LayoutComponent = ({ className, fixed = false, ...props }) => {

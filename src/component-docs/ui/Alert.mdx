@@ -12,23 +12,69 @@ import { InfoIcon } from 'lucide-react';
 
 ## Demo
 
-<div className="space-y-3">
+<div className="space-y-6">
   <div>
-    <p className="text-muted-foreground mb-2 text-xs font-medium">Variants</p>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Filled-light variants (default)</p>
     <div className="space-y-2">
       <Alert variant="default">
         <InfoIcon />
+        <Alert.Title>Default</Alert.Title>
+        <Alert.Description>Neutral filled-light alert.</Alert.Description>
+      </Alert>
+
+      <Alert variant="info">
+        <InfoIcon />
         <Alert.Title>Info</Alert.Title>
-        <Alert.Description>This is an informational alert message.</Alert.Description>
+        <Alert.Description>Informational alert with a primary tone.</Alert.Description>
+      </Alert>
+
+      <Alert variant="success">
+        <InfoIcon />
+        <Alert.Title>Success</Alert.Title>
+        <Alert.Description>Operation completed successfully.</Alert.Description>
+      </Alert>
+
+      <Alert variant="warning">
+        <InfoIcon />
+        <Alert.Title>Warning</Alert.Title>
+        <Alert.Description>This action requires your attention.</Alert.Description>
       </Alert>
 
       <Alert variant="destructive">
         <InfoIcon />
         <Alert.Title>Error</Alert.Title>
-        <Alert.Description>This is an error alert message.</Alert.Description>
+        <Alert.Description>Something went wrong.</Alert.Description>
       </Alert>
     </div>
+  </div>
 
+  <div>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Outline variants (preserved for back-compat)</p>
+    <div className="space-y-2">
+      <Alert variant="outline">
+        <InfoIcon />
+        <Alert.Title>Outline</Alert.Title>
+        <Alert.Description>Outline-only primary alert with no background fill.</Alert.Description>
+      </Alert>
+
+      <Alert variant="outline-info">
+        <InfoIcon />
+        <Alert.Title>Outline Info</Alert.Title>
+        <Alert.Description>Plain background informational alert.</Alert.Description>
+      </Alert>
+
+      <Alert variant="outline-destructive">
+        <InfoIcon />
+        <Alert.Title>Outline Error</Alert.Title>
+        <Alert.Description>Outline-only error alert.</Alert.Description>
+      </Alert>
+
+      <Alert variant="outline-success">
+        <InfoIcon />
+        <Alert.Title>Outline Success</Alert.Title>
+        <Alert.Description>Outline-only success alert.</Alert.Description>
+      </Alert>
+    </div>
   </div>
 
   <div>
@@ -47,21 +93,55 @@ import { Alert } from '@components/ui';
 import { InfoIcon } from 'lucide-react';
 ```
 
+## Variants
+
+Bare names use the filled-light pattern (`bg-X-200 text-foreground border-X/50 [&>svg]:text-X`) — soft prominence, neutral readable text, colored border + icon for tone signal. Mirrors `Toast` + `Chip` conventions.
+
+| Variant | Use case |
+|---|---|
+| `default` | Neutral message (muted bg) |
+| `info` | Informational message (primary tone) |
+| `success` | Successful action confirmation |
+| `warning` | Caution or non-fatal issue |
+| `destructive` | Error or fatal condition |
+| `outline` | Outline-only primary alert (legacy / no-fill needs) |
+| `outline-info` | Plain background informational alert (legacy) |
+| `outline-destructive` | Outline-only error alert (legacy / less prominent) |
+| `outline-success` | Outline-only success alert (less prominent than filled) |
+
 ## Code
 
 ```tsx
-// With Icon
+// Filled-light (default style — use these for new code)
 <Alert variant="default">
   <InfoIcon />
-  <Alert.Title>Title</Alert.Title>
+  <Alert.Title>Default</Alert.Title>
   <Alert.Description>Description</Alert.Description>
 </Alert>
 
-// Destructive
+<Alert variant="success">
+  <InfoIcon />
+  <Alert.Title>Success</Alert.Title>
+  <Alert.Description>Operation completed</Alert.Description>
+</Alert>
+
+<Alert variant="warning">
+  <InfoIcon />
+  <Alert.Title>Warning</Alert.Title>
+  <Alert.Description>Needs attention</Alert.Description>
+</Alert>
+
 <Alert variant="destructive">
   <InfoIcon />
   <Alert.Title>Error</Alert.Title>
-  <Alert.Description>Error message</Alert.Description>
+  <Alert.Description>Something went wrong</Alert.Description>
+</Alert>
+
+// Outline (preserved variants — use when filled would be too prominent)
+<Alert variant="outline-destructive">
+  <InfoIcon />
+  <Alert.Title>Subtle Error</Alert.Title>
+  <Alert.Description>Outline-only error message</Alert.Description>
 </Alert>
 
 // Without Icon
