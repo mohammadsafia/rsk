@@ -35,6 +35,7 @@
   --color-secondary-800: var(--secondary-800);
   --color-secondary-900: var(--secondary-900);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-canvas: var(--canvas);
   --color-muted-50: var(--muted-50);
   --color-muted-100: var(--muted-100);
   --color-muted-200: var(--muted-200);
@@ -145,6 +146,8 @@
     --secondary-900: oklch(0.28 0.03 262);
     --secondary-foreground: oklch(0.21 0.03 264);
 
+    --canvas: oklch(0.965 0.006 256);          /* app shell behind floating cards */
+
     --muted: oklch(0.83 0.012 256);            /* visible slate borders */
     --muted-50:  oklch(0.985 0.003 256);
     --muted-100: oklch(0.97 0.006 256);        /* subtle bg tint */
@@ -232,6 +235,8 @@
     --secondary-800: oklch(0.79 0.008 264);
     --secondary-900: oklch(0.90 0.006 264);
     --secondary-foreground: oklch(0.97 0.004 264);
+
+    --canvas: oklch(0.13 0.006 264);            /* darkest: floating cards sit above it */
 
     --muted: oklch(0.32 0.008 264);
     --muted-50:  oklch(0.20 0.006 264);
