@@ -21,3 +21,4 @@ export * from './combobox';
 export * from './grid-card';
 export * from './field-section';
 export * from './composed-components';
+export * from './command-palette';
