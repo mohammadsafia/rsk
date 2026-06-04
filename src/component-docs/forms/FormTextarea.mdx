@@ -26,11 +26,6 @@ import { useForm } from 'react-hook-form';
 const form = useForm({ defaultValues: { notes: '' } });
 
 <FormContainer formContext={form} onSuccess={console.log}>
-  <FormTextarea
-    name="notes"
-    label="Notes"
-    placeholder="Enter your notes..."
-    required
-  />
-</FormContainer>
+  <FormTextarea name="notes" label="Notes" placeholder="Enter your notes..." required />
+</FormContainer>;
 ```

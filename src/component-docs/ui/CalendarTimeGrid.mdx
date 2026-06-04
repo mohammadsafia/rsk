@@ -1,0 +1,193 @@
+---
+id: calendar-time-grid
+title: CalendarTimeGrid
+section: Components
+category: UI
+description: 'Pure rendering primitives for time-axis calendar grids — Spacer, Header, Axis, Cell, EventCard, NowLine, and Column. Domain-agnostic; consumers compose these into day or week views.'
+tags: [ui, calendar, calendar-time-grid, calendar-grid, time-axis, schedule, primitive, compound]
+---
+
+import { CalendarTimeGrid } from '@components/ui';
+
+## Demo
+
+A single-day view assembled from the primitives — chrome row (spacer + header), then a body row (time axis on the left, a column of cells, with an event card and a now-line layered on top).
+
+<div className="flex h-[480px] flex-col rounded-2xl border border-muted-200 overflow-clip">
+  <CalendarTimeGrid>
+    <div className="flex shrink-0">
+      <CalendarTimeGrid.Spacer />
+      <CalendarTimeGrid.Header dayName="MON" dayNumber={28} isToday />
+    </div>
+
+    <div className="flex flex-1 overflow-y-auto">
+      <CalendarTimeGrid.Axis
+        rows={[
+          { label: '8 AM', isHourMark: true },
+          { label: '', isHourMark: false },
+          { label: '9 AM', isHourMark: true },
+          { label: '', isHourMark: false },
+          { label: '10 AM', isHourMark: true },
+          { label: '', isHourMark: false },
+          { label: '11 AM', isHourMark: true },
+          { label: '', isHourMark: false },
+          { label: '12 PM', isHourMark: true },
+          { label: '', isHourMark: false },
+        ]}
+      />
+
+      <CalendarTimeGrid.Column rowCount={10}>
+        <CalendarTimeGrid.Cell available />
+        <CalendarTimeGrid.Cell available />
+        <CalendarTimeGrid.Cell available />
+        <CalendarTimeGrid.Cell available />
+        <CalendarTimeGrid.Cell available />
+        <CalendarTimeGrid.Cell available={false} />
+        <CalendarTimeGrid.Cell available={false} />
+        <CalendarTimeGrid.Cell available />
+        <CalendarTimeGrid.Cell available />
+        <CalendarTimeGrid.Cell available />
+
+        <CalendarTimeGrid.EventCard top={20} height={20} left={5} width={90}>
+          <div className="bg-secondary-100 text-secondary text-2xs flex h-full w-full items-center px-1.5 py-0.5 truncate">
+            9:00 AM - Patient A
+          </div>
+        </CalendarTimeGrid.EventCard>
+
+        <CalendarTimeGrid.EventCard top={70} height={15} left={5} width={90}>
+          <div className="bg-primary-100 text-primary text-2xs flex h-full w-full items-center px-1.5 py-0.5 truncate">
+            11:30 AM - Patient B
+          </div>
+        </CalendarTimeGrid.EventCard>
+
+        <CalendarTimeGrid.NowLine percent={45} />
+      </CalendarTimeGrid.Column>
+    </div>
+  </CalendarTimeGrid>
+</div>
+
+## Imports
+
+```tsx
+import { CalendarTimeGrid, type CalendarTimeGridAxisRow } from '@components/ui';
+```
+
+## Sub-Components
+
+```
+CalendarTimeGrid              — Root namespace. Returns a Fragment; renders children. No DOM.
+CalendarTimeGrid.Spacer       — Empty corner cell that aligns with the time-axis column above the body.
+CalendarTimeGrid.Header       — Day header chip (dayName + dayNumber + isToday highlight). One per day.
+CalendarTimeGrid.Axis         — Time axis with hour marks, takes a rows array. Optional showStepLabels.
+CalendarTimeGrid.Cell         — One row inside a column, with available={true|false} for availability tint.
+CalendarTimeGrid.EventCard    — Absolutely positioned button (top/height/left/width as percentages). Children render the event content.
+CalendarTimeGrid.NowLine      — A 1px destructive line + dot, positioned via percent. Decorative.
+CalendarTimeGrid.Column       — Grid container for one day's cells + events + nowline. Requires rowCount.
+```
+
+## Code
+
+### Single day
+
+```tsx
+<CalendarTimeGrid>
+  <div className="flex shrink-0">
+    <CalendarTimeGrid.Spacer />
+    <CalendarTimeGrid.Header dayName="MON" dayNumber={28} isToday />
+  </div>
+
+  <div className="flex flex-1 overflow-y-auto">
+    <CalendarTimeGrid.Axis rows={axisRows} />
+
+    <CalendarTimeGrid.Column rowCount={axisRows.length}>
+      {cells.map((cell, idx) => (
+        <CalendarTimeGrid.Cell key={idx} available={cell.available} />
+      ))}
+
+      {events.map((event) => (
+        <CalendarTimeGrid.EventCard
+          key={event.id}
+          top={event.top}
+          height={event.height}
+          left={event.left}
+          width={event.width}
+          onClick={() => openPopover(event)}
+        >
+          {renderEvent(event)}
+        </CalendarTimeGrid.EventCard>
+      ))}
+
+      <CalendarTimeGrid.NowLine percent={nowPercent} />
+    </CalendarTimeGrid.Column>
+  </div>
+</CalendarTimeGrid>
+```
+
+### Week — multiple columns
+
+The same structure repeats once per day for week view. Each day gets its own `Header` + `Column`; they share one axis.
+
+```tsx
+<CalendarTimeGrid>
+  <div className="flex shrink-0">
+    <CalendarTimeGrid.Spacer />
+    {days.map((day) => (
+      <CalendarTimeGrid.Header
+        key={day.iso}
+        dayName={day.name}
+        dayNumber={day.number}
+        isToday={day.isToday}
+      />
+    ))}
+  </div>
+
+  <div className="flex flex-1 overflow-y-auto">
+    <CalendarTimeGrid.Axis rows={axisRows} />
+
+    {days.map((day) => (
+      <CalendarTimeGrid.Column key={day.iso} rowCount={axisRows.length}>
+        {/* cells, events, now-line */}
+      </CalendarTimeGrid.Column>
+    ))}
+  </div>
+</CalendarTimeGrid>
+```
+
+### Building axis rows
+
+`Axis` takes an array of `{ label: string; isHourMark: boolean }`. Generate one entry per row in the grid. Hour-mark rows show their label; non-hour-mark rows leave the label blank unless `showStepLabels` is on.
+
+```tsx
+const axisRows: CalendarTimeGridAxisRow[] = [];
+const totalMinutes = (endHour - startHour) * 60;
+
+for (let m = 0; m < totalMinutes; m += stepMinutes) {
+  const hour = Math.floor(m / 60) + startHour;
+  const isHourMark = m % 60 === 0;
+  axisRows.push({
+    label: isHourMark ? formatHour(hour) : '',
+    isHourMark,
+  });
+}
+```
+
+### Positioning events
+
+`top` / `height` / `left` / `width` are percent values (0-100) inside the column. The consumer computes them from the event's start/end times relative to the grid window.
+
+```tsx
+const top = ((eventStartMinutes - gridStartMinutes) / totalMinutes) * 100;
+const height = ((eventEndMinutes - eventStartMinutes) / totalMinutes) * 100;
+const left = columnIndex * (100 / concurrentColumns);
+const width = 100 / concurrentColumns;
+```
+
+For overlapping events on the same day, split the column into vertical lanes and assign each event a lane → that's where `left` / `width` come from.
+
+## Notes
+
+- **Pure rendering — no domain logic**. The primitive doesn't know what an event IS, what counts as "available," or what time-zone rules apply. Consumers pre-compute everything (cells, placements, axis rows, now-percent) and hand them in.
+- **`Column` requires `rowCount`** for its CSS grid template. Pass the same value the axis was built from to keep rows aligned.
+- **`Spacer` and `NowLine` are decorative** (`aria-hidden`). Day headers and event cards carry the meaningful semantics.
+- **`EventCard` is a `<button>`** — accepts the same props as a native button (`onClick`, `disabled`, `aria-label`, etc.). Use it as the trigger for popover details when paired with Radix `Popover.Trigger asChild`.
+- **No internal state** — sub-parts are pure. The `Provider` was removed; pass `rowCount` directly to `Column`.

@@ -1,0 +1,149 @@
+---
+id: prime-tooltip
+title: PrimeTooltip
+section: Components
+category: Shared
+description: 'Configurable tooltip with simple props-driven and composable compound modes.'
+tags: [shared, prime-tooltip, tooltip]
+---
+
+import { PrimeTooltip } from '@components/shared';
+import { Button } from '@components/ui';
+import { Info, PencilLine, Shield } from 'lucide-react';
+
+## Simple Mode
+
+Pass `content` prop for the tooltip text, children become the trigger.
+
+<div className="flex items-center gap-4">
+  <PrimeTooltip content="Save your changes">
+    <Button>Hover me</Button>
+  </PrimeTooltip>
+
+<PrimeTooltip content="View detailed information" side="right">
+  <Button variant="outline">Right side</Button>
+</PrimeTooltip>
+
+  <PrimeTooltip content="Bottom aligned tooltip" side="bottom">
+    <Button variant="secondary">Bottom</Button>
+  </PrimeTooltip>
+</div>
+
+## Composable Mode
+
+Use `PrimeTooltip.Trigger` slot for non-button triggers. Remaining children become tooltip content.
+
+<div className="flex items-center gap-4">
+  <PrimeTooltip>
+    <PrimeTooltip.Trigger>
+      <Info size={20} className="text-primary" />
+    </PrimeTooltip.Trigger>
+    This is a composable tooltip with rich content.
+  </PrimeTooltip>
+</div>
+
+## Structured Content
+
+Use `PrimeTooltip.Item` for structured tooltip content with icons. Pass `asChild` to `PrimeTooltip.Trigger` when wrapping a `<Button>` to avoid button-inside-button nesting.
+
+<div className="flex items-center gap-4">
+  <PrimeTooltip>
+    <PrimeTooltip.Trigger asChild>
+      <Button variant="outline" size="sm">
+        +2 Roles
+      </Button>
+    </PrimeTooltip.Trigger>
+    <PrimeTooltip.Item icon={<Shield size={14} />}>Admin</PrimeTooltip.Item>
+    <PrimeTooltip.Item icon={<PencilLine size={14} />}>Editor</PrimeTooltip.Item>
+  </PrimeTooltip>
+</div>
+
+## Items without icons
+
+<div className="flex items-center gap-4">
+  <PrimeTooltip>
+    <PrimeTooltip.Trigger asChild>
+      <Button variant="outline" size="sm">
+        3 Modifiers
+      </Button>
+    </PrimeTooltip.Trigger>
+    <PrimeTooltip.Item>Modifier A</PrimeTooltip.Item>
+    <PrimeTooltip.Item>Modifier B</PrimeTooltip.Item>
+    <PrimeTooltip.Item>Modifier C</PrimeTooltip.Item>
+  </PrimeTooltip>
+</div>
+
+## Positioning
+
+Use `side` and `align` props for precise placement.
+
+<div className="flex items-center gap-4">
+  <PrimeTooltip content="Bottom start" side="bottom" align="start">
+    <Button variant="outline" size="sm">Bottom Start</Button>
+  </PrimeTooltip>
+
+<PrimeTooltip content="Bottom end" side="bottom" align="end">
+  <Button variant="outline" size="sm">
+    Bottom End
+  </Button>
+</PrimeTooltip>
+
+<PrimeTooltip content="Top start" side="top" align="start">
+  <Button variant="outline" size="sm">
+    Top Start
+  </Button>
+</PrimeTooltip>
+
+  <PrimeTooltip content="Right" side="right">
+    <Button variant="outline" size="sm">Right</Button>
+  </PrimeTooltip>
+</div>
+
+## Composable with content fallback
+
+When using `PrimeTooltip.Trigger` without other children, the `content` prop is used as fallback.
+
+<div className="flex items-center gap-4">
+  <PrimeTooltip content="Fallback tooltip text">
+    <PrimeTooltip.Trigger>
+      <Info size={20} className="text-muted-400" />
+    </PrimeTooltip.Trigger>
+  </PrimeTooltip>
+</div>
+
+## Imports
+
+```tsx
+import { PrimeTooltip } from '@components/shared';
+```
+
+## Code
+
+```tsx
+{
+  /* Simple */
+}
+<PrimeTooltip content="Tooltip text">
+  <Button>Trigger</Button>
+</PrimeTooltip>;
+
+{
+  /* Composable — asChild when child is a button */
+}
+<PrimeTooltip>
+  <PrimeTooltip.Trigger asChild>
+    <Button>Trigger</Button>
+  </PrimeTooltip.Trigger>
+  <PrimeTooltip.Item icon={<Icon />}>Item</PrimeTooltip.Item>
+</PrimeTooltip>;
+
+{
+  /* Composable — no asChild when child is not a button */
+}
+<PrimeTooltip>
+  <PrimeTooltip.Trigger>
+    <Icon />
+  </PrimeTooltip.Trigger>
+  <PrimeTooltip.Item icon={<Icon />}>Item</PrimeTooltip.Item>
+</PrimeTooltip>;
+```

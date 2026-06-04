@@ -1,0 +1,351 @@
+---
+id: file-card
+title: FileCard
+section: Components
+category: Shared
+description: 'Layout-driven card for file / folder entries. Generic over <TEntry>, accepts accessors, exposes composable sub-compounds for header / preview / status / footer regions.'
+tags: [shared, file-card, card, file, folder, document, ioc, composable, generic, accessors]
+---
+
+import { useState } from 'react';
+import { ConfirmDialog, FileCard } from '@components/shared';
+import { Download, Mail, Trash } from 'lucide-react';
+
+export const ACCESSORS = {
+  getId: (entry) => entry.id,
+  getTitle: (entry) => entry.name,
+  getFileType: (entry) => entry.extension,
+  getDate: (entry) => entry.dueDate,
+};
+
+export const STATUS_OPTIONS = [
+  { id: 'todo', label: 'To Do', dotClass: 'bg-primary' },
+  { id: 'in-progress', label: 'In Progress', dotClass: 'bg-warning' },
+  { id: 'in-review', label: 'In Review', dotClass: 'bg-accent' },
+  { id: 'done', label: 'Done', dotClass: 'bg-success' },
+  { id: 'blocked', label: 'Blocked', dotClass: 'bg-destructive' },
+];
+
+export const ASSIGNEE_OPTIONS = [
+  { id: 'u1', name: 'Mohamed Ali' },
+  { id: 'u2', name: 'Sarah Johnson' },
+  { id: 'u3', name: 'David Chen' },
+  { id: 'u4', name: 'Emily Rodriguez' },
+  { id: 'u5', name: 'James Patel' },
+];
+
+export const PARTY_NOTICE = { id: 'd-1', name: 'Party Notice', extension: 'docx', dueDate: '2025-11-01' };
+
+export const MEDICAL_REPORT = { id: 'd-2', name: 'Medical Examination Report', extension: 'pdf', dueDate: '2025-10-15' };
+
+export const PATIENT_RECORDS = { id: 'f-1', name: 'Patient Records', extension: '', dueDate: '2025-09-30', documentCount: 12 };
+
+export const NeutralDemo = () => {
+  const [status, setStatus] = useState(STATUS_OPTIONS[0]);
+  const [assignee, setAssignee] = useState(ASSIGNEE_OPTIONS[0]);
+  return (
+    <FileCard className="max-w-md" entry={PARTY_NOTICE} accessors={ACCESSORS}>
+      <FileCard.Header>
+        <FileCard.Title />
+
+        <FileCard.Actions>
+          {(entry) => (
+            <>
+              <FileCard.Item icon={<Mail size={16} />}>Send by Email</FileCard.Item>
+
+              <FileCard.Separator />
+
+              <FileCard.Item icon={<Trash size={16} />} variant="destructive">
+                Delete
+              </FileCard.Item>
+            </>
+          )}
+        </FileCard.Actions>
+      </FileCard.Header>
+
+      <FileCard.Preview>{(entry) => <FileCard.FileShape />}</FileCard.Preview>
+
+      <FileCard.Status options={STATUS_OPTIONS} value={status} getOptionLabel={(o) => o.label} getOptionValue={(o) => o.id} getOptionDot={(o) => o.dotClass} onChange={setStatus} />
+
+      <FileCard.Footer>
+        <FileCard.Assignee options={ASSIGNEE_OPTIONS} value={assignee} getOptionLabel={(o) => o.name} getOptionValue={(o) => o.id} onChange={setAssignee} />
+
+        <FileCard.Date />
+      </FileCard.Footer>
+    </FileCard>
+  );
+};
+
+export const ApprovedDemo = () => {
+  const [status, setStatus] = useState(STATUS_OPTIONS[3]);
+  const [assignee, setAssignee] = useState(ASSIGNEE_OPTIONS[1]);
+  return (
+    <FileCard className="max-w-md" entry={MEDICAL_REPORT} accessors={ACCESSORS}>
+      <FileCard.Header>
+        <FileCard.Title />
+
+        <FileCard.Actions>{(entry) => <FileCard.Item icon={<Download size={16} />}>Download</FileCard.Item>}</FileCard.Actions>
+      </FileCard.Header>
+
+      <FileCard.Preview>
+        {(entry) => (
+          <FileCard.FileShape>
+            <FileCard.StatusPill variant="success">Approved</FileCard.StatusPill>
+          </FileCard.FileShape>
+        )}
+      </FileCard.Preview>
+
+      <FileCard.Status options={STATUS_OPTIONS} value={status} getOptionLabel={(o) => o.label} getOptionValue={(o) => o.id} getOptionDot={(o) => o.dotClass} onChange={setStatus} />
+
+      <FileCard.Footer>
+        <FileCard.Assignee options={ASSIGNEE_OPTIONS} value={assignee} getOptionLabel={(o) => o.name} getOptionValue={(o) => o.id} onChange={setAssignee} />
+
+        <FileCard.Date />
+      </FileCard.Footer>
+    </FileCard>
+  );
+};
+
+export const RejectedDemo = () => {
+  const [status, setStatus] = useState(STATUS_OPTIONS[4]);
+  const [assignee, setAssignee] = useState(ASSIGNEE_OPTIONS[2]);
+  return (
+    <FileCard className="max-w-md" entry={PARTY_NOTICE} accessors={ACCESSORS}>
+      <FileCard.Header>
+        <FileCard.Title />
+
+        <FileCard.Actions>{(entry) => <FileCard.Item icon={<Download size={16} />}>Download</FileCard.Item>}</FileCard.Actions>
+      </FileCard.Header>
+
+      <FileCard.Preview>
+        {(entry) => (
+          <FileCard.FileShape>
+            <FileCard.StatusPill variant="destructive">Rejected</FileCard.StatusPill>
+          </FileCard.FileShape>
+        )}
+      </FileCard.Preview>
+
+      <FileCard.Status options={STATUS_OPTIONS} value={status} getOptionLabel={(o) => o.label} getOptionValue={(o) => o.id} getOptionDot={(o) => o.dotClass} onChange={setStatus} />
+
+      <FileCard.Footer>
+        <FileCard.Assignee options={ASSIGNEE_OPTIONS} value={assignee} getOptionLabel={(o) => o.name} getOptionValue={(o) => o.id} onChange={setAssignee} />
+
+        <FileCard.Date />
+      </FileCard.Footer>
+    </FileCard>
+  );
+};
+
+export const ApprovalRequiredDemo = () => {
+  const [status, setStatus] = useState(STATUS_OPTIONS[2]);
+  const [assignee, setAssignee] = useState(ASSIGNEE_OPTIONS[3]);
+  return (
+    <FileCard className="max-w-md" entry={MEDICAL_REPORT} accessors={ACCESSORS}>
+      <FileCard.Header>
+        <FileCard.Title />
+
+        <FileCard.Actions>
+          {(entry) => (
+            <>
+              <FileCard.Item icon={<Mail size={16} />}>Send by Email</FileCard.Item>
+
+              <FileCard.Separator />
+
+              <FileCard.Item icon={<Trash size={16} />} variant="destructive">
+                Delete
+              </FileCard.Item>
+            </>
+          )}
+        </FileCard.Actions>
+      </FileCard.Header>
+
+      <FileCard.Preview>
+        {(entry) => (
+          <FileCard.FileShape>
+            <FileCard.ApprovalPrompt>Your approval is required for this file</FileCard.ApprovalPrompt>
+
+            <div className="flex gap-2">
+              <ConfirmDialog variant="destructive" title="Reject Document" onConfirm={() => {}}>
+                <div>
+                  <FileCard.Reject>Reject</FileCard.Reject>
+                </div>
+              </ConfirmDialog>
+
+              <ConfirmDialog variant="success" title="Approve Document" onConfirm={() => {}}>
+                <div>
+                  <FileCard.Approve>Approve</FileCard.Approve>
+                </div>
+              </ConfirmDialog>
+            </div>
+          </FileCard.FileShape>
+        )}
+      </FileCard.Preview>
+
+      <FileCard.Status options={STATUS_OPTIONS} value={status} getOptionLabel={(o) => o.label} getOptionValue={(o) => o.id} getOptionDot={(o) => o.dotClass} onChange={setStatus} />
+
+      <FileCard.Footer>
+        <FileCard.Assignee options={ASSIGNEE_OPTIONS} value={assignee} getOptionLabel={(o) => o.name} getOptionValue={(o) => o.id} onChange={setAssignee} />
+
+        <FileCard.Date />
+      </FileCard.Footer>
+    </FileCard>
+  );
+};
+
+export const FolderDemo = () => {
+  const [assignee, setAssignee] = useState(ASSIGNEE_OPTIONS[4]);
+  return (
+    <FileCard className="max-w-md" entry={PATIENT_RECORDS} accessors={ACCESSORS} onClick={() => {}}>
+      <FileCard.Header>
+        <FileCard.Title />
+
+        <FileCard.Actions>
+          {(entry) => (
+            <FileCard.Item icon={<Trash size={16} />} variant="destructive">
+              Delete
+            </FileCard.Item>
+          )}
+        </FileCard.Actions>
+      </FileCard.Header>
+
+      <FileCard.Preview>{(entry) => <FileCard.FolderShape count={entry.documentCount} />}</FileCard.Preview>
+
+      <FileCard.Footer>
+        <FileCard.Assignee options={ASSIGNEE_OPTIONS} value={assignee} getOptionLabel={(o) => o.name} getOptionValue={(o) => o.id} onChange={setAssignee} />
+
+        <FileCard.Date />
+      </FileCard.Footer>
+    </FileCard>
+  );
+};
+
+## Variant — Neutral
+
+File shape with no overlay. Status pill / approval prompt only render when consumer mounts them inside `Preview`. Status combobox and assignee picker are interactive — try selecting different options.
+
+<NeutralDemo />
+
+## Variant — Approved
+
+`<FileCard.StatusPill variant="success">` mounted inside the file shape — content sits in front of the watermark icon.
+
+<ApprovedDemo />
+
+## Variant — Rejected
+
+`<FileCard.StatusPill variant="destructive">`.
+
+<RejectedDemo />
+
+## Variant — Approval Required (dual-action)
+
+`<FileCard.ApprovalPrompt>` + `<FileCard.Approve>` / `<FileCard.Reject>` as ConfirmDialog triggers. Each button is `forwardRef` so it works with `Dialog.Trigger asChild`.
+
+<ApprovalRequiredDemo />
+
+## Variant — Folder Mode
+
+Mount `<FileCard.FolderShape count={...} />` inside Preview instead of `<FileCard.FileShape>`. The same card chrome (header / footer) reads as a folder. Pair with `onClick` to make the whole card a navigation target. The count comes from `accessors`-aligned entry data.
+
+<FolderDemo />
+
+## Imports
+
+```tsx
+import { FileCard, type FileCardAccessors } from '@components/shared';
+```
+
+## Composition shape
+
+```tsx
+<FileCard entry={entry} accessors={ACCESSORS} onClick={onClick}>
+  <FileCard.Header>
+    <FileCard.Title />
+
+    <FileCard.Actions>
+      {(entry) => (
+        <>
+          <FileCard.Item condition={entry.canSendByEmail} permissions={[Permissions.SendByEmail]} icon={<Mail size={16} />} onClick={...}>
+            Send by Email
+          </FileCard.Item>
+
+          <FileCard.Separator />
+
+          <FileCard.Item condition={entry.canDelete} permissions={[Permissions.Delete]} icon={<Trash size={16} />} variant="destructive" onClick={...}>
+            Delete
+          </FileCard.Item>
+        </>
+      )}
+    </FileCard.Actions>
+  </FileCard.Header>
+
+  <FileCard.Preview>
+    {(entry) => (
+      <FileCard.FileShape>
+        <FileCard.ApprovalPrompt>Your approval is required for this file</FileCard.ApprovalPrompt>
+
+        <div className="flex gap-2">
+          <ConfirmDialog variant="destructive" title="Reject" onConfirm={() => rejectMutation.mutateAsync(entry.id)}>
+            <div>
+              <FileCard.Reject condition={entry.canReject} permissions={[Permissions.Reject]}>
+                Reject
+              </FileCard.Reject>
+            </div>
+          </ConfirmDialog>
+
+          <ConfirmDialog variant="success" title="Approve" onConfirm={() => approveMutation.mutateAsync(entry.id)}>
+            <div>
+              <FileCard.Approve condition={entry.canApprove} permissions={[Permissions.Approve]}>
+                Approve
+              </FileCard.Approve>
+            </div>
+          </ConfirmDialog>
+        </div>
+      </FileCard.FileShape>
+    )}
+  </FileCard.Preview>
+
+  <FileCard.Status
+    options={statusOptions}
+    value={entry.taskStatus}
+    getOptionLabel={(o) => o.label}
+    getOptionValue={(o) => o.id}
+    getOptionDot={(o) => o.dotClass}
+    onChange={(option) => onStatusChange(entry, option)}
+  />
+
+  <FileCard.Footer>
+    <FileCard.Assignee
+      options={teamOptionsAsync}
+      value={entry.assignee}
+      getOptionLabel={(o) => o.name}
+      getOptionValue={(o) => o.id}
+      getOptionAvatar={(o) => o.avatarUrl}
+      onChange={(option) => onAssign(entry, option)}
+    />
+
+    <FileCard.Date />
+  </FileCard.Footer>
+</FileCard>
+```
+
+## Sub-compound surface
+
+| Sub-compound | Type | Auto-renders |
+|---|---|---|
+| `<FileCard.Header>` | container | — |
+| `<FileCard.Title>` | reads context | file-icon chip + title text |
+| `<FileCard.Actions>` | reads context, render-prop children | dropdown trigger + list |
+| `<FileCard.Item>` | alias of `PrimeDropdown.Item` | already `withConditional(withAuth(…))` |
+| `<FileCard.Separator>` | alias of `PrimeDropdown.Separator` | — |
+| `<FileCard.Preview>` | reads context, render-prop children | preview region container |
+| `<FileCard.FileShape>` | visual primitive | document watermark icon with content overlay |
+| `<FileCard.FolderShape>` | visual primitive | folder shape with `count` |
+| `<FileCard.StatusPill>` | alias of `Badge` | DS Badge with full variant set (default / success / destructive / warning / muted / secondary / neutral / accent) + size set |
+| `<FileCard.ApprovalPrompt>` | visual primitive | text styling for approval-required copy |
+| `<FileCard.Approve>` | wraps `ComposedButton` (outline-success) | `forwardRef` — works as `Dialog.Trigger asChild` |
+| `<FileCard.Reject>` | wraps `ComposedButton` (outline-destructive) | `forwardRef` — works as `Dialog.Trigger asChild` |
+| `<FileCard.Status>` | baked combobox | DI: `options`, `getOption*`, `value`, `onChange` (sync or async) |
+| `<FileCard.Footer>` | container | — |
+| `<FileCard.Assignee>` | baked combobox | DI: `options`, `getOption*`, `value`, `onChange` (sync or async) |
+| `<FileCard.Date>` | reads context | formatted date via `accessors.getDate` |

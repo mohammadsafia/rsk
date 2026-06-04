@@ -1,0 +1,146 @@
+---
+id: prime-dropdown
+title: PrimeDropdown
+section: Components
+category: Shared
+description: 'Configurable dropdown menu with pre-styled items, icon support, and built-in condition/permissions.'
+tags: [shared, prime-dropdown, dropdown, menu, actions]
+---
+
+import { PrimeDropdown } from '@components/shared';
+import { Button } from '@components/ui';
+import { Copy, LogOut, Pencil, PlusCircle, Settings, Trash2, User } from 'lucide-react';
+
+## Simple Mode
+
+First child is the trigger, remaining children are menu items. No explicit Trigger or List needed.
+
+<PrimeDropdown align="end">
+  <Button variant="outline">Actions</Button>
+  <PrimeDropdown.Item icon={<Pencil size={14} />} onClick={() => alert('Edit')}>
+    Edit
+  </PrimeDropdown.Item>
+  <PrimeDropdown.Item icon={<Copy size={14} />} onClick={() => alert('Duplicate')}>
+    Duplicate
+  </PrimeDropdown.Item>
+  <PrimeDropdown.Separator />
+  <PrimeDropdown.Item icon={<Trash2 size={14} />} variant="destructive" onClick={() => alert('Delete')}>
+    Delete
+  </PrimeDropdown.Item>
+</PrimeDropdown>
+
+## Composable Mode
+
+Use `PrimeDropdown.Trigger` for explicit trigger control and `PrimeDropdown.List` for content styling.
+
+<PrimeDropdown>
+  <PrimeDropdown.Trigger asChild>
+    <Button variant="outline" size="icon"><Settings size={16} /></Button>
+  </PrimeDropdown.Trigger>
+
+  <PrimeDropdown.List className="w-48">
+    <PrimeDropdown.Label>My Account</PrimeDropdown.Label>
+    <PrimeDropdown.Separator />
+    <PrimeDropdown.Item icon={<User size={14} />}>Profile</PrimeDropdown.Item>
+    <PrimeDropdown.Item icon={<Settings size={14} />}>Settings</PrimeDropdown.Item>
+    <PrimeDropdown.Separator />
+    <PrimeDropdown.Item icon={<LogOut size={14} />}>Logout</PrimeDropdown.Item>
+  </PrimeDropdown.List>
+</PrimeDropdown>
+
+## Destructive Variant
+
+Use `variant="destructive"` for dangerous actions.
+
+<PrimeDropdown align="end">
+  <Button variant="outline">Manage</Button>
+  <PrimeDropdown.Item icon={<Pencil size={14} />}>Rename</PrimeDropdown.Item>
+  <PrimeDropdown.Item icon={<Copy size={14} />}>Duplicate</PrimeDropdown.Item>
+  <PrimeDropdown.Separator />
+  <PrimeDropdown.Item icon={<Trash2 size={14} />} variant="destructive">
+    Delete permanently
+  </PrimeDropdown.Item>
+</PrimeDropdown>
+
+## With Labels and Groups
+
+Use `PrimeDropdown.Label` for section headers and `PrimeDropdown.Separator` for visual dividers.
+
+<PrimeDropdown align="end">
+  <Button variant="outline">Options</Button>
+  <PrimeDropdown.Label>Documents</PrimeDropdown.Label>
+  <PrimeDropdown.Item icon={<PlusCircle size={14} />}>New document</PrimeDropdown.Item>
+  <PrimeDropdown.Item icon={<Copy size={14} />}>Import</PrimeDropdown.Item>
+  <PrimeDropdown.Separator />
+  <PrimeDropdown.Label>Danger zone</PrimeDropdown.Label>
+  <PrimeDropdown.Item icon={<Trash2 size={14} />} variant="destructive">
+    Delete all
+  </PrimeDropdown.Item>
+</PrimeDropdown>
+
+## Items without Icons
+
+Icons are optional — items work with text only.
+
+<PrimeDropdown align="end">
+  <Button variant="outline">Sort by</Button>
+  <PrimeDropdown.Item>Name (A-Z)</PrimeDropdown.Item>
+  <PrimeDropdown.Item>Date created</PrimeDropdown.Item>
+  <PrimeDropdown.Item>Last modified</PrimeDropdown.Item>
+</PrimeDropdown>
+
+## Condition and Permissions
+
+Items support `condition` and `permissions` props. Items that don't meet the condition or permissions are hidden automatically.
+
+<PrimeDropdown align="end">
+  <Button variant="outline">Admin Actions</Button>
+  <PrimeDropdown.Item icon={<Pencil size={14} />} condition={true}>
+    Edit (visible)
+  </PrimeDropdown.Item>
+  <PrimeDropdown.Item icon={<Trash2 size={14} />} variant="destructive" condition={false}>
+    Delete (hidden by condition)
+  </PrimeDropdown.Item>
+  <PrimeDropdown.Item icon={<Settings size={14} />}>Settings (always visible)</PrimeDropdown.Item>
+</PrimeDropdown>
+
+## Imports
+
+```tsx
+import { PrimeDropdown } from '@components/shared';
+```
+
+## Code
+
+```tsx
+{
+  /* Simple — first child = trigger */
+}
+<PrimeDropdown align="end">
+  <Button>Actions</Button>
+  <PrimeDropdown.Item icon={<Pencil />} onClick={onEdit}>
+    Edit
+  </PrimeDropdown.Item>
+  <PrimeDropdown.Separator />
+  <PrimeDropdown.Item icon={<Trash2 />} variant="destructive" onClick={onDelete}>
+    Delete
+  </PrimeDropdown.Item>
+</PrimeDropdown>;
+
+{
+  /* Composable — explicit trigger + list */
+}
+<PrimeDropdown>
+  <PrimeDropdown.Trigger asChild>
+    <Button>Menu</Button>
+  </PrimeDropdown.Trigger>
+
+  <PrimeDropdown.List className="w-48">
+    <PrimeDropdown.Label>Section</PrimeDropdown.Label>
+    <PrimeDropdown.Separator />
+    <PrimeDropdown.Item icon={<Icon />} condition={canEdit} permissions={['items.edit']}>
+      Edit
+    </PrimeDropdown.Item>
+  </PrimeDropdown.List>
+</PrimeDropdown>;
+```

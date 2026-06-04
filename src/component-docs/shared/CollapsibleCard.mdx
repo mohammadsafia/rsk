@@ -3,14 +3,13 @@ id: collapsible-card
 title: CollapsibleCard
 section: Components
 category: Shared
-description: Card component with collapsible content and built-in variants. Includes TriggerIcon with default chevron.
-tags: [shared, collapsible-card, card, collapse, variants, trigger-icon]
+description: Card component with collapsible content, built-in variants, and sub-components for Leading, Tooltip, and Description header composition.
+tags: [shared, collapsible-card, card, collapse, variants, trigger-icon, tooltip, description, leading]
 ---
 
 import { CollapsibleCard } from '@components/shared';
-import { Collapsible } from '@components/ui';
-import { Card } from '@components/ui';
-import { Plus, User, Settings, ChevronDown } from 'lucide-react';
+import { Card, Collapsible } from '@components/ui';
+import { ChevronDown, FileText, FolderOpen, Plus, Settings, User } from 'lucide-react';
 
 ## Demo
 
@@ -32,7 +31,8 @@ import { Plus, User, Settings, ChevronDown } from 'lucide-react';
     </Card>
   </Collapsible>
 
-  {/* Using CollapsibleCard component with clickable title and default TriggerIcon */}
+{/* Using CollapsibleCard component with clickable title and default TriggerIcon */}
+
   <CollapsibleCard>
     <CollapsibleCard.Header>
       <CollapsibleCard.Trigger className="flex w-full items-center justify-between">
@@ -45,9 +45,58 @@ import { Plus, User, Settings, ChevronDown } from 'lucide-react';
     <CollapsibleCard.Content>
       The entire header (title + icon) is clickable. Icon uses default ChevronDown with rotation animation.
     </CollapsibleCard.Content>
+
   </CollapsibleCard>
 
-  {/* TriggerIcon with custom children and clickable title */}
+{/* Leading + Tooltip: icon with title and tooltip hint */}
+
+  <CollapsibleCard variant="primary">
+    <CollapsibleCard.Header>
+      <CollapsibleCard.Leading>
+        <FolderOpen size={18} />
+
+        <CollapsibleCard.Title>
+          With Leading + Tooltip
+          <CollapsibleCard.Tooltip>Records should be sent to this address.</CollapsibleCard.Tooltip>
+        </CollapsibleCard.Title>
+      </CollapsibleCard.Leading>
+
+      <CollapsibleCard.Trigger>
+        <CollapsibleCard.TriggerIcon />
+      </CollapsibleCard.Trigger>
+    </CollapsibleCard.Header>
+
+    <CollapsibleCard.Content>
+      Leading provides a grid layout for icon + title. Tooltip shows a hint on hover via an info icon.
+    </CollapsibleCard.Content>
+
+  </CollapsibleCard>
+
+{/* Leading + Description: icon with title and short always-visible reference */}
+
+  <CollapsibleCard variant="primary">
+    <CollapsibleCard.Header>
+      <CollapsibleCard.Leading>
+        <FileText size={18} />
+
+        <CollapsibleCard.Title>With Leading + Description</CollapsibleCard.Title>
+
+        <CollapsibleCard.Description>CMS 1500 Box 33</CollapsibleCard.Description>
+      </CollapsibleCard.Leading>
+
+      <CollapsibleCard.Trigger>
+        <CollapsibleCard.TriggerIcon />
+      </CollapsibleCard.Trigger>
+    </CollapsibleCard.Header>
+
+    <CollapsibleCard.Content>
+      Description is always visible below the title. Use for short references (few words only).
+    </CollapsibleCard.Content>
+
+  </CollapsibleCard>
+
+{/* TriggerIcon with custom children and clickable title */}
+
   <CollapsibleCard variant="primary">
     <CollapsibleCard.Header>
       <CollapsibleCard.Trigger className="flex w-full items-center justify-between">
@@ -62,9 +111,11 @@ import { Plus, User, Settings, ChevronDown } from 'lucide-react';
     <CollapsibleCard.Content>
       Override the default icon by passing children to TriggerIcon. Entire header is clickable.
     </CollapsibleCard.Content>
+
   </CollapsibleCard>
 
-  {/* Custom text as TriggerIcon children */}
+{/* Custom text as TriggerIcon children */}
+
   <CollapsibleCard variant="success">
     <CollapsibleCard.Header>
       <CollapsibleCard.Title>Text Trigger</CollapsibleCard.Title>
@@ -79,9 +130,11 @@ import { Plus, User, Settings, ChevronDown } from 'lucide-react';
     </CollapsibleCard.Header>
 
     <CollapsibleCard.Content>You can even use text or any React element as the trigger.</CollapsibleCard.Content>
+
   </CollapsibleCard>
 
-  {/* With title and icon in trigger - icon at the end */}
+{/* With title and icon in trigger - icon at the end */}
+
   <CollapsibleCard variant="primary" defaultOpen={true}>
     <CollapsibleCard.Header>
       <CollapsibleCard.Trigger className="flex w-full items-center gap-2">
@@ -113,9 +166,11 @@ import { Plus, User, Settings, ChevronDown } from 'lucide-react';
 
       <button className="text-destructive text-sm hover:underline">Delete</button>
     </CollapsibleCard.Footer>
+
   </CollapsibleCard>
 
-  {/* Glass variant with custom compound icon */}
+{/* Glass variant with custom compound icon */}
+
   <CollapsibleCard variant="glass">
     <CollapsibleCard.Header>
       <div className="flex items-center gap-3">
@@ -142,6 +197,7 @@ import { Plus, User, Settings, ChevronDown } from 'lucide-react';
         <div className="text-sm">Option 3: Pending</div>
       </div>
     </CollapsibleCard.Content>
+
   </CollapsibleCard>
 </div>
 
@@ -167,6 +223,43 @@ import { CollapsibleCard } from '@components/shared';
   </CollapsibleCard.Content>
 </CollapsibleCard>
 
+// With Leading + Tooltip (icon, title, and hover hint)
+<CollapsibleCard variant="primary">
+  <CollapsibleCard.Header>
+    <CollapsibleCard.Leading>
+      <Icon />
+
+      <CollapsibleCard.Title>
+        Title
+        <CollapsibleCard.Tooltip>Hint text for longer explanations</CollapsibleCard.Tooltip>
+      </CollapsibleCard.Title>
+    </CollapsibleCard.Leading>
+
+    <CollapsibleCard.Trigger>
+      <CollapsibleCard.TriggerIcon />
+    </CollapsibleCard.Trigger>
+  </CollapsibleCard.Header>
+  <CollapsibleCard.Content>Content</CollapsibleCard.Content>
+</CollapsibleCard>
+
+// With Leading + Description (icon, title, and short always-visible reference)
+<CollapsibleCard variant="primary">
+  <CollapsibleCard.Header>
+    <CollapsibleCard.Leading>
+      <Icon />
+
+      <CollapsibleCard.Title>Title</CollapsibleCard.Title>
+
+      <CollapsibleCard.Description>Short reference (few words)</CollapsibleCard.Description>
+    </CollapsibleCard.Leading>
+
+    <CollapsibleCard.Trigger>
+      <CollapsibleCard.TriggerIcon />
+    </CollapsibleCard.Trigger>
+  </CollapsibleCard.Header>
+  <CollapsibleCard.Content>Content</CollapsibleCard.Content>
+</CollapsibleCard>
+
 // Override TriggerIcon with custom icon and clickable title
 <CollapsibleCard variant="primary">
   <CollapsibleCard.Header>
@@ -180,51 +273,12 @@ import { CollapsibleCard } from '@components/shared';
   <CollapsibleCard.Content>Content</CollapsibleCard.Content>
 </CollapsibleCard>
 
-// Another custom icon example
-<CollapsibleCard variant="warning">
-  <CollapsibleCard.Header>
-    <CollapsibleCard.Title>Title</CollapsibleCard.Title>
-    <CollapsibleCard.Trigger>
-      <CollapsibleCard.TriggerIcon>
-        <Plus className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
-      </CollapsibleCard.TriggerIcon>
-    </CollapsibleCard.Trigger>
-  </CollapsibleCard.Header>
-  <CollapsibleCard.Content>Content</CollapsibleCard.Content>
-</CollapsibleCard>
-
-// TriggerIcon with text or custom elements
-<CollapsibleCard variant="success">
-  <CollapsibleCard.Header>
-    <CollapsibleCard.Title>Title</CollapsibleCard.Title>
-    <CollapsibleCard.Trigger>
-      <CollapsibleCard.TriggerIcon>
-        <span>Show/Hide</span>
-      </CollapsibleCard.TriggerIcon>
-    </CollapsibleCard.Trigger>
-  </CollapsibleCard.Header>
-  <CollapsibleCard.Content>Content</CollapsibleCard.Content>
-</CollapsibleCard>
-
-// Everything in the trigger - icon pushed to the end
-<CollapsibleCard variant="info">
-  <CollapsibleCard.Header>
-    <CollapsibleCard.Trigger className="flex w-full items-center gap-2">
-      <Icon className="h-5 w-5" />
-      <CollapsibleCard.Title>Clickable Title</CollapsibleCard.Title>
-      <CollapsibleCard.TriggerIcon className="ml-auto" />
-    </CollapsibleCard.Trigger>
-  </CollapsibleCard.Header>
-  <CollapsibleCard.Content>Content</CollapsibleCard.Content>
-</CollapsibleCard>
-
 // Controlled state
 <CollapsibleCard open={isOpen} onOpenChange={setIsOpen}>
   ...
 </CollapsibleCard>
 
 // Available variants
-variant="default" | "primary" | "secondary" | "success" | "danger" | "warning" | "info" |
-        "outline" | "outline-secondary" | "flat" | "elevated" | "elevated-lg" |
-        "elevated-xl" | "glass" | "gradient"
+variant="default" | "primary" | "secondary" | "success" | "destructive" | "warning" | "info" |
+        "outline" | "outline-secondary" | "glass" | "gradient"
 ```

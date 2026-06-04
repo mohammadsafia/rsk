@@ -7,11 +7,11 @@ description: Form with schema validation using Zod.
 tags: [forms, validation, zod]
 ---
 
-import {FormWithValidationDemo} from '@pages/components/components.data.demos';
+import { FormWithValidationDemo } from '@pages/components/components.data.demos';
 
 ## Demo
 
-<FormWithValidationDemo/>
+<FormWithValidationDemo />
 
 ## Imports
 
@@ -41,5 +41,5 @@ const form = useForm<FormData>({
   <FormInput name="password" type="password" label="Password" required />
   <FormNumber name="age" control={form.control} label="Age" />
   <Button type="submit">Submit</Button>
-</FormContainer>
+</FormContainer>;
 ```

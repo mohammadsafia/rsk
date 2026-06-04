@@ -1,0 +1,1 @@
+export { default as DocPanel } from './DocPanel';

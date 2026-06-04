@@ -1,0 +1,768 @@
+---
+id: calendar-grid
+title: CalendarGrid
+section: Components
+category: Calendar
+description: 'Library-grade compound primitive for time-grid calendars: day, week, and month views with availability slots, events, popovers, and view toggling.'
+tags: [calendar, calendar-grid, schedule, compound, day-view, week-view, month-view, availability, slots, events, generic]
+---
+
+import { useMemo, useState } from 'react';
+
+import { Chip, Divider, Table } from '@components/ui';
+import { MetaCard, TooltipButton } from '@components/shared';
+import { CalendarGrid } from '@components/calendar';
+import { Conditional } from '@components/utils';
+
+import { cn } from '@utils';
+
+import { CalendarClock, Clock, MapPin, Stethoscope, X } from 'lucide-react';
+
+## Demo
+
+The demo wires the same calendar to BOTH a calendar mode and a list mode. Use the view toggle (top-right, calendar/list icons) to switch — the calendar views self-guard out, and the consumer-rendered `<Table>` takes over the body.
+
+export const TONES = {
+  initial: { bg: 'bg-secondary-100', text: 'text-secondary', dotClass: 'bg-secondary' },
+  're-eval': { bg: 'bg-primary-100', text: 'text-primary', dotClass: 'bg-primary-400' },
+  deposition: { bg: 'bg-destructive-200', text: 'text-destructive', dotClass: 'bg-destructive' },
+};
+
+export const TYPE_LABELS = { initial: 'Initial Evaluation', 're-eval': 'Re Evaluation', deposition: 'Deposition' };
+
+export const formatTime = (iso) => new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+export const CalendarGridDemo = () => {
+  const today = new Date();
+
+  const at = (offset, hour, min = 0) => {
+    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + offset, hour, min);
+    return d.toISOString();
+  };
+
+  const events = [
+    // Day -2: 5 events → overflow shows "+2 more"
+    { id: '1', start: at(-2, 9), end: at(-2, 10), patient: 'John Doe', doctor: 'Dr. Smith', location: 'Main Office', type: 'initial' },
+    { id: '2', start: at(-2, 11), end: at(-2, 12), patient: 'Jane Smith', doctor: 'Dr. Johnson', location: 'Branch Office', type: 're-eval' },
+    { id: '3', start: at(-2, 13), end: at(-2, 14), patient: 'Robert Chen', doctor: 'Dr. Lee', location: 'Court House', type: 'deposition' },
+    { id: '4', start: at(-2, 15), end: at(-2, 16), patient: 'Maria Garcia', doctor: 'Dr. Kumar', location: 'Main Office', type: 'initial' },
+    { id: '5', start: at(-2, 16), end: at(-2, 17), patient: 'Sarah Lee', doctor: 'Dr. Smith', location: 'Branch Office', type: 're-eval' },
+    // Day 0 (today): 4 events → overflow shows "+1 more"
+    { id: '6', start: at(0, 9), end: at(0, 10), patient: 'John Doe', doctor: 'Dr. Smith', location: 'Main Office', type: 'initial' },
+    { id: '7', start: at(0, 11), end: at(0, 12, 30), patient: 'Jane Smith', doctor: 'Dr. Johnson', location: 'Branch Office', type: 're-eval' },
+    { id: '8', start: at(0, 14), end: at(0, 16), patient: 'Robert Chen', doctor: 'Dr. Lee', location: 'Court House', type: 'deposition' },
+    { id: '9', start: at(0, 16), end: at(0, 17), patient: 'Bob Wilson', doctor: 'Dr. Kumar', location: 'Main Office', type: 'initial' },
+    // Day +2: 3 overlapping events
+    { id: '10', start: at(2, 9), end: at(2, 11), patient: 'Alex Brown', doctor: 'Dr. Lee', location: 'Branch Office', type: 're-eval' },
+    { id: '11', start: at(2, 10), end: at(2, 12), patient: 'David Park', doctor: 'Dr. Smith', location: 'Main Office', type: 'initial' },
+    { id: '12', start: at(2, 10, 30), end: at(2, 11, 30), patient: 'Sarah Lee', doctor: 'Dr. Johnson', location: 'Court House', type: 'deposition' },
+    // Day +4: 5 events → overflow shows "+2 more"
+    { id: '13', start: at(4, 9), end: at(4, 10), patient: 'Maria Garcia', doctor: 'Dr. Smith', location: 'Branch Office', type: 'initial' },
+    { id: '14', start: at(4, 10), end: at(4, 11), patient: 'John Doe', doctor: 'Dr. Lee', location: 'Main Office', type: 're-eval' },
+    { id: '15', start: at(4, 13), end: at(4, 14), patient: 'Robert Chen', doctor: 'Dr. Johnson', location: 'Court House', type: 'deposition' },
+    { id: '16', start: at(4, 15), end: at(4, 16), patient: 'Bob Wilson', doctor: 'Dr. Kumar', location: 'Branch Office', type: 'initial' },
+    { id: '17', start: at(4, 16), end: at(4, 17), patient: 'Alex Brown', doctor: 'Dr. Smith', location: 'Main Office', type: 're-eval' },
+    // Day +7: 2 events (sparse cell)
+    { id: '18', start: at(7, 9), end: at(7, 10), patient: 'David Park', doctor: 'Dr. Johnson', location: 'Court House', type: 'deposition' },
+    { id: '19', start: at(7, 11), end: at(7, 12), patient: 'Jane Smith', doctor: 'Dr. Lee', location: 'Branch Office', type: 'initial' },
+  ];
+
+  const slots = (() => {
+    const y = today.getFullYear();
+    const m = today.getMonth();
+    const lastDay = new Date(y, m + 1, 0).getDate();
+    const out = {};
+    for (let day = 1; day <= lastDay; day++) {
+      const d = new Date(y, m, day);
+      if (d.getDay() === 0 || d.getDay() === 6) continue;
+      const key = `${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      out[key] = [
+        { startTime: '08:00', endTime: '12:00' },
+        { startTime: '13:00', endTime: '17:00' },
+      ];
+    }
+    return out;
+  })();
+
+  const [viewMode, setViewMode] = useState('calendar');
+  const [range, setRange] = useState(null);
+  const hasSlots = Object.keys(slots).length > 0;
+  const hasEvents = events.length > 0;
+
+  const toDayKey = (date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
+
+  const listRows = useMemo(() => {
+    if (!range || (!hasSlots && !hasEvents)) return [];
+
+    const eventsByDay = new Map();
+
+    for (const event of events) {
+      const dayKey = toDayKey(new Date(event.start));
+      if (!eventsByDay.has(dayKey)) eventsByDay.set(dayKey, []);
+      eventsByDay.get(dayKey).push(event);
+    }
+
+    const rows = [];
+    const cursor = new Date(range.startDate);
+
+    while (cursor <= range.endDate) {
+      const dayKey = toDayKey(cursor);
+      const dayEvents = (eventsByDay.get(dayKey) ?? []).slice().sort((a, b) => a.start.localeCompare(b.start));
+      const slotRanges = (slots[dayKey] ?? []).slice().sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+      if (dayEvents.length > 0 || slotRanges.length > 0) {
+        rows.push({ dayKey, events: dayEvents, slotRanges });
+      }
+
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    return rows;
+  }, [range, hasSlots, hasEvents, events, slots]);
+
+  return (
+    <div className="flex h-[760px] flex-col">
+      <CalendarGrid
+        initialView="week"
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        onRangeChange={setRange}
+        events={events}
+        eventAccessors={{ getId: (e) => e.id, getStartTime: (e) => e.start, getEndTime: (e) => e.end }}
+        slots={slots}
+      >
+        <CalendarGrid.Header>
+          <CalendarGrid.Navigation />
+
+          <div className="flex flex-1 items-center justify-end gap-3">
+            <CalendarGrid.ViewTabs />
+
+            <Divider orientation="vertical" className="h-6" />
+
+            <CalendarGrid.ViewToggle />
+          </div>
+        </CalendarGrid.Header>
+
+        <CalendarGrid.Legend
+          items={[
+            { label: 'Available', colorClass: 'bg-background' },
+            { label: 'Not Available', colorClass: 'bg-muted-100' },
+            { label: 'Initial Evaluation', colorClass: 'bg-secondary-100' },
+            { label: 'Re Evaluation', colorClass: 'bg-primary-100' },
+            { label: 'Deposition', colorClass: 'bg-destructive-200' },
+          ]}
+        />
+
+        <CalendarGrid.EventTemplate>
+          {(event, status) => {
+            const tone = TONES[event.type];
+            const pastDecoration = status === 'past' ? 'line-through' : '';
+            return (
+              <div className={`text-2xs h-full w-full truncate px-1.5 py-0.5 ${tone.bg} ${tone.text} ${pastDecoration}`}>
+                <span className={`me-1 inline-block size-1.5 rounded-full ${tone.dotClass}`} />
+                {formatTime(event.start)} - {event.patient}
+              </div>
+            );
+          }}
+        </CalendarGrid.EventTemplate>
+
+        <CalendarGrid.PopoverTemplate>
+          {(event, onClose) => (
+            <div className="flex w-80 flex-col gap-3 p-4">
+              <div className="border-muted-200 flex items-start justify-between border-b pb-3">
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm font-bold">{event.patient}</span>
+
+                  <Chip variant="muted" className="w-fit">{TYPE_LABELS[event.type]}</Chip>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <TooltipButton title="Reschedule" type="button" variant="ghost" size="icon-sm" onClick={onClose}>
+                    <CalendarClock size={16} />
+                  </TooltipButton>
+
+                  <TooltipButton title="Close" type="button" variant="ghost" size="icon-sm" onClick={onClose}>
+                    <X size={16} />
+                  </TooltipButton>
+                </div>
+              </div>
+
+              <div className="border-muted-200 flex flex-col gap-2 border-b pb-3">
+                <MetaCard
+                  direction="horizontal"
+                  title={<span className="flex items-center gap-2"><Stethoscope size={14} /> Doctor</span>}
+                  description={event.doctor}
+                />
+
+                <MetaCard
+                  direction="horizontal"
+                  title={<span className="flex items-center gap-2"><MapPin size={14} /> Location</span>}
+                  description={event.location}
+                />
+              </div>
+
+              <MetaCard
+                title={<span className="flex items-center gap-2"><Clock size={14} /> Date & Time</span>}
+                description={`${new Date(event.start).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })} ${formatTime(event.start)} - ${formatTime(event.end)}`}
+              />
+            </div>
+          )}
+        </CalendarGrid.PopoverTemplate>
+
+        <CalendarGrid.DayView />
+
+        <CalendarGrid.WeekView />
+
+        <CalendarGrid.MonthView />
+
+        <Conditional.If condition={viewMode === 'list'}>
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto [scrollbar-color:var(--color-muted-200)_transparent] [scrollbar-width:thin]">
+            <Table className={cn(!hasSlots && !hasEvents && 'flex-1')}>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>Day</Table.Head>
+                  <Table.Head>Type</Table.Head>
+                  <Table.Head>From</Table.Head>
+                  <Table.Head>To</Table.Head>
+                  <Table.Head>Doctor</Table.Head>
+                  <Table.Head>Patient</Table.Head>
+                </Table.Row>
+              </Table.Header>
+
+              <Table.Body className="[&_[data-slot=table-row]_td]:h-12 [&_tr:last-child:not([data-slot=table-empty])]:border-b">
+                <Table.Empty
+                  when={!hasSlots && !hasEvents}
+                  colSpan={6}
+                  title="No schedule data"
+                  description="No availability slots or events to display."
+                />
+
+                {listRows.flatMap(({ dayKey, events: dayEvents, slotRanges }) => {
+                  const dayDate = new Date(dayKey);
+                  const dayLabel = `${dayDate.toLocaleDateString('en-US', { weekday: 'short' })} ${dayDate.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}`;
+
+                  if (dayEvents.length === 0) {
+                    return slotRanges.map((slot, idx) => (
+                      <Table.Row key={`${dayKey}-${idx}`}>
+                        <Table.Cell className="font-semibold">{idx === 0 ? dayLabel : ''}</Table.Cell>
+                        <Table.Cell />
+                        <Table.Cell>{slot.startTime}</Table.Cell>
+                        <Table.Cell>{slot.endTime}</Table.Cell>
+                        <Table.Cell />
+                        <Table.Cell />
+                      </Table.Row>
+                    ));
+                  }
+
+                  return dayEvents.map((event, idx) => {
+                    const tone = TONES[event.type];
+                    return (
+                      <Table.Row key={`${dayKey}-${event.id}`}>
+                        <Table.Cell className="font-semibold">{idx === 0 ? dayLabel : ''}</Table.Cell>
+                        <Table.Cell>
+                          <span className={`text-2xs inline-flex items-center gap-1 rounded-md px-2 py-0.5 ${tone.bg} ${tone.text}`}>
+                            <span className={`size-1.5 rounded-full ${tone.dotClass}`} />
+                            {TYPE_LABELS[event.type]}
+                          </span>
+                        </Table.Cell>
+                        <Table.Cell>{formatTime(event.start)}</Table.Cell>
+                        <Table.Cell>{formatTime(event.end)}</Table.Cell>
+                        <Table.Cell>{event.doctor}</Table.Cell>
+                        <Table.Cell>{event.patient}</Table.Cell>
+                      </Table.Row>
+                    );
+                  });
+                })}
+              </Table.Body>
+            </Table>
+          </div>
+        </Conditional.If>
+      </CalendarGrid>
+    </div>
+  );
+};
+
+<CalendarGridDemo />
+
+## Imports
+
+```tsx
+import { CalendarGrid, type CalendarAccessors, type CalendarLegendItem, type CalendarRange, type CalendarView, type CalendarViewMode, type EventTimeStatus, type TimeRange } from '@components/calendar';
+```
+
+## Sub-Components
+
+```
+CalendarGrid.Header           — Header row container; pass Navigation / ViewTabs / ViewToggle as children
+CalendarGrid.Navigation       — Prev / next buttons + current-range label, reads from context
+CalendarGrid.ViewTabs         — Day / Week / Month tab switcher (Tabs primitive)
+CalendarGrid.ViewToggle       — Calendar / list mode toggle (ToggleGroup primitive)
+CalendarGrid.Legend           — Color-coded legend strip (items: { label, colorClass }[])
+CalendarGrid.EventTemplate    — Required when events are provided. Function-as-children: (event, status) => ReactNode. Renders each event card. Omit only when rendering a slot-only calendar (no events).
+CalendarGrid.PopoverTemplate  — Optional slot. Function-as-children: (event, onClose) => ReactNode. When provided, clicking an event opens a popover with this content.
+CalendarGrid.DayView          — Single-day time grid (renders only when view === 'day')
+CalendarGrid.WeekView         — Seven-day time grid with day headers (renders only when view === 'week')
+CalendarGrid.MonthView        — Month grid with overflow popover for >3 events/day (renders only when view === 'month')
+
+(any custom child)            — Renders alongside the views inside the body region. Use this to show alternative content (e.g., a list/table) when the calendar views self-guard out (viewMode === 'list'). See "List mode" example below.
+```
+
+## Props (root)
+
+```
+events            TEvent[]                                 Required   Event objects (generic over TEvent)
+eventAccessors    CalendarAccessors<TEvent>                Required   { getId, getStartTime, getEndTime }
+children          ReactNode                                Required   Slot sub-components. Include <CalendarGrid.EventTemplate> when events are provided; <CalendarGrid.PopoverTemplate> for clickable event popovers; plus Header / Legend / DayView / WeekView / MonthView as needed.
+
+initialView       'day' | 'week' | 'month'                 Optional   Uncontrolled initial view; default 'month'
+initialDate       Date                                     Optional   Uncontrolled initial focused date; default now
+initialViewMode   'calendar' | 'list'                      Optional   Uncontrolled initial mode; default 'calendar'
+
+view              'day' | 'week' | 'month'                 Optional   Controlled view (pair with onViewChange)
+date              Date                                     Optional   Controlled focused date (pair with onDateChange)
+viewMode          'calendar' | 'list'                      Optional   Controlled mode (pair with onViewModeChange)
+onViewChange      (view) => void                           Optional   Fires on user-initiated view change
+onDateChange      (date) => void                           Optional   Fires on user-initiated date navigation
+onViewModeChange  (mode) => void                           Optional   Fires on user-initiated mode toggle
+onRangeChange     (range) => void                          Optional   Fires whenever the visible range changes; { startDate, endDate }
+
+slots             Record<string, TimeRange[]> | null       Optional   Availability slots keyed by ISO date string (YYYY-MM-DD)
+
+startHour         number (default 8)                       Optional   First hour of the time grid (0–23)
+endHour           number (default 24)                      Optional   Last hour of the time grid (1–24, exclusive)
+stepMinutes       number (default 30)                      Optional   Row step in minutes (15 / 30 / 60)
+showStepLabels    boolean (default false)                  Optional   Show labels on every step instead of hour marks only
+nowLine           NowLineMode (default 'in-range')         Optional   Now-indicator visibility on today's column. 'in-range' = show only when current time is between startHour and endHour; 'always' = clamp to top/bottom when out of range; 'off' = never show
+
+isLoading         boolean (default false)                  Optional   Show skeleton; renders calendar once events arrive
+className         string                                   Optional   Forwarded to the root container
+```
+
+## Types
+
+```ts
+type CalendarView = 'day' | 'week' | 'month';
+type CalendarViewMode = 'calendar' | 'list';
+type NowLineMode = 'in-range' | 'always' | 'off'; // re-exported from @components/ui (CalendarTimeGrid)
+type EventTimeStatus = 'past' | 'current' | 'future';
+
+type CalendarAccessors<T> = {
+  getId: (event: T) => string;
+  getStartTime: (event: T) => string; // ISO 8601 datetime
+  getEndTime: (event: T) => string;
+};
+
+type CalendarRange = { startDate: Date; endDate: Date };
+
+type TimeRange = { startTime: string; endTime: string }; // 'HH:mm' format
+
+type CalendarLegendItem = { label: string; colorClass: string }; // colorClass is a Tailwind bg-* utility
+```
+
+## Code
+
+### Basic — minimal compound
+
+```tsx
+<CalendarGrid
+  events={appointments}
+  eventAccessors={{ getId: (e) => e.id, getStartTime: (e) => e.start, getEndTime: (e) => e.end }}
+>
+  <CalendarGrid.EventTemplate>
+    {(event) => <div className="bg-secondary-100 text-secondary text-2xs h-full w-full truncate px-1.5 py-0.5">{event.title}</div>}
+  </CalendarGrid.EventTemplate>
+
+  <CalendarGrid.Header>
+    <CalendarGrid.Navigation />
+
+    <CalendarGrid.ViewTabs />
+  </CalendarGrid.Header>
+
+  <CalendarGrid.DayView />
+
+  <CalendarGrid.WeekView />
+
+  <CalendarGrid.MonthView />
+</CalendarGrid>
+```
+
+### With availability slots
+
+Slots are passed as an object keyed by ISO date (`YYYY-MM-DD`), with each value an array of `{ startTime, endTime }` (`HH:mm`). Cells outside any slot render as "Not Available" (`bg-muted-100`); cells inside a slot render as "Available" (`bg-background`).
+
+```tsx
+const slots = {
+  '2026-04-26': [
+    { startTime: '08:00', endTime: '12:00' },
+    { startTime: '13:00', endTime: '17:00' },
+  ],
+  '2026-04-27': [{ startTime: '09:00', endTime: '15:00' }],
+};
+
+<CalendarGrid
+  events={appointments}
+  eventAccessors={ACCESSORS}
+  slots={slots}
+>
+  <CalendarGrid.EventTemplate>{renderEvent}</CalendarGrid.EventTemplate>
+  {/* other sub-components */}
+</CalendarGrid>
+```
+
+### Slot-only calendar (no events)
+
+When the calendar visualizes availability only (no appointments), pass `events={[]}` and **omit `<CalendarGrid.EventTemplate>` entirely**. The component recognizes the empty events array and skips the EventTemplate requirement — useful for read-only availability viewers, public schedule pages, or "browse availability" flows where no event rendering is needed.
+
+```tsx
+<CalendarGrid
+  events={[]}
+  eventAccessors={ACCESSORS}
+  slots={slots}
+>
+  <CalendarGrid.Header>
+    <CalendarGrid.Navigation />
+
+    <CalendarGrid.ViewTabs />
+  </CalendarGrid.Header>
+
+  <CalendarGrid.Legend
+    items={[
+      { label: 'Available', colorClass: 'bg-background' },
+      { label: 'Not Available', colorClass: 'bg-muted-100' },
+    ]}
+  />
+
+  {/* No EventTemplate or PopoverTemplate needed */}
+
+  <CalendarGrid.DayView />
+
+  <CalendarGrid.WeekView />
+
+  <CalendarGrid.MonthView />
+</CalendarGrid>
+```
+
+If `events.length > 0` and `<CalendarGrid.EventTemplate>` is missing, the component throws at render with a clear error: `"CalendarGrid: <CalendarGrid.EventTemplate> is required when events are provided."`
+
+### With Legend, View Toggle, and Divider
+
+The header row's right-side group uses a `<Divider orientation="vertical">` to separate the view tabs from the calendar/list toggle.
+
+```tsx
+const LEGEND_ITEMS: CalendarLegendItem[] = [
+  { label: 'Available', colorClass: 'bg-background' },
+  { label: 'Not Available', colorClass: 'bg-muted-100' },
+  { label: 'Initial Evaluation', colorClass: 'bg-secondary-100' },
+  { label: 'Re Evaluation', colorClass: 'bg-primary-100' },
+  { label: 'Supplemental', colorClass: 'bg-accent-200' },
+  { label: 'Deposition', colorClass: 'bg-destructive-200' },
+];
+
+<CalendarGrid {...props}>
+  <CalendarGrid.Header>
+    <CalendarGrid.Navigation />
+
+    <div className="flex flex-1 items-center justify-end gap-3">
+      <CalendarGrid.ViewTabs />
+
+      <Divider orientation="vertical" className="h-6" />
+
+      <CalendarGrid.ViewToggle />
+    </div>
+  </CalendarGrid.Header>
+
+  <CalendarGrid.Legend items={LEGEND_ITEMS} />
+
+  <CalendarGrid.DayView />
+
+  <CalendarGrid.WeekView />
+
+  <CalendarGrid.MonthView />
+</CalendarGrid>
+```
+
+### With event popover
+
+`<CalendarGrid.PopoverTemplate>` is an optional slot. Function-as-children receives the event and an `onClose` callback. Omit the slot to disable click-to-popover (events become non-interactive).
+
+```tsx
+<CalendarGrid {...props}>
+  <CalendarGrid.EventTemplate>{renderEvent}</CalendarGrid.EventTemplate>
+
+  <CalendarGrid.PopoverTemplate>
+    {(event, onClose) => (
+      <div className="flex w-80 flex-col gap-3 p-4">
+        <div className="flex items-start justify-between">
+          <span className="text-sm font-bold">{event.patient}</span>
+
+          <TooltipButton title="Close" type="button" variant="ghost" size="icon-sm" onClick={onClose}>
+            <X size={16} />
+          </TooltipButton>
+        </div>
+
+        <MetaCard direction="horizontal" title="Doctor" description={event.doctor} />
+
+        <MetaCard direction="horizontal" title="Location" description={event.location} />
+      </div>
+    )}
+  </CalendarGrid.PopoverTemplate>
+
+  {/* other sub-components */}
+</CalendarGrid>
+```
+
+### Custom event rendering by status
+
+`<CalendarGrid.EventTemplate>` receives `status: 'past' | 'current' | 'future'` as the second arg of its function-as-children. Use it to apply visual treatments such as `line-through` for past events (avoid `opacity-*` on the container — see `CLAUDE.md §4`; use semantic muted tokens or text-decoration instead).
+
+```tsx
+<CalendarGrid.EventTemplate>
+  {(event, status) => {
+    const tone = APPOINTMENT_TYPE_TONES[event.appointmentType];
+    return (
+      <div className={cn('text-2xs h-full w-full truncate px-1.5 py-0.5', tone.bg, tone.text, status === 'past' && 'line-through')}>
+        <span className={cn('me-1 inline-block size-1.5 rounded-full', tone.dotClass)} />
+        {event.title}
+      </div>
+    );
+  }}
+</CalendarGrid.EventTemplate>
+```
+
+### Custom hour range, step, and labels
+
+Restrict the time grid to business hours and switch to 15-minute increments with labels on every step.
+
+```tsx
+<CalendarGrid
+  {...props}
+  startHour={8}
+  endHour={18}
+  stepMinutes={15}
+  showStepLabels
+>
+  {/* sub-components */}
+</CalendarGrid>
+```
+
+### Loading state
+
+When `isLoading` is true and there are no events yet, a skeleton renders instead of the calendar. Once events arrive (or `isLoading` flips to false), the calendar replaces the skeleton.
+
+```tsx
+const eventsQuery = useCalendarEventsQuery(...);
+
+<CalendarGrid
+  isLoading={eventsQuery.isLoading}
+  events={eventsQuery.data?.events ?? []}
+  eventAccessors={ACCESSORS}
+>
+  <CalendarGrid.EventTemplate>{renderEvent}</CalendarGrid.EventTemplate>
+  {/* other sub-components */}
+</CalendarGrid>
+```
+
+### Controlled view + date
+
+Pair `view` / `date` / `viewMode` with their `on*Change` callbacks to drive state from the consumer (e.g., for URL sync).
+
+```tsx
+const [view, setView] = useState<CalendarView>('week');
+const [date, setDate] = useState<Date>(new Date());
+
+<CalendarGrid
+  view={view}
+  date={date}
+  onViewChange={setView}
+  onDateChange={setDate}
+  events={events}
+  eventAccessors={ACCESSORS}
+>
+  <CalendarGrid.EventTemplate>{renderEvent}</CalendarGrid.EventTemplate>
+  {/* other sub-components */}
+</CalendarGrid>
+```
+
+### List mode — render an alternative body
+
+`viewMode: 'calendar' | 'list'` is part of the public API. When the consumer flips to `'list'`, the three calendar views (`DayView` / `WeekView` / `MonthView`) self-guard and return `null`. The consumer can render a custom child (e.g., a `<Table>`) alongside the views — it falls into the body region and shows when calendar views are inactive.
+
+```tsx
+const [viewMode, setViewMode] = useState<CalendarViewMode>('calendar');
+
+<CalendarGrid
+  viewMode={viewMode}
+  onViewModeChange={setViewMode}
+  onRangeChange={setRange}
+  events={events}
+  eventAccessors={ACCESSORS}
+  slots={slots}
+>
+  <CalendarGrid.Header>
+    <CalendarGrid.Navigation />
+    <CalendarGrid.ViewTabs />
+    <CalendarGrid.ViewToggle />
+  </CalendarGrid.Header>
+
+  <CalendarGrid.Legend items={LEGEND} />
+
+  <CalendarGrid.EventTemplate>{renderEvent}</CalendarGrid.EventTemplate>
+
+  <CalendarGrid.DayView />
+  <CalendarGrid.WeekView />
+  <CalendarGrid.MonthView />
+
+  <Conditional.If condition={viewMode === 'list'}>
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+      <Table className={cn(!hasSlots && !hasEvents && 'flex-1')}>
+        <Table.Header>
+          <Table.Row>
+            <Table.Head>Day</Table.Head>
+            <Table.Head>Type</Table.Head>
+            <Table.Head>From</Table.Head>
+            <Table.Head>To</Table.Head>
+            <Table.Head>Doctor</Table.Head>
+            <Table.Head>Patient</Table.Head>
+          </Table.Row>
+        </Table.Header>
+
+        <Table.Body className="[&_[data-slot=table-row]_td]:h-12 [&_tr:last-child:not([data-slot=table-empty])]:border-b">
+          <Table.Empty
+            when={!hasSlots && !hasEvents}
+            colSpan={6}
+            title="No schedule data"
+            description="No availability slots or events to display."
+          />
+          {listRows.flatMap(/* day rows */)}
+        </Table.Body>
+      </Table>
+    </div>
+  </Conditional.If>
+</CalendarGrid>
+```
+
+### Events vs slots — how they're handled
+
+Both modes consume the same `events` and `slots` props but render them differently. Understanding the split avoids accidentally mixing them.
+
+```
+events  — booked appointments (each one becomes an event card / row).
+          Has type, doctor, patient, from, to. Renders inside <EventTemplate>.
+
+slots   — availability windows (the "open" hours per day).
+          Just startTime/endTime per day. Affects the calendar BACKDROP only:
+            - Calendar mode: bg-muted-100 on cells outside any slot's window
+            - Calendar mode: legend "Available" / "Not Available" tints
+            - List mode (consumer): together with events drives the empty state
+              ("No schedule data" — only when BOTH are absent) AND optionally
+              fills From/To when a day has slots but no events
+```
+
+In list mode, the consumer's `listRows` typically grouped by day:
+- Day has events → render event rows (Type chip + From + To + Doctor + Patient)
+- Day has slots only → render slot row (Day + From + To from the slot, other cells blank) — useful as the "doctor is open but no bookings yet" signal
+- Day has neither → filter the day out of the list entirely (sparse months stay readable)
+
+The calendar primitive itself doesn't take an opinion on slot-row rendering — that's a consumer choice for the list body. The empty state is consumer-driven too: render `Table.Empty` only when BOTH `!hasSlots && !hasEvents`. Events without slots still render — never silently discard data.
+
+### React to range changes (data fetching)
+
+`onRangeChange` fires whenever the visible window shifts (navigation, view switch). Wire it to your query hook to refetch the right window.
+
+```tsx
+const [range, setRange] = useState<CalendarRange | null>(null);
+
+const eventsQuery = useCalendarEventsQuery({
+  startDate: range?.startDate,
+  endDate: range?.endDate,
+  enabled: range !== null,
+});
+
+<CalendarGrid
+  onRangeChange={setRange}
+  isLoading={eventsQuery.isLoading}
+  events={eventsQuery.data?.events ?? []}
+  eventAccessors={ACCESSORS}
+>
+  <CalendarGrid.EventTemplate>{renderEvent}</CalendarGrid.EventTemplate>
+  {/* other sub-components */}
+</CalendarGrid>
+```
+
+### Generic typing
+
+The root is generic over `TEvent`. TypeScript infers from `events` + `eventAccessors`. Slot-based templates don't propagate the generic through their children's function signature, so **annotate the function parameter explicitly** in the slot to keep IntelliSense:
+
+```tsx
+<CalendarGrid<AppointmentDto>
+  events={appointments}
+  eventAccessors={{
+    getId: (e) => e.id,                       // e: AppointmentDto (inferred)
+    getStartTime: (e) => `${e.date}T${e.start}`,
+    getEndTime: (e) => `${e.date}T${e.end}`,
+  }}
+>
+  <CalendarGrid.EventTemplate>
+    {(event: AppointmentDto, status) => /* event annotated */}
+  </CalendarGrid.EventTemplate>
+
+  <CalendarGrid.PopoverTemplate>
+    {(event: AppointmentDto, onClose) => /* event annotated */}
+  </CalendarGrid.PopoverTemplate>
+
+  {/* other sub-components */}
+</CalendarGrid>
+```
+
+### Header layout patterns
+
+The `<CalendarGrid.Header>` container is `flex items-center justify-between`. Pass `<Navigation>` first; group the view controls in a flex container on the right.
+
+```tsx
+{/* Navigation only */}
+<CalendarGrid.Header>
+  <CalendarGrid.Navigation />
+</CalendarGrid.Header>
+
+{/* Navigation + tabs */}
+<CalendarGrid.Header>
+  <CalendarGrid.Navigation />
+
+  <CalendarGrid.ViewTabs />
+</CalendarGrid.Header>
+
+{/* Navigation + grouped tabs / divider / toggle */}
+<CalendarGrid.Header>
+  <CalendarGrid.Navigation />
+
+  <div className="flex flex-1 items-center justify-end gap-3">
+    <CalendarGrid.ViewTabs />
+
+    <Divider orientation="vertical" className="h-6" />
+
+    <CalendarGrid.ViewToggle />
+  </div>
+</CalendarGrid.Header>
+```
+
+## Guidelines
+
+- **Compound, context-driven**: `Navigation`, `ViewTabs`, `ViewToggle`, `DayView`, `WeekView`, `MonthView`, `Legend` all read from internal context. They MUST be rendered inside `<CalendarGrid>`.
+- **All three views always**: `DayView`, `WeekView`, and `MonthView` self-guard on the active view (return `null` when not active). Include all three even if you only switch between two — the unused one is free.
+- **Generic over `TEvent`**: Pass the type explicitly as `<CalendarGrid<MyEvent>>` for inferred types in `eventAccessors`. Slot-based templates require explicit param annotation for IntelliSense — see "Generic typing" example below.
+- **Pure Composable API**: `EventTemplate` (required when events are provided; omit for slot-only calendars) and `PopoverTemplate` (optional) are slot sub-components. No render-prop on the root, no IoC stacking — every slot is a child.
+- **Accessor strings only**: `getStartTime` / `getEndTime` return ISO 8601 strings. The internal helpers parse them via `useDate().toLocalDate()`. If your DTO uses `Date` objects, convert at the accessor.
+- **Slots shape is BE-driven**: `slots: Record<string, TimeRange[]>` lets you pass the API response directly with no transformation. The grid computes per-cell availability via interval overlap (no negative-space derivation needed).
+- **Now indicator**: a 1px destructive line shows the current time on today's column in day / week views. No setInterval — it refreshes on natural re-renders.
+- **Month overflow**: in month view, events past the third per day collapse into a "+N more" popover.
+- **Scrollbar gutter**: header row reserves an invisible scrollbar gutter to match the body's scrollbar width — keeps day-column dividers aligned with day-header dividers across the week.
+- **Range callback fires on window shifts**: use `onRangeChange` to drive query refetching. The callback dedupes via the start/end date keys (does not fire when the range object is recomputed but the window is the same).
+- **Legend tokens must match cell tokens**: pass the same Tailwind `bg-*` class the renderer uses for the card background. Don't use `var(--color-*)` for tokens that may not exist in the theme — verify with `bg-*` first.
+- **Loading state**: pass `isLoading` from your query. The component renders a skeleton when loading AND no events; once events arrive, the calendar replaces the skeleton even if the query is still pending.
+- **Accessibility**: root has `role="application"` + `aria-roledescription="calendar"`. Today's day-cell carries `aria-current="date"` in month view.
+- **RTL**: uses logical properties throughout (`border-e`, `pe-*`, `inset-x-*`).

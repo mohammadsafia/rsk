@@ -3,26 +3,65 @@ id: prime-card
 title: PrimeCard
 section: Components
 category: Shared
-description: 'Enhanced card with multiple variants and automatic header styling.'
-tags: [shared, prime-card, card, variants]
+description: 'Enhanced card with multiple variants, configurable props, and compound sub-components for flexible header composition.'
+tags: [shared, prime-card, card, variants, tooltip, description, leading]
 ---
 
 import { PrimeCard } from '@components/shared';
-import { Home, CheckCircle } from 'lucide-react';
+import { CheckCircle, Home, Info, Settings } from 'lucide-react';
 
 ## Demo
 
 <div className="space-y-4">
-  <PrimeCard title="Default Card" icon={<Home size={20} />} variant="default">
-    Card content goes here
+  {/* Configurable: title only */}
+  <PrimeCard title="Title Only" variant="default">
+    Simplest usage with just a title prop.
   </PrimeCard>
 
-<PrimeCard title="Success Card" icon={<CheckCircle size={20} />} variant="success">
-  Operation completed successfully
+{/* Configurable: title + icon */}
+
+<PrimeCard title="With Icon" icon={<Home size={20} />} variant="primary">
+  Icon + title uses Leading grid layout automatically.
 </PrimeCard>
 
-  <PrimeCard title="Elevated Card" variant="elevated">
-    With shadow elevation
+{/* Configurable: title + icon + tooltip */}
+
+<PrimeCard title="With Tooltip" icon={<CheckCircle size={20} />} tooltip="This is a helpful hint shown on hover." variant="success">
+  Tooltip appears as an info icon next to the title. Use for longer explanations.
+</PrimeCard>
+
+{/* Configurable: title + icon + description */}
+
+<PrimeCard title="With Description" icon={<Settings size={20} />} description="CMS 1500 Box 33" variant="secondary">
+  Description is always visible below the title. Use for short references (few words).
+</PrimeCard>
+
+{/* Configurable: title + tooltip (no icon) */}
+
+<PrimeCard title="Tooltip Without Icon" tooltip="No icon, no Leading grid — flat layout." variant="info">
+  Without an icon, Leading renders as display:contents so no grid is applied.
+</PrimeCard>
+
+{/* Compound: full control */}
+
+  <PrimeCard variant="gradient">
+    <PrimeCard.Header>
+      <PrimeCard.Leading>
+        <Info size={20} />
+
+        <PrimeCard.Title>
+          Compound Usage
+          <PrimeCard.Tooltip>Full control over header composition using sub-components.</PrimeCard.Tooltip>
+        </PrimeCard.Title>
+
+        <PrimeCard.Description>Short reference</PrimeCard.Description>
+      </PrimeCard.Leading>
+    </PrimeCard.Header>
+
+    <PrimeCard.Content>
+      Use compound sub-components when you need custom header layouts beyond the configurable props.
+    </PrimeCard.Content>
+
   </PrimeCard>
 </div>
 
@@ -35,7 +74,30 @@ import { PrimeCard } from '@components/shared';
 ## Code
 
 ```tsx
-<PrimeCard title="Card Title" icon={<Icon />} variant="default | primary | success | danger | warning | info | elevated | glass">
+// Configurable usage (shorthand props)
+<PrimeCard title="Card Title" icon={<Icon />} tooltip="Hint text" description="Short ref" variant="primary">
   Content
 </PrimeCard>
+
+// Compound usage (full control)
+<PrimeCard variant="primary">
+  <PrimeCard.Header>
+    <PrimeCard.Leading>
+      <Icon />
+
+      <PrimeCard.Title>
+        Title
+        <PrimeCard.Tooltip>Hint text for longer explanations</PrimeCard.Tooltip>
+      </PrimeCard.Title>
+
+      <PrimeCard.Description>Short reference (few words)</PrimeCard.Description>
+    </PrimeCard.Leading>
+  </PrimeCard.Header>
+
+  <PrimeCard.Content>Content</PrimeCard.Content>
+</PrimeCard>
+
+// Available variants
+variant="default" | "primary" | "secondary" | "success" | "destructive" | "warning" | "info" |
+        "outline" | "outline-secondary" | "glass" | "gradient"
 ```

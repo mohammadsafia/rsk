@@ -1,0 +1,162 @@
+---
+id: file-icon
+title: FileIcon
+section: Components
+category: Shared
+description: 'Pure visual primitive for file-extension iconography. Maps an extension string to a sized icon, with an optional chip variant that adds an uppercase label.'
+tags: [shared, file-icon, file, extension, icon, chip, badge]
+---
+
+import { FileIcon } from '@components/shared';
+
+## Plain Variant
+
+Default. Renders the extension's icon at the requested size, in the muted token. Useful for inline contexts (list rows, breadcrumbs, secondary surfaces).
+
+<div className="flex flex-wrap items-center gap-4 rounded-lg border bg-muted-50 p-4">
+  <FileIcon extension="pdf" />
+
+  <FileIcon extension="docx" />
+
+  <FileIcon extension="xlsx" />
+
+  <FileIcon extension="png" />
+
+  <FileIcon extension="mp4" />
+
+  <FileIcon extension="mp3" />
+
+  <FileIcon extension="pptx" />
+
+  <FileIcon extension="zip" />
+</div>
+
+## Chip Variant
+
+Primary-tinted background with an uppercase extension label. Matches the file-card header chip in the design.
+
+<div className="flex flex-wrap items-center gap-3 rounded-lg border bg-muted-50 p-4">
+  <FileIcon extension="pdf" variant="chip" />
+
+  <FileIcon extension="doc" variant="chip" />
+
+  <FileIcon extension="docx" variant="chip" />
+
+  <FileIcon extension="xlsx" variant="chip" />
+
+  <FileIcon extension="csv" variant="chip" />
+
+  <FileIcon extension="png" variant="chip" />
+
+  <FileIcon extension="mp4" variant="chip" />
+
+  <FileIcon extension="mp3" variant="chip" />
+</div>
+
+## Size
+
+`size` controls the icon glyph's pixel size. Default is `20`. Chip padding stays constant — the chip sizes itself from the icon.
+
+<div className="flex flex-wrap items-center gap-4 rounded-lg border bg-muted-50 p-4">
+  <FileIcon extension="pdf" size={16} />
+
+  <FileIcon extension="pdf" size={20} />
+
+  <FileIcon extension="pdf" size={24} />
+
+  <FileIcon extension="pdf" size={32} />
+
+  <FileIcon extension="docx" variant="chip" size={16} />
+
+  <FileIcon extension="docx" variant="chip" size={20} />
+
+  <FileIcon extension="docx" variant="chip" size={24} />
+
+  <FileIcon extension="docx" variant="chip" size={32} />
+</div>
+
+## Extension Normalization
+
+The component accepts dotted (`.pdf`), undotted (`pdf`), uppercase (`PDF`), or mixed-case (`Docx`) inputs. Unknown / null / undefined fall back to a generic file icon — and the chip variant suppresses the label for unknowns.
+
+<div className="flex flex-wrap items-center gap-3 rounded-lg border bg-muted-50 p-4">
+  <FileIcon extension=".pdf" variant="chip" />
+
+  <FileIcon extension="PDF" variant="chip" />
+
+  <FileIcon extension="Docx" variant="chip" />
+
+  <FileIcon extension="zip" variant="chip" />
+
+  <FileIcon extension={null} variant="chip" />
+
+  <FileIcon extension={undefined} variant="chip" />
+</div>
+
+## Inside a Card Header
+
+Typical use — the chip variant pairs with a title in a card header. Pure visual; no side effects, no API calls, no context.
+
+<div className="flex items-center gap-2 rounded-lg border bg-background p-4 max-w-sm">
+  <FileIcon extension="docx" variant="chip" size={16} />
+
+  <span className="text-base font-bold">Party Notice</span>
+</div>
+
+## Imports
+
+```tsx
+import { FileIcon, type FileExtension } from '@components/shared';
+```
+
+## Props
+
+| Prop        | Type                                        | Default   | Description                                                                                                |
+| ----------- | ------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------- |
+| `extension` | `string \| null \| undefined`                | required  | File extension, with or without a leading dot. Case-insensitive. Unknown / nullish falls back to a generic file icon. |
+| `variant`   | `'plain' \| 'chip'`                          | `'plain'` | `'plain'` renders the icon only. `'chip'` adds a primary-tinted background with an uppercase label.        |
+| `size`      | `number`                                    | `20`      | Icon glyph pixel size. The chip's outer padding is constant; only the glyph resizes.                       |
+| `className` | `string`                                    | —         | Pass-through to the outer `<span>`.                                                                        |
+| ...rest     | `ComponentProps<'span'>` minus `'children'`  | —         | All native span props (`id`, `aria-*`, `data-*`, `onClick`, etc.).                                         |
+
+## Code
+
+```tsx
+{/* Plain — inline use */}
+<FileIcon extension="pdf" />
+
+{/* Chip — header / badge use */}
+<FileIcon extension="docx" variant="chip" size={16} />
+
+{/* Generic fallback for unknown extensions */}
+<FileIcon extension={file.extension} variant="chip" />
+
+{/* Typed extension narrowing — the FileExtension union is exported */}
+const isKnownExtension = (e: string | null | undefined): e is FileExtension => {
+  // narrow at the call site — the icon component handles the unknown case visually
+};
+```
+
+## Supported Extensions
+
+The icon mapping is a fixed `Record<FileExtension, LucideIcon>`. Anything outside the union falls back to a generic file icon at runtime.
+
+```ts
+type FileExtension =
+  | 'pdf' | 'doc' | 'docx' | 'txt' | 'csv'
+  | 'xls' | 'xlsx'
+  | 'ppt' | 'pptx'
+  | 'jpg' | 'jpeg' | 'png' | 'gif'
+  | 'mp3' | 'wav' | 'ogg' | 'webm'
+  | 'mp4' | 'avi' | 'mov' | 'mkv';
+```
+
+| Group        | Extensions                              | Icon              |
+| ------------ | --------------------------------------- | ----------------- |
+| Document     | `pdf`, `doc`, `docx`, `txt`             | `FileText`        |
+| Spreadsheet  | `csv`, `xls`, `xlsx`                    | `FileSpreadsheet` |
+| Presentation | `ppt`, `pptx`                           | `File`            |
+| Image        | `jpg`, `jpeg`, `png`, `gif`             | `FileImage`       |
+| Audio        | `mp3`, `wav`, `ogg`, `webm`             | `FileAudio`       |
+| Video        | `mp4`, `avi`, `mov`, `mkv`              | `FileVideo`       |
+| Unknown      | anything else (incl. `null`/`undefined`) | `File`            |

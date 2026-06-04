@@ -3,7 +3,7 @@ id: meta-card
 title: MetaCard
 section: Components
 category: Shared
-description: 'Card for displaying metadata with optional image, loading state, and flexible content.'
+description: 'Card for displaying metadata with optional image, loading state, truncation, and flexible direction.'
 tags: [shared, meta-card, card, metadata]
 ---
 
@@ -11,10 +11,31 @@ import { MetaCard } from '@components/shared';
 
 ## Demo
 
-<div className="space-y-4">
-  <MetaCard title="User Name" subtitle="Role" description="john.doe@example.com" />
-  <MetaCard title="Status" subtitle="Active" imageURL="https://via.placeholder.com/100" />
-  <MetaCard title="Loading" isLoading />
+### Default (vertical)
+
+<div className="flex gap-4">
+  <MetaCard title="Doctor Name" subtitle="Dr. John Doe" description="john.doe@example.com" />
+  <MetaCard title="Status" subtitle="Active" />
+  <MetaCard title="With Image" subtitle="Avatar" imageURL="https://via.placeholder.com/100" />
+</div>
+
+### Horizontal direction
+
+<div className="max-w-sm space-y-2">
+  <MetaCard direction="horizontal" title="Name" description="Dr. John Doe" />
+  <MetaCard direction="horizontal" title="Email" description="john.doe@example.com" />
+</div>
+
+### Truncated text
+
+<div className="max-w-xs">
+  <MetaCard title="Email Address" truncate description="doctor.abbieankunding.415943@meccasoft.com" />
+</div>
+
+### Loading state
+
+<div className="max-w-xs">
+  <MetaCard isLoading />
 </div>
 
 ## Imports
@@ -26,5 +47,28 @@ import { MetaCard } from '@components/shared';
 ## Code
 
 ```tsx
-<MetaCard title="Title" subtitle="Subtitle" description="Description" imageURL="url" isLoading={false} />
+{
+  /* Default vertical */
+}
+<MetaCard title="Title" subtitle="Subtitle" description="Description" />;
+
+{
+  /* With truncation */
+}
+<MetaCard title="Email" truncate description="very.long.email@example.com" />;
+
+{
+  /* Horizontal direction */
+}
+<MetaCard direction="horizontal" title="Label" description="Value" />;
+
+{
+  /* With image */
+}
+<MetaCard title="Avatar" imageURL="/path/to/image.png" />;
+
+{
+  /* Loading */
+}
+<MetaCard isLoading />;
 ```
