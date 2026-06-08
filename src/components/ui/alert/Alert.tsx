@@ -27,10 +27,10 @@ const alertVariants = cva(
     variants: {
       variant: {
         default: 'bg-muted-50 text-muted-foreground border border-muted-200 [&>svg]:text-muted-foreground',
-        info: 'bg-primary-15 text-primary border border-primary-25 [&>svg]:text-primary',
-        destructive: 'bg-destructive-200 text-destructive border border-destructive-300 [&>svg]:text-destructive',
-        warning: 'bg-warning-200 text-warning border border-warning-300 [&>svg]:text-warning',
-        success: 'bg-success-200 text-success border border-success-300 [&>svg]:text-success',
+        info: 'bg-primary-15 text-foreground border border-primary-25 [&>svg]:text-primary',
+        destructive: 'bg-destructive-200 text-foreground border border-destructive-300 [&>svg]:text-destructive',
+        warning: 'bg-warning-200 text-foreground border border-warning-300 [&>svg]:text-warning',
+        success: 'bg-success-200 text-foreground border border-success-300 [&>svg]:text-success',
         outline: 'border border-primary-400 text-primary [&>svg]:text-primary',
         'outline-info': 'border border-muted-400 bg-background text-foreground [&>svg]:text-foreground',
         'outline-destructive': 'border border-destructive-400 text-destructive [&>svg]:text-destructive',

@@ -70,7 +70,7 @@ const Head = ({ className, ...props }: TableHeadProps) => (
   <th
     data-slot="table-head"
     className={cn(
-      'bg-primary-25 text-primary px-6 py-3 text-start align-middle text-xs font-bold [&:has([role=checkbox])]:pe-0',
+      'bg-primary-25 text-primary-700 px-6 py-3 text-start align-middle text-xs font-bold [&:has([role=checkbox])]:pe-0',
       className,
     )}
     {...props}

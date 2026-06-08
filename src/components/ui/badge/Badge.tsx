@@ -21,9 +21,9 @@ export const badgeVariants = cva('inline-flex items-center gap-1 font-normal tex
       destructive: `**:data-[slot=badge-dot]:text-destructive`,
       warning: `**:data-[slot=badge-dot]:text-warning`,
       muted: `**:data-[slot=badge-dot]:text-muted-foreground`,
-      secondary: `**:data-[slot=badge-dot]:text-secondary`,
+      secondary: `**:data-[slot=badge-dot]:text-secondary-600`,
       neutral: `**:data-[slot=badge-dot]:text-primary-900`,
-      accent: `**:data-[slot=badge-dot]:text-accent`,
+      accent: `**:data-[slot=badge-dot]:text-primary-400`,
     },
   },
   defaultVariants: {

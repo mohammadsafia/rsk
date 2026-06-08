@@ -26,7 +26,7 @@ const fieldSectionHeaderVariants = cva('text-sm', {
     variant: {
       default: 'text-foreground font-medium',
       primary: 'text-primary font-medium',
-      secondary: 'text-secondary font-medium',
+      secondary: 'text-muted-foreground font-medium',
       subtle: 'text-muted-400',
     },
   },
