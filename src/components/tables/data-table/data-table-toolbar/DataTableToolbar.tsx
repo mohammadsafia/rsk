@@ -79,7 +79,7 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
           <button
             type="button"
             className={cn(
-              'border-muted-200 text-muted relative flex cursor-pointer items-center gap-2 rounded-se-2xl border-s px-6 text-sm font-normal',
+              'border-muted-200 text-muted-foreground relative flex cursor-pointer items-center gap-2 rounded-se-2xl border-s px-6 text-sm font-normal',
               showFilters ? 'bg-primary-25' : 'rounded-ee-2xl',
             )}
             onClick={onToggleFilters}

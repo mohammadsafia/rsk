@@ -62,7 +62,7 @@ const ComboboxTrigger: FC<ComboboxTriggerProps> = ({ className, children, ...pro
     role="combobox"
     className={cn(
       'group/combobox-trigger bg-background relative flex w-full cursor-pointer items-center gap-2 rounded-md border p-3 text-sm shadow-xs',
-      'text-muted border-muted-200 transition-[color,box-shadow]',
+      'text-muted-foreground border-muted-200 transition-[color,box-shadow]',
       'data-[state=open]:border-primary data-[state=open]:ring-primary data-[state=open]:ring',
       'hover:not-disabled:border-primary hover:not-disabled:ring-primary hover:not-disabled:ring',
       'focus-visible:ring-primary focus-visible:border-primary focus-visible:ring focus-visible:outline-none',

@@ -18,7 +18,7 @@ type FormLabelProps = ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &
   };
 
 const labelVariants = cva(
-  'text-muted inline-block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+  'text-muted-foreground inline-block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
 );
 
 const FormLabel: FC<FormLabelProps> = ({ className, error, children, tooltip, required, hidden, ...props }) => {

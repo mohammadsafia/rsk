@@ -34,7 +34,7 @@ const NavButton = ({ className, isActive, ...props }: PaginationLinkProps) => (
       'inline-flex cursor-pointer items-center justify-center rounded-full px-3 py-2 text-xs font-medium transition-colors',
       'size-9 outline-none',
       'disabled:pointer-events-none disabled:opacity-50',
-      isActive ? 'bg-primary text-primary-foreground' : 'text-muted-400 hover:text-primary-900 hover:bg-muted-50',
+      isActive ? 'bg-primary text-primary-foreground dark:bg-primary-300' : 'text-muted-400 hover:text-primary-900 hover:bg-muted-50',
       className,
     )}
     {...props}

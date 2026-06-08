@@ -29,7 +29,7 @@ const primeDropdownItemVariants = cva('', {
   variants: {
     variant: {
       primary: '',
-      destructive: 'text-destructive hover:bg-destructive hover:not-disabled:text-destructive-foreground',
+      destructive: 'text-destructive hover:bg-destructive dark:hover:bg-destructive-400 hover:not-disabled:text-destructive-foreground',
     },
   },
   defaultVariants: { variant: 'primary' },

@@ -20,7 +20,7 @@ function PrimeLoader({ withOverlay = true, message = 'Please Wait ...', ..._ }: 
         </svg>
       </div>
 
-      <p className="text-muted mt-4 text-sm">{message}</p>
+      <p className="text-muted-foreground mt-4 text-sm">{message}</p>
     </div>
   );
 }

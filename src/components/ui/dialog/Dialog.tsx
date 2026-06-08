@@ -87,7 +87,7 @@ const DialogHeaderTitle: FC<ComponentPropsWithoutRef<typeof DialogPrimitive.Titl
 );
 
 const DialogHeaderDescription: FC<ComponentPropsWithoutRef<typeof DialogPrimitive.Description>> = ({ className, ...props }) => (
-  <DialogPrimitive.Description data-slot="dialog-description" className={cn('text-muted text-sm', className)} {...props} />
+  <DialogPrimitive.Description data-slot="dialog-description" className={cn('text-muted-foreground text-sm', className)} {...props} />
 );
 
 const DialogContent: FC<DialogContentProps> = ({ className, ...props }) => (

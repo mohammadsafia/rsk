@@ -33,7 +33,7 @@ const tabsTriggerVariants = cva(
   `
   inline-flex cursor-pointer items-center justify-center rounded-[inherit] px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors
   focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50
-  data-[state=active]:bg-primary data-[state=active]:font-bold data-[state=active]:text-surface hover:bg-primary-15 hover:text-foreground
+  data-[state=active]:bg-primary data-[state=active]:font-bold data-[state=active]:text-surface dark:data-[state=active]:bg-primary-300 hover:bg-primary-15 hover:text-foreground
   `,
   {
     variants: {

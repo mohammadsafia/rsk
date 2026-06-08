@@ -124,7 +124,7 @@ const Legend: FC<LegendProps> = ({ items, className, ...props }) => (
       <div key={item.label} data-slot="calendar-grid-legend-item" className="flex items-center gap-2">
         <span aria-hidden="true" className={cn('border-muted-200 size-3 shrink-0 rounded-full border', item.colorClass)} />
 
-        <span className="text-muted text-xs">{item.label}</span>
+        <span className="text-muted-foreground text-xs">{item.label}</span>
       </div>
     ))}
   </div>

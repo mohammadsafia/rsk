@@ -34,12 +34,12 @@ function CalendarDayButton({ className, day, modifiers, ...props }: ComponentPro
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        // Today styling (only when not selected)
-        isTodayOnly && 'bg-primary-400 text-primary-foreground rounded-md',
+        // Today styling (only when not selected) — soft highlight, readable + distinct from selected
+        isTodayOnly && 'bg-primary-15 text-primary font-semibold rounded-md',
         // Selected date styling
-        isSelected && 'bg-primary text-primary-foreground rounded-md',
+        isSelected && 'bg-primary text-primary-foreground rounded-md dark:bg-primary-300',
         // Range styling
-        'data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground',
+        'data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary dark:data-[range-start=true]:bg-primary-300 data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary dark:data-[range-end=true]:bg-primary-300 data-[range-end=true]:text-primary-foreground',
         // Focus and layout
         'group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px]',
         // Range border radius
@@ -183,15 +183,15 @@ function Calendar({
           'select-none font-medium',
           captionLayout === 'label'
             ? 'text-sm'
-            : 'rounded-md pl-2 pr-1 flex items-center gap-1 text-sm h-8 [&>svg]:text-muted [&>svg]:size-3.5',
+            : 'rounded-md pl-2 pr-1 flex items-center gap-1 text-sm h-8 [&>svg]:text-muted-foreground [&>svg]:size-3.5',
           defaultClassNames.caption_label,
         ),
         table: 'w-full border-collapse',
         weekdays: cn('flex', defaultClassNames.weekdays),
-        weekday: cn('text-muted rounded-md flex-1 font-normal text-[0.8rem] select-none', defaultClassNames.weekday),
+        weekday: cn('text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem] select-none', defaultClassNames.weekday),
         week: cn('flex w-full mt-2', defaultClassNames.week),
         week_number_header: cn('select-none w-(--cell-size)', defaultClassNames.week_number_header),
-        week_number: cn('text-[0.8rem] select-none text-muted', defaultClassNames.week_number),
+        week_number: cn('text-[0.8rem] select-none text-muted-foreground', defaultClassNames.week_number),
         day: cn(
           'relative w-full h-full p-0 text-center [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none',
           props.showWeekNumber
@@ -203,8 +203,8 @@ function Calendar({
         range_middle: cn('rounded-none', defaultClassNames.range_middle),
         range_end: cn('rounded-r-md bg-accent', defaultClassNames.range_end),
         today: cn('bg-accent text-accent-foreground rounded-md', defaultClassNames.today),
-        outside: cn('text-muted aria-selected:text-muted', defaultClassNames.outside),
-        disabled: cn('text-muted opacity-50', defaultClassNames.disabled),
+        outside: cn('text-muted-foreground aria-selected:text-muted-foreground', defaultClassNames.outside),
+        disabled: cn('text-muted-foreground opacity-50', defaultClassNames.disabled),
         hidden: cn('invisible', defaultClassNames.hidden),
         ...classNames,
       }}

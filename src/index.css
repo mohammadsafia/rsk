@@ -154,7 +154,7 @@
     --muted-200: oklch(0.92 0.008 256);        /* slate-200 borders/dividers */
     --muted-300: oklch(0.45 0.03 257);         /* tertiary text */
     --muted-400: oklch(0.50 0.03 257);         /* secondary text */
-    --muted-foreground: oklch(0.55 0.03 257);  /* slate-500 #64748B */
+    --muted-foreground: oklch(0.52 0.03 257);  /* AA on subtle panels (was 0.55) */
 
     --surface: oklch(0.985 0.003 256);
     --surface-15: oklch(0.985 0.003 256 / 15%);
@@ -169,19 +169,19 @@
     --accent-400: oklch(0.78 0.13 264);
     --accent-foreground: oklch(0.21 0.03 264);
 
-    --success: oklch(0.72 0.16 157) !important;
+    --success: oklch(0.52 0.15 157) !important;  /* AA: white label + green text both pass (was 0.72) */
     --success-200: oklch(0.97 0.013 160);
     --success-300: oklch(0.95 0.025 158);
     --success-400: oklch(0.85 0.10 157);
     --success-foreground: oklch(0.99 0 0);
 
-    --destructive: oklch(0.60 0.23 28) !important;
+    --destructive: oklch(0.55 0.22 28) !important;  /* AA: white label + red text both pass (was 0.60) */
     --destructive-200: oklch(0.96 0.016 17);
     --destructive-300: oklch(0.92 0.036 18);
     --destructive-400: oklch(0.70 0.16 22);
     --destructive-foreground: oklch(0.99 0 0);
 
-    --warning: oklch(0.82 0.17 78) !important;
+    --warning: oklch(0.62 0.15 74) !important;  /* deeper amber: readable as text + AA fill (was 0.82) */
     --warning-200: oklch(0.97 0.039 88);
     --warning-300: oklch(0.94 0.072 88);
     --warning-400: oklch(0.87 0.148 85);
@@ -213,8 +213,8 @@
     --primary-25:  oklch(0.28 0.05 264);
     --primary-50:  oklch(0.32 0.07 264);
     --primary-100: oklch(0.38 0.10 264);
-    --primary-200: oklch(0.45 0.14 264);
-    --primary-300: oklch(0.53 0.17 264);
+    --primary-200: oklch(0.44 0.14 264);       /* dark button-fill hover (white label AA) */
+    --primary-300: oklch(0.50 0.17 264);       /* dark button fill (white label AA) */
     --primary-400: oklch(0.58 0.18 264);
     --primary-600: oklch(0.68 0.17 264);
     --primary-700: oklch(0.75 0.14 262);
@@ -243,7 +243,7 @@
     --muted-100: oklch(0.24 0.007 264);
     --muted-200: oklch(0.30 0.008 264);
     --muted-300: oklch(0.60 0.01 264);
-    --muted-400: oklch(0.55 0.01 264);
+    --muted-400: oklch(0.64 0.01 264);         /* AA secondary text on dark bg (was 0.55) */
     --muted-foreground: oklch(0.68 0.012 264);
 
     --surface: oklch(1 0 0);                     /* always-light: white text/surface on brand */
@@ -268,7 +268,7 @@
     --destructive: oklch(0.65 0.20 25);
     --destructive-200: oklch(0.22 0.08 25);
     --destructive-300: oklch(0.35 0.12 22);
-    --destructive-400: oklch(0.55 0.18 24);
+    --destructive-400: oklch(0.50 0.18 25);    /* dark destructive button fill (white label AA) */
     --destructive-foreground: oklch(0.99 0 0);
 
     --warning: oklch(0.75 0.15 70);

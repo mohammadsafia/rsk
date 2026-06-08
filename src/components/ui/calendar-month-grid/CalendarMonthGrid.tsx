@@ -38,7 +38,7 @@ const Weekdays: FC<WeekdaysProps> = ({ className, ...props }) => (
 const Weekday: FC<WeekdayProps> = ({ className, ...props }) => (
   <div
     data-slot="calendar-month-grid-weekday"
-    className={cn('text-muted border-muted-200 border-e border-t py-2 text-center text-sm font-semibold last:border-e-0', className)}
+    className={cn('text-muted-foreground border-muted-200 border-e border-t py-2 text-center text-sm font-semibold last:border-e-0', className)}
     {...props}
   />
 );

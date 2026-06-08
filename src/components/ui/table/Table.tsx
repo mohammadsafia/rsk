@@ -82,7 +82,7 @@ const Cell = ({ className, ...props }: TableCellProps) => (
 );
 
 const Caption = ({ className, ...props }: TableCaptionProps) => (
-  <caption data-slot="table-caption" className={cn('text-muted mt-4 text-sm', className)} {...props} />
+  <caption data-slot="table-caption" className={cn('text-muted-foreground mt-4 text-sm', className)} {...props} />
 );
 
 const Empty = ({

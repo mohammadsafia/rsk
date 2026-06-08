@@ -41,7 +41,7 @@ type CommandComponent = FC<CommandProps> & {
 
 const CommandInput: FC<CommandInputProps> = ({ className, children, ...props }) => (
   <div className="border-b-muted-200 flex items-center gap-2 border-b px-3" cmdk-input-wrapper="">
-    <Search size={16} className="text-muted shrink-0" />
+    <Search size={16} className="text-muted-foreground shrink-0" />
 
     <CommandPrimitive.Input
       data-slot="command-input"

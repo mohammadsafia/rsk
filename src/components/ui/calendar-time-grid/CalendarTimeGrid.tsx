@@ -65,7 +65,7 @@ const Header: FC<HeaderProps> = ({ dayName, dayNumber, isToday, className, ...pr
     )}
     {...props}
   >
-    <span className="text-muted text-sm font-semibold">{dayName}</span>
+    <span className="text-muted-foreground text-sm font-semibold">{dayName}</span>
 
     <span
       className={cn(
