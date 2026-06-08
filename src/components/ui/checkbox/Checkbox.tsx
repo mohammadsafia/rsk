@@ -20,17 +20,17 @@ const checkboxVariants = cva(
     variants: {
       variant: {
         secondary: [
-          'data-[state=checked]:border-secondary data-[state=checked]:bg-secondary data-[state=checked]:text-secondary-foreground',
-          'data-[state=checked]:hover:not-disabled:border-secondary data-[state=checked]:hover:not-disabled:ring-secondary',
+          'data-[state=checked]:border-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background',
+          'data-[state=checked]:hover:not-disabled:border-foreground data-[state=checked]:hover:not-disabled:ring-muted-400',
         ],
         primary: [
-          'data-[state=checked]:border-muted-400 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground',
+          'data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:border-primary-300 dark:data-[state=checked]:bg-primary-300',
           'data-[state=checked]:hover:not-disabled:border-primary data-[state=checked]:hover:not-disabled:ring-primary',
         ],
       },
     },
     defaultVariants: {
-      variant: 'secondary',
+      variant: 'primary',
     },
   },
 );

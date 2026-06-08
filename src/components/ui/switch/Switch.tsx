@@ -23,7 +23,7 @@ const switchRootVariants = cva(
         default: 'data-[state=checked]:bg-primary',
         success: 'data-[state=checked]:bg-success',
         destructive: 'data-[state=checked]:bg-destructive',
-        secondary: 'data-[state=checked]:bg-secondary',
+        secondary: 'data-[state=checked]:bg-secondary-600',
       },
     },
     defaultVariants: {
