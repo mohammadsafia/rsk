@@ -13,7 +13,7 @@ function DashboardLayout() {
       <div className="bg-canvas flex h-dvh flex-col gap-2 overflow-hidden p-2 md:flex-row">
         <DashboardSidebar />
 
-        <div className="bg-background border-border shadow-spread flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border">
+        <div className="border-border shadow-spread flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border">
           <DashboardHeader />
 
           <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
