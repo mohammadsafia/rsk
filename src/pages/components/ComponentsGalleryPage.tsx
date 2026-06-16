@@ -23,9 +23,13 @@ import {
 } from '@component-docs/gallery';
 import { getComponentDocsRegistry, normalizeCategoryKey } from '@component-docs/registry';
 
+import { useAppTranslation } from '@hooks/shared';
+
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
 const ComponentDocsGalleryPage = () => {
+  const { t } = useAppTranslation('components');
+
   const allDocs = useMemo(() => getComponentDocsRegistry(), []);
 
   const defaultCategoryKey = normalizeCategoryKey(allDocs[0]?.category);
@@ -133,9 +137,9 @@ const ComponentDocsGalleryPage = () => {
       <div className="mx-auto w-full max-w-480 px-6 py-8">
         <header className="mb-8 flex items-start justify-between">
           <div>
-            <h1 className="text-primary-900 text-2xl font-bold">Components Gallery</h1>
+            <h1 className="text-primary-900 text-2xl font-bold">{t('gallery.title')}</h1>
 
-            <p className="text-muted-400 mt-1 text-sm">Browse and explore components with live demos and usage examples.</p>
+            <p className="text-muted-400 mt-1 text-sm">{t('gallery.subtitle')}</p>
           </div>
 
           <Button variant="ghost-muted" size="icon-sm" onClick={toggleSidebar} className="mt-1">

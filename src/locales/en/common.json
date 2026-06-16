@@ -10,11 +10,33 @@
   "next": "Next",
   "previous": "Previous",
   "search": "Search",
+  "searchHere": "Search Here",
   "loading": "Loading…",
   "noResults": "No results found.",
+  "clearFilters": "Clear filters",
+  "clearAll": "Clear All",
+  "filter": "Filter",
+  "selectedCount": "{{count}} selected",
   "yes": "Yes",
   "no": "No",
   "actions": "Actions",
+  "empty": {
+    "title": "No Results Found",
+    "description": "No results found for your search. Please try again with different keywords."
+  },
+  "confirmDialog": {
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "breadcrumb": {
+    "root": "Dashboard"
+  },
+  "table": {
+    "total": "Total: {{count}} {{label}}",
+    "rowsPerPage": "Rows per page",
+    "emptyTitle": "No Results Found",
+    "emptyDescription": "No results found for your search. Please try again with different keywords."
+  },
   "pagination": {
     "previous": "Previous",
     "next": "Next",

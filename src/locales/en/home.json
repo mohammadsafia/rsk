@@ -1,0 +1,94 @@
+{
+  "nav": {
+    "brand": "RSK",
+    "logoAlt": "RSK logo",
+    "features": "Features",
+    "components": "Components",
+    "github": "GitHub"
+  },
+  "hero": {
+    "eyebrow": "React · TypeScript · Vite",
+    "titleLead": "The foundation for what's ",
+    "titleEmphasis": "next",
+    "titleTrail": ".",
+    "subtitle": "A considered starter for developers who value craft. 76 components, enterprise patterns, and zero compromise — wired together so you can ship on day one.",
+    "ctaPrimary": "Get Started",
+    "ctaSecondary": "Browse Components"
+  },
+  "stats": {
+    "uiComponents": "UI Components",
+    "formComponents": "Form Components",
+    "mdxDocs": "MDX Docs",
+    "sharedComponents": "Shared Components"
+  },
+  "techStack": {
+    "builtOn": "Built on"
+  },
+  "features": {
+    "eyebrow": "What's inside",
+    "title": "Everything wired, nothing in your way.",
+    "componentLibrary": {
+      "title": "Component Library",
+      "desc": "35 Radix UI primitives with CVA variants. Compound component patterns — Dialog.Header, Tabs.List, Card.Content. Dark mode ready. Fully typed with TypeScript generics."
+    },
+    "formSystem": {
+      "title": "Form System",
+      "desc": "17 form components powered by React Hook Form and Zod. Input masks, number formatting, date pickers, file uploaders, and async comboboxes with infinite scroll."
+    },
+    "dataTables": {
+      "title": "Data Tables",
+      "desc": "TanStack Table with headless sorting, filtering, and pagination. Server-side query integration via custom hooks. Faceted filters out of the box."
+    },
+    "authentication": {
+      "title": "Authentication",
+      "desc": "OIDC via oidc-client-ts with Azure AD support. AuthGuard layout, route-level protection, and withAuth HOC for component-level access control."
+    },
+    "internationalization": {
+      "title": "Internationalization",
+      "desc": "i18next with browser language detection. Namespace-organized translations, RTL layout support, and lazy-loaded locale bundles."
+    },
+    "errorMonitoring": {
+      "title": "Error Monitoring",
+      "desc": "Sentry integration with Vite source maps. React error boundaries with graceful fallback UI. Structured error tracking from day one."
+    }
+  },
+  "showcase": {
+    "eyebrow": "Documented",
+    "title": "See exactly what you get.",
+    "desc": "79 MDX-powered documentation pages with live previews, code snippets, and usage guidelines. Browse the full gallery to explore every component.",
+    "cta": "Open Gallery",
+    "browserUrl": "localhost:3000/components",
+    "searchPlaceholder": "Search…",
+    "buttonTitle": "Button",
+    "buttonDesc": "Displays a button or a component that looks like a button.",
+    "variantDefault": "Default",
+    "variantOutline": "Outline",
+    "variantGhost": "Ghost"
+  },
+  "cli": {
+    "eyebrow": "Tooling",
+    "title": "Generate, don't write.",
+    "desc": "A 7-step pipeline fetches your OpenAPI spec, parses schemas, generates fully-typed TypeScript DTOs, formats with Prettier, and writes to disk. One command replaces hours of manual typing.",
+    "logFetching": "Fetching OpenAPI spec…",
+    "logParsing": "Parsing 42 schemas",
+    "logGenerating": "Generating TypeScript DTOs",
+    "logFormatting": "Formatting with Prettier",
+    "logWritten": "Written 42 files"
+  },
+  "architecture": {
+    "eyebrow": "Structure",
+    "title": "Organized by design.",
+    "desc": "15 path aliases keep imports clean and refactoring painless. Every folder has a purpose, every alias has a convention. No guessing where things live."
+  },
+  "gettingStarted": {
+    "eyebrow": "Get going",
+    "title": "Up and running in seconds.",
+    "clone": "Clone",
+    "install": "Install",
+    "start": "Start"
+  },
+  "footer": {
+    "builtBy": "Built by Mohammad Safia",
+    "github": "GitHub"
+  }
+}

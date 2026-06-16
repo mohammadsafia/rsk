@@ -1,0 +1,27 @@
+{
+  "title": "Dashboard",
+  "subtitle": "Welcome back, here's what's happening.",
+  "stats": {
+    "totalUsers": "Total Users",
+    "revenue": "Revenue",
+    "activeSessions": "Active Sessions",
+    "conversion": "Conversion"
+  },
+  "activity": {
+    "createdProject": "created a new project",
+    "commentedDesignReview": "commented on Design Review",
+    "mergedPullRequest": "merged pull request #142",
+    "updatedBilling": "updated billing settings",
+    "invitedMembers": "invited 3 team members"
+  },
+  "time": {
+    "minutesAgo_one": "{{count}}m ago",
+    "minutesAgo_other": "{{count}}m ago",
+    "hoursAgo_one": "{{count}}h ago",
+    "hoursAgo_other": "{{count}}h ago"
+  },
+  "revenueOverview": "Revenue overview",
+  "lastTwelveMonths": "Last 12 months",
+  "recentActivity": "Recent activity",
+  "revenueTrend": "Revenue trend"
+}

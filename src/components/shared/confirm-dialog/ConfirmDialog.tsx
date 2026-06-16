@@ -6,6 +6,8 @@ import { type ButtonVariants, Dialog } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { LoadingButton } from '@components/shared';
 
+import { useAppTranslation } from '@hooks/shared';
+
 import { cn } from '@utils';
 
 import { AlertTriangle, CheckCircle, Info, X, XCircle } from 'lucide-react';
@@ -113,14 +115,19 @@ function ConfirmDialog({
   primaryVariant,
   title,
   description,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel,
+  cancelLabel,
   children,
   className,
   loading,
   dismissible = false,
   onConfirm,
 }: ConfirmDialogProps) {
+  const { t } = useAppTranslation('common');
+
+  const resolvedConfirmLabel = confirmLabel ?? t('confirmDialog.confirm');
+  const resolvedCancelLabel = cancelLabel ?? t('confirmDialog.cancel');
+
   const [internalOpen, setInternalOpen] = useState(false);
   const [internalLoading, setInternalLoading] = useState(false);
 
@@ -182,7 +189,7 @@ function ConfirmDialog({
         aria-describedby={undefined}
       >
         <Dialog.Close
-          aria-label="Close"
+          aria-label={t('close')}
           className="absolute inset-e-4 top-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
         >
           <X size={18} />
@@ -212,7 +219,7 @@ function ConfirmDialog({
               <Conditional.If condition={variant !== 'success' && variant !== 'info'}>
                 <Dialog.Close asChild>
                   <LoadingButton variant="muted" size="lg">
-                    {cancelLabel}
+                    {resolvedCancelLabel}
                   </LoadingButton>
                 </Dialog.Close>
               </Conditional.If>
@@ -223,7 +230,7 @@ function ConfirmDialog({
                 loading={isLoading}
                 onClick={handleConfirm}
               >
-                {confirmLabel}
+                {resolvedConfirmLabel}
               </LoadingButton>
             </Conditional.Else>
           </Conditional>

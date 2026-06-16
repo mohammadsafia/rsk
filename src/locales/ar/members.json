@@ -1,0 +1,27 @@
+{
+  "title": "الأعضاء",
+  "addMember": "إضافة عضو",
+  "totalLabel": "الأعضاء",
+  "searchPlaceholder": "ابحث في الأعضاء…",
+  "columns": {
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "role": "الدور",
+    "status": "الحالة",
+    "joined": "تاريخ الانضمام"
+  },
+  "roles": {
+    "Admin": "مدير",
+    "Editor": "محرر",
+    "Viewer": "مشاهد"
+  },
+  "statuses": {
+    "Active": "نشط",
+    "Invited": "مدعو",
+    "Suspended": "موقوف"
+  },
+  "emptyState": {
+    "title": "لا يوجد أعضاء",
+    "description": "لا يوجد أعضاء يطابقون بحثك. حاول تعديل عوامل التصفية أو الكلمات المفتاحية."
+  }
+}
