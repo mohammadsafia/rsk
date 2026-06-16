@@ -5,7 +5,7 @@ import { Conditional } from '@components/utils';
 
 import { DashboardSidebarLink, SidebarSubLink, DashboardSidebarDrawer } from '@layouts';
 
-import { useAuth } from '@hooks/shared';
+import { useAppTranslation, useAuth } from '@hooks/shared';
 
 import { cn } from '@utils';
 import { APP_MENU, type AppMenu } from '@routes';
@@ -13,7 +13,7 @@ import { APP_CONFIGURATIONS } from '@app-config';
 
 import { ChevronsLeft, ChevronsRight } from 'lucide-react';
 
-const DEFAULT_GROUP = 'Main';
+const DEFAULT_GROUP = 'main';
 
 type MenuGroup = { label: string; items: AppMenu[] };
 
@@ -40,6 +40,7 @@ function DashboardSidebar() {
   const [showMenu, setShowMenu] = useState(false);
 
   const { currentUser } = useAuth();
+  const { t } = useAppTranslation('nav');
 
   const groups = useMemo(() => groupMenu(APP_MENU), []);
 
@@ -131,7 +132,7 @@ function DashboardSidebar() {
                     collapse && 'md:sr-only',
                   )}
                 >
-                  {group.label}
+                  {t(`groups.${group.label}`)}
                 </p>
 
                 {group.items.map(renderItem)}

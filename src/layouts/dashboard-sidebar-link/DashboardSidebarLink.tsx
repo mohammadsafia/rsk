@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Collapsible } from '@components/ui';
 
 import { useRouteUtils } from '@hooks/utils';
+import { useAppTranslation } from '@hooks/shared';
 import { cn } from '@utils';
 import { type AppMenu, FULL_ROUTES_PATH } from '@routes';
 
@@ -23,6 +24,7 @@ const LINK_DEFAULT_STYLES = 'text-sidebar-foreground/70 hover:bg-sidebar-accent 
 const LINK_ACTIVE_STYLES = 'bg-primary text-primary-foreground shadow-sm';
 
 export function SidebarSubLink({ route, collapse }: SidebarLinkProps) {
+  const { t } = useAppTranslation('nav');
   const { isAnyRouteActive } = useRouteUtils();
 
   const childPaths = route.submenu?.map((sub) => sub.path) ?? [];
@@ -33,7 +35,7 @@ export function SidebarSubLink({ route, collapse }: SidebarLinkProps) {
       <Collapsible.Trigger className={cn(LINK_BASE_STYLES, isActive ? LINK_ACTIVE_STYLES : LINK_DEFAULT_STYLES)}>
         <route.icon className="h-5 w-5 shrink-0" />
 
-        <span className="flex-1 truncate text-start">{route.name}</span>
+        <span className="flex-1 truncate text-start">{t(route.id)}</span>
 
         <ChevronDown className='h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state="open"]:-rotate-180' />
       </Collapsible.Trigger>
@@ -52,6 +54,7 @@ export function SidebarSubLink({ route, collapse }: SidebarLinkProps) {
 }
 
 function DashboardSidebarLink({ route, collapse, subLink, onExpandSidebar }: SidebarLinkProps) {
+  const { t } = useAppTranslation('nav');
   const { isActiveLink, isAnyRouteActive } = useRouteUtils();
 
   const childPaths = route.submenu?.map((sub) => sub.path) ?? [];
@@ -62,7 +65,7 @@ function DashboardSidebarLink({ route, collapse, subLink, onExpandSidebar }: Sid
     return (
       <button
         type="button"
-        title={route.name ?? route.path}
+        title={t(route.id)}
         onClick={onExpandSidebar}
         className={cn(LINK_BASE_STYLES, isActive ? LINK_ACTIVE_STYLES : LINK_DEFAULT_STYLES, 'justify-center')}
       >
@@ -73,7 +76,7 @@ function DashboardSidebarLink({ route, collapse, subLink, onExpandSidebar }: Sid
 
   return (
     <Link
-      title={route.name ?? route.path}
+      title={t(route.id)}
       to={route.path}
       className={cn(LINK_BASE_STYLES, isActive ? LINK_ACTIVE_STYLES : LINK_DEFAULT_STYLES, {
         'justify-center': collapse && !subLink,
@@ -82,7 +85,7 @@ function DashboardSidebarLink({ route, collapse, subLink, onExpandSidebar }: Sid
     >
       <route.icon className="h-5 w-5 shrink-0" />
 
-      <span className={cn('truncate', { 'sr-only': collapse && !subLink })}>{route.name ?? route.path}</span>
+      <span className={cn('truncate', { 'sr-only': collapse && !subLink })}>{t(route.id)}</span>
     </Link>
   );
 }
