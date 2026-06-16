@@ -9,3 +9,4 @@ export * from './useComboboxOptions';
 export * from './useTime';
 export * from './useAuth';
 export * from './useDataTableQuery';
+export * from './useAppTranslation';
