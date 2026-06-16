@@ -2,10 +2,10 @@ import { useNavigate } from 'react-router-dom';
 
 import { Avatar, Button, DropdownMenu } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { ThemeSwitcher } from '@components/shared';
+import { LanguageSwitcher, ThemeSwitcher } from '@components/shared';
 
 import { useCommandPalette } from '@contexts';
-import { useAuth } from '@hooks/shared';
+import { useAppTranslation, useAuth } from '@hooks/shared';
 
 import { FULL_ROUTES_PATH } from '@routes';
 
@@ -13,6 +13,7 @@ import { Bell, LogOut, Search, Settings, User } from 'lucide-react';
 
 function DashboardHeader() {
   const navigate = useNavigate();
+  const { t } = useAppTranslation('header');
   const { currentUser, removeCurrentUser } = useAuth();
   const { toggle } = useCommandPalette();
 
@@ -27,12 +28,12 @@ function DashboardHeader() {
       <button
         type="button"
         onClick={toggle}
-        aria-label="Open command palette"
+        aria-label={t('openCommandPalette')}
         className="text-muted-foreground bg-secondary border-border hover:bg-accent hover:text-foreground flex h-9 w-full max-w-xs items-center gap-2 rounded-lg border px-3 text-sm transition-colors"
       >
         <Search className="h-4 w-4 shrink-0" />
 
-        <span className="flex-1 text-start">Search or jump to…</span>
+        <span className="flex-1 text-start">{t('searchPlaceholder')}</span>
 
         <kbd className="bg-background text-muted-foreground border-border pointer-events-none hidden rounded border px-1.5 font-mono text-[10px] sm:inline-block">
           ⌘K
@@ -42,12 +43,15 @@ function DashboardHeader() {
       {/* Right Section: Actions */}
       <div className="flex items-center gap-1">
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground relative h-9 w-9" aria-label="Notifications">
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground relative h-9 w-9" aria-label={t('notifications')}>
           <Bell className="h-4 w-4" />
         </Button>
 
         {/* Theme Switcher */}
         <ThemeSwitcher />
+
+        {/* Language Switcher */}
+        <LanguageSwitcher />
 
         {/* Separator */}
         <div className="bg-border mx-1 hidden h-5 w-px md:block" />
@@ -55,7 +59,7 @@ function DashboardHeader() {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenu.Trigger asChild>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0" aria-label="Open user menu">
+            <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0" aria-label={t('openUserMenu')}>
               <Avatar className="ring-primary/20 h-8 w-8 ring-2 transition-all hover:ring-2">
                 <Conditional.If condition={!!currentUser?.picture}>
                   <Avatar.Image src={currentUser?.picture} alt="User avatar" />
@@ -90,12 +94,12 @@ function DashboardHeader() {
             <DropdownMenu.Group>
               <DropdownMenu.Item onClick={handleNavigateToProfile}>
                 <User className="me-2 h-4 w-4" />
-                My profile
+                {t('myProfile')}
               </DropdownMenu.Item>
 
               <DropdownMenu.Item>
                 <Settings className="me-2 h-4 w-4" />
-                Settings
+                {t('settings')}
               </DropdownMenu.Item>
             </DropdownMenu.Group>
 
@@ -103,7 +107,7 @@ function DashboardHeader() {
 
             <DropdownMenu.Item onClick={removeCurrentUser}>
               <LogOut className="me-2 h-4 w-4" />
-              Log out
+              {t('logout')}
             </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu>
