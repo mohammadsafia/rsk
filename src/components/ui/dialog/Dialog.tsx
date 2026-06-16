@@ -55,7 +55,7 @@ const DialogPanel: FC<DialogPanelProps> = ({ ref, className, children, ...props 
       data-slot="dialog-panel"
       className={cn(
         'bg-background grid w-full max-w-lg gap-6 rounded-2xl py-6 shadow-lg',
-        'fixed inset-s-1/2 top-1/2 z-50 translate-x-[-50%] translate-y-[-50%] duration-200',
+        'fixed left-1/2 top-1/2 z-50 translate-x-[-50%] translate-y-[-50%] duration-200',
         'focus:outline-none',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',

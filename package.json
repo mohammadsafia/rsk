@@ -7,6 +7,9 @@
   "engines": {
     "node": "22.14.0"
   },
+  "overrides": {
+    "@radix-ui/react-direction": "$@radix-ui/react-direction"
+  },
   "dependencies": {
     "@hookform/resolvers": "^2.9.11",
     "@radix-ui/react-accordion": "^1.2.2",
