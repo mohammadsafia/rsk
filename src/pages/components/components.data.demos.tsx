@@ -96,7 +96,7 @@ export function CommandAutocompleteDemo() {
       <Popover.Trigger asChild>
         <Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
           {selectedFramework ? selectedFramework.label : 'Select framework...'}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </Popover.Trigger>
       <Popover.Content className="w-[200px] p-0">
@@ -115,7 +115,7 @@ export function CommandAutocompleteDemo() {
                     setOpen(false);
                   }}
                 >
-                  <Check className={`mr-2 h-4 w-4 ${value === framework.value ? 'opacity-100' : 'opacity-0'}`} />
+                  <Check className={`me-2 h-4 w-4 ${value === framework.value ? 'opacity-100' : 'opacity-0'}`} />
                   {framework.label}
                 </Command.Item>
               ))}
@@ -947,8 +947,8 @@ export function CalendarDemo() {
         <p className="text-muted mb-2 text-xs font-medium">Single Date Selection</p>
         <Popover>
           <Popover.Trigger asChild>
-            <Button variant="outline" className="w-[280px] justify-start text-left font-normal">
-              <CalendarIcon className="mr-2 h-4 w-4" />
+            <Button variant="outline" className="w-[280px] justify-start text-start font-normal">
+              <CalendarIcon className="me-2 h-4 w-4" />
               {date ? date.toLocaleDateString() : 'Pick a date'}
             </Button>
           </Popover.Trigger>
@@ -956,7 +956,7 @@ export function CalendarDemo() {
             <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
           </Popover.Content>
         </Popover>
-        <Button variant="outline" size="sm" className="ml-2" onClick={() => setDate(undefined)}>
+        <Button variant="outline" size="sm" className="ms-2" onClick={() => setDate(undefined)}>
           Clear
         </Button>
       </div>
@@ -964,8 +964,8 @@ export function CalendarDemo() {
         <p className="text-muted mb-2 text-xs font-medium">Date Range Selection</p>
         <Popover>
           <Popover.Trigger asChild>
-            <Button variant="outline" className="w-[280px] justify-start text-left font-normal">
-              <CalendarIcon className="mr-2 h-4 w-4" />
+            <Button variant="outline" className="w-[280px] justify-start text-start font-normal">
+              <CalendarIcon className="me-2 h-4 w-4" />
               {dateRange?.from ? (
                 dateRange.to ? (
                   <>
@@ -990,7 +990,7 @@ export function CalendarDemo() {
             />
           </Popover.Content>
         </Popover>
-        <Button variant="outline" size="sm" className="ml-2" onClick={() => setDateRange(undefined)}>
+        <Button variant="outline" size="sm" className="ms-2" onClick={() => setDateRange(undefined)}>
           Clear
         </Button>
       </div>

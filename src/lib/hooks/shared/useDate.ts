@@ -12,8 +12,8 @@ import {
   endOfMonth,
   endOfWeek,
   endOfYear,
-  format,
-  formatDistanceToNow,
+  format as dateFnsFormat,
+  formatDistanceToNow as dateFnsFormatDistanceToNow,
   getDay,
   getHours,
   getMilliseconds,
@@ -32,6 +32,11 @@ import {
   startOfYear,
   sub,
 } from 'date-fns';
+import { ar, enUS } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
+
+import { LANGUAGES } from '@constants';
+import { toLatinDigits } from '@utils';
 
 // Date formats — string-valued enum so raw literals fail compile.
 // Member values are date-fns format tokens; comments above each show example output.
@@ -146,7 +151,7 @@ export const formatDateValue = (input: DateInput | null, pattern: DateFormat | T
 
   const date = toNativeDate(input);
 
-  return isValid(date) ? format(date, pattern) : fallback;
+  return isValid(date) ? dateFnsFormat(date, pattern) : fallback;
 };
 
 export const iterateDateRange = (start: DateInput, end: DateInput, callback: (date: Date, weekday: number) => void): void => {
@@ -164,6 +169,15 @@ export const iterateDateRange = (start: DateInput, end: DateInput, callback: (da
 };
 
 export const useDate = () => {
+  const { i18n } = useTranslation();
+  const locale = i18n.language === LANGUAGES.AR ? ar : enUS;
+
+  // Locale-aware display formatting; toLatinDigits keeps Western (0-9) digits under Arabic.
+  const format = (date: Date | number, pattern: string): string => toLatinDigits(dateFnsFormat(date, pattern, { locale }));
+
+  const formatDistanceToNow = (date: Date | number, options?: { addSuffix?: boolean }): string =>
+    toLatinDigits(dateFnsFormatDistanceToNow(date, { ...options, locale }));
+
   const toDate = (input: DateInput = new Date(), inputFormat?: DateFormat | TimeFormat): string => {
     const date = toNativeDate(input);
 

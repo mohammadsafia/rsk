@@ -43,7 +43,7 @@ function CalendarDayButton({ className, day, modifiers, ...props }: ComponentPro
         // Focus and layout
         'group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px]',
         // Range border radius
-        'data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md',
+        'data-[range-end=true]:rounded-md data-[range-end=true]:rounded-e-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-s-md',
         '[&>span]:text-xs [&>span]:opacity-70',
         defaultClassNames.day,
         className,
@@ -183,7 +183,7 @@ function Calendar({
           'select-none font-medium',
           captionLayout === 'label'
             ? 'text-sm'
-            : 'rounded-md pl-2 pr-1 flex items-center gap-1 text-sm h-8 [&>svg]:text-muted-foreground [&>svg]:size-3.5',
+            : 'rounded-md ps-2 pe-1 flex items-center gap-1 text-sm h-8 [&>svg]:text-muted-foreground [&>svg]:size-3.5',
           defaultClassNames.caption_label,
         ),
         table: 'w-full border-collapse',
@@ -193,15 +193,15 @@ function Calendar({
         week_number_header: cn('select-none w-(--cell-size)', defaultClassNames.week_number_header),
         week_number: cn('text-[0.8rem] select-none text-muted-foreground', defaultClassNames.week_number),
         day: cn(
-          'relative w-full h-full p-0 text-center [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none',
+          'relative w-full h-full p-0 text-center [&:last-child[data-selected=true]_button]:rounded-e-md group/day aspect-square select-none',
           props.showWeekNumber
-            ? '[&:nth-child(2)[data-selected=true]_button]:rounded-l-md'
-            : '[&:first-child[data-selected=true]_button]:rounded-l-md',
+            ? '[&:nth-child(2)[data-selected=true]_button]:rounded-s-md'
+            : '[&:first-child[data-selected=true]_button]:rounded-s-md',
           defaultClassNames.day,
         ),
-        range_start: cn('rounded-l-md bg-accent', defaultClassNames.range_start),
+        range_start: cn('rounded-s-md bg-accent', defaultClassNames.range_start),
         range_middle: cn('rounded-none', defaultClassNames.range_middle),
-        range_end: cn('rounded-r-md bg-accent', defaultClassNames.range_end),
+        range_end: cn('rounded-e-md bg-accent', defaultClassNames.range_end),
         today: cn('bg-accent text-accent-foreground rounded-md', defaultClassNames.today),
         outside: cn('text-muted-foreground aria-selected:text-muted-foreground', defaultClassNames.outside),
         disabled: cn('text-muted-foreground opacity-50', defaultClassNames.disabled),

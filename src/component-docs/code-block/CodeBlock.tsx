@@ -5,7 +5,7 @@ import { Check, Copy } from 'lucide-react';
 type CodeBlockProps = Readonly<ComponentPropsWithoutRef<'pre'>>;
 
 const copyButtonStyles = [
-  'absolute top-3 right-3 z-10',
+  'absolute top-3 end-3 z-10',
   'grid h-9 w-9 place-items-center',
   'border-primary/20 rounded-xl border',
   'bg-[radial-gradient(120%_140%_at_50%_0%,color-mix(in_oklch,var(--primary)_12%,transparent)_0%,transparent_60%),linear-gradient(180deg,color-mix(in_oklch,var(--surface)_92%,white)_0%,color-mix(in_oklch,var(--surface)_65%,var(--primary-15))_100%)]',

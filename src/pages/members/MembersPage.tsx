@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import {
   type ColumnDef,
   type FilterFn,
@@ -13,6 +15,8 @@ import {
 import { Badge } from '@components/ui';
 import { DataTable } from '@components/tables';
 
+import { useAppTranslation } from '@hooks/shared';
+
 import { createFilterMeta } from '@utils';
 import { ActionPanel } from '@components/shared';
 import { AddCircle } from 'iconsax-react';
@@ -26,18 +30,18 @@ type Member = {
   joined: string;
 };
 
-type Option = { id: string; name: string };
+type Option = { id: string; labelKey: string };
 
 const ROLE_OPTIONS: Option[] = [
-  { id: 'Admin', name: 'Admin' },
-  { id: 'Editor', name: 'Editor' },
-  { id: 'Viewer', name: 'Viewer' },
+  { id: 'Admin', labelKey: 'roles.Admin' },
+  { id: 'Editor', labelKey: 'roles.Editor' },
+  { id: 'Viewer', labelKey: 'roles.Viewer' },
 ];
 
 const STATUS_OPTIONS: Option[] = [
-  { id: 'Active', name: 'Active' },
-  { id: 'Invited', name: 'Invited' },
-  { id: 'Suspended', name: 'Suspended' },
+  { id: 'Active', labelKey: 'statuses.Active' },
+  { id: 'Invited', labelKey: 'statuses.Invited' },
+  { id: 'Suspended', labelKey: 'statuses.Suspended' },
 ];
 
 const STATUS_VARIANT: Record<Member['status'], 'success' | 'warning' | 'destructive'> = {
@@ -72,62 +76,73 @@ const inSelectedValues: FilterFn<Member> = (row, columnId, filterValue) => {
   return (filterValue as string[]).includes(String(row.getValue(columnId)));
 };
 
-const COLUMNS: ColumnDef<Member>[] = [
-  {
-    accessorKey: 'name',
-    header: 'Name',
-    enableSorting: true,
-    cell: ({ row }) => <span className="text-foreground font-medium">{row.original.name}</span>,
-  },
-  {
-    accessorKey: 'email',
-    header: 'Email',
-    cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span>,
-  },
-  {
-    accessorKey: 'role',
-    header: 'Role',
-    filterFn: inSelectedValues,
-    meta: {
-      label: 'Role',
-      filterMeta: createFilterMeta({
-        variant: 'multiSelect',
-        label: 'Role',
-        options: ROLE_OPTIONS,
-        getOptionLabel: (option: Option) => option.name,
-        getOptionValue: (option: Option) => option.id,
-      }),
+type TranslateFn = ReturnType<typeof useAppTranslation>['t'];
+
+const buildColumns = (t: TranslateFn): ColumnDef<Member>[] => {
+  const roleOptions = ROLE_OPTIONS.map((option) => ({ id: option.id, name: t(option.labelKey) }));
+  const statusOptions = STATUS_OPTIONS.map((option) => ({ id: option.id, name: t(option.labelKey) }));
+
+  return [
+    {
+      accessorKey: 'name',
+      header: t('columns.name'),
+      enableSorting: true,
+      cell: ({ row }) => <span className="text-foreground font-medium">{row.original.name}</span>,
     },
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    filterFn: inSelectedValues,
-    cell: ({ row }) => <Badge variant={STATUS_VARIANT[row.original.status]}>{row.original.status}</Badge>,
-    meta: {
-      label: 'Status',
-      filterMeta: createFilterMeta({
-        variant: 'multiSelect',
-        label: 'Status',
-        options: STATUS_OPTIONS,
-        getOptionLabel: (option: Option) => option.name,
-        getOptionValue: (option: Option) => option.id,
-      }),
+    {
+      accessorKey: 'email',
+      header: t('columns.email'),
+      cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span>,
     },
-  },
-  {
-    accessorKey: 'joined',
-    header: 'Joined',
-    enableSorting: true,
-    sortDescFirst: true,
-    cell: ({ row }) => <span className="text-muted-foreground">{row.original.joined}</span>,
-  },
-];
+    {
+      accessorKey: 'role',
+      header: t('columns.role'),
+      filterFn: inSelectedValues,
+      meta: {
+        label: t('columns.role'),
+        filterMeta: createFilterMeta({
+          variant: 'multiSelect',
+          label: t('columns.role'),
+          options: roleOptions,
+          getOptionLabel: (option: { id: string; name: string }) => option.name,
+          getOptionValue: (option: { id: string; name: string }) => option.id,
+        }),
+      },
+    },
+    {
+      accessorKey: 'status',
+      header: t('columns.status'),
+      filterFn: inSelectedValues,
+      cell: ({ row }) => <Badge variant={STATUS_VARIANT[row.original.status]}>{t(`statuses.${row.original.status}`)}</Badge>,
+      meta: {
+        label: t('columns.status'),
+        filterMeta: createFilterMeta({
+          variant: 'multiSelect',
+          label: t('columns.status'),
+          options: statusOptions,
+          getOptionLabel: (option: { id: string; name: string }) => option.name,
+          getOptionValue: (option: { id: string; name: string }) => option.id,
+        }),
+      },
+    },
+    {
+      accessorKey: 'joined',
+      header: t('columns.joined'),
+      enableSorting: true,
+      sortDescFirst: true,
+      cell: ({ row }) => <span className="text-muted-foreground">{row.original.joined}</span>,
+    },
+  ];
+};
 
 function MembersPage() {
+  const { t } = useAppTranslation('members');
+
+  const columns = useMemo(() => buildColumns(t), [t]);
+
   const table = useReactTable<Member>({
     data: MEMBERS,
-    columns: COLUMNS,
+    columns,
     enableGlobalFilter: true,
     globalFilterFn: 'includesString',
     enableSortingRemoval: true,
@@ -146,20 +161,20 @@ function MembersPage() {
     <DataTable table={table}>
       <ActionPanel>
         <ActionPanel.Header>
-          <ActionPanel.Title>Members</ActionPanel.Title>
+          <ActionPanel.Title>{t('title')}</ActionPanel.Title>
         </ActionPanel.Header>
 
         <ActionPanel.Actions>
           <ActionPanel.Action>
             <AddCircle size={20} />
-            Add Member
+            {t('addMember')}
           </ActionPanel.Action>
         </ActionPanel.Actions>
       </ActionPanel>
 
-      <DataTable.Toolbar totalCount={totalCount} totalLabel="Claims" />
+      <DataTable.Toolbar totalCount={totalCount} totalLabel={t('totalLabel')} placeholder={t('searchPlaceholder')} />
 
-      <DataTable.Content />
+      <DataTable.Content emptyState={{ title: t('emptyState.title'), description: t('emptyState.description') }} />
 
       <DataTable.Pagination />
     </DataTable>

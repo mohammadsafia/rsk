@@ -11,7 +11,11 @@ import { useSelectedDocComponent } from '@component-docs/gallery';
 import { mdxComponents } from '@component-docs/gallery/utils';
 import { FULL_ROUTES_PATH } from '@routes';
 
+import { useAppTranslation } from '@hooks/shared';
+
 const ComponentDetailPage = () => {
+  const { t } = useAppTranslation('components');
+
   const { id } = useParams<{ id: string }>();
   const allDocs = useMemo(() => getComponentDocsRegistry(), []);
 
@@ -29,15 +33,15 @@ const ComponentDetailPage = () => {
       <div className="bg-background min-h-screen">
         <div className="mx-auto w-full max-w-480 px-6 py-8">
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-foreground text-lg font-medium">Component not found</p>
+            <p className="text-foreground text-lg font-medium">{t('detail.notFoundTitle')}</p>
             <p className="text-muted-400 mt-1 text-sm">
-              No component with id "{id}" exists in the registry.
+              {t('detail.notFoundDescription', { id })}
             </p>
             <Link
               to={FULL_ROUTES_PATH.COMPONENTS.INDEX}
               className="text-foreground mt-4 text-sm font-medium underline underline-offset-4"
             >
-              Back to Gallery
+              {t('detail.backToGallery')}
             </Link>
           </div>
         </div>
@@ -54,7 +58,7 @@ const ComponentDetailPage = () => {
             to={FULL_ROUTES_PATH.COMPONENTS.INDEX}
             className="text-muted-400 hover:text-foreground transition-colors"
           >
-            Components
+            {t('detail.breadcrumbComponents')}
           </Link>
           <ChevronRight className="h-3.5 w-3.5 text-muted-300" />
           <span className="text-foreground font-medium">{selectedDoc.title}</span>
@@ -82,7 +86,7 @@ const ComponentDetailPage = () => {
         {/* MDX Validation Errors */}
         {componentDocsErrors.length > 0 ? (
           <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive-200 p-4 text-sm">
-            <div className="mb-2 font-semibold">MDX docs validation issues</div>
+            <div className="mb-2 font-semibold">{t('detail.mdxValidationIssues')}</div>
             <ul className="list-disc space-y-1 ps-5">
               {componentDocsErrors.map((error, index) => (
                 <li key={`${index}-${error}`}>{error}</li>
@@ -95,7 +99,7 @@ const ComponentDetailPage = () => {
         <Suspense
           fallback={
             <div className="flex items-center justify-center py-20">
-              <p className="text-muted-400 text-sm">Loading documentation...</p>
+              <p className="text-muted-400 text-sm">{t('detail.loadingDocumentation')}</p>
             </div>
           }
         >

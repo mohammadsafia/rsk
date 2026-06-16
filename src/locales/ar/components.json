@@ -1,0 +1,14 @@
+{
+  "gallery": {
+    "title": "معرض المكونات",
+    "subtitle": "تصفح واستكشف المكونات مع عروض حية وأمثلة استخدام."
+  },
+  "detail": {
+    "notFoundTitle": "المكون غير موجود",
+    "notFoundDescription": "لا يوجد مكون بالمعرّف \"{{id}}\" في السجل.",
+    "backToGallery": "العودة إلى المعرض",
+    "breadcrumbComponents": "المكونات",
+    "mdxValidationIssues": "مشكلات التحقق من وثائق MDX",
+    "loadingDocumentation": "جارٍ تحميل الوثائق..."
+  }
+}

@@ -4,6 +4,8 @@ import { Dialog } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { LoadingButton, type LoadingButtonProps } from '@components/shared';
 
+import { useAppTranslation } from '@hooks/shared';
+
 import { cn } from '@utils';
 
 import { X } from 'lucide-react';
@@ -64,24 +66,28 @@ const Trigger: FC<TriggerProps> = ({ children, ...props }) => (
   </Dialog.Trigger>
 );
 
-const Panel: FC<PanelProps> = ({ dismissible = false, className, children, ...props }) => (
-  <Dialog.Panel
-    className={cn('flex max-h-[90dvh] flex-col overflow-clip py-0 md:max-w-200', className)}
-    aria-describedby={undefined}
-    onInteractOutside={(e) => !dismissible && e.preventDefault()}
-    onEscapeKeyDown={(e) => !dismissible && e.preventDefault()}
-    {...props}
-  >
-    <Dialog.Close
-      aria-label="Close"
-      className="absolute inset-e-4 top-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
-    >
-      <X size={18} />
-    </Dialog.Close>
+const Panel: FC<PanelProps> = ({ dismissible = false, className, children, ...props }) => {
+  const { t } = useAppTranslation('common');
 
-    {children}
-  </Dialog.Panel>
-);
+  return (
+    <Dialog.Panel
+      className={cn('flex max-h-[90dvh] flex-col overflow-clip py-0 md:max-w-200', className)}
+      aria-describedby={undefined}
+      onInteractOutside={(e) => !dismissible && e.preventDefault()}
+      onEscapeKeyDown={(e) => !dismissible && e.preventDefault()}
+      {...props}
+    >
+      <Dialog.Close
+        aria-label={t('close')}
+        className="absolute inset-e-4 top-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
+      >
+        <X size={18} />
+      </Dialog.Close>
+
+      {children}
+    </Dialog.Panel>
+  );
+};
 
 const Header: FC<HeaderProps> = ({ className, children, ...props }) => (
   <Dialog.Header className={cn('bg-primary/5 border-primary/20 shrink-0 border-b py-6', className)} {...props}>

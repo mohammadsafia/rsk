@@ -1,0 +1,52 @@
+{
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "delete": "حذف",
+  "edit": "تعديل",
+  "create": "إنشاء",
+  "confirm": "تأكيد",
+  "close": "إغلاق",
+  "back": "رجوع",
+  "next": "التالي",
+  "previous": "السابق",
+  "search": "بحث",
+  "searchHere": "ابحث هنا",
+  "loading": "جارٍ التحميل…",
+  "noResults": "لا توجد نتائج.",
+  "clearFilters": "مسح عوامل التصفية",
+  "clearAll": "مسح الكل",
+  "filter": "تصفية",
+  "selectedCount": "{{count}} محدد",
+  "yes": "نعم",
+  "no": "لا",
+  "actions": "إجراءات",
+  "goBack": "رجوع",
+  "download": "تنزيل",
+  "clear": "مسح",
+  "unsavedChanges": "تغييرات غير محفوظة",
+  "searchPlaceholder": "بحث…",
+  "breadcrumbLabel": "مسار التنقل",
+  "empty": {
+    "title": "لا توجد نتائج",
+    "description": "لا توجد نتائج لبحثك. يرجى المحاولة مرة أخرى بكلمات مختلفة."
+  },
+  "confirmDialog": {
+    "confirm": "تأكيد",
+    "cancel": "إلغاء"
+  },
+  "breadcrumb": {
+    "root": "لوحة التحكم"
+  },
+  "table": {
+    "total": "الإجمالي: {{count}} {{label}}",
+    "rowsPerPage": "صفوف لكل صفحة",
+    "emptyTitle": "لا توجد نتائج",
+    "emptyDescription": "لا توجد نتائج لبحثك. يرجى المحاولة مرة أخرى بكلمات مختلفة."
+  },
+  "pagination": {
+    "previous": "السابق",
+    "next": "التالي",
+    "rowsPerPage": "صفوف لكل صفحة",
+    "pageOf": "صفحة {{current}} من {{total}}"
+  }
+}

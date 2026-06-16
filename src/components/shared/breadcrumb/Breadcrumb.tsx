@@ -2,6 +2,8 @@ import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Conditional } from '@components/utils';
 
+import { useAppTranslation } from '@hooks/shared';
+
 import { cn } from '@utils';
 import { PLAIN_ROUTES } from '@routes';
 
@@ -20,6 +22,8 @@ export type BreadcrumbProps = {
 };
 
 const Breadcrumb = ({ className, links, separator, withRoot = false }: BreadcrumbProps) => {
+  const { t } = useAppTranslation('common');
+
   if (links.length === 0 && !withRoot) return null;
 
   const finalLinks = withRoot
@@ -28,7 +32,7 @@ const Breadcrumb = ({ className, links, separator, withRoot = false }: Breadcrum
 
   return (
     <div className={cn(className)}>
-      <nav aria-label="breadcrumb">
+      <nav aria-label={t('breadcrumbLabel')}>
         <ol className="flex">
           {finalLinks.map(({ title, href }, idx) => {
             const isLastItem = idx === finalLinks.length - 1;

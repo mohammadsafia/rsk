@@ -1,0 +1,27 @@
+{
+  "title": "Members",
+  "addMember": "Add Member",
+  "totalLabel": "members",
+  "searchPlaceholder": "Search members…",
+  "columns": {
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "joined": "Joined"
+  },
+  "roles": {
+    "Admin": "Admin",
+    "Editor": "Editor",
+    "Viewer": "Viewer"
+  },
+  "statuses": {
+    "Active": "Active",
+    "Invited": "Invited",
+    "Suspended": "Suspended"
+  },
+  "emptyState": {
+    "title": "No members found",
+    "description": "No members match your search. Try adjusting your filters or keywords."
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "boundary": {
+    "title": "Something went wrong",
+    "description": "We hit an unexpected error. Your data is safe — try one of the options below.",
+    "refresh": "Refresh",
+    "goBack": "Go Back",
+    "home": "Home"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist or has moved.",
+    "backHome": "Back to home"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "min": "Must be at least {{count}} characters",
+    "max": "Must be at most {{count}} characters"
+  }
+}

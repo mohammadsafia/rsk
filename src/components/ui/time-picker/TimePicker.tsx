@@ -116,10 +116,10 @@ const TimePickerTrigger = forwardRef<HTMLButtonElement, TimePickerTriggerProps>(
           />
           <Conditional>
             <Conditional.If condition={!!displayValue}>
-              <span className="text-primary-900 line-clamp-1 min-w-[100px] text-left">{displayValue}</span>
+              <span className="text-primary-900 line-clamp-1 min-w-[100px] text-start">{displayValue}</span>
             </Conditional.If>
             <Conditional.Else>
-              <span className="text-muted-400 line-clamp-1 min-w-[100px] text-left">{placeholder}</span>
+              <span className="text-muted-400 line-clamp-1 min-w-[100px] text-start">{placeholder}</span>
             </Conditional.Else>
           </Conditional>
           {otherChildren}

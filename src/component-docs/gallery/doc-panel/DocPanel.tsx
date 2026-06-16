@@ -21,7 +21,7 @@ const DocPanel = (props: DocPanelProps) => {
           <div className="border-destructive/30 bg-destructive-200 m-4 rounded-xl border p-4 text-sm">
             <div className="mb-2 font-semibold">MDX docs validation issues</div>
 
-            <ul className="list-disc space-y-1 pl-5">
+            <ul className="list-disc space-y-1 ps-5">
               {componentDocsErrors.map((error, index) => (
                 <li key={`${index}-${error}`}>{error}</li>
               ))}

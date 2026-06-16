@@ -5,6 +5,7 @@ export * from './loading-button';
 export * from './tooltip-button';
 export * from './prime-loader';
 export * from './theme-switcher';
+export * from './language-switcher';
 export * from './toaster';
 export * from './prime-dialog';
 export * from './prime-dropdown';

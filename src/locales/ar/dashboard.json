@@ -1,0 +1,35 @@
+{
+  "title": "لوحة التحكم",
+  "subtitle": "مرحبًا بعودتك، إليك آخر المستجدات.",
+  "stats": {
+    "totalUsers": "إجمالي المستخدمين",
+    "revenue": "الإيرادات",
+    "activeSessions": "الجلسات النشطة",
+    "conversion": "معدل التحويل"
+  },
+  "activity": {
+    "createdProject": "أنشأ مشروعًا جديدًا",
+    "commentedDesignReview": "علّق على مراجعة التصميم",
+    "mergedPullRequest": "دمج طلب السحب رقم 142",
+    "updatedBilling": "حدّث إعدادات الفوترة",
+    "invitedMembers": "دعا 3 أعضاء إلى الفريق"
+  },
+  "time": {
+    "minutesAgo_zero": "قبل {{count}} دقيقة",
+    "minutesAgo_one": "قبل {{count}} دقيقة",
+    "minutesAgo_two": "قبل {{count}} دقيقتين",
+    "minutesAgo_few": "قبل {{count}} دقائق",
+    "minutesAgo_many": "قبل {{count}} دقيقة",
+    "minutesAgo_other": "قبل {{count}} دقيقة",
+    "hoursAgo_zero": "قبل {{count}} ساعة",
+    "hoursAgo_one": "قبل {{count}} ساعة",
+    "hoursAgo_two": "قبل {{count}} ساعتين",
+    "hoursAgo_few": "قبل {{count}} ساعات",
+    "hoursAgo_many": "قبل {{count}} ساعة",
+    "hoursAgo_other": "قبل {{count}} ساعة"
+  },
+  "revenueOverview": "نظرة عامة على الإيرادات",
+  "lastTwelveMonths": "آخر 12 شهرًا",
+  "recentActivity": "النشاط الأخير",
+  "revenueTrend": "اتجاه الإيرادات"
+}

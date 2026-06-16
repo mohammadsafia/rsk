@@ -6,17 +6,20 @@ import { NuqsAdapter } from 'nuqs/adapters/react';
 
 import { queryClient } from '@api/config';
 import { ROUTER } from '@routes';
-import { ThemeProvider } from '@contexts';
+import { AppDirectionProvider, ThemeProvider } from '@contexts';
 
+import './i18n';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <NuqsAdapter>
-          <RouterProvider router={ROUTER} future={{ v7_startTransition: true }} />
-        </NuqsAdapter>
+        <AppDirectionProvider>
+          <NuqsAdapter>
+            <RouterProvider router={ROUTER} future={{ v7_startTransition: true }} />
+          </NuqsAdapter>
+        </AppDirectionProvider>
       </QueryClientProvider>
     </ThemeProvider>
   </StrictMode>,

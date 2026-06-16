@@ -1,0 +1,14 @@
+{
+  "gallery": {
+    "title": "Components Gallery",
+    "subtitle": "Browse and explore components with live demos and usage examples."
+  },
+  "detail": {
+    "notFoundTitle": "Component not found",
+    "notFoundDescription": "No component with id \"{{id}}\" exists in the registry.",
+    "backToGallery": "Back to Gallery",
+    "breadcrumbComponents": "Components",
+    "mdxValidationIssues": "MDX docs validation issues",
+    "loadingDocumentation": "Loading documentation..."
+  }
+}

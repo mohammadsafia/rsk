@@ -5,6 +5,8 @@ import { Button } from '@components/ui';
 import { ConfirmDialog, FormSubmitButton } from '@components/shared';
 import { Conditional } from '@components/utils';
 
+import { useAppTranslation } from '@hooks/shared';
+
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
@@ -34,6 +36,8 @@ const formSubmitBtnsVariants = cva('', {
 function FormSubmitButtons({ align, className, ...props }: FormActionButtonsProps) {
   const navigate = useNavigate();
 
+  const { t } = useAppTranslation('common');
+
   return (
     <div
       className={cn(
@@ -44,7 +48,7 @@ function FormSubmitButtons({ align, className, ...props }: FormActionButtonsProp
     >
       <ConfirmDialog
         variant="warning"
-        title="Unsaved Changes"
+        title={t('unsavedChanges')}
         description="Are you sure you want to cancel? Any unsaved changes will be lost."
         confirmLabel="Yes, Cancel"
         onConfirm={() => navigate(-1)}

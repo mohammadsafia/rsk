@@ -3,6 +3,9 @@ import { type Control, useController } from 'react-hook-form';
 import { Badge, Button, Command, Divider, Popover } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { FormDateRange, FormInput } from '@components/forms';
+
+import { useAppTranslation } from '@hooks/shared';
+
 import { cn } from '@utils';
 
 import { CheckIcon, PlusIcon } from 'lucide-react';
@@ -19,6 +22,8 @@ export type FacetedFilterProps = FacetedColumn & {
 };
 
 function FacetedFilter({ title, name, control, filterVariant = 'text', filterOptions = [] }: FacetedFilterProps) {
+  const { t } = useAppTranslation('common');
+
   const {
     field: { value, onChange },
   } = useController({ name, control });
@@ -46,7 +51,7 @@ function FacetedFilter({ title, name, control, filterVariant = 'text', filterOpt
       <Popover>
         <Popover.Trigger asChild>
           <Button variant="outline" size="sm" className="border-dashed">
-            <PlusIcon className="mr-2 h-4 w-4" />
+            <PlusIcon className="me-2 h-4 w-4" />
 
             {title}
 
@@ -94,7 +99,7 @@ function FacetedFilter({ title, name, control, filterVariant = 'text', filterOpt
                   return (
                     <Command.Item key={opt.value} onSelect={() => onSelect(opt.value)}>
                       <div
-                        className={cn('border-primary mr-2 flex h-4 w-4 items-center justify-center border', {
+                        className={cn('border-primary me-2 flex h-4 w-4 items-center justify-center border', {
                           'bg-primary text-primary-foreground': isSelected,
                           'opacity-50 [&_svg]:invisible': !isSelected,
                           'rounded-sm': multiSelect,
@@ -126,7 +131,7 @@ function FacetedFilter({ title, name, control, filterVariant = 'text', filterOpt
     );
   }
 
-  return <FormInput name={name} placeholder={title ?? 'Search'} className="m-0 mr-0 h-[36px] w-[150px] lg:w-[250px]" />;
+  return <FormInput name={name} placeholder={title ?? 'Search'} className="m-0 me-0 h-[36px] w-[150px] lg:w-[250px]" />;
 }
 
 export default FacetedFilter;

@@ -22,7 +22,7 @@ import {
 } from '@components/shared';
 import { Conditional } from '@components/utils';
 
-import { type ComboboxOptionsParams, type DateInput, useComboboxOptions, useDate } from '@hooks/shared';
+import { type ComboboxOptionsParams, type DateInput, useAppTranslation, useComboboxOptions, useDate } from '@hooks/shared';
 
 import { cn } from '@utils';
 
@@ -133,10 +133,12 @@ const Title: FC<TitleProps> = ({ className, ...props }) => {
 const Actions = <TEntry,>({ children, align = 'end' }: ActionsProps<TEntry>): ReactNode => {
   const { entry } = useFileCardContext<TEntry>();
 
+  const { t } = useAppTranslation('common');
+
   return (
     <PrimeDropdown align={align}>
       <PrimeDropdown.Trigger asChild>
-        <TooltipButton title="Actions" type="button" variant="ghost" size="icon-sm">
+        <TooltipButton title={t('actions')} type="button" variant="ghost" size="icon-sm">
           <MoreHorizontal size={16} />
         </TooltipButton>
       </PrimeDropdown.Trigger>
@@ -216,6 +218,8 @@ const Status = <TOption,>({
   disabled,
   onChange,
 }: StatusProps<TOption>): ReactNode => {
+  const { t } = useAppTranslation('common');
+
   const [open, setOpen] = useState(false);
 
   const { search, setSearch, allOptions, isAsync, onScroll, isLoading, isFetchingNextPage } = useComboboxOptions<TOption>({
@@ -246,7 +250,7 @@ const Status = <TOption,>({
         </Combobox.Trigger>
 
         <Combobox.Content shouldFilter={!isAsync}>
-          <Combobox.Input placeholder="Search..." {...(isAsync && { value: search, onValueChange: setSearch })}>
+          <Combobox.Input placeholder={t('searchPlaceholder')} {...(isAsync && { value: search, onValueChange: setSearch })}>
             <Combobox.Loader when={isLoading} />
           </Combobox.Input>
 
@@ -302,6 +306,8 @@ const Assignee = <TOption,>({
   disabled,
   onChange,
 }: AssigneeProps<TOption>): ReactNode => {
+  const { t } = useAppTranslation('common');
+
   const [open, setOpen] = useState(false);
 
   const { search, setSearch, allOptions, isAsync, onScroll, isLoading, isFetchingNextPage } = useComboboxOptions<TOption>({
@@ -351,7 +357,7 @@ const Assignee = <TOption,>({
       </Combobox.Trigger>
 
       <Combobox.Content className="w-(--radix-popover-content-available-width) min-w-64" shouldFilter={!isAsync}>
-        <Combobox.Input placeholder="Search assignee..." {...(isAsync && { value: search, onValueChange: setSearch })}>
+        <Combobox.Input placeholder={t('searchPlaceholder')} {...(isAsync && { value: search, onValueChange: setSearch })}>
           <Combobox.Loader when={isLoading} />
         </Combobox.Input>
 

@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@components/ui';
 import { ComposedTooltipButton } from '@components/shared';
 
+import { useAppTranslation } from '@hooks/shared';
+
 import { cn } from '@utils';
 
 import { ChevronLeft } from 'lucide-react';
@@ -33,6 +35,8 @@ type ActionPanelComponent = FC<ActionPanelProps> & {
 const ActionPanelBack: FC<BackButtonProps> = ({ className, onClick, ...props }) => {
   const navigate = useNavigate();
 
+  const { t } = useAppTranslation('common');
+
   const handleClick = (e: MouseEvent<HTMLButtonElement>): void => {
     if (onClick) {
       onClick(e);
@@ -43,7 +47,7 @@ const ActionPanelBack: FC<BackButtonProps> = ({ className, onClick, ...props }) 
   };
 
   return (
-    <Button size="icon-sm" variant="ghost-muted" className={cn(className)} aria-label="Go back" onClick={handleClick} {...props}>
+    <Button size="icon-sm" variant="ghost-muted" className={cn(className)} aria-label={t('goBack')} onClick={handleClick} {...props}>
       <ChevronLeft size={20} />
     </Button>
   );
