@@ -42,3 +42,5 @@ temp-api-types/
 /dist
 # Playwright MCP artifacts
 .playwright-mcp/
+
+i18n-*.png
