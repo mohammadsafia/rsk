@@ -99,7 +99,7 @@ function FacetedFilter({ title, name, control, filterVariant = 'text', filterOpt
                   return (
                     <Command.Item key={opt.value} onSelect={() => onSelect(opt.value)}>
                       <div
-                        className={cn('border-primary mr-2 flex h-4 w-4 items-center justify-center border', {
+                        className={cn('border-primary me-2 flex h-4 w-4 items-center justify-center border', {
                           'bg-primary text-primary-foreground': isSelected,
                           'opacity-50 [&_svg]:invisible': !isSelected,
                           'rounded-sm': multiSelect,
@@ -131,7 +131,7 @@ function FacetedFilter({ title, name, control, filterVariant = 'text', filterOpt
     );
   }
 
-  return <FormInput name={name} placeholder={title ?? 'Search'} className="m-0 mr-0 h-[36px] w-[150px] lg:w-[250px]" />;
+  return <FormInput name={name} placeholder={title ?? 'Search'} className="m-0 me-0 h-[36px] w-[150px] lg:w-[250px]" />;
 }
 
 export default FacetedFilter;
