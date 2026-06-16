@@ -20,6 +20,12 @@
   "yes": "نعم",
   "no": "لا",
   "actions": "إجراءات",
+  "goBack": "رجوع",
+  "download": "تنزيل",
+  "clear": "مسح",
+  "unsavedChanges": "تغييرات غير محفوظة",
+  "searchPlaceholder": "بحث…",
+  "breadcrumbLabel": "مسار التنقل",
   "empty": {
     "title": "لا توجد نتائج",
     "description": "لا توجد نتائج لبحثك. يرجى المحاولة مرة أخرى بكلمات مختلفة."

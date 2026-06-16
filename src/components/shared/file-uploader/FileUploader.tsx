@@ -18,6 +18,8 @@ import { Button, Chip, ScrollArea } from '@components/ui';
 import { TooltipButton } from '@components/shared';
 import { Conditional } from '@components/utils';
 
+import { useAppTranslation } from '@hooks/shared';
+
 import { cn } from '@utils';
 
 import { DownloadIcon, Loader2Icon, PaperclipIcon, XCircleIcon, XIcon } from 'lucide-react';
@@ -178,6 +180,8 @@ const FileUploaderDropzone: FC<FileUploaderDropzoneProps> = ({ ref, placeholder,
 const FileUploaderActions: FC<FileUploaderActionsProps> = ({ onDownload, clearable = true, className, ...props }) => {
   const { files, onRemove, multiple, disabled, isUploading } = useFileUploaderContext();
 
+  const { t } = useAppTranslation('common');
+
   const showClear = clearable && !multiple && files.length > 0 && !disabled && !isUploading;
   const showDownload = !!onDownload && !isUploading;
 
@@ -186,13 +190,13 @@ const FileUploaderActions: FC<FileUploaderActionsProps> = ({ onDownload, clearab
   return (
     <div data-slot="file-uploader-actions" className={cn('relative z-10 flex shrink-0 items-center gap-2', className)} {...props}>
       <Conditional.If condition={showDownload}>
-        <TooltipButton asChild title="Download" variant="ghost" size="unstyled" type="button" onClick={onDownload}>
+        <TooltipButton asChild title={t('download')} variant="ghost" size="unstyled" type="button" onClick={onDownload}>
           <DownloadIcon size={16} className="text-primary" />
         </TooltipButton>
       </Conditional.If>
 
       <Conditional.If condition={showClear}>
-        <TooltipButton asChild title="Clear" variant="ghost-muted-destructive" size="unstyled" type="button" onClick={() => onRemove(0)}>
+        <TooltipButton asChild title={t('clear')} variant="ghost-muted-destructive" size="unstyled" type="button" onClick={() => onRemove(0)}>
           <XCircleIcon size={16} />
         </TooltipButton>
       </Conditional.If>

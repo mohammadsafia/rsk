@@ -7,6 +7,10 @@
   "navigation": "التنقل",
   "actions": "الإجراءات",
   "toggleTheme": "تبديل المظهر",
+  "expandSidebar": "توسيع الشريط الجانبي",
+  "collapseSidebar": "طي الشريط الجانبي",
+  "openMenu": "فتح القائمة",
+  "closeMenu": "إغلاق القائمة",
   "groups": {
     "main": "الرئيسية",
     "account": "الحساب"

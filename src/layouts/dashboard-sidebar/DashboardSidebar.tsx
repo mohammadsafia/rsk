@@ -86,8 +86,8 @@ function DashboardSidebar() {
           <button
             type="button"
             onClick={handleToggleCollapse}
-            title="Expand sidebar"
-            aria-label="Expand sidebar"
+            title={t('expandSidebar')}
+            aria-label={t('expandSidebar')}
             className={cn('group relative mx-auto hidden h-8 w-8 shrink-0 items-center justify-center', collapse ? 'md:flex' : 'md:hidden')}
           >
             <span className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold transition-opacity group-hover:opacity-0">
@@ -101,8 +101,8 @@ function DashboardSidebar() {
           <button
             type="button"
             onClick={handleToggleCollapse}
-            title="Collapse sidebar"
-            aria-label="Collapse sidebar"
+            title={t('collapseSidebar')}
+            aria-label={t('collapseSidebar')}
             className={cn(
               'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hidden h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors',
               collapse ? 'md:hidden' : 'md:inline-flex',

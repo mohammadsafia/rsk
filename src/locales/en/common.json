@@ -20,6 +20,12 @@
   "yes": "Yes",
   "no": "No",
   "actions": "Actions",
+  "goBack": "Go back",
+  "download": "Download",
+  "clear": "Clear",
+  "unsavedChanges": "Unsaved Changes",
+  "searchPlaceholder": "Search…",
+  "breadcrumbLabel": "breadcrumb",
   "empty": {
     "title": "No Results Found",
     "description": "No results found for your search. Please try again with different keywords."

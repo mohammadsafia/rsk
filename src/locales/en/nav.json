@@ -7,6 +7,10 @@
   "navigation": "Navigation",
   "actions": "Actions",
   "toggleTheme": "Toggle theme",
+  "expandSidebar": "Expand sidebar",
+  "collapseSidebar": "Collapse sidebar",
+  "openMenu": "Open menu",
+  "closeMenu": "Close menu",
   "groups": {
     "main": "Main",
     "account": "Account"
