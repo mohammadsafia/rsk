@@ -1,0 +1,24 @@
+{
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "delete": "حذف",
+  "edit": "تعديل",
+  "create": "إنشاء",
+  "confirm": "تأكيد",
+  "close": "إغلاق",
+  "back": "رجوع",
+  "next": "التالي",
+  "previous": "السابق",
+  "search": "بحث",
+  "loading": "جارٍ التحميل…",
+  "noResults": "لا توجد نتائج.",
+  "yes": "نعم",
+  "no": "لا",
+  "actions": "إجراءات",
+  "pagination": {
+    "previous": "السابق",
+    "next": "التالي",
+    "rowsPerPage": "صفوف لكل صفحة",
+    "pageOf": "صفحة {{current}} من {{total}}"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "dashboard": "لوحة التحكم",
+  "components": "المكوّنات",
+  "members": "الأعضاء",
+  "settings": "الإعدادات",
+  "commandPalette": "لوحة الأوامر",
+  "navigation": "التنقل",
+  "actions": "الإجراءات",
+  "toggleTheme": "تبديل المظهر",
+  "groups": {
+    "main": "الرئيسية",
+    "account": "الحساب"
+  }
+}

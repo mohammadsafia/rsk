@@ -1,0 +1,24 @@
+{
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "create": "Create",
+  "confirm": "Confirm",
+  "close": "Close",
+  "back": "Back",
+  "next": "Next",
+  "previous": "Previous",
+  "search": "Search",
+  "loading": "Loading…",
+  "noResults": "No results found.",
+  "yes": "Yes",
+  "no": "No",
+  "actions": "Actions",
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "rowsPerPage": "Rows per page",
+    "pageOf": "Page {{current}} of {{total}}"
+  }
+}

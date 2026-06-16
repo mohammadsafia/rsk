@@ -1,0 +1,14 @@
+{
+  "dashboard": "Dashboard",
+  "components": "Components",
+  "members": "Members",
+  "settings": "Settings",
+  "commandPalette": "Command palette",
+  "navigation": "Navigation",
+  "actions": "Actions",
+  "toggleTheme": "Toggle theme",
+  "groups": {
+    "main": "Main",
+    "account": "Account"
+  }
+}
