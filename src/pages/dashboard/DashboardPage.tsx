@@ -4,17 +4,17 @@ import { Card } from '@components/ui';
 
 import { useAppTranslation } from '@hooks/shared';
 
-import { cn } from '@utils';
+import { cn, type NumberFormatStyle, useNumberFormat } from '@utils';
 
 import { Activity, ArrowDownRight, ArrowUpRight, DollarSign, TrendingUp, Users } from 'lucide-react';
 
-type Stat = { labelKey: string; value: string; delta: number; icon: ElementType };
+type Stat = { labelKey: string; value: number; format: NumberFormatStyle; delta: number; icon: ElementType };
 
 const STATS: Stat[] = [
-  { labelKey: 'stats.totalUsers', value: '12,840', delta: 12.5, icon: Users },
-  { labelKey: 'stats.revenue', value: '$48,210', delta: 8.2, icon: DollarSign },
-  { labelKey: 'stats.activeSessions', value: '2,318', delta: -3.1, icon: Activity },
-  { labelKey: 'stats.conversion', value: '4.7%', delta: 1.4, icon: TrendingUp },
+  { labelKey: 'stats.totalUsers', value: 12840, format: 'decimal', delta: 12.5, icon: Users },
+  { labelKey: 'stats.revenue', value: 48210, format: 'currency', delta: 8.2, icon: DollarSign },
+  { labelKey: 'stats.activeSessions', value: 2318, format: 'decimal', delta: -3.1, icon: Activity },
+  { labelKey: 'stats.conversion', value: 0.047, format: 'percent', delta: 1.4, icon: TrendingUp },
 ];
 
 const CHART_DATA = [32, 40, 35, 50, 49, 60, 70, 65, 72, 80, 76, 92];
@@ -29,6 +29,7 @@ const ACTIVITY = [
 
 function StatCard({ stat }: { stat: Stat }) {
   const { t } = useAppTranslation('dashboard');
+  const formatNumber = useNumberFormat();
   const positive = stat.delta >= 0;
 
   return (
@@ -43,11 +44,13 @@ function StatCard({ stat }: { stat: Stat }) {
         </div>
 
         <div className="flex items-end justify-between">
-          <span className="text-foreground text-2xl font-bold">{stat.value}</span>
+          <span className="text-foreground text-2xl font-bold">
+            {formatNumber(stat.value, { style: stat.format, maximumFractionDigits: stat.format === 'percent' ? 1 : 0 })}
+          </span>
 
           <span className={cn('flex items-center gap-0.5 text-xs font-medium', positive ? 'text-success' : 'text-destructive')}>
             {positive ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
-            {Math.abs(stat.delta)}%
+            {formatNumber(Math.abs(stat.delta) / 100, { style: 'percent', maximumFractionDigits: 1 })}
           </span>
         </div>
       </Card.Content>
