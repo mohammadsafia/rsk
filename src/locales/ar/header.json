@@ -8,5 +8,6 @@
   "logout": "تسجيل الخروج",
   "switchLanguage": "تغيير اللغة",
   "switchToLight": "التبديل إلى المظهر الفاتح",
-  "switchToDark": "التبديل إلى المظهر الداكن"
+  "switchToDark": "التبديل إلى المظهر الداكن",
+  "toggleTheme": "تبديل المظهر"
 }

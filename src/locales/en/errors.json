@@ -6,6 +6,11 @@
     "goBack": "Go Back",
     "home": "Home"
   },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist or has moved.",
+    "backHome": "Back to home"
+  },
   "validation": {
     "required": "This field is required",
     "email": "Please enter a valid email address",

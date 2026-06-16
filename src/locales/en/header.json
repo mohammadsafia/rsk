@@ -8,5 +8,6 @@
   "logout": "Log out",
   "switchLanguage": "Switch language",
   "switchToLight": "Switch to light theme",
-  "switchToDark": "Switch to dark theme"
+  "switchToDark": "Switch to dark theme",
+  "toggleTheme": "Toggle theme"
 }

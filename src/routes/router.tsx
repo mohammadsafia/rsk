@@ -4,6 +4,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { AuthGuard, AuthLayout, DashboardLayout, ErrorBoundary } from '@layouts';
 
 import { FULL_ROUTES_PATH } from './routes';
+import { LoginPlaceholder, NotFound, SettingsPlaceholder } from './RoutePlaceholders';
 
 const HomePage = lazy(() => import('@pages/home/HomePage'));
 const ComponentsGalleryPage = lazy(() => import('@pages/components/ComponentsGalleryPage'));
@@ -32,7 +33,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: FULL_ROUTES_PATH.AUTH.LOGIN,
-        element: <div>Login Page</div>,
+        element: <LoginPlaceholder />,
       },
     ],
   },
@@ -63,7 +64,7 @@ export const router = createBrowserRouter([
           },
           {
             path: FULL_ROUTES_PATH.SETTINGS.INDEX,
-            element: <div className="p-6">Settings</div>,
+            element: <SettingsPlaceholder />,
           },
         ],
       },
@@ -73,10 +74,6 @@ export const router = createBrowserRouter([
   // Catch-all 404
   {
     path: '*',
-    element: (
-      <div className="text-muted-foreground flex h-dvh items-center justify-center text-lg">
-        404 — Page not found
-      </div>
-    ),
+    element: <NotFound />,
   },
 ]);
