@@ -2,7 +2,7 @@ import '@tanstack/react-table';
 
 import type { RowData, ColumnSort } from '@tanstack/react-table';
 
-import type { AsyncOptionsFn } from '@hooks/shared';
+import type { AsyncOptionsFn, DateFormat } from '@hooks/shared';
 
 type Pagination = {
   page: number;
@@ -27,15 +27,35 @@ type FilterMetaBase = {
   urlSearchParams?: URLSearchParams | string;
 };
 
-type FilterConfig = FilterMetaBase & {
+/** Static or async option-driven filter (single `select` or `multiSelect`). */
+export type SelectFilterMeta = FilterMetaBase & {
+  variant: 'select' | 'multiSelect';
   options: Record<string, unknown>[] | AsyncOptionsFn<Record<string, unknown>>;
   getOptionLabel: (option: Record<string, unknown>) => string;
   getOptionValue: (option: Record<string, unknown>) => string;
 };
 
-type FilterMetalVariant = 'select' | 'multiSelect';
+/** Calendar-driven filter — a single day (`date`) or an inclusive `[from, to]` range (`dateRange`). */
+export type DateFilterMeta = FilterMetaBase & {
+  variant: 'date' | 'dateRange';
+  /** Display format for the active-value chip. Defaults to `DateFormats.SHORT_MONTH_DAY_YEAR`. */
+  dateFormat?: DateFormat;
+};
 
-export type DataTableFilterMeta = { variant: FilterMetalVariant } & FilterConfig;
+/** Time-of-day filter backed by the shared `TimePicker`. */
+export type TimeFilterMeta = FilterMetaBase & {
+  variant: 'time';
+  use24hFormat?: boolean;
+  /** Time-picker bounds, e.g. `'08:00 AM'` / `'23:59'`. */
+  min?: string;
+  max?: string;
+  step?: number;
+};
+
+export type DataTableFilterMeta = SelectFilterMeta | DateFilterMeta | TimeFilterMeta;
+
+/** Column filter value for the `dateRange` variant (ISO `yyyy-MM-dd` strings). */
+export type DateRangeFilterValue = { from?: string; to?: string };
 
 declare module '@tanstack/table-core' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

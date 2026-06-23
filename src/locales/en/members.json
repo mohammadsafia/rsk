@@ -8,7 +8,9 @@
     "email": "Email",
     "role": "Role",
     "status": "Status",
-    "joined": "Joined"
+    "joined": "Joined",
+    "lastSeen": "Last seen",
+    "shiftStart": "Shift start"
   },
   "roles": {
     "Admin": "Admin",

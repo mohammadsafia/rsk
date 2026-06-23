@@ -17,7 +17,7 @@ import { DataTable } from '@components/tables';
 
 import { useAppTranslation } from '@hooks/shared';
 
-import { createFilterMeta } from '@utils';
+import { createFilterMeta, dateFilterFn, dateRangeFilterFn, timeFilterFn } from '@utils';
 import { ActionPanel } from '@components/shared';
 import { AddCircle } from 'iconsax-react';
 
@@ -28,7 +28,11 @@ type Member = {
   role: 'Admin' | 'Editor' | 'Viewer';
   status: 'Active' | 'Invited' | 'Suspended';
   joined: string;
+  lastSeen: string;
+  shiftStart: string;
 };
+
+const SHIFT_TIMES = ['08:00 AM', '09:30 AM', '01:00 PM', '03:45 PM'];
 
 type Option = { id: string; labelKey: string };
 
@@ -58,6 +62,7 @@ const MEMBERS: Member[] = Array.from({ length: 24 }, (_, i) => {
   const role = ROLE_OPTIONS[i % ROLE_OPTIONS.length].id as Member['role'];
   const status = STATUS_OPTIONS[i % STATUS_OPTIONS.length].id as Member['status'];
   const day = String((i % 27) + 1).padStart(2, '0');
+  const lastSeenDay = String(((i * 3) % 27) + 1).padStart(2, '0');
 
   return {
     id: `member-${i + 1}`,
@@ -66,6 +71,8 @@ const MEMBERS: Member[] = Array.from({ length: 24 }, (_, i) => {
     role,
     status,
     joined: `2026-${String((i % 12) + 1).padStart(2, '0')}-${day}`,
+    lastSeen: `2026-${String(((i * 2) % 12) + 1).padStart(2, '0')}-${lastSeenDay}`,
+    shiftStart: SHIFT_TIMES[i % SHIFT_TIMES.length],
   };
 });
 
@@ -130,7 +137,43 @@ const buildColumns = (t: TranslateFn): ColumnDef<Member>[] => {
       header: t('columns.joined'),
       enableSorting: true,
       sortDescFirst: true,
+      filterFn: dateRangeFilterFn,
       cell: ({ row }) => <span className="text-muted-foreground">{row.original.joined}</span>,
+      meta: {
+        label: t('columns.joined'),
+        filterMeta: createFilterMeta({
+          variant: 'dateRange',
+          label: t('columns.joined'),
+        }),
+      },
+    },
+    {
+      accessorKey: 'lastSeen',
+      header: t('columns.lastSeen'),
+      enableSorting: true,
+      sortDescFirst: true,
+      filterFn: dateFilterFn,
+      cell: ({ row }) => <span className="text-muted-foreground">{row.original.lastSeen}</span>,
+      meta: {
+        label: t('columns.lastSeen'),
+        filterMeta: createFilterMeta({
+          variant: 'date',
+          label: t('columns.lastSeen'),
+        }),
+      },
+    },
+    {
+      accessorKey: 'shiftStart',
+      header: t('columns.shiftStart'),
+      filterFn: timeFilterFn,
+      cell: ({ row }) => <span className="text-muted-foreground">{row.original.shiftStart}</span>,
+      meta: {
+        label: t('columns.shiftStart'),
+        filterMeta: createFilterMeta({
+          variant: 'time',
+          label: t('columns.shiftStart'),
+        }),
+      },
     },
   ];
 };
