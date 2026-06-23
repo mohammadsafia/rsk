@@ -11,11 +11,11 @@ import { type AsyncOptionsFn, useAsyncOptionsInfiniteQuery, useDebounce, useInfi
 
 import { ChevronDown } from 'lucide-react';
 
-import type { DataTableFilterMeta } from '@app-types';
+import type { SelectFilterMeta } from '@app-types';
 
 type AsyncSelectFilterProps<TData> = {
   column: Column<TData>;
-  filterMeta: DataTableFilterMeta;
+  filterMeta: SelectFilterMeta;
 };
 
 function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps<TData>) {

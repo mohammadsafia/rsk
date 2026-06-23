@@ -9,11 +9,11 @@ import { type FilterChipItem, FilterChipList } from '@components/tables';
 
 import { ChevronDown } from 'lucide-react';
 
-import type { DataTableFilterMeta } from '@app-types';
+import type { SelectFilterMeta } from '@app-types';
 
 type SelectFilterProps<TData> = {
   column: Column<TData>;
-  filterMeta: DataTableFilterMeta;
+  filterMeta: SelectFilterMeta;
 };
 
 function SelectFilter<TData>({ column, filterMeta }: SelectFilterProps<TData>) {

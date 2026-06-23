@@ -1,11 +1,11 @@
 import type { CSSProperties, MouseEvent } from 'react';
 
-import type { Column, ColumnSort } from '@tanstack/react-table';
+import type { Column, ColumnSort, FilterFn } from '@tanstack/react-table';
 import { createParser } from 'nuqs';
 
-import type { AsyncOptionsFn } from '@hooks/shared';
+import type { AsyncOptionsFn, DateFormat } from '@hooks/shared';
 
-import type { DataTableFilterMeta } from '@app-types';
+import type { DataTableFilterMeta, DateRangeFilterValue } from '@app-types';
 
 const INTERACTIVE_SELECTOR = [
   'button',
@@ -115,17 +115,14 @@ export const getSortingStateParser = <TData extends Record<string, unknown>>(col
  *   getOptionValue: (option) => option.id,
  * })
  *
- * // Static options
- * filterMeta: createFilterMeta({
- *   variant: 'select',
- *   label: 'Status',
- *   options: [{ id: 'active', name: 'Active' }, { id: 'inactive', name: 'Inactive' }],
- *   getOptionLabel: (option) => option.name, // option inferred from array
- *   getOptionValue: (option) => option.id,
- * })
+ * // Date / date-range (no options)
+ * filterMeta: createFilterMeta({ variant: 'dateRange', label: 'Created' })
+ *
+ * // Time of day
+ * filterMeta: createFilterMeta({ variant: 'time', label: 'Start time', use24hFormat: true })
  * ```
  */
-export const createFilterMeta = <TOption>(config: {
+export function createFilterMeta<TOption>(config: {
   variant: 'select' | 'multiSelect';
   label: string;
   placeholder?: string;
@@ -134,9 +131,114 @@ export const createFilterMeta = <TOption>(config: {
   getOptionValue: (option: TOption) => string;
   queryKey?: string;
   urlSearchParams?: URLSearchParams | string;
-}): DataTableFilterMeta => config as unknown as DataTableFilterMeta;
+}): DataTableFilterMeta;
+export function createFilterMeta(config: {
+  variant: 'date' | 'dateRange';
+  label: string;
+  placeholder?: string;
+  dateFormat?: DateFormat;
+}): DataTableFilterMeta;
+export function createFilterMeta(config: {
+  variant: 'time';
+  label: string;
+  placeholder?: string;
+  use24hFormat?: boolean;
+  min?: string;
+  max?: string;
+  step?: number;
+}): DataTableFilterMeta;
+export function createFilterMeta(config: unknown): DataTableFilterMeta {
+  return config as DataTableFilterMeta;
+}
 
 /**
- * Type guard: checks if filter options are async (function) vs static (array).
+ * Type guard: checks if a select filter's options are async (function) vs static (array).
+ * Safe on the full union — date/time variants have no `options` and return `false`.
  */
-export const isAsyncFilterMeta = (meta: DataTableFilterMeta): boolean => typeof meta.options === 'function';
+export const isAsyncFilterMeta = (meta: DataTableFilterMeta): boolean => 'options' in meta && typeof meta.options === 'function';
+
+/* -------------------------------------------------------------------------- */
+/*                           Date / time filter fns                           */
+/* -------------------------------------------------------------------------- */
+
+/** Normalizes a cell/filter value to a comparable local `yyyy-MM-dd` string (empty when invalid). */
+const toComparableDate = (input: unknown): string => {
+  if (input == null || input === '') return '';
+
+  let date: Date;
+
+  if (input instanceof Date) {
+    date = input;
+  } else if (typeof input === 'string' && /^\d{4}-\d{2}-\d{2}/.test(input)) {
+    // Parse date-only ISO strings in local time to avoid UTC day-shift.
+    const [year, month, day] = input.slice(0, 10).split('-').map(Number);
+    date = new Date(year, month - 1, day);
+  } else {
+    date = new Date(input as string | number);
+  }
+
+  if (Number.isNaN(date.getTime())) return '';
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+/** Normalizes a `'h:mm a'` / `'HH:mm'` value to minutes-since-midnight (null when invalid). */
+const toComparableMinutes = (input: unknown): number | null => {
+  if (input == null || input === '') return null;
+
+  const match = String(input)
+    .trim()
+    .toUpperCase()
+    .match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?$/);
+  if (!match) return null;
+
+  let hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  const meridiem = match[3];
+
+  if (meridiem === 'AM' && hours === 12) hours = 0;
+  if (meridiem === 'PM' && hours !== 12) hours += 12;
+
+  return hours * 60 + minutes;
+};
+
+// Filter predicates are loosely typed (`FilterFn<any>`) so a single shared fn stays
+// assignable to any column's `FilterFn<TData>` regardless of its row type.
+
+/** Matches rows whose date cell equals the selected day. Pair with `variant: 'date'`. */
+export const dateFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
+  if (!filterValue) return true;
+
+  const cell = toComparableDate(row.getValue(columnId));
+
+  return cell !== '' && cell === toComparableDate(filterValue);
+};
+
+/** Matches rows whose date cell falls within the inclusive `[from, to]` range. Pair with `variant: 'dateRange'`. */
+export const dateRangeFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
+  const range = filterValue as DateRangeFilterValue | undefined;
+  if (!range || (!range.from && !range.to)) return true;
+
+  const cell = toComparableDate(row.getValue(columnId));
+  if (!cell) return false;
+
+  const from = range.from ? toComparableDate(range.from) : '';
+  const to = range.to ? toComparableDate(range.to) : '';
+
+  if (from && cell < from) return false;
+  return !(to && cell > to);
+};
+
+/** Matches rows whose time cell equals the selected time. Pair with `variant: 'time'`. */
+export const timeFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
+  if (!filterValue) return true;
+
+  const cell = toComparableMinutes(row.getValue(columnId));
+  const target = toComparableMinutes(filterValue);
+
+  return cell !== null && target !== null && cell === target;
+};
