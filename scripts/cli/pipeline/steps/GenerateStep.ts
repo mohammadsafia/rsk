@@ -65,6 +65,7 @@ export function createGenerateStep(): PipelineStep {
               content: result.content,
               hash: computeContentHash(result.content),
               changed: false,
+              created: false,
             });
           }
 
@@ -98,6 +99,7 @@ export function createGenerateStep(): PipelineStep {
             content: barrelContent,
             hash: computeContentHash(barrelContent),
             changed: false,
+            created: false,
           });
         }
 

@@ -29,6 +29,8 @@ export type IRSchema = {
   description?: string;
   kind: IRSchemaKind;
   properties: IRProperty[];
+  /** Base type names composed via OpenAPI `allOf` `$ref`s, emitted as an intersection. */
+  extends?: string[];
   enumValues?: string[];
   aliasType?: string;
   imports: IRImport[];
