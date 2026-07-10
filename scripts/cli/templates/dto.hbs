@@ -3,7 +3,7 @@
 import type { {{name}} } from './{{from}}';
 {{/each}}
 
-export type {{name}} = {
+export type {{name}} = {{{baseClause}}}{
 {{#each properties}}
 {{#if deprecated}}
   /**

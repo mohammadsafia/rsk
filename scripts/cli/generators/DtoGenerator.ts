@@ -24,8 +24,12 @@ export class DtoGenerator extends BaseGenerator {
       readOnly: prop.readOnly,
     }));
 
+    // Compose OpenAPI `allOf` base types as a leading intersection, e.g. `AuditedDto & `.
+    const baseClause = schema.extends && schema.extends.length > 0 ? `${schema.extends.join(' & ')} & ` : '';
+
     const content = this.renderTemplate('dto', {
       name: schema.name,
+      baseClause,
       imports: schema.imports,
       properties,
     });

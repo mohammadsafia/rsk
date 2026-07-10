@@ -217,14 +217,18 @@ export class SchemaParser {
     let mergedProperties: Record<string, OpenAPISchemaObject> = {};
     let mergedRequired: string[] = [];
     const imports: IRImport[] = [];
+    const extendsBases: string[] = [];
 
-    // Handle allOf by merging all properties
+    // Handle allOf: `$ref` parts are base types (emitted as an intersection),
+    // inline object parts contribute their own properties.
     if (schema.allOf) {
       for (const part of schema.allOf) {
         if (part.$ref) {
           const refName = extractRefName(part.$ref);
-          // For allOf with $ref, we'd ideally resolve it,
-          // but since we generate separately, treat as an import
+          // Base type is generated separately; import it and compose via `&`.
+          if (refName !== name && !extendsBases.includes(refName)) {
+            extendsBases.push(refName);
+          }
           imports.push({ name: refName, from: refName });
         }
         if (part.properties) {
@@ -278,6 +282,7 @@ export class SchemaParser {
       description: schema.description,
       kind: 'object',
       properties,
+      extends: extendsBases.length > 0 ? extendsBases : undefined,
       imports,
       deprecated: schema.deprecated,
     };
