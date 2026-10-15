@@ -80,11 +80,8 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
                 <Select.Trigger
                   ref={ref}
                   id={name}
-                  className={cn(
-                    !!error &&
-                      'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive text-destructive ps-8',
-                    className,
-                  )}
+                  invalid={!!error}
+                  className={cn(!!error && 'ps-8', className)}
                   disabled={field.disabled || props.disabled}
                 >
                   <Select.Value placeholder={placeholder} />

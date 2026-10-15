@@ -193,9 +193,6 @@
   "src/components/forms/form-file-uploader/FormFileUploader.tsx": {
     "legacy-color-name": 3
   },
-  "src/components/forms/form-input/FormInput.tsx": {
-    "legacy-color-name": 6
-  },
   "src/components/forms/form-label/FormLabel.tsx": {
     "prime-component": 7,
     "legacy-color-ramp": 1,
@@ -212,9 +209,6 @@
   },
   "src/components/forms/form-radio-group/FormRadioGroup.tsx": {
     "legacy-color-name": 11
-  },
-  "src/components/forms/form-select/FormSelect.tsx": {
-    "legacy-color-name": 6
   },
   "src/components/forms/form-textarea/FormTextarea.tsx": {
     "legacy-color-ramp": 4,

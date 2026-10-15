@@ -39,11 +39,8 @@ function FormInput<TFieldValues extends FieldValues>({
         <Input
           id={id}
           autoComplete="off"
-          className={cn(
-            error &&
-              'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive placeholder:text-destructive ps-8',
-            className,
-          )}
+          invalid={!!error}
+          className={cn(error && 'ps-8', className)}
           {...register(name, rules)}
           {...props}
         />
