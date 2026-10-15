@@ -200,7 +200,7 @@ const skeletonRule: TagRule = {
 const switchRule: TagRule = {
   tag: 'Switch',
   keys: ['variant', 'size'],
-  transform: (attrs) => (attrs.size === undefined ? {} : { size: attrs.size === 'sm' ? 'sm' : 'md' }),
+  transform: (attrs): Record<string, AttrValue> => (attrs.size === undefined ? {} : { size: attrs.size === 'sm' ? 'sm' : 'md' }),
 };
 
 const checkboxRule: TagRule = {
