@@ -5,7 +5,7 @@ import { type FieldError, type FieldPath, type FieldValues, useController } from
 
 import { Calendar, type CalendarProps, fieldVariants, Popover, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
+import { FormField } from '@components/forms';
 
 import { DATE_INPUT_FORMATS, type DateInputFormat, useAppTranslation, useDateRangeMask } from '@hooks/shared';
 import { cn } from '@utils';
@@ -75,11 +75,9 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
   inputRef,
   error,
   label,
+  description,
   tooltip,
-  containerClassName,
-  labelClassName,
   className,
-  errorClassName,
   required,
   disabled,
   placeholder,
@@ -188,17 +186,19 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
   const hasValue = dateRange?.from || dateRange?.to;
 
   return (
-    <FormControl className={containerClassName}>
-      <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
-        {label}
-      </FormLabel>
-
-      <div className="relative">
+    <FormField id={name} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+      {(fieldControl) => (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <div
             data-slot="date-range-container"
-            aria-invalid={!!error || undefined}
-            className={cn(fieldVariants(), 'group gap-2 pe-1', error && 'ps-8', disabled && 'pointer-events-none opacity-50', className)}
+            aria-invalid={fieldControl.invalid || undefined}
+            data-disabled={disabled || undefined}
+            className={cn(
+              fieldVariants(),
+              'group gap-2 pe-1',
+              'data-disabled:border-border data-disabled:bg-surface-sunken data-disabled:text-fg-subtle data-disabled:pointer-events-none',
+              className,
+            )}
           >
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <Popover.Trigger asChild>
@@ -223,7 +223,7 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
 
               <input
                 ref={inputRef}
-                id={name}
+                id={fieldControl.id}
                 type="text"
                 inputMode="numeric"
                 autoComplete="off"
@@ -234,7 +234,9 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
                 onKeyDown={handleKeyDown}
                 onPaste={handlePaste}
                 onBlur={handleInputBlur}
-                aria-invalid={!!error || undefined}
+                aria-invalid={fieldControl.invalid || undefined}
+                aria-describedby={fieldControl['aria-describedby']}
+                aria-required={fieldControl['aria-required']}
                 className={cn(
                   'text-fg placeholder:text-fg-muted min-w-0 flex-1 bg-transparent outline-none',
                   !!inputValue && !isValidInput && 'text-danger',
@@ -265,10 +267,8 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
             />
           </Popover.Content>
         </Popover>
-
-        <FormMessage className={errorClassName} hidden={!error} error={error!} />
-      </div>
-    </FormControl>
+      )}
+    </FormField>
   );
 };
 

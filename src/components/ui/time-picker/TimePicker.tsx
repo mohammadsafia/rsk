@@ -72,6 +72,8 @@ export type TimePickerProps = FieldVariants & {
   step?: number;
   startAt?: string;
   invalid?: boolean;
+  'aria-describedby'?: string;
+  'aria-required'?: boolean;
 };
 
 type TimeColumnProps<TValue extends number | string> = {
@@ -296,6 +298,8 @@ const TimePicker: TimePickerComponent = ({
   value,
   onChange,
   invalid = false,
+  'aria-describedby': ariaDescribedBy,
+  'aria-required': ariaRequired,
 }) => {
   const { t } = useAppTranslation('common');
 
@@ -331,6 +335,8 @@ const TimePicker: TimePickerComponent = ({
         <Popover.Trigger id={id ?? name} asChild>
           <TimePickerTrigger
             size={size}
+            aria-describedby={ariaDescribedBy}
+            aria-required={ariaRequired}
             invalid={invalid}
             disabled={disabled}
             placeholder={placeholder ?? t('timePicker.placeholder')}

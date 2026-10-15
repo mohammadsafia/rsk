@@ -3,7 +3,7 @@ import { type FieldValues, useController } from 'react-hook-form';
 
 import { Calendar, type CalendarProps, fieldVariants, Popover, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
+import { FormField } from '@components/forms';
 
 import { DATE_INPUT_FORMATS, type DateInputFormat, useAppTranslation, useDateMask } from '@hooks/shared';
 import { cn } from '@utils';
@@ -26,11 +26,9 @@ function FormDatePicker<TFieldValues extends FieldValues>({
   rules,
   control,
   label,
+  description,
   tooltip,
-  containerClassName,
-  labelClassName,
   className,
-  errorClassName,
   required,
   disabled,
   placeholder,
@@ -170,17 +168,19 @@ function FormDatePicker<TFieldValues extends FieldValues>({
   const displayPlaceholder = placeholder || maskPlaceholder;
 
   return (
-    <FormControl className={containerClassName}>
-      <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
-        {label}
-      </FormLabel>
-
-      <div className="relative">
+    <FormField id={name} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+      {(fieldControl) => (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <div
             data-slot="date-picker-container"
-            aria-invalid={!!error || undefined}
-            className={cn(fieldVariants(), 'group gap-2 pe-1', error && 'ps-8', disabled && 'pointer-events-none opacity-50', className)}
+            aria-invalid={fieldControl.invalid || undefined}
+            data-disabled={disabled || undefined}
+            className={cn(
+              fieldVariants(),
+              'group gap-2 pe-1',
+              'data-disabled:border-border data-disabled:bg-surface-sunken data-disabled:text-fg-subtle data-disabled:pointer-events-none',
+              className,
+            )}
           >
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <Popover.Trigger asChild>
@@ -205,7 +205,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
 
               <input
                 ref={ref}
-                id={name}
+                id={fieldControl.id}
                 type="text"
                 inputMode="numeric"
                 autoComplete="off"
@@ -216,7 +216,9 @@ function FormDatePicker<TFieldValues extends FieldValues>({
                 onKeyDown={handleKeyDown}
                 onPaste={handlePaste}
                 onBlur={handleInputBlur}
-                aria-invalid={!!error || undefined}
+                aria-invalid={fieldControl.invalid || undefined}
+                aria-describedby={fieldControl['aria-describedby']}
+                aria-required={fieldControl['aria-required']}
                 className={cn(
                   'text-fg placeholder:text-fg-muted min-w-0 flex-1 bg-transparent outline-none',
                   !!inputValue && !isValidInput && 'text-danger',
@@ -247,10 +249,8 @@ function FormDatePicker<TFieldValues extends FieldValues>({
             />
           </Popover.Content>
         </Popover>
-
-        <FormMessage className={errorClassName} hidden={!error} error={error!} />
-      </div>
-    </FormControl>
+      )}
+    </FormField>
   );
 }
 
