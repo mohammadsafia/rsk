@@ -1,12 +1,14 @@
 import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type PropsWithChildren } from 'react';
 
-import { Command, type CommandProps, Popover } from '@components/ui';
+import { Command, type CommandProps, fieldVariants, type FieldVariants, Popover } from '@components/ui';
+
+import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
 
 import { ChevronsUpDownIcon, Loader2Icon, XIcon } from 'lucide-react';
 
-type ComboboxTriggerProps = ComponentProps<typeof Popover.Trigger>;
+type ComboboxTriggerProps = ComponentProps<typeof Popover.Trigger> & FieldVariants & { invalid?: boolean };
 
 type ComboboxValueProps = ComponentPropsWithoutRef<'span'> & { placeholder?: string };
 
@@ -55,17 +57,14 @@ type ComboboxComponent = FC<ComboboxProps> & {
   Indicator: FC<ComboboxIndicatorProps>;
 };
 
-const ComboboxTrigger: FC<ComboboxTriggerProps> = ({ className, children, ...props }) => (
+const ComboboxTrigger: FC<ComboboxTriggerProps> = ({ className, size, invalid, children, ...props }) => (
   <Popover.Trigger
     data-slot="combobox-trigger"
     role="combobox"
+    aria-invalid={invalid || undefined}
     className={cn(
-      'group/combobox-trigger bg-background relative flex w-full cursor-pointer items-center gap-2 rounded-md border p-3 text-sm shadow-xs',
-      'text-muted-foreground border-muted-200 transition-[color,box-shadow]',
-      'data-[state=open]:border-primary data-[state=open]:ring-primary data-[state=open]:ring',
-      'hover:not-disabled:border-primary hover:not-disabled:ring-primary hover:not-disabled:ring',
-      'focus-visible:ring-primary focus-visible:border-primary focus-visible:ring focus-visible:outline-none',
-      'disabled:bg-muted-50 disabled:text-muted-300 disabled:pointer-events-none',
+      fieldVariants({ size }),
+      'group/combobox-trigger data-[state=open]:border-accent cursor-pointer gap-2 text-start',
       className,
     )}
     {...props}
@@ -75,24 +74,26 @@ const ComboboxTrigger: FC<ComboboxTriggerProps> = ({ className, children, ...pro
 );
 
 const ComboboxValue: FC<ComboboxValueProps> = ({ placeholder, children, className, ...props }) => (
-  <span data-slot="combobox-value" className={cn('flex-1 truncate text-start', className)} {...props}>
+  <span data-slot="combobox-value" className={cn('flex-1 truncate text-start', !children && 'text-fg-muted', className)} {...props}>
     {children ?? placeholder}
   </span>
 );
 
-const ComboboxClear: FC<ComboboxClearProps> = ({ when, title = 'Clear', onClear }) => {
+const ComboboxClear: FC<ComboboxClearProps> = ({ when, title, onClear }) => {
+  const { t } = useAppTranslation('common');
+
   if (!when) return null;
 
   return (
     <XIcon
       size={16}
       role="button"
-      aria-label={title}
+      aria-label={title ?? t('clear')}
       className="text-fg-muted hover:text-danger shrink-0 cursor-pointer"
-      onPointerDown={(e) => e.stopPropagation()}
-      onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
+      onPointerDown={(event) => event.stopPropagation()}
+      onClick={(event) => {
+        event.stopPropagation();
+        event.preventDefault();
         onClear();
       }}
     />
@@ -103,11 +104,10 @@ const ComboboxIcon: FC<ComboboxIconProps> = ({ className, children, ...props }) 
   <span data-slot="combobox-icon" {...props}>
     {children ?? (
       <ChevronsUpDownIcon
-        size={20}
+        aria-hidden="true"
         className={cn(
-          'text-muted-400 shrink-0 transition-colors',
-          'group-data-[state=open]/combobox-trigger:text-primary',
-          'group-disabled/combobox-trigger:text-muted-300',
+          'text-fg-muted size-4 shrink-0 transition-colors',
+          'group-data-[state=open]/combobox-trigger:text-accent group-disabled/combobox-trigger:text-fg-subtle',
           className,
         )}
       />
@@ -131,10 +131,10 @@ const ComboboxInput: FC<ComboboxInputProps> = (props) => <Command.Input {...prop
 const ComboboxLoader: FC<ComboboxLoaderProps> = ({ when, message, className }) => {
   if (!when) return null;
 
-  if (!message) return <Loader2Icon size={20} className={cn('text-muted-400 animate-spin', className)} />;
+  if (!message) return <Loader2Icon size={20} className={cn('text-fg-muted animate-spin', className)} />;
 
   return (
-    <div className={cn('text-muted-400 flex items-center justify-center gap-2 py-2', className)}>
+    <div className={cn('text-fg-muted flex items-center justify-center gap-2 py-2', className)}>
       <Loader2Icon size={16} className="animate-spin" />
 
       <span className="text-xs">{message}</span>

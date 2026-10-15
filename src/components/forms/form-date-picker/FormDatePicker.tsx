@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type FieldValues, useController } from 'react-hook-form';
 
-import { Calendar, type CalendarProps, Popover, IconButton } from '@components/ui';
+import { Calendar, type CalendarProps, fieldVariants, Popover, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { FormControl, FormLabel, FormMessage } from '@components/forms';
 
@@ -179,16 +179,8 @@ function FormDatePicker<TFieldValues extends FieldValues>({
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <div
             data-slot="date-picker-container"
-            className={cn(
-              'group bg-background relative flex h-12 w-full items-center rounded-md border px-3 py-3 text-xs shadow-xs',
-              'transition-colors focus-within:outline-none',
-              {
-                'border-muted-200 hover:border-muted-300 focus-within:border-primary focus-within:ring-primary focus-within:ring-1': !error,
-                'border-destructive focus-within:border-destructive focus-within:ring-destructive ps-8 focus-within:ring-1': !!error,
-                'pointer-events-none cursor-not-allowed opacity-50': disabled,
-              },
-              className,
-            )}
+            aria-invalid={!!error || undefined}
+            className={cn(fieldVariants(), 'group gap-2 pe-1', error && 'ps-8', disabled && 'pointer-events-none opacity-50', className)}
           >
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <Popover.Trigger asChild>
@@ -196,18 +188,17 @@ function FormDatePicker<TFieldValues extends FieldValues>({
                   type="button"
                   disabled={disabled}
                   onClick={handleIconClick}
-                  className="shrink-0 focus:outline-none"
-                  aria-label="Open calendar"
+                  className="focus-ring shrink-0 rounded-sm"
+                  aria-label={t('openCalendar')}
                   tabIndex={-1}
                 >
                   <CalendarIcon
-                    size={20}
-                    className={cn('h-5 w-5 cursor-pointer transition-colors', {
-                      'text-destructive': !!error,
-                      'text-muted-300 opacity-50': disabled,
-                      'text-muted-400 hover:text-primary': !error && !disabled,
-                      'text-primary': isOpen && !error && !disabled,
-                    })}
+                    aria-hidden="true"
+                    className={cn(
+                      'text-fg-muted hover:text-fg size-4 cursor-pointer transition-colors',
+                      isOpen && 'text-accent',
+                      !!error && 'text-danger',
+                    )}
                   />
                 </button>
               </Popover.Trigger>
@@ -225,11 +216,11 @@ function FormDatePicker<TFieldValues extends FieldValues>({
                 onKeyDown={handleKeyDown}
                 onPaste={handlePaste}
                 onBlur={handleInputBlur}
-                aria-invalid={!!error}
-                className={cn('min-w-0 flex-1 bg-transparent text-xs outline-none', 'placeholder:text-muted-400', {
-                  'text-primary-900': !!inputValue && isValidInput,
-                  'text-destructive': !!inputValue && !isValidInput,
-                })}
+                aria-invalid={!!error || undefined}
+                className={cn(
+                  'text-fg placeholder:text-fg-muted min-w-0 flex-1 bg-transparent outline-none',
+                  !!inputValue && !isValidInput && 'text-danger',
+                )}
                 {...field}
               />
             </div>

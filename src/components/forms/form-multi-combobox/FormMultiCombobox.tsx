@@ -149,11 +149,8 @@ function FormMultiCombobox<TFieldValues extends FieldValues, TOption = FormSelec
             id={name}
             onBlur={field.onBlur}
             disabled={field.disabled || disabled}
-            className={cn(
-              error &&
-                'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive text-destructive ps-8',
-              className,
-            )}
+            invalid={!!error}
+            className={cn('h-auto min-h-control-md flex-wrap py-1', error && 'ps-8', className)}
           >
             <Combobox.Value placeholder={placeholder}>
               <Conditional>

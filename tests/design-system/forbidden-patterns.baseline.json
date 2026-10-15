@@ -133,17 +133,6 @@
     "legacy-color-ramp": 10,
     "legacy-color-name": 13
   },
-  "src/components/forms/form-combobox/FormCombobox.tsx": {
-    "legacy-color-name": 6
-  },
-  "src/components/forms/form-date-picker/FormDatePicker.tsx": {
-    "legacy-color-ramp": 6,
-    "legacy-color-name": 10
-  },
-  "src/components/forms/form-date-range/FormDateRange.tsx": {
-    "legacy-color-ramp": 6,
-    "legacy-color-name": 10
-  },
   "src/components/forms/form-file-uploader/FormFileUploader.tsx": {
     "legacy-color-name": 3
   },
@@ -152,9 +141,6 @@
   },
   "src/components/forms/form-message/FormMessage.tsx": {
     "legacy-color-name": 1
-  },
-  "src/components/forms/form-multi-combobox/FormMultiCombobox.tsx": {
-    "legacy-color-name": 6
   },
   "src/components/forms/form-radio-group/FormRadioGroup.tsx": {
     "legacy-color-name": 11
@@ -176,10 +162,6 @@
   "src/components/shared/collapsible-card/CollapsibleCard.tsx": {
     "legacy-color-ramp": 21,
     "legacy-color-name": 18
-  },
-  "src/components/shared/combobox/Combobox.tsx": {
-    "legacy-color-ramp": 7,
-    "legacy-color-name": 9
   },
   "src/components/shared/confirm-dialog/ConfirmDialog.tsx": {
     "legacy-color-name": 2
