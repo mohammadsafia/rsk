@@ -13,7 +13,7 @@ import { Loader2Icon } from 'lucide-react';
 
 export const buttonVariants = cva(
   [
-    'inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-transparent font-medium whitespace-nowrap select-none',
+    'relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-transparent font-medium whitespace-nowrap select-none',
     'focus-ring state-press [&_svg]:size-4 [&_svg]:shrink-0',
     'disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50',
   ],
@@ -115,10 +115,18 @@ const Button: FC<ButtonProps> = ({
       {...props}
     >
       <Conditional.If condition={loading}>
-        <Loader2Icon data-slot="button-spinner" className="animate-spin" aria-label={t('loading')} />
+        <Loader2Icon data-slot="button-spinner" className="absolute inset-0 m-auto animate-spin" aria-label={t('loading')} />
       </Conditional.If>
 
-      <Slottable>{children}</Slottable>
+      {/* Slot only finds a Slottable that is its direct child, so this branch can't go through Conditional.
+          `contents` keeps the label's children in the flex layout; `invisible` holds their width while loading. */}
+      {asChild ? (
+        <Slottable>{children}</Slottable>
+      ) : (
+        <span data-slot="button-label" className={cn('contents', loading && 'invisible')}>
+          {children}
+        </span>
+      )}
     </Comp>
   );
 };

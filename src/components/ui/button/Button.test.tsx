@@ -53,6 +53,15 @@ describe('Button', () => {
     expect(button.querySelector('[data-slot="button-spinner"]')).not.toBeNull();
   });
 
+  it('loading preserves width: label hidden in place, spinner overlaid', () => {
+    render(<Button loading>Save</Button>);
+    const button = screen.getByRole('button', { name: /Save/ });
+    const label = button.querySelector('[data-slot="button-label"]');
+    expect(label?.textContent).toBe('Save');
+    expect(label?.className).toMatch(/\binvisible\b/);
+    expect(button.querySelector('[data-slot="button-spinner"]')?.getAttribute('class')).toMatch(/\babsolute\b/);
+  });
+
   it('asChild renders the child element with button styling', () => {
     render(
       <MemoryRouter>
