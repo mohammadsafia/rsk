@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { type DateRange } from 'react-day-picker';
-import { CalendarIcon, Check, ChevronsUpDown, Circle, Square, Star, StarOffIcon, Trash2, X } from 'lucide-react';
-import { Button, Calendar, CheckboxGroup, Command, Popover, RadioGroup, TimePicker, IconButton } from '@components/ui';
+import { CalendarIcon, Check, ChevronsUpDown, Circle, Square, Star, StarOffIcon, Trash2 } from 'lucide-react';
+import { Button, Calendar, CheckboxGroup, Command, Input, Popover, RadioGroup, TimePicker, IconButton } from '@components/ui';
 import { Dialog } from '@components/ui/dialog';
 import {
   FormCheckbox,
@@ -20,7 +20,7 @@ import {
   FormTextarea,
   FormTimePicker,
 } from '@components/forms';
-import { ConfirmDialog, DateNavigation, FacetedFilter, PrimeDialog } from '@components/shared';
+import { ConfirmDialog, DateNavigation, FacetedFilter } from '@components/shared';
 
 import { useToast } from '@hooks/shared';
 import { LookupHandler as LookupService } from '@api/handlers';
@@ -31,32 +31,50 @@ import { CheckCircleFilled, CheckSquareFilled } from '@assets/icons';
 
 // ---------- Demo components (hooks must be used inside components) ----------
 export function DialogDemo() {
-  const [open, setOpen] = useState(false);
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger asChild>
-        <Button variant="outline">Open Dialog</Button>
-      </Dialog.Trigger>
+    <div className="flex flex-wrap gap-2">
+      <Dialog>
+        <Dialog.Trigger asChild>
+          <Button variant="outline">Edit profile</Button>
+        </Dialog.Trigger>
 
-      <Dialog.Panel>
-        <Dialog.Close
-          aria-label="Close"
-          className="absolute end-4 top-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
-        >
-          <X size={18} />
-        </Dialog.Close>
+        <Dialog.Content title="Edit profile" description="Changes are saved when you press Save.">
+          <Input aria-label="Name" defaultValue="Layla Haddad" />
 
-        <Dialog.Header>
-          <Dialog.Title>Dialog Title</Dialog.Title>
+          <Dialog.Footer>
+            <Dialog.Close asChild>
+              <Button variant="outline">Cancel</Button>
+            </Dialog.Close>
 
-          <Dialog.Description>This is a dialog description.</Dialog.Description>
-        </Dialog.Header>
+            <Button tone="accent">Save</Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>
 
-        <Dialog.Content>Dialog content goes here.</Dialog.Content>
+      <Dialog>
+        <Dialog.Trigger asChild>
+          <Button variant="outline">Large</Button>
+        </Dialog.Trigger>
 
-        <Dialog.Footer>Dialog footer goes here.</Dialog.Footer>
-      </Dialog.Panel>
-    </Dialog>
+        <Dialog.Content title="Visit notes" size="lg">
+          <p className="text-fg-muted text-sm">A wider dialog for longer content such as notes or tables.</p>
+        </Dialog.Content>
+      </Dialog>
+
+      <Dialog>
+        <Dialog.Trigger asChild>
+          <Button variant="outline">Not dismissible</Button>
+        </Dialog.Trigger>
+
+        <Dialog.Content title="Finish this step" description="Escape and outside clicks are ignored." dismissible={false}>
+          <Dialog.Footer>
+            <Dialog.Close asChild>
+              <Button>Done</Button>
+            </Dialog.Close>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>
+    </div>
   );
 }
 
@@ -740,97 +758,6 @@ export function FacetedFilterDemo() {
         <FacetedFilter name="dateRange" title="Date Range" control={form.control} filterVariant="date-range" />
       </div>
     </FormContainer>
-  );
-}
-
-export function PrimeDialogDemo() {
-  const [openCreate, setOpenCreate] = useState(false);
-  const [openUpdate, setOpenUpdate] = useState(false);
-  const [openView, setOpenView] = useState(false);
-  return (
-    <div className="flex flex-wrap gap-2">
-      <PrimeDialog dialogMode="Create" open={openCreate} onOpenChange={setOpenCreate}>
-        <PrimeDialog.Trigger asChild>
-          <Button variant="outline">Create Mode</Button>
-        </PrimeDialog.Trigger>
-
-        <PrimeDialog.Panel>
-          <PrimeDialog.Header>
-            <PrimeDialog.Title>User</PrimeDialog.Title>
-
-            <PrimeDialog.Description>User Description</PrimeDialog.Description>
-          </PrimeDialog.Header>
-
-          <PrimeDialog.Content>Create mode dialog content</PrimeDialog.Content>
-
-          <PrimeDialog.Actions />
-        </PrimeDialog.Panel>
-      </PrimeDialog>
-
-      <PrimeDialog dialogMode="Update" open={openUpdate} onOpenChange={setOpenUpdate}>
-        <PrimeDialog.Trigger asChild>
-          <Button variant="outline">Update Mode</Button>
-        </PrimeDialog.Trigger>
-
-        <PrimeDialog.Panel>
-          <PrimeDialog.Header>
-            <PrimeDialog.Title>User</PrimeDialog.Title>
-          </PrimeDialog.Header>
-
-          <PrimeDialog.Content>Update mode dialog content</PrimeDialog.Content>
-
-          <PrimeDialog.Actions />
-        </PrimeDialog.Panel>
-      </PrimeDialog>
-
-      <PrimeDialog dialogMode="View" open={openView} onOpenChange={setOpenView}>
-        <PrimeDialog.Trigger asChild>
-          <Button variant="outline">View Mode</Button>
-        </PrimeDialog.Trigger>
-
-        <PrimeDialog.Panel>
-          <PrimeDialog.Header>
-            <PrimeDialog.Title>User</PrimeDialog.Title>
-          </PrimeDialog.Header>
-
-          <PrimeDialog.Content>View mode dialog content (submit button hidden)</PrimeDialog.Content>
-
-          <PrimeDialog.Actions />
-        </PrimeDialog.Panel>
-      </PrimeDialog>
-
-      <PrimeDialog>
-        <PrimeDialog.Trigger asChild>
-          <Button variant="outline">Dismissable Dialog</Button>
-        </PrimeDialog.Trigger>
-
-        <PrimeDialog.Panel dismissible>
-          <PrimeDialog.Header>
-            <PrimeDialog.Title>Dialog can be dismissed</PrimeDialog.Title>
-          </PrimeDialog.Header>
-
-          <PrimeDialog.Content>
-            Click on the backdrop Or press Escape-Key to close the Dialog (Default is not dismissable)
-          </PrimeDialog.Content>
-
-          <PrimeDialog.Actions />
-        </PrimeDialog.Panel>
-      </PrimeDialog>
-
-      <PrimeDialog>
-        <PrimeDialog.Trigger asChild>
-          <Button variant="outline">Prime Dialog With no Actions</Button>
-        </PrimeDialog.Trigger>
-
-        <PrimeDialog.Panel dismissible>
-          <PrimeDialog.Header>
-            <PrimeDialog.Title>Dialog with no Actions</PrimeDialog.Title>
-          </PrimeDialog.Header>
-
-          <PrimeDialog.Content>This Dialog doesn't contain the actions/footer</PrimeDialog.Content>
-        </PrimeDialog.Panel>
-      </PrimeDialog>
-    </div>
   );
 }
 

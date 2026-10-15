@@ -74,9 +74,6 @@
     "prime-component": 43,
     "legacy-color-name": 1
   },
-  "src/component-docs/shared/PrimeDialog.mdx": {
-    "prime-component": 17
-  },
   "src/component-docs/shared/PrimeDropdown.mdx": {
     "prime-component": 88
   },
@@ -284,10 +281,6 @@
     "legacy-color-ramp": 13,
     "legacy-color-name": 7
   },
-  "src/components/shared/prime-dialog/PrimeDialog.tsx": {
-    "prime-component": 20,
-    "legacy-color-name": 2
-  },
   "src/components/shared/prime-dropdown/PrimeDropdown.tsx": {
     "prime-component": 35,
     "legacy-color-ramp": 1,
@@ -357,9 +350,6 @@
     "legacy-color-ramp": 1,
     "legacy-color-name": 1,
     "legacy-shadow": 9
-  },
-  "src/components/ui/dialog/Dialog.tsx": {
-    "legacy-color-name": 4
   },
   "src/components/ui/dropdown-menu/DropdownMenu.tsx": {
     "legacy-color-ramp": 2,
@@ -441,7 +431,6 @@
     "legacy-color-name": 1
   },
   "src/pages/components/components.data.demos.tsx": {
-    "prime-component": 68,
     "legacy-color-ramp": 43,
     "legacy-color-name": 42,
     "arbitrary-length": 5

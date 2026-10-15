@@ -23,7 +23,7 @@ type CommandShortcutProps = HTMLAttributes<HTMLSpanElement>;
 
 type CommandSeparatorProps = ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>;
 
-type CommandDialogProps = ComponentPropsWithoutRef<typeof Dialog>;
+type CommandDialogProps = ComponentPropsWithoutRef<typeof Dialog> & { title: string };
 
 export type CommandProps = ComponentPropsWithoutRef<typeof CommandPrimitive>;
 
@@ -117,20 +117,20 @@ const CommandItemSeparator: FC<CommandSeparatorProps> = ({ className, ...props }
   <CommandPrimitive.Separator data-slot="command-separator" className={cn('bg-border-subtle -mx-1 my-1 h-px', className)} {...props} />
 );
 
-const CommandDialog: FC<CommandDialogProps> = ({ children, ...props }) => (
+const CommandDialog: FC<CommandDialogProps> = ({ title, children, ...props }) => (
   <Dialog {...props}>
-    <Dialog.Panel className="overflow-hidden p-0">
+    <Dialog.Content title={title} hideTitle className="gap-0 overflow-hidden p-0">
       <Command
         className={cn(
           '**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium',
           '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5',
           '[&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5 **:[[cmdk-group]]:px-2',
-          '**:[[cmdk-input]]:h-12 **:[[cmdk-item]]:p-3',
+          '**:[[cmdk-input]]:h-12 **:[[cmdk-item]]:p-3 **:[[cmdk-input-wrapper]]:pe-12',
         )}
       >
         {children}
       </Command>
-    </Dialog.Panel>
+    </Dialog.Content>
   </Dialog>
 );
 

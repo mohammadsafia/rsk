@@ -29,7 +29,7 @@
     "title": "كل شيء مترابط، ولا شيء يعترض طريقك.",
     "componentLibrary": {
       "title": "مكتبة المكوّنات",
-      "desc": "35 عنصراً أساسياً من Radix UI مع خيارات CVA. أنماط مكوّنات مركّبة — Dialog.Header وTabs.List وCard.Content. جاهزة للوضع الداكن. مكتوبة بأنواع كاملة عبر أنواع TypeScript العامة."
+      "desc": "35 عنصراً أساسياً من Radix UI مع خيارات CVA. أنماط مكوّنات مركّبة — Dialog.Content وTabs.List وCard.Content. جاهزة للوضع الداكن. مكتوبة بأنواع كاملة عبر أنواع TypeScript العامة."
     },
     "formSystem": {
       "title": "نظام النماذج",

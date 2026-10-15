@@ -29,7 +29,7 @@
     "title": "Everything wired, nothing in your way.",
     "componentLibrary": {
       "title": "Component Library",
-      "desc": "35 Radix UI primitives with CVA variants. Compound component patterns — Dialog.Header, Tabs.List, Card.Content. Dark mode ready. Fully typed with TypeScript generics."
+      "desc": "35 Radix UI primitives with CVA variants. Compound component patterns — Dialog.Content, Tabs.List, Card.Content. Dark mode ready. Fully typed with TypeScript generics."
     },
     "formSystem": {
       "title": "Form System",

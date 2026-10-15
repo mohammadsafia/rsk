@@ -9,7 +9,7 @@ import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
 
-import { AlertTriangle, CheckCircle, Info, X, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react';
 
 export type ConfirmDialogVariants = VariantProps<typeof confirmDialogVariants>;
 
@@ -87,7 +87,7 @@ export const confirmDialogVariants = cva('border-t-4', {
  * # ConfirmDialog
  *
  * Confirmation dialog with variant styling, async-aware confirm, and dismissible control.
- * Built on `Dialog.Panel` (Radix).
+ * Built on `Dialog.Content` (Radix).
  *
  * ## Children (Dual Mode)
  *
@@ -181,36 +181,32 @@ function ConfirmDialog({
         <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       </Conditional.If>
 
-      <Dialog.Panel
+      <Dialog.Content
+        title={title ?? resolvedConfirmLabel}
+        hideTitle
+        size="sm"
+        dismissible={dismissible}
         className={cn(confirmDialogVariants({ variant }), className)}
-        onInteractOutside={(e) => !dismissible && e.preventDefault()}
-        onEscapeKeyDown={(e) => !dismissible && e.preventDefault()}
-        aria-describedby={undefined}
       >
-        <Dialog.Close
-          aria-label={t('close')}
-          className="absolute inset-e-4 top-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
-        >
-          <X size={18} />
-        </Dialog.Close>
-
         <Conditional.If condition={!!title}>
-          <Dialog.Header className="flex flex-col items-center gap-y-1.5 text-center">
+          <div className="flex flex-col items-center gap-y-1.5 text-center">
             <Icon className={confirmDialogIconVariants({ variant })} size={48} />
 
-            <Dialog.Title>{title}</Dialog.Title>
+            <p aria-hidden="true" className="text-fg text-md font-semibold">
+              {title}
+            </p>
 
             <Conditional.If condition={!!description}>
-              <Dialog.Description>{description}</Dialog.Description>
+              <p className="text-fg-muted text-sm">{description}</p>
             </Conditional.If>
-          </Dialog.Header>
+          </div>
         </Conditional.If>
 
         <Conditional.If condition={!!content}>
-          <Dialog.Content className="flex flex-col items-center">{content}</Dialog.Content>
+          <div className="flex flex-col items-center">{content}</div>
         </Conditional.If>
 
-        <Dialog.Footer className="space-x-2 text-center">
+        <Dialog.Footer className="justify-center">
           <Conditional>
             <Conditional.If condition={!!actions}>{actions}</Conditional.If>
 
@@ -234,7 +230,7 @@ function ConfirmDialog({
             </Conditional.Else>
           </Conditional>
         </Dialog.Footer>
-      </Dialog.Panel>
+      </Dialog.Content>
     </Dialog>
   );
 }

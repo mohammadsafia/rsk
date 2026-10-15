@@ -3,7 +3,7 @@ id: dialog
 title: Dialog
 section: Components
 category: UI
-description: 'Modal dialog overlay.'
+description: 'Modal dialog on the raised surface. Content requires a title; size sm/md/lg; dismissible by default.'
 tags: [ui, dialog, modal]
 ---
 
@@ -22,15 +22,30 @@ import { Dialog, Button } from '@components/ui';
 ## Code
 
 ```tsx
-<Dialog open={open} onOpenChange={setOpen}>
+<Dialog>
   <Dialog.Trigger asChild>
-    <Button>Open</Button>
+    <Button variant="outline">Edit profile</Button>
   </Dialog.Trigger>
-  <Dialog.Content>
-    <Dialog.Header>
-      <Dialog.Title>Title</Dialog.Title>
-    </Dialog.Header>
-    Content here
+
+  <Dialog.Content title="Edit profile" description="Changes are saved when you press Save.">
+    <Input aria-label="Name" />
+
+    <Dialog.Footer>
+      <Dialog.Close asChild>
+        <Button variant="outline">Cancel</Button>
+      </Dialog.Close>
+      <Button tone="accent">Save</Button>
+    </Dialog.Footer>
   </Dialog.Content>
 </Dialog>
 ```
+
+## API
+
+| Prop (`Dialog.Content`) | Type | Default | Notes |
+|---|---|---|---|
+| `title` | `ReactNode` | — | Required. Names the dialog for assistive tech. |
+| `hideTitle` | `boolean` | `false` | Keeps the title for screen readers only. |
+| `description` | `ReactNode` | — | Shown under the title; wired to `aria-describedby`. |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Max width. |
+| `dismissible` | `boolean` | `true` | `false` removes the close button and ignores Escape and outside clicks. |
