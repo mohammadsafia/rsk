@@ -33,6 +33,12 @@ export function buildCategoryTabOptions(docs: ReadonlyArray<Readonly<ComponentDo
     categoryTabs.push(calendar);
   }
 
+  const foundationsTabIndex = categoryTabs.findIndex((categoryTab) => categoryTab.key === 'FOUNDATIONS');
+  if (foundationsTabIndex > 0) {
+    const [foundations] = categoryTabs.splice(foundationsTabIndex, 1);
+    categoryTabs.unshift(foundations);
+  }
+
   return categoryTabs;
 }
 
