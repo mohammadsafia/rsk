@@ -165,13 +165,13 @@ export const ApprovalRequiredDemo = () => {
             <FileCard.ApprovalPrompt>Your approval is required for this file</FileCard.ApprovalPrompt>
 
             <div className="flex gap-2">
-              <ConfirmDialog variant="destructive" title="Reject Document" onConfirm={() => {}}>
+              <ConfirmDialog tone="danger" title="Reject Document" onConfirm={() => {}}>
                 <div>
                   <FileCard.Reject>Reject</FileCard.Reject>
                 </div>
               </ConfirmDialog>
 
-              <ConfirmDialog variant="success" title="Approve Document" onConfirm={() => {}}>
+              <ConfirmDialog tone="success" title="Approve Document" onConfirm={() => {}}>
                 <div>
                   <FileCard.Approve>Approve</FileCard.Approve>
                 </div>
@@ -285,7 +285,7 @@ import { FileCard, type FileCardAccessors } from '@components/shared';
         <FileCard.ApprovalPrompt>Your approval is required for this file</FileCard.ApprovalPrompt>
 
         <div className="flex gap-2">
-          <ConfirmDialog variant="destructive" title="Reject" onConfirm={() => rejectMutation.mutateAsync(entry.id)}>
+          <ConfirmDialog tone="danger" title="Reject" onConfirm={() => rejectMutation.mutateAsync(entry.id)}>
             <div>
               <FileCard.Reject condition={entry.canReject} permissions={[Permissions.Reject]}>
                 Reject
@@ -293,7 +293,7 @@ import { FileCard, type FileCardAccessors } from '@components/shared';
             </div>
           </ConfirmDialog>
 
-          <ConfirmDialog variant="success" title="Approve" onConfirm={() => approveMutation.mutateAsync(entry.id)}>
+          <ConfirmDialog tone="success" title="Approve" onConfirm={() => approveMutation.mutateAsync(entry.id)}>
             <div>
               <FileCard.Approve condition={entry.canApprove} permissions={[Permissions.Approve]}>
                 Approve

@@ -47,7 +47,8 @@ function FormSubmitButtons({ align, className, ...props }: FormActionButtonsProp
       )}
     >
       <ConfirmDialog
-        variant="warning"
+        tone="warning"
+
         title={t('unsavedChanges')}
         description="Are you sure you want to cancel? Any unsaved changes will be lost."
         confirmLabel="Yes, Cancel"

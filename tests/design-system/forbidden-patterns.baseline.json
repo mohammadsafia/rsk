@@ -48,10 +48,6 @@
   "src/component-docs/shared/Conditional.mdx": {
     "legacy-color-name": 1
   },
-  "src/component-docs/shared/CountTooltip.mdx": {
-    "legacy-color-ramp": 1,
-    "legacy-color-name": 1
-  },
   "src/component-docs/shared/FieldSection.mdx": {
     "legacy-color-name": 2
   },
@@ -132,9 +128,6 @@
   "src/components/shared/collapsible-card/CollapsibleCard.tsx": {
     "legacy-color-ramp": 21,
     "legacy-color-name": 18
-  },
-  "src/components/shared/confirm-dialog/ConfirmDialog.tsx": {
-    "legacy-color-name": 2
   },
   "src/components/shared/faceted-filter/FacetedFilter.tsx": {
     "legacy-color-name": 3,

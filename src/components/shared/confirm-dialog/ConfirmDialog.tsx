@@ -1,26 +1,22 @@
-import { Children, type ReactNode, useCallback, useState } from 'react';
+import { Children, type ReactNode, useCallback, useId, useState } from 'react';
 
-import { cva, type VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
 
 import { Button, type ButtonVariants, Dialog, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
 
-import { cn } from '@utils';
-
 import { AlertTriangle, CheckCircle, Info, XCircle, XIcon } from 'lucide-react';
 
-export type ConfirmDialogVariants = VariantProps<typeof confirmDialogVariants>;
-
-type ConfirmDialogVariant = NonNullable<ConfirmDialogVariants['variant']>;
+export type ConfirmDialogTone = 'danger' | 'warning' | 'success' | 'info';
 
 export type ConfirmDialogProps = {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** @default 'destructive' */
-  variant?: ConfirmDialogVariant;
-  /** Overrides the auto-mapped button tone. @see {@link confirmDialogVariantToButtonToneMapping} */
+  /** Meaning of the action; carried by the icon and the confirm button. @default 'danger' */
+  tone?: ConfirmDialogTone;
+  /** Overrides the auto-mapped button tone. */
   primaryTone?: ButtonVariants['tone'];
   title?: ReactNode;
   description?: ReactNode;
@@ -30,26 +26,23 @@ export type ConfirmDialogProps = {
   cancelLabel?: string;
   children?: ReactNode | [ReactNode] | [ReactNode, ReactNode] | [ReactNode, ReactNode, ReactNode];
   className?: string;
-  /** When provided, the consumer manages spinner and close. When omitted, the component auto-manages both. @default undefined */
+  /** When provided, the consumer manages spinner and close. When omitted, the component auto-manages both. */
   loading?: boolean;
-  /**
-   * Controls overlay click and escape key dismissal.
-   * @default false
-   * */
+  /** Escape and outside clicks close the dialog only when true; a ✕ is always shown. @default false */
   dismissible?: boolean;
   /** Supports async — return a `Promise` for auto-spinner and auto-close on resolve. */
   onConfirm?: () => void | Promise<unknown>;
 };
 
-const confirmDialogVariantToIconsMapping: Record<ConfirmDialogVariant, typeof AlertTriangle> = {
+const TONE_ICON: Record<ConfirmDialogTone, typeof AlertTriangle> = {
   warning: AlertTriangle,
   success: CheckCircle,
-  destructive: XCircle,
+  danger: XCircle,
   info: Info,
 };
 
-const confirmDialogVariantToButtonToneMapping: Record<ConfirmDialogVariant, ButtonVariants['tone']> = {
-  destructive: 'danger',
+const TONE_BUTTON: Record<ConfirmDialogTone, ButtonVariants['tone']> = {
+  danger: 'danger',
   success: 'neutral',
   warning: 'neutral',
   info: 'neutral',
@@ -57,36 +50,22 @@ const confirmDialogVariantToButtonToneMapping: Record<ConfirmDialogVariant, Butt
 
 export const confirmDialogIconVariants = cva('mb-4', {
   variants: {
-    variant: {
+    tone: {
       warning: 'text-warning',
       success: 'text-success',
-      destructive: 'text-destructive',
-      info: 'text-primary',
+      danger: 'text-danger',
+      info: 'text-info',
     },
   },
   defaultVariants: {
-    variant: 'destructive',
-  },
-});
-
-export const confirmDialogVariants = cva('border-t-4', {
-  variants: {
-    variant: {
-      warning: 'border-t-warning',
-      success: 'border-t-success',
-      destructive: 'border-t-destructive',
-      info: 'border-t-primary',
-    },
-  },
-  defaultVariants: {
-    variant: 'destructive',
+    tone: 'danger',
   },
 });
 
 /**
  * # ConfirmDialog
  *
- * Confirmation dialog with variant styling, async-aware confirm, and dismissible control.
+ * Confirmation dialog with tone styling, async-aware confirm, and dismissible control.
  * Built on `Dialog.Content` (Radix).
  *
  * ## Children (Dual Mode)
@@ -99,18 +78,16 @@ export const confirmDialogVariants = cva('border-t-4', {
  * - `loading` **not provided** → Auto-managed: sync closes immediately, async (`Promise`) shows spinner and closes on resolve, stays open on reject.
  * - `loading` **provided** → Consumer-managed: consumer controls the spinner display and close timing via `onOpenChange`.
  *
- * ## Variant → Button Mapping
+ * ## Tone → Button
  *
- * The confirm button variant is auto-mapped from the dialog variant:
- * `destructive → destructive`, `success → success`, `warning → default`, `info → default`.
- * Override with `primaryTone`.
+ * `danger → danger`; `success`, `warning`, `info` → `neutral`. Override with `primaryTone`.
  *
  * @see {@link ConfirmDialogProps} for prop details and defaults.
  */
 function ConfirmDialog({
   open,
   onOpenChange,
-  variant = 'destructive',
+  tone = 'danger',
   primaryTone,
   title,
   description,
@@ -133,7 +110,8 @@ function ConfirmDialog({
   const isControlled = open !== undefined;
   const isOpen = isControlled ? open : internalOpen;
   const isLoading = loading ?? internalLoading;
-  const Icon = confirmDialogVariantToIconsMapping[variant];
+  const Icon = TONE_ICON[tone];
+  const descriptionId = useId();
 
   const childrenArray = Children.toArray(children);
 
@@ -186,7 +164,8 @@ function ConfirmDialog({
         hideTitle
         size="sm"
         dismissible={dismissible}
-        className={cn(confirmDialogVariants({ variant }), className)}
+        {...(description ? { 'aria-describedby': descriptionId } : {})}
+        className={className}
       >
         {/* Escape and outside clicks stay blocked when not dismissible, but a visible ✕ always offers a way out (e.g. after a failed async confirm). */}
         <Conditional.If condition={!dismissible}>
@@ -199,14 +178,16 @@ function ConfirmDialog({
 
         <Conditional.If condition={!!title}>
           <div className="flex flex-col items-center gap-y-1.5 text-center">
-            <Icon className={confirmDialogIconVariants({ variant })} size={48} />
+            <Icon className={confirmDialogIconVariants({ tone })} size={48} />
 
             <p aria-hidden="true" className="text-fg text-md font-semibold">
               {title}
             </p>
 
             <Conditional.If condition={!!description}>
-              <p className="text-fg-muted text-sm">{description}</p>
+              <p id={descriptionId} className="text-fg-muted text-sm">
+                {description}
+              </p>
             </Conditional.If>
           </div>
         </Conditional.If>
@@ -220,7 +201,7 @@ function ConfirmDialog({
             <Conditional.If condition={!!actions}>{actions}</Conditional.If>
 
             <Conditional.Else>
-              <Conditional.If condition={variant !== 'success' && variant !== 'info'}>
+              <Conditional.If condition={tone !== 'success' && tone !== 'info'}>
                 <Dialog.Close asChild>
                   <Button variant="outline" size="lg">
                     {resolvedCancelLabel}
@@ -228,12 +209,7 @@ function ConfirmDialog({
                 </Dialog.Close>
               </Conditional.If>
 
-              <Button
-                tone={primaryTone ?? confirmDialogVariantToButtonToneMapping[variant]}
-                size="lg"
-                loading={isLoading}
-                onClick={handleConfirm}
-              >
+              <Button tone={primaryTone ?? TONE_BUTTON[tone]} size="lg" loading={isLoading} onClick={handleConfirm}>
                 {resolvedConfirmLabel}
               </Button>
             </Conditional.Else>

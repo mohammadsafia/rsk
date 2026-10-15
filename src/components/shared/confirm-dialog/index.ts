@@ -1,1 +1,1 @@
-export { default as ConfirmDialog, type ConfirmDialogProps, type ConfirmDialogVariants } from './ConfirmDialog';
+export { default as ConfirmDialog, type ConfirmDialogProps, type ConfirmDialogTone } from './ConfirmDialog';

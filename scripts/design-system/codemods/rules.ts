@@ -264,6 +264,20 @@ const tabsTriggerRule: TagRule = {
   transform: () => ({}),
 };
 
+const CONFIRM_TONES: Readonly<Record<string, string>> = {
+  destructive: 'danger',
+  warning: 'warning',
+  success: 'success',
+  info: 'info',
+};
+
+const confirmDialogRule: TagRule = {
+  tag: 'ConfirmDialog',
+  keys: ['variant'],
+  transform: (attrs): Record<string, AttrValue> =>
+    attrs.variant === undefined ? {} : { tone: lookup(CONFIRM_TONES, attrs.variant, 'ConfirmDialog variant') },
+};
+
 export const RULE_SETS: Record<string, ReadonlyArray<TagRule>> = {
   button: [buttonRule('Button'), buttonRule('LoadingButton', 'Button')],
   badge: [badgeRule, statusPillRule],
@@ -273,4 +287,5 @@ export const RULE_SETS: Record<string, ReadonlyArray<TagRule>> = {
   menus: [toggleRule('ToggleGroup'), toggleRule('ToggleGroup.Item')],
   card: [cardRule],
   tabs: [tabsListRule, tabsTriggerRule],
+  confirm: [confirmDialogRule],
 };

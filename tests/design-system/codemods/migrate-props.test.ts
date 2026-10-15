@@ -170,3 +170,17 @@ describe('tabs rules', () => {
     expect(run(input)).toBe(expected);
   });
 });
+
+describe('confirm rules', () => {
+  const run = (source: string) => migrateSource(source, RULE_SETS.confirm, 'x.tsx').output;
+
+  it.each([
+    ['<ConfirmDialog variant="destructive" title="x">', '<ConfirmDialog tone="danger" title="x">'],
+    ['<ConfirmDialog variant="warning">', '<ConfirmDialog tone="warning">'],
+    ['<ConfirmDialog variant="success">', '<ConfirmDialog tone="success">'],
+    ['<ConfirmDialog variant="info">', '<ConfirmDialog tone="info">'],
+    ['<ConfirmDialog title="x">', '<ConfirmDialog title="x">'],
+  ])('%s → %s', (input, expected) => {
+    expect(run(input)).toBe(expected);
+  });
+});

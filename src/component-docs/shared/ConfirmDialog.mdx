@@ -33,3 +33,14 @@ import { Button } from '@components/ui/button';
   <Button tone="danger">Delete</Button>
 </ConfirmDialog>
 ```
+
+## Tones
+
+| `tone` | Icon | Confirm button | Cancel shown |
+|---|---|---|---|
+| `danger` (default) | ✕ circle, danger | danger | yes |
+| `warning` | triangle, warning | neutral | yes |
+| `success` | check circle, success | neutral | no |
+| `info` | info, info | neutral | no |
+
+Tone is carried by the icon and the confirm button — the dialog itself has no colored border. A non-dismissible dialog ignores Escape and outside clicks but always shows a ✕.

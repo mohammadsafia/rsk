@@ -606,7 +606,8 @@ export function ConfirmDialogDemo() {
     <div className="flex flex-wrap gap-2">
       {/* Uncontrolled + async onConfirm */}
       <ConfirmDialog
-        variant="success"
+        tone="success"
+
         title="Confirm Change"
         description="Are you sure you want to make this change? This action cannot be undone."
         onConfirm={onConfirm}
@@ -618,7 +619,8 @@ export function ConfirmDialogDemo() {
 
       {/* Uncontrolled + async onConfirm */}
       <ConfirmDialog
-        variant="destructive"
+        tone="danger"
+
         title="Delete Admin"
         description="Are you sure you want to delete this admin? This action cannot be undone."
         confirmLabel="Delete"
@@ -633,10 +635,11 @@ export function ConfirmDialogDemo() {
 
       {/* Controlled + custom actions */}
       <ConfirmDialog
+        tone="warning"
         className="md:min-w-[450px]"
         open={open}
         onOpenChange={setOpen}
-        variant="warning"
+
         title="Warning: Forbidden CIF Detected"
         description={
           <>
@@ -663,18 +666,19 @@ export function ConfirmDialogDemo() {
       </ConfirmDialog>
 
       {/* Success variant */}
-      <ConfirmDialog variant="success" title="Operation Successful" description="Your changes have been saved." confirmLabel="OK">
+      <ConfirmDialog tone="success" title="Operation Successful" description="Your changes have been saved." confirmLabel="OK">
         <Button>Success</Button>
       </ConfirmDialog>
 
       {/* Info variant */}
-      <ConfirmDialog variant="info" title="Information" description="This is an informational message." confirmLabel="Got it">
+      <ConfirmDialog tone="info" title="Information" description="This is an informational message." confirmLabel="Got it">
         <Button variant="outline">Info</Button>
       </ConfirmDialog>
 
       {/* Not Auto Closes on Confirm */}
       <ConfirmDialog
-        variant="info"
+        tone="info"
+
         title="Not Auto Closes on Confirm"
         description="Don't Close on Confirm by passing loading prop as well as not returning a Promise from the onConfirm which indicate this is sync operation"
         confirmLabel="Keep Open"
@@ -686,7 +690,8 @@ export function ConfirmDialogDemo() {
 
       {/* Auto Closes on Confirm */}
       <ConfirmDialog
-        variant="info"
+        tone="info"
+
         title="Auto Close on Confirm"
         description="Close on Confirm don't pass loading prop"
         confirmLabel="Close on Confirm"
@@ -696,13 +701,14 @@ export function ConfirmDialogDemo() {
       </ConfirmDialog>
 
       {/* Loading variant */}
-      <ConfirmDialog variant="warning" title="External Loading" description="This is an async external loading action." loading>
+      <ConfirmDialog tone="warning" title="External Loading" description="This is an async external loading action." loading>
         <Button variant="outline">External Loading</Button>
       </ConfirmDialog>
 
       {/* Dismissable variant by default (false) */}
       <ConfirmDialog
-        variant="warning"
+        tone="warning"
+
         title="Dismissable"
         description="This is a dismissable via espace-key or backdrop example."
         dismissible={true}
