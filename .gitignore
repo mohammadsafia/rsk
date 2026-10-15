@@ -44,3 +44,4 @@ temp-api-types/
 .playwright-mcp/
 
 i18n-*.png
+.vitest/

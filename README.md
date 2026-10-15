@@ -98,7 +98,7 @@ All page components are code-split with `React.lazy` + `Suspense`. Route constan
 | i18n          | i18next with browser detection                                    |
 | Monitoring    | Sentry (error tracking), Firebase (push notifications)            |
 | Docs          | MDX + rehype-pretty-code + Shiki (component gallery)              |
-| Tooling       | DTO generator CLI, ESLint, Prettier, Vitest                       |
+| Tooling       | Vite+ (`vp`: Vite, Rolldown, Vitest, Oxlint, Oxfmt), DTO CLI      |
 
 ---
 
@@ -247,15 +247,15 @@ All folders use **kebab-case**. Each component lives in its own folder with a ba
 
 ### Prerequisites
 
-- Node.js **22.14.0** (`.nvmrc` included)
-- Yarn
+- Node.js **22.18+** (`.node-version` included)
+- pnpm 10 (pinned via `packageManager`)
+- Optional: the [Vite+ global CLI](https://viteplus.dev/guide/) (`curl -fsSL https://vite.plus | bash`), which manages Node and pnpm for you
 
 ### Install & Run
 
 ```bash
-nvm use
-yarn install
-yarn dev
+vp install   # or: pnpm install
+vp dev       # or: pnpm dev
 ```
 
 Opens on http://localhost:3000.
@@ -264,31 +264,35 @@ Opens on http://localhost:3000.
 
 | Command           | Description                                                     |
 |-------------------|-----------------------------------------------------------------|
-| `yarn dev`        | Start the Vite development server                               |
-| `yarn build`      | Type-check and build for production                             |
-| `yarn build:dev`  | Build with the development mode flag                            |
-| `yarn preview`    | Serve the production build locally                              |
-| `yarn test`       | Run the Vitest test suite                                       |
-| `yarn lint`       | Lint the codebase with ESLint 9                                 |
-| `yarn dto:gen`    | Interactive DTO generation with diff badges                     |
-| `yarn dto:list`   | List all tracked schemas in the manifest                        |
-| `yarn dto:diff`   | Show schemas that have changed since last generation            |
-| `yarn dto:clean`  | Remove orphaned generated files and update the manifest         |
-| `yarn dto:init`   | Scaffold the `.dto-gen.json` configuration file                 |
-| `yarn docs:new`   | Scaffold a new MDX component documentation file                 |
-| `yarn docs:lint`  | Validate completeness of component documentation                |
+| `pnpm dev`        | Start the Vite development server                               |
+| `pnpm build`      | Type-check and build for production                             |
+| `pnpm build:dev`  | Build with the development mode flag                            |
+| `pnpm preview`    | Serve the production build locally                              |
+| `pnpm test`       | Run the Vitest test suite                                       |
+| `pnpm lint`       | Lint the codebase with Oxlint (type-aware)                      |
+| `vp check`        | Format check (Oxfmt), lint, and type-check in one pass          |
+| `vp fmt`          | Format the codebase with Oxfmt                                  |
+| `pnpm dto:gen`    | Interactive DTO generation with diff badges                     |
+| `pnpm dto:list`   | List all tracked schemas in the manifest                        |
+| `pnpm dto:diff`   | Show schemas that have changed since last generation            |
+| `pnpm dto:clean`  | Remove orphaned generated files and update the manifest         |
+| `pnpm dto:init`   | Scaffold the `.dto-gen.json` configuration file                 |
+| `pnpm docs:new`   | Scaffold a new MDX component documentation file                 |
+| `pnpm docs:lint`  | Validate completeness of component documentation                |
 
 ### Important Notes
+
+- **Tooling config** — Vite, Vitest (`test`), Oxlint (`lint`), and Oxfmt (`fmt`) are all configured in `vite.config.ts`. Import from `vite-plus` / `vite-plus/test`, not `vite` / `vitest`.
 
 - **Path aliases** are configured in both `vite.config.ts` and `tsconfig.app.json`. Available aliases: `@api`, `@components`, `@hooks`, `@utils`, `@contexts`, `@constants`, `@layouts`, `@pages`, `@views`, `@routes`, `@app-types`, `@assets`, `@locales`, `@app-config`, `@hoc`, `@component-docs`.
 
 - **Environment variables** — A `.env` file is required. All app variables use the `VITE_APP_*` prefix. Key variables: `VITE_APP_BASE_URL` (API base URL), `VITE_APP_CLIENT_ID` (OIDC client ID), plus Firebase config variables for push notifications.
 
-- **DTO generator** — Requires a Swagger/OpenAPI endpoint configured in `.dto-gen.json`. Run `yarn dto:init` to scaffold the config file before first use.
+- **DTO generator** — Requires a Swagger/OpenAPI endpoint configured in `.dto-gen.json`. Run `pnpm dto:init` to scaffold the config file before first use.
 
 - **Theming** — The default theme is dark. When adding new design tokens, define them in both `:root` (light) and `.dark` (dark) blocks in `index.css`.
 
-- **Component docs** — Run `yarn docs:new` to scaffold MDX component documentation in `src/component-docs/`. The live demo gallery is driven by these files.
+- **Component docs** — Run `pnpm docs:new` to scaffold MDX component documentation in `src/component-docs/`. The live demo gallery is driven by these files.
 
 - **Conditional rendering** — `Conditional.If` is mandatory for all conditional rendering in JSX. Do not use `&&` or ternary expressions inside JSX templates.
 
@@ -309,19 +313,19 @@ Features:
 - Auto-dependency resolution via BFS — selecting a schema automatically includes all referenced schemas
 - Flexible enum strategies — generate as TypeScript `type` literals or native `enum` declarations
 - Manifest tracking — the generator records every generated file and automatically removes orphans on clean
-- Post-generation formatting with Prettier and ESLint to ensure generated files match project standards
+- Post-generation formatting with Oxfmt and Oxlint (via Vite+) to ensure generated files match project standards
 
 | Command           | Description                                                     |
 |-------------------|-----------------------------------------------------------------|
-| `yarn dto:gen`    | Run interactive DTO generation with diff badges                 |
-| `yarn dto:list`   | List all schemas currently tracked in the manifest              |
-| `yarn dto:diff`   | Show which tracked schemas have upstream changes                |
-| `yarn dto:clean`  | Delete orphaned generated files and sync the manifest           |
-| `yarn dto:init`   | Scaffold `.dto-gen.json` with a guided setup prompt             |
+| `pnpm dto:gen`    | Run interactive DTO generation with diff badges                 |
+| `pnpm dto:list`   | List all schemas currently tracked in the manifest              |
+| `pnpm dto:diff`   | Show which tracked schemas have upstream changes                |
+| `pnpm dto:clean`  | Delete orphaned generated files and sync the manifest           |
+| `pnpm dto:init`   | Scaffold `.dto-gen.json` with a guided setup prompt             |
 
 ### Component Docs
 
-Run `yarn docs:new` to scaffold MDX documentation for a new component. The scaffolded file includes frontmatter, a live demo section, and prop tables. Run `yarn docs:lint` to validate completeness.
+Run `pnpm docs:new` to scaffold MDX documentation for a new component. The scaffolded file includes frontmatter, a live demo section, and prop tables. Run `pnpm docs:lint` to validate completeness.
 
 ### Components Gallery
 
@@ -332,7 +336,7 @@ The gallery is available at `/components` and showcases UI, Forms, and Shared co
 **Adding a new component doc:**
 
 ```bash
-yarn docs:new
+pnpm docs:new
 ```
 
 The interactive CLI prompts for category, component id (kebab-case), description, and optional tags — then scaffolds an MDX file in the correct folder.
@@ -350,4 +354,4 @@ The interactive CLI prompts for category, component id (kebab-case), description
 
 **MDX sections:** Each doc includes a `## Demo` section with live JSX, a `## Imports` section with the import statement, and a `## Code` section with usage examples. See any file under `src/component-docs/ui/` for reference.
 
-**Validation:** Run `yarn docs:lint` before committing. It checks all required frontmatter fields, validates kebab-case ids, ensures category matches folder name, detects duplicate ids, and flags any remaining template placeholders.
+**Validation:** Run `pnpm docs:lint` before committing. It checks all required frontmatter fields, validates kebab-case ids, ensures category matches folder name, detects duplicate ids, and flags any remaining template placeholders.

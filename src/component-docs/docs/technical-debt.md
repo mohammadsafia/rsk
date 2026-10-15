@@ -8,8 +8,8 @@ the issue is, why it matters, and what a safe fix looks like.
 - Components Gallery page (`ComponentsGalleryPage` / docs browser UX)
 - Gallery internals (`component-docs/gallery/`)
 - Registry (`component-docs/registry/`)
-- CLI generator (`yarn docs:new`)
-- Linter (`yarn docs:lint`)
+- CLI generator (`pnpm docs:new`)
+- Linter (`pnpm docs:lint`)
 
 ## Non goals
 

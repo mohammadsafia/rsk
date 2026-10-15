@@ -19,7 +19,7 @@ Run it before committing any docs changes.
 ## Command
 
 ```bash
-yarn docs:lint
+pnpm docs:lint
 ```
 
 ## Scan scope
@@ -115,7 +115,7 @@ If lint fails:
 3. Re-run:
 
 ```bash
-yarn docs:lint
+pnpm docs:lint
 ```
 
 Common fixes:
@@ -131,7 +131,7 @@ files — fix and re-run to reveal remaining issues.
 
 ## Summary
 
-* Run `yarn docs:lint` before committing
+* Run `pnpm docs:lint` before committing
 * Only `_*` directories are excluded from scanning
 * Validation is ordered — fix missing fields first before other errors appear
 * Fix errors using the "Error types and fixes" table

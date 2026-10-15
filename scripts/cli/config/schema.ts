@@ -10,10 +10,18 @@ export const SwaggerEndpointSchema = z.object({
   outputDir: z.string().min(1),
 });
 
-export const FormattingConfigSchema = z.object({
-  prettier: z.boolean().default(true),
-  eslint: z.boolean().default(true),
-});
+export const FormattingConfigSchema = z.preprocess(
+  // Accept legacy `prettier` / `eslint` keys from pre-Vite+ configs.
+  (raw) => {
+    if (!raw || typeof raw !== 'object') return raw;
+    const { prettier, eslint, ...rest } = raw as Record<string, unknown>;
+    return { format: prettier, lint: eslint, ...rest };
+  },
+  z.object({
+    format: z.boolean().default(true),
+    lint: z.boolean().default(true),
+  }),
+);
 
 export const DtoGenConfigSchema = z.object({
   endpoints: z.array(SwaggerEndpointSchema).min(1),

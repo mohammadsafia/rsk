@@ -21,8 +21,8 @@ export const DEFAULT_CONFIG: DtoGenConfig = {
   endpoints: DEFAULT_ENDPOINTS,
   enumStrategy: 'type-literal',
   formatting: {
-    prettier: true,
-    eslint: true,
+    format: true,
+    lint: true,
   },
   dryRun: false,
 };

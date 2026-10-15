@@ -316,7 +316,7 @@ function CalendarGridRoot<TEvent>({
 
   useEffect(() => {
     onRangeChange?.(range);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- string keys are the actual change signal; range object recomputes per render due to useDate closure instability
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- string keys are the actual change signal; range object recomputes per render due to useDate closure instability
   }, [range.startDate, range.endDate]);
 
   if (isLoading && events.length === 0) {

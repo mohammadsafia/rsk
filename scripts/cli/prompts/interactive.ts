@@ -75,8 +75,8 @@ export async function runInteractiveFlow(
     endpoints: selectedEndpoints,
     enumStrategy,
     formatting: {
-      prettier: options.prettier,
-      eslint: options.eslint,
+      format: options.format,
+      lint: options.lint,
     },
     dryRun: options.dryRun,
   };

@@ -169,7 +169,7 @@ npx tsx scripts/cli/bin-cli/dto-gen.ts list --json
 
 ## Diff Mode
 
-The `--diff` flag compares what the generator would produce against what exists on disk. It uses Prettier formatting on the generated content and blank-line-insensitive comparison to avoid false positives from cosmetic formatting differences.
+The `--diff` flag compares what the generator would produce against what exists on disk. It uses Oxfmt formatting (with the `fmt` options from `vite.config.ts`) on the generated content and blank-line-insensitive comparison to avoid false positives from cosmetic formatting differences.
 
 Statuses:
 - **new** — schema exists in BE swagger but no corresponding local `.ts` file
@@ -297,8 +297,8 @@ The tool reads `.dto-gen.json` from the project root. Run `npm run dto:init` to 
   ],
   "enumStrategy": "type-literal",   // "type-literal" | "enum"
   "formatting": {
-    "prettier": true,                // Run Prettier on generated files
-    "eslint": true                   // Run ESLint --fix on generated files
+    "format": true,                  // Run Oxfmt on generated files
+    "lint": true                     // Run Oxlint --fix (vp lint) on generated files
   }
 }
 ```
@@ -310,8 +310,8 @@ The tool reads `.dto-gen.json` from the project root. Run `npm run dto:init` to 
 | `endpoints[].url` | `string` | Full URL to the `swagger.json` |
 | `endpoints[].outputDir` | `string` | Output directory relative to project root |
 | `enumStrategy` | `"type-literal" \| "enum"` | How to generate enum-like schemas |
-| `formatting.prettier` | `boolean` | Run Prettier after generation |
-| `formatting.eslint` | `boolean` | Run ESLint `--fix` after generation |
+| `formatting.format` | `boolean` | Run Oxfmt after generation (legacy key: `prettier`) |
+| `formatting.lint` | `boolean` | Run Oxlint `--fix` after writing (legacy key: `eslint`) |
 
 ---
 
@@ -330,7 +330,7 @@ Fetch ─> Parse ─> Filter ─> Resolve ─> Generate ─> Format ─> Write
 | **Filter** | Narrows schemas to the user's selection (or keeps all) |
 | **Resolve** | BFS over `$ref` imports to auto-include transitive dependencies |
 | **Generate** | Dispatches each IR schema to the correct generator via the Registry pattern |
-| **Format** | Runs Prettier and ESLint plugins on generated code |
+| **Format** | Runs Oxfmt on generated code (Oxlint runs as a post-write plugin) |
 | **Write** | Writes files to disk with hash-based change detection, updates manifest, auto-deletes orphans |
 
 ### Design Patterns
@@ -391,8 +391,7 @@ scripts/cli/
 ├── plugins/
 │   ├── Plugin.ts               # Plugin type + HookName definitions
 │   ├── PluginManager.ts        # Registers and runs plugins
-│   ├── PrettierPlugin.ts       # Prettier formatting plugin
-│   └── ESLintPlugin.ts         # ESLint --fix plugin
+│   └── LintPlugin.ts           # Oxlint --fix plugin (vp lint)
 ├── prompts/
 │   ├── interactive.ts          # Full interactive flow (diff-aware)
 │   ├── versionSelector.ts      # API version checkbox prompt

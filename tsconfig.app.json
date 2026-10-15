@@ -7,7 +7,7 @@
     "useDefineForClassFields": true,
 
     /* Bundler mode */
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
@@ -21,9 +21,6 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-
-    /* Path resolution */
-    "baseUrl": ".",
     "paths": {
       "@api/*": ["./src/api/*"],
       "@assets/*": ["./src/assets/*"],
@@ -51,7 +48,6 @@
     "allowJs": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "downlevelIteration": true,
     "resolveJsonModule": true
   },
   "include": ["src"]

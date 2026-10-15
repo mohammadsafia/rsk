@@ -1,6 +1,6 @@
 # CLI
 
-This document explains the MDX docs generator CLI (`yarn docs:new`): what it prompts for, what it creates, and common
+This document explains the MDX docs generator CLI (`pnpm docs:new`): what it prompts for, what it creates, and common
 failure cases.
 
 ---
@@ -22,7 +22,7 @@ failure cases.
 ## Command
 
 ```bash
-yarn docs:new
+pnpm docs:new
 ```
 
 ## What it generates
@@ -224,7 +224,7 @@ Fix:
 
 ## Summary
 
-* Use `yarn docs:new` to create docs (do not create MDX manually)
+* Use `pnpm docs:new` to create docs (do not create MDX manually)
 * Category comes from folder selection (excludes `_*` and `scripts` only)
 * File name, component name, and import path are derived from the id
 * Tags are auto-generated and de-duplicated

@@ -9,7 +9,7 @@ type Pagination = {
   pageSize: number;
   total: number;
   totalPage: number;
-}
+};
 
 export type ExtendedSortingState<TData extends Record<string, unknown>> = Array<
   Omit<ColumnSort, 'id'> & { id: Extract<keyof TData, string> }
@@ -58,7 +58,7 @@ export type DataTableFilterMeta = SelectFilterMeta | DateFilterMeta | TimeFilter
 export type DateRangeFilterValue = { from?: string; to?: string };
 
 declare module '@tanstack/table-core' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // oxlint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
     label?: string;
     filterMeta?: DataTableFilterMeta;

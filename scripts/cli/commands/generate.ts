@@ -9,7 +9,7 @@ import { runInteractiveFlow } from '../prompts/interactive.js';
 import { Pipeline } from '../pipeline/Pipeline.js';
 import { createPipelineContext } from '../pipeline/PipelineContext.js';
 import { PluginManager } from '../plugins/PluginManager.js';
-import { createESLintPlugin } from '../plugins/ESLintPlugin.js';
+import { createLintPlugin } from '../plugins/LintPlugin.js';
 import { createFetchStep } from '../pipeline/steps/FetchStep.js';
 import { createParseStep } from '../pipeline/steps/ParseStep.js';
 import { createFilterStep } from '../pipeline/steps/FilterStep.js';
@@ -43,7 +43,7 @@ export async function generateCommand(
 
     // Build and execute pipeline
     const pluginManager = new PluginManager();
-    pluginManager.register(createESLintPlugin());
+    pluginManager.register(createLintPlugin());
 
     const pipeline = new Pipeline(pluginManager)
       .addStep(createFetchStep())

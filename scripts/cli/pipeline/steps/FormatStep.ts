@@ -1,41 +1,35 @@
 /**
- * FormatStep — Formats generated files with Prettier.
- * (ESLint is handled as a plugin after writing, since it needs files on disk.)
+ * FormatStep — Formats generated files with Oxfmt (via Vite+).
+ * (Linting is handled as a plugin after writing, since it needs files on disk.)
  */
 
-import prettier from 'prettier';
 import type { PipelineStep } from '../Pipeline.js';
 import { logger } from '../../utils/logger.js';
+import { formatTs } from '../../utils/format.js';
 
 export function createFormatStep(): PipelineStep {
   return {
     name: 'Format',
     async execute(ctx) {
-      if (!ctx.config.formatting.prettier) {
-        logger.dim('Prettier formatting skipped (disabled in config).');
+      if (!ctx.config.formatting.format) {
+        logger.dim('Oxfmt formatting skipped (disabled in config).');
         return;
       }
 
       const spinner = logger.spinner(
-        `Formatting ${ctx.generatedFiles.length} file(s) with Prettier...`
+        `Formatting ${ctx.generatedFiles.length} file(s) with Oxfmt...`
       );
 
       try {
         for (const file of ctx.generatedFiles) {
-          const config = await prettier.resolveConfig(file.path);
-
-          file.content = await prettier.format(file.content, {
-            ...(config ?? {}),
-            parser: 'typescript',
-            filepath: file.path,
-          });
+          file.content = await formatTs(file.path, file.content);
         }
 
-        spinner.succeed('Files formatted with Prettier.');
+        spinner.succeed('Files formatted with Oxfmt.');
       } catch (error) {
-        spinner.fail('Prettier formatting failed.');
+        spinner.fail('Oxfmt formatting failed.');
         logger.warn(
-          `Prettier error: ${error instanceof Error ? error.message : String(error)}`
+          `Oxfmt error: ${error instanceof Error ? error.message : String(error)}`
         );
       }
     },

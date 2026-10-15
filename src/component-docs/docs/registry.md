@@ -204,7 +204,7 @@ If any required key is missing or empty:
 - the entry is still created using fallback values
 
 Note: the registry does **not** detect duplicate `id` values at runtime. Duplicate detection is handled by the linter
-(`yarn docs:lint`). See `docs/technical-debt.md` for context on this gap.
+(`pnpm docs:lint`). See `docs/technical-debt.md` for context on this gap.
 
 ## Errors surfaced in the UI
 
@@ -244,7 +244,7 @@ Use when you want a clean rebuild without restarting the dev server.
 |---|---|---|
 | Doc does not show up | Missing required frontmatter or not under scanned path | Check `componentDocsErrors` and fix frontmatter or location |
 | Category mismatch error | Frontmatter `category` differs from folder category | Update frontmatter or move file to the correct folder |
-| Duplicate id issues | Another doc already uses the same `id` | Change `id` and run `yarn docs:lint` (runtime does not catch this) |
+| Duplicate id issues | Another doc already uses the same `id` | Change `id` and run `pnpm docs:lint` (runtime does not catch this) |
 | Wrong title in gallery | Missing `title` in frontmatter | Add `title`; fallback is the raw `id` which may not look right |
 | Stale data after adding a doc | Registry cache not invalidated | Call `resetComponentDocsRegistryCache()` or restart dev server |
 

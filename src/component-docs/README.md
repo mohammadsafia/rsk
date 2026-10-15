@@ -8,13 +8,13 @@ consistency, and rendered in the docs UI.
 Create a new doc:
 
 ```bash
-yarn docs:new
+pnpm docs:new
 ```
 
 Lint all docs:
 
 ```bash
-yarn docs:lint
+pnpm docs:lint
 ```
 
 View in UI (local):
@@ -75,7 +75,7 @@ tags: ["ui", "toggle", "group"]
 * Frontmatter `category` must match the folder category after normalization
 * All five required frontmatter fields must be present and non-empty
 * Do not put docs under `_template/`, `scripts/`, or `docs/`
-* Run `yarn docs:lint` before committing any docs changes
+* Run `pnpm docs:lint` before committing any docs changes
 
 ## Read more
 
