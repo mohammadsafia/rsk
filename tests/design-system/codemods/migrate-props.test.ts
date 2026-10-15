@@ -119,3 +119,18 @@ describe('alert rules', () => {
     expect(migrateSource(input, RULE_SETS.alert).output).toBe(expected);
   });
 });
+
+describe('feedback rules', () => {
+  it.each([
+    ['<Progress value={30} variant="default" indicatorVariant="default"/>', '<Progress value={30}/>'],
+    ['<Progress value={60} variant="success" indicatorVariant="success"/>', '<Progress tone="success" value={60}/>'],
+    ['<Progress value={90} variant="destructive" size="lg"/>', '<Progress tone="danger" size="lg" value={90}/>'],
+    ['<Skeleton shape="text" size="xs" />', '<Skeleton size="sm" />'],
+    ['<Skeleton shape="avatar" size="xl" />', '<Skeleton shape="circle" size="lg" />'],
+    ['<Skeleton shape="banner" size="md" variant="card" />', '<Skeleton shape="block" />'],
+    ['<Switch variant="success" size="lg" />', '<Switch size="md" />'],
+    ['<Checkbox variant="secondary" />', '<Checkbox />'],
+  ])('%s → %s', (input, expected) => {
+    expect(migrateSource(input, RULE_SETS.feedback).output.replace(/\s+/g, ' ')).toBe(expected);
+  });
+});

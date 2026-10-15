@@ -216,7 +216,7 @@ function FormMultiCombobox<TFieldValues extends FieldValues, TOption = FormSelec
                     onSelect={() => onToggleValue(optValue)}
                   >
                     <Combobox.Indicator>
-                      <Checkbox checked={isChecked} variant="primary" tabIndex={-1} className="pointer-events-none" />
+                      <Checkbox checked={isChecked} tabIndex={-1} className="pointer-events-none" />
                     </Combobox.Indicator>
 
                     {getOptionLabel(option)}

@@ -327,11 +327,11 @@ function CalendarGridRoot<TEvent>({
         aria-live="polite"
         className={cn('border-muted-200 bg-background flex min-h-180 flex-col gap-3 overflow-clip rounded-2xl border p-4', className)}
       >
-        <Skeleton shape="text" size="md" />
+        <Skeleton />
 
-        <Skeleton shape="text" size="xs" />
+        <Skeleton size="sm" />
 
-        <Skeleton shape="banner" size="xl" className="flex-1" />
+        <Skeleton shape="block" size="lg" className="flex-1" />
       </div>
     );
   }

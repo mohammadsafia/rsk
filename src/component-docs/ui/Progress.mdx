@@ -3,7 +3,7 @@ id: progress
 title: Progress
 section: Components
 category: UI
-description: 'Visual progress indicator with multiple variants and sizes.'
+description: 'Linear progress with a tone (accent, neutral, success, danger) and three thicknesses; fills from the inline start, RTL-aware.'
 tags: [ui, progress, loading]
 ---
 
@@ -17,23 +17,23 @@ import { Progress } from '@components/ui';
         <div className="space-y-2">
             <div className="space-y-1">
                 <span className="text-xs">Default (30%)</span>
-                <Progress value={30} variant="default" indicatorVariant="default"/>
+                <Progress value={30}/>
             </div>
             <div className="space-y-1">
                 <span className="text-xs">Success (60%)</span>
-                <Progress value={60} variant="success" indicatorVariant="success"/>
+                <Progress tone="success" value={60}/>
             </div>
             <div className="space-y-1">
                 <span className="text-xs">Destructive (90%)</span>
-                <Progress value={90} variant="destructive" indicatorVariant="destructive"/>
+                <Progress tone="danger" value={90}/>
             </div>
             <div className="space-y-1">
                 <span className="text-xs">Secondary (50%)</span>
-                <Progress value={50} variant="secondary" indicatorVariant="secondary"/>
+                <Progress tone="neutral" value={50}/>
             </div>
             <div className="space-y-1">
                 <span className="text-xs">Accent Indicator (75%)</span>
-                <Progress value={75} variant="default" indicatorVariant="accent"/>
+                <Progress value={75}/>
             </div>
         </div>
     </div>
@@ -43,15 +43,15 @@ import { Progress } from '@components/ui';
         <div className="space-y-2">
             <div className="space-y-1">
                 <span className="text-xs">Small</span>
-                <Progress value={70} size="sm"/>
+                <Progress size="sm" value={70}/>
             </div>
             <div className="space-y-1">
                 <span className="text-xs">Medium</span>
-                <Progress value={70} size="md"/>
+                <Progress size="md" value={70}/>
             </div>
             <div className="space-y-1">
                 <span className="text-xs">Large</span>
-                <Progress value={70} size="lg"/>
+                <Progress size="lg" value={70}/>
             </div>
         </div>
     </div>
@@ -68,14 +68,14 @@ import { Progress } from '@components/ui';
 
 ```tsx
 // Variants
-<Progress value={30} variant="default" indicatorVariant="default" />
-<Progress value={60} variant="success" indicatorVariant="success" />
-<Progress value={90} variant="destructive" indicatorVariant="destructive" />
-<Progress value={50} variant="secondary" indicatorVariant="secondary" />
-<Progress value={75} variant="default" indicatorVariant="accent" />
+<Progress value={30} />
+<Progress tone="success" value={60} />
+<Progress tone="danger" value={90} />
+<Progress tone="neutral" value={50} />
+<Progress value={75} />
 
 // Sizes
-<Progress value={70} size="sm" />
-<Progress value={70} size="md" />
-<Progress value={70} size="lg" />
+<Progress size="sm" value={70} />
+<Progress size="md" value={70} />
+<Progress size="lg" value={70} />
 ```

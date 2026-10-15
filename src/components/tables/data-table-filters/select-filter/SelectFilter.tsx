@@ -101,7 +101,7 @@ function SelectFilter<TData>({ column, filterMeta }: SelectFilterProps<TData>) {
                 <Conditional>
                   <Conditional.If condition={isMulti}>
                     <Combobox.Indicator>
-                      <Checkbox checked={isSelected} variant="primary" tabIndex={-1} className="pointer-events-none" />
+                      <Checkbox checked={isSelected} tabIndex={-1} className="pointer-events-none" />
                     </Combobox.Indicator>
                   </Conditional.If>
 

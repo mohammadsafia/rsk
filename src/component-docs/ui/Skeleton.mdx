@@ -3,7 +3,7 @@ id: skeleton
 title: Skeleton
 section: Components
 category: UI
-description: 'Loading placeholders with preset sizes and variants.'
+description: 'Loading placeholder: line, circle or block in three sizes; hidden from assistive technology.'
 tags: [ui, skeleton, loading]
 ---
 
@@ -15,78 +15,78 @@ import { Skeleton } from '@components/ui';
   <div>
     <p className="text-muted-foreground mb-2 text-xs font-medium">Sizes</p>
     <div className="space-y-2">
-      <Skeleton size="xs" />
       <Skeleton size="sm" />
-      <Skeleton size="default" />
-      <Skeleton size="md" />
+      <Skeleton size="sm" />
+      <Skeleton />
+      <Skeleton />
       <Skeleton size="lg" />
-      <Skeleton size="xl" />
+      <Skeleton size="lg" />
     </div>
   </div>
 
 <div>
   <p className="text-muted-foreground mb-2 text-xs font-medium">Shapes: Text</p>
   <div className="flex gap-3">
-    <Skeleton shape="text" size="xs" />
-    <Skeleton shape="text" size="sm" />
-    <Skeleton shape="text" size="md" />
-    <Skeleton shape="text" size="lg" />
-    <Skeleton shape="text" size="xl" />
+    <Skeleton size="sm" />
+    <Skeleton size="sm" />
+    <Skeleton />
+    <Skeleton size="lg" />
+    <Skeleton size="lg" />
   </div>
 </div>
 
 <div>
   <p className="text-muted-foreground mb-2 text-xs font-medium">Shapes: Avatar</p>
   <div className="flex gap-3">
-    <Skeleton shape="avatar" size="xs" />
-    <Skeleton shape="avatar" size="sm" />
-    <Skeleton shape="avatar" size="md" />
-    <Skeleton shape="avatar" size="lg" />
-    <Skeleton shape="avatar" size="xl" />
+    <Skeleton shape="circle" size="sm" />
+    <Skeleton shape="circle" size="sm" />
+    <Skeleton shape="circle" />
+    <Skeleton shape="circle" size="lg" />
+    <Skeleton shape="circle" size="lg" />
   </div>
 </div>
 
 <div>
   <p className="text-muted-foreground mb-2 text-xs font-medium">Shapes: Thumbnail</p>
   <div className="flex gap-3">
-    <Skeleton shape="thumbnail" size="xs" />
-    <Skeleton shape="thumbnail" size="sm" />
-    <Skeleton shape="thumbnail" size="md" />
-    <Skeleton shape="thumbnail" size="lg" />
-    <Skeleton shape="thumbnail" size="xl" />
+    <Skeleton shape="block" size="sm" />
+    <Skeleton shape="block" size="sm" />
+    <Skeleton shape="block" />
+    <Skeleton shape="block" size="lg" />
+    <Skeleton shape="block" size="lg" />
   </div>
 </div>
 
 <div>
   <p className="text-muted-foreground mb-2 text-xs font-medium">Shapes: Banner</p>
   <div className="flex gap-3">
-    <Skeleton shape="banner" size="xs" />
-    <Skeleton shape="banner" size="sm" />
-    <Skeleton shape="banner" size="md" />
-    <Skeleton shape="banner" size="lg" />
-    <Skeleton shape="banner" size="xl" />
+    <Skeleton shape="block" size="sm" />
+    <Skeleton shape="block" size="sm" />
+    <Skeleton shape="block" />
+    <Skeleton shape="block" size="lg" />
+    <Skeleton shape="block" size="lg" />
   </div>
 </div>
 
 <div>
   <p className="text-muted-foreground mb-2 text-xs font-medium">Shapes: square</p>
   <div className="flex gap-3">
-    <Skeleton shape="square" size="xs" />
-    <Skeleton shape="square" size="sm" />
-    <Skeleton shape="square" size="md" />
-    <Skeleton shape="square" size="lg" />
-    <Skeleton shape="square" size="xl" />
+    <Skeleton shape="block" size="sm" />
+    <Skeleton shape="block" size="sm" />
+    <Skeleton shape="block" />
+    <Skeleton shape="block" size="lg" />
+    <Skeleton shape="block" size="lg" />
   </div>
 </div>
 
 <div>
   <p className="text-muted-foreground mb-2 text-xs font-medium">Shapes: rectangle</p>
   <div className="flex gap-3">
-    <Skeleton shape="rectangle" size="xs" />
-    <Skeleton shape="rectangle" size="sm" />
-    <Skeleton shape="rectangle" size="md" />
-    <Skeleton shape="rectangle" size="lg" />
-    <Skeleton shape="rectangle" size="xl" />
+    <Skeleton shape="block" size="sm" />
+    <Skeleton shape="block" size="sm" />
+    <Skeleton shape="block" />
+    <Skeleton shape="block" size="lg" />
+    <Skeleton shape="block" size="lg" />
   </div>
 </div>
 
@@ -94,11 +94,11 @@ import { Skeleton } from '@components/ui';
   <h2>Sharp Edges</h2>
   <p className="text-muted-foreground mb-2 text-xs font-medium">Shapes: Square Sharp</p>
   <div className="flex gap-3">
-    <Skeleton shape="squareSharp" size="xs" />
-    <Skeleton shape="squareSharp" size="sm" />
-    <Skeleton shape="squareSharp" size="md" />
-    <Skeleton shape="squareSharp" size="lg" />
-    <Skeleton shape="squareSharp" size="xl" />
+    <Skeleton shape="block" size="sm" />
+    <Skeleton shape="block" size="sm" />
+    <Skeleton shape="block" />
+    <Skeleton shape="block" size="lg" />
+    <Skeleton shape="block" size="lg" />
   </div>
 </div>
 
@@ -106,20 +106,20 @@ import { Skeleton } from '@components/ui';
   <h2>Sharp Edges</h2>
   <p className="text-muted-foreground mb-2 text-xs font-medium">Shapes: Rectangle Sharp</p>
   <div className="flex gap-3">
-    <Skeleton shape="rectangleSharp" size="xs" />
-    <Skeleton shape="rectangleSharp" size="sm" />
-    <Skeleton shape="rectangleSharp" size="md" />
-    <Skeleton shape="rectangleSharp" size="lg" />
-    <Skeleton shape="rectangleSharp" size="xl" />
+    <Skeleton shape="block" size="sm" />
+    <Skeleton shape="block" size="sm" />
+    <Skeleton shape="block" />
+    <Skeleton shape="block" size="lg" />
+    <Skeleton shape="block" size="lg" />
   </div>
 </div>
 
 <div>
   <p className="text-muted-foreground mb-2 text-xs font-medium">Variants</p>
   <div className="space-y-2">
-    <Skeleton variant="default" className="h-4 w-full" />
-    <Skeleton variant="card" className="h-4 w-full" />
-    <Skeleton variant="primary" className="h-4 w-full" />
+    <Skeleton className="h-4 w-full" />
+    <Skeleton className="h-4 w-full" />
+    <Skeleton className="h-4 w-full" />
   </div>
 </div>
 
@@ -127,7 +127,7 @@ import { Skeleton } from '@components/ui';
     <p className="text-muted-foreground mb-2 text-xs font-medium">Card Example</p>
     <div className="space-y-2">
       <div className="flex items-center space-x-4">
-        <Skeleton shape="avatar" size="default" />
+        <Skeleton shape="circle" />
         <div className="flex-1 space-y-2">
           <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-3/4" />
@@ -147,27 +147,27 @@ import { Skeleton } from '@components/ui';
 
 ```tsx
 // Sizes
-<Skeleton size="xs" />
 <Skeleton size="sm" />
-<Skeleton size="default" />
-<Skeleton size="md" />
+<Skeleton size="sm" />
+<Skeleton />
+<Skeleton />
 <Skeleton size="lg" />
-<Skeleton size="xl" />
+<Skeleton size="lg" />
 
 // Shapes
-<Skeleton shape="text" size="sm" />
-<Skeleton shape="avatar" size="default" />
-<Skeleton shape="thumbnail" size="md" />
-<Skeleton shape="banner" size="lg" />
-<Skeleton shape="square" size="sm" />
-<Skeleton shape="rectangle" size="md" />
-<Skeleton shape="squareSharp" size="sm" />
-<Skeleton shape="rectangleSharp" size="md" />
+<Skeleton size="sm" />
+<Skeleton shape="circle" />
+<Skeleton shape="block" />
+<Skeleton shape="block" size="lg" />
+<Skeleton shape="block" size="sm" />
+<Skeleton shape="block" />
+<Skeleton shape="block" size="sm" />
+<Skeleton shape="block" />
 
 // Variants
-<Skeleton variant="default" className="h-4 w-full" />
-<Skeleton variant="card" className="h-4 w-full" />
-<Skeleton variant="primary" className="h-4 w-full" />
+<Skeleton className="h-4 w-full" />
+<Skeleton className="h-4 w-full" />
+<Skeleton className="h-4 w-full" />
 
 // Custom
 <Skeleton className="h-4 w-full" />

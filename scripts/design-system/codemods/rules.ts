@@ -151,10 +151,69 @@ const alertRule: TagRule = {
   },
 };
 
+const PROGRESS_TONES: Readonly<Record<string, string | null>> = {
+  default: null,
+  accent: null,
+  success: 'success',
+  destructive: 'danger',
+  secondary: 'neutral',
+};
+
+const progressRule: TagRule = {
+  tag: 'Progress',
+  keys: ['variant', 'indicatorVariant', 'size'],
+  transform: (attrs) => {
+    const out: Record<string, AttrValue> = {};
+    const tone = lookup(PROGRESS_TONES, attrs.indicatorVariant ?? attrs.variant ?? 'default', 'Progress variant');
+    if (tone) out.tone = tone;
+    if (attrs.size !== undefined) out.size = attrs.size;
+    return out;
+  },
+};
+
+const SKELETON_SHAPES: Readonly<Record<string, string | null>> = {
+  text: null,
+  avatar: 'circle',
+  banner: 'block',
+  thumbnail: 'block',
+  square: 'block',
+  rectangle: 'block',
+  squareSharp: 'block',
+  rectangleSharp: 'block',
+};
+
+const SKELETON_SIZES: Readonly<Record<string, string | null>> = { xs: 'sm', sm: 'sm', default: null, md: null, lg: 'lg', xl: 'lg' };
+
+const skeletonRule: TagRule = {
+  tag: 'Skeleton',
+  keys: ['variant', 'size', 'shape'],
+  transform: (attrs) => {
+    const out: Record<string, AttrValue> = {};
+    const shape = lookup(SKELETON_SHAPES, attrs.shape ?? 'text', 'Skeleton shape');
+    if (shape) out.shape = shape;
+    const size = lookup(SKELETON_SIZES, attrs.size ?? 'default', 'Skeleton size');
+    if (size) out.size = size;
+    return out;
+  },
+};
+
+const switchRule: TagRule = {
+  tag: 'Switch',
+  keys: ['variant', 'size'],
+  transform: (attrs) => (attrs.size === undefined ? {} : { size: attrs.size === 'sm' ? 'sm' : 'md' }),
+};
+
+const checkboxRule: TagRule = {
+  tag: 'Checkbox',
+  keys: ['variant'],
+  transform: () => ({}),
+};
+
 /** Rule sets applied with `pnpm ds:migrate <set>`. Each Plan A task adds its set. */
 export const RULE_SETS: Record<string, ReadonlyArray<TagRule>> = {
   button: [buttonRule('Button'), buttonRule('LoadingButton', 'Button')],
   badge: [badgeRule, statusPillRule],
   tag: [chipRule],
   alert: [alertRule],
+  feedback: [progressRule, skeletonRule, switchRule, checkboxRule],
 };

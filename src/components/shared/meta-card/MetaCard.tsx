@@ -48,7 +48,7 @@ const MetaCardLoader = () => (
   <div className="flex w-full flex-col space-y-2">
     <Skeleton />
 
-    <Skeleton size="md" />
+    <Skeleton />
   </div>
 );
 

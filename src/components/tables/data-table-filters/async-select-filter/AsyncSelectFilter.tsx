@@ -120,7 +120,7 @@ function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps
                 <Conditional>
                   <Conditional.If condition={isMulti}>
                     <Combobox.Indicator>
-                      <Checkbox checked={isChecked} variant="primary" tabIndex={-1} className="pointer-events-none" />
+                      <Checkbox checked={isChecked} tabIndex={-1} className="pointer-events-none" />
                     </Combobox.Indicator>
                   </Conditional.If>
 
