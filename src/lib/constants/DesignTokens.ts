@@ -65,3 +65,39 @@ export const FONT_FAMILIES = {
   sans: "'Schibsted Grotesk', 'Noto Kufi Arabic', system-ui, sans-serif",
   mono: "'Spline Sans Mono', ui-monospace, 'SFMono-Regular', monospace",
 } as const;
+
+export type FoundationScaleStep = Readonly<{
+  token: string;
+  value: string;
+  use: string;
+}>;
+
+export const RADIUS_SCALE: ReadonlyArray<FoundationScaleStep> = [
+  { token: 'radius-sm', value: '0.25rem', use: 'Checkbox, kbd' },
+  { token: 'radius-md', value: '0.375rem', use: 'Controls' },
+  { token: 'radius-lg', value: '0.625rem', use: 'Cards, popovers, dialogs, sheets' },
+];
+
+export const CONTROL_SIZES: ReadonlyArray<FoundationScaleStep> = [
+  { token: 'control-sm', value: '1.75rem', use: 'size="sm" — 28px' },
+  { token: 'control-md', value: '2rem', use: 'size="md" (default) — 32px' },
+  { token: 'control-lg', value: '2.5rem', use: 'size="lg" — 40px' },
+];
+
+export const ELEVATIONS: ReadonlyArray<FoundationScaleStep> = [
+  { token: 'shadow-raised', value: 'var(--elevation-raised)', use: 'Menus, popovers, hover cards, toasts' },
+  { token: 'shadow-overlay', value: 'var(--elevation-overlay)', use: 'Dialogs, sheets' },
+];
+
+export const DURATIONS: ReadonlyArray<FoundationScaleStep> = [
+  { token: 'duration-fast', value: '120ms', use: 'Hover, press' },
+  { token: 'duration-base', value: '180ms', use: 'Menus, popovers, tabs' },
+  { token: 'duration-slow', value: '260ms', use: 'Dialogs, sheets' },
+];
+
+export const STATE_UTILITIES: ReadonlyArray<FoundationScaleStep> = [
+  { token: 'focus-ring', value: '2px solid ring + 2px offset', use: 'Buttons, links, toggles' },
+  { token: 'focus-ring-input', value: 'ring border + 3px ring-subtle glow', use: 'Inputs and input-like triggers' },
+  { token: 'state-invalid', value: 'danger border + danger-subtle glow', use: 'aria-invalid controls (always with a message)' },
+  { token: 'state-press', value: 'scale(0.98) on :active', use: 'Pressable controls' },
+];

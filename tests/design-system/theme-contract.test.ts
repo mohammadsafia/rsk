@@ -4,7 +4,16 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { FONT_FAMILIES, SEMANTIC_COLOR_ROLES, TEXT_SCALE } from '../../src/lib/constants/DesignTokens';
+import {
+  CONTROL_SIZES,
+  DURATIONS,
+  ELEVATIONS,
+  FONT_FAMILIES,
+  RADIUS_SCALE,
+  SEMANTIC_COLOR_ROLES,
+  STATE_UTILITIES,
+  TEXT_SCALE,
+} from '../../src/lib/constants/DesignTokens';
 import { extractBlock, readProjectFile } from './css-tokens';
 
 const SRC_DIR = fileURLToPath(new URL('../../src/', import.meta.url));
@@ -93,5 +102,41 @@ describe('typography', () => {
     const bodyApply = /body \{\s*@apply ([^;]+);/.exec(indexCss)?.[1].split(/\s+/) ?? [];
     expect(bodyApply).toEqual(expect.arrayContaining(['bg-canvas', 'text-fg', 'font-sans']));
     expect(bodyApply).not.toContain('font-family-sans');
+  });
+});
+
+describe('shape, motion and states', () => {
+  const utilitiesCss = readProjectFile('src/styles/utilities.css');
+
+  for (const step of RADIUS_SCALE) {
+    it(`defines ${step.token}`, () => expect(themeCss).toContain(`--${step.token}: ${step.value};`));
+  }
+
+  for (const size of CONTROL_SIZES) {
+    it(`defines control size ${size.token}`, () => expect(themeCss).toContain(`--spacing-${size.token}: ${size.value};`));
+  }
+
+  it('overrides the ease-out curve', () => {
+    expect(themeCss).toContain('--ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);');
+  });
+
+  for (const utility of [...ELEVATIONS, ...DURATIONS, ...STATE_UTILITIES]) {
+    it(`declares @utility ${utility.token}`, () => expect(utilitiesCss).toContain(`@utility ${utility.token} {`));
+  }
+
+  it('neutralizes every tw-animate transform variable under reduced motion', () => {
+    const reduced = utilitiesCss.slice(utilitiesCss.indexOf('@media (prefers-reduced-motion: reduce)'));
+    for (const phase of ['enter', 'exit']) {
+      for (const part of ['scale: 1', 'rotate: 0', 'translate-x: 0', 'translate-y: 0']) {
+        expect(reduced).toContain(`--tw-${phase}-${part} !important;`);
+      }
+    }
+    expect(reduced).not.toContain('--tw-enter-opacity');
+  });
+
+  it('imports utilities.css after the legacy bridge', () => {
+    expect(indexCss.indexOf("@import './styles/utilities.css';")).toBeGreaterThan(
+      indexCss.indexOf("@import './styles/legacy-tokens.css';"),
+    );
   });
 });
