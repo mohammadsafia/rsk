@@ -1,0 +1,44 @@
+---
+id: form-field
+title: FormField
+section: Components
+category: Forms
+description: 'The anatomy every Form* field shares: label row, control, and one message line for the description or the error.'
+tags: [forms, field, label, error, description]
+---
+
+import { FormWithValidationDemo } from '@pages/components/components.data.demos';
+
+## Demo
+
+<FormWithValidationDemo />
+
+## Anatomy
+
+| Part | data-slot | Notes |
+|---|---|---|
+| Root | `form-field` | `data-invalid` while the field has an error |
+| Label row | `form-field-label` | Label + required `*` + optional ⓘ tooltip button **beside** the label (kept out of the field's name) |
+| Control | `form-field-control` | Receives `id`, `invalid`, `aria-labelledby`, `aria-describedby`, `aria-required` |
+| Message | `form-field-message` | Shows the error (danger) or else the `description` (muted); referenced by `aria-describedby` |
+
+## Field props (every `Form*`)
+
+| Prop | Notes |
+|---|---|
+| `name` | react-hook-form path |
+| `label` | Visible label |
+| `description` | Help text under the field while valid |
+| `tooltip` | Extra context behind an ⓘ button |
+| `required` | Red `*` + `aria-required` |
+| `disabled` | Disables the control |
+| `className` | Applied to the control; style the rest via `data-slot` |
+| `rules` | react-hook-form rules when not using a schema |
+
+## Building a custom field
+
+```tsx
+<FormField id={id} label="Licence number" description="As printed on the card" error={error}>
+  {(control) => <Input {...control} {...register('licence')} />}
+</FormField>
+```

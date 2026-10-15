@@ -4,7 +4,7 @@ import { Controller, type FieldValues } from 'react-hook-form';
 
 import { FileUploader, type FileUploaderProps } from '@components/shared';
 import { Conditional } from '@components/utils';
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
+import { FormField } from '@components/forms';
 
 import { cn } from '@utils';
 
@@ -25,11 +25,9 @@ function FormFileUploader<TFieldValues extends FieldValues>({
   rules,
   control,
   label,
+  description,
   tooltip,
-  containerClassName,
-  labelClassName,
   className,
-  errorClassName,
   required,
   disabled,
   accept,
@@ -47,49 +45,40 @@ function FormFileUploader<TFieldValues extends FieldValues>({
       control={control}
       rules={rules}
       render={({ field: { ref, value, onChange, onBlur, ...field }, fieldState: { error } }) => (
-        <FormControl className={containerClassName}>
-          <FormLabel
-            className={labelClassName}
-            htmlFor={`${name}-file-upload`}
-            tooltip={tooltip}
-            required={required}
-            hidden={!label}
-            error={error!}
-          >
-            {label}
-          </FormLabel>
+        <FormField id={`${name}-file-upload`} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+          {({ id: _inputId, invalid, ...fieldControl }) => (
+            <FileUploader
+              name={name}
+              value={value}
+              onChange={onChange}
+              accept={accept}
+              multiple={multiple}
+              disabled={field.disabled || disabled}
+              isUploading={isUploading}
+              className={cn(invalid && '**:data-[slot=file-uploader-dropzone-group]:border-danger', className)}
+            >
+              <FileUploader.DropzoneGroup>
+                <FileUploader.Dropzone
+                  ref={ref}
+                  onBlur={onBlur}
+                  aria-invalid={invalid || undefined}
+                  placeholder={placeholder ?? label}
+                  {...fieldControl}
+                />
 
-          <FileUploader
-            name={name}
-            value={value}
-            onChange={onChange}
-            accept={accept}
-            multiple={multiple}
-            disabled={field.disabled || disabled}
-            isUploading={isUploading}
-            className={cn(
-              error &&
-                '**:data-[slot=file-uploader-dropzone-group]:border-destructive **:data-[slot=file-uploader-dropzone-group]:text-destructive **:data-[slot=file-uploader-dropzone-group]:hover:border-destructive',
-              className,
-            )}
-          >
-            <FileUploader.DropzoneGroup>
-              <FileUploader.Dropzone ref={ref} onBlur={onBlur} placeholder={placeholder ?? label} />
+                <FileUploader.Actions onDownload={onDownload} clearable={clearable} />
+              </FileUploader.DropzoneGroup>
 
-              <FileUploader.Actions onDownload={onDownload} clearable={clearable} />
+              <Conditional.If condition={multiple && !showPreview}>
+                <FileUploader.FileList variant={listVariant} />
+              </Conditional.If>
 
-              <FormMessage className={errorClassName} hidden={!error} error={error!} />
-            </FileUploader.DropzoneGroup>
-
-            <Conditional.If condition={multiple && !showPreview}>
-              <FileUploader.FileList variant={listVariant} />
-            </Conditional.If>
-
-            <Conditional.If condition={showPreview}>
-              <FileUploader.ImagePreview />
-            </Conditional.If>
-          </FileUploader>
-        </FormControl>
+              <Conditional.If condition={showPreview}>
+                <FileUploader.ImagePreview />
+              </Conditional.If>
+            </FileUploader>
+          )}
+        </FormField>
       )}
     />
   );

@@ -12,7 +12,6 @@ export * from './faceted-filter';
 export * from './file-icon';
 export * from './file-uploader';
 export * from './date-navigation';
-export * from './error-tooltip';
 export * from './breadcrumb';
 export * from './form-submit-buttons';
 export * from './action-panel';

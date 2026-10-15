@@ -9,9 +9,6 @@ export type FieldBaseProps<TFieldValues extends FieldValues = FieldValues> = {
   description?: ReactNode;
   required?: boolean;
   rules?: ControllerProps<TFieldValues>['rules'];
-  containerClassName?: string;
-  labelClassName?: string;
-  errorClassName?: string;
 };
 
 // Controlled field base props that are generic and every controlled-field must-have
