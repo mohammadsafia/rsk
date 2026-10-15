@@ -3,7 +3,7 @@ id: alert
 title: Alert
 section: Components
 category: UI
-description: 'Display important messages with different severity levels.'
+description: 'Inline message with a tone (neutral, info, success, warning, danger) in soft or outline style; danger alerts use role=alert.'
 tags: [ui, alert, feedback]
 ---
 
@@ -14,33 +14,33 @@ import { InfoIcon } from 'lucide-react';
 
 <div className="space-y-6">
   <div>
-    <p className="text-muted-foreground mb-2 text-xs font-medium">Filled-light variants (default)</p>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Soft (default)</p>
     <div className="space-y-2">
-      <Alert variant="default">
+      <Alert>
         <InfoIcon />
         <Alert.Title>Default</Alert.Title>
         <Alert.Description>Neutral filled-light alert.</Alert.Description>
       </Alert>
 
-      <Alert variant="info">
+      <Alert tone="info">
         <InfoIcon />
         <Alert.Title>Info</Alert.Title>
         <Alert.Description>Informational alert with a primary tone.</Alert.Description>
       </Alert>
 
-      <Alert variant="success">
+      <Alert tone="success">
         <InfoIcon />
         <Alert.Title>Success</Alert.Title>
         <Alert.Description>Operation completed successfully.</Alert.Description>
       </Alert>
 
-      <Alert variant="warning">
+      <Alert tone="warning">
         <InfoIcon />
         <Alert.Title>Warning</Alert.Title>
         <Alert.Description>This action requires your attention.</Alert.Description>
       </Alert>
 
-      <Alert variant="destructive">
+      <Alert tone="danger">
         <InfoIcon />
         <Alert.Title>Error</Alert.Title>
         <Alert.Description>Something went wrong.</Alert.Description>
@@ -49,7 +49,7 @@ import { InfoIcon } from 'lucide-react';
   </div>
 
   <div>
-    <p className="text-muted-foreground mb-2 text-xs font-medium">Outline variants (preserved for back-compat)</p>
+    <p className="text-muted-foreground mb-2 text-xs font-medium">Outline</p>
     <div className="space-y-2">
       <Alert variant="outline">
         <InfoIcon />
@@ -57,19 +57,19 @@ import { InfoIcon } from 'lucide-react';
         <Alert.Description>Outline-only primary alert with no background fill.</Alert.Description>
       </Alert>
 
-      <Alert variant="outline-info">
+      <Alert variant="outline" tone="info">
         <InfoIcon />
         <Alert.Title>Outline Info</Alert.Title>
         <Alert.Description>Plain background informational alert.</Alert.Description>
       </Alert>
 
-      <Alert variant="outline-destructive">
+      <Alert variant="outline" tone="danger">
         <InfoIcon />
         <Alert.Title>Outline Error</Alert.Title>
         <Alert.Description>Outline-only error alert.</Alert.Description>
       </Alert>
 
-      <Alert variant="outline-success">
+      <Alert variant="outline" tone="success">
         <InfoIcon />
         <Alert.Title>Outline Success</Alert.Title>
         <Alert.Description>Outline-only success alert.</Alert.Description>
@@ -79,7 +79,7 @@ import { InfoIcon } from 'lucide-react';
 
   <div>
     <p className="text-muted-foreground mb-2 text-xs font-medium">Without Icon</p>
-    <Alert variant="default">
+    <Alert>
       <Alert.Title>Simple Alert</Alert.Title>
       <Alert.Description>Alert without an icon.</Alert.Description>
     </Alert>
@@ -93,52 +93,46 @@ import { Alert } from '@components/ui';
 import { InfoIcon } from 'lucide-react';
 ```
 
-## Variants
+## Variant and tone
 
-Bare names use the filled-light pattern (`bg-X-200 text-foreground border-X/50 [&>svg]:text-X`) — soft prominence, neutral readable text, colored border + icon for tone signal. Mirrors `Toast` + `Chip` conventions.
+`variant` is the treatment, `tone` is the meaning. Danger alerts use `role="alert"` (announced immediately); every other tone uses `role="status"`.
 
-| Variant | Use case |
-|---|---|
-| `default` | Neutral message (muted bg) |
-| `info` | Informational message (primary tone) |
-| `success` | Successful action confirmation |
-| `warning` | Caution or non-fatal issue |
-| `destructive` | Error or fatal condition |
-| `outline` | Outline-only primary alert (legacy / no-fill needs) |
-| `outline-info` | Plain background informational alert (legacy) |
-| `outline-destructive` | Outline-only error alert (legacy / less prominent) |
-| `outline-success` | Outline-only success alert (less prominent than filled) |
+| Prop | Values | Use |
+|---|---|---|
+| `variant` | `soft` (default) | Tinted background with a hairline tone border |
+| | `outline` | Surface background, neutral hairline; tone only on the icon — no side stripe |
+| `tone` | `neutral` (default), `info`, `success`, `warning`, `danger` | The message's meaning |
 
 ## Code
 
 ```tsx
-// Filled-light (default style — use these for new code)
-<Alert variant="default">
+// Soft (default)
+<Alert>
   <InfoIcon />
   <Alert.Title>Default</Alert.Title>
   <Alert.Description>Description</Alert.Description>
 </Alert>
 
-<Alert variant="success">
+<Alert tone="success">
   <InfoIcon />
   <Alert.Title>Success</Alert.Title>
   <Alert.Description>Operation completed</Alert.Description>
 </Alert>
 
-<Alert variant="warning">
+<Alert tone="warning">
   <InfoIcon />
   <Alert.Title>Warning</Alert.Title>
   <Alert.Description>Needs attention</Alert.Description>
 </Alert>
 
-<Alert variant="destructive">
+<Alert tone="danger">
   <InfoIcon />
   <Alert.Title>Error</Alert.Title>
   <Alert.Description>Something went wrong</Alert.Description>
 </Alert>
 
-// Outline (preserved variants — use when filled would be too prominent)
-<Alert variant="outline-destructive">
+// Outline
+<Alert variant="outline" tone="danger">
   <InfoIcon />
   <Alert.Title>Subtle Error</Alert.Title>
   <Alert.Description>Outline-only error message</Alert.Description>

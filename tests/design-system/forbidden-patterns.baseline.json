@@ -95,8 +95,7 @@
     "prime-component": 6
   },
   "src/component-docs/ui/Alert.mdx": {
-    "legacy-color-name": 7,
-    "removed-button-variant": 3
+    "legacy-color-name": 3
   },
   "src/component-docs/ui/Avatar.mdx": {
     "legacy-color-name": 2
@@ -343,10 +342,6 @@
   "src/components/ui/accordion/Accordion.tsx": {
     "legacy-color-ramp": 1,
     "legacy-color-name": 2
-  },
-  "src/components/ui/alert/Alert.tsx": {
-    "legacy-color-ramp": 14,
-    "legacy-color-name": 16
   },
   "src/components/ui/avatar/Avatar.tsx": {
     "legacy-color-name": 1

@@ -107,3 +107,15 @@ describe('tag rules', () => {
     );
   });
 });
+
+describe('alert rules', () => {
+  it.each([
+    ['<Alert variant="default">', '<Alert>'],
+    ['<Alert variant="destructive">', '<Alert tone="danger">'],
+    ['<Alert variant="outline">', '<Alert variant="outline">'],
+    ['<Alert variant="outline-info">', '<Alert variant="outline" tone="info">'],
+    ['<Alert variant="outline-destructive">', '<Alert variant="outline" tone="danger">'],
+  ])('%s → %s', (input, expected) => {
+    expect(migrateSource(input, RULE_SETS.alert).output).toBe(expected);
+  });
+});

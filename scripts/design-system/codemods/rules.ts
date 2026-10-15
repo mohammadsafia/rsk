@@ -127,9 +127,34 @@ const chipRule: TagRule = {
   },
 };
 
+const ALERT_VARIANTS: Readonly<Record<string, { variant?: 'outline'; tone?: string }>> = {
+  default: {},
+  info: { tone: 'info' },
+  success: { tone: 'success' },
+  warning: { tone: 'warning' },
+  destructive: { tone: 'danger' },
+  outline: { variant: 'outline' },
+  'outline-info': { variant: 'outline', tone: 'info' },
+  'outline-success': { variant: 'outline', tone: 'success' },
+  'outline-destructive': { variant: 'outline', tone: 'danger' },
+};
+
+const alertRule: TagRule = {
+  tag: 'Alert',
+  keys: ['variant'],
+  transform: (attrs) => {
+    const mapped = lookup(ALERT_VARIANTS, attrs.variant ?? 'default', 'Alert variant');
+    const out: Record<string, AttrValue> = {};
+    if (mapped.variant) out.variant = mapped.variant;
+    if (mapped.tone) out.tone = mapped.tone;
+    return out;
+  },
+};
+
 /** Rule sets applied with `pnpm ds:migrate <set>`. Each Plan A task adds its set. */
 export const RULE_SETS: Record<string, ReadonlyArray<TagRule>> = {
   button: [buttonRule('Button'), buttonRule('LoadingButton', 'Button')],
   badge: [badgeRule, statusPillRule],
   tag: [chipRule],
+  alert: [alertRule],
 };
