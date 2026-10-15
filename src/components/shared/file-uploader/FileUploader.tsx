@@ -223,23 +223,19 @@ const FileUploaderFileList: FC<FileUploaderFileListProps> = ({ variant = 'list',
       <ScrollArea>
         <div data-slot="file-uploader-file-list" className={cn('flex max-h-16 flex-wrap items-center gap-1', className)}>
           {files.map((file, index) => (
-            <Tag size="sm" key={`${file.name}-${index}`} className="justify-between gap-1">
-              <span className="max-w-36 truncate">{file.name}</span>
-
+            <Conditional key={`${file.name}-${index}`}>
               <Conditional.If condition={!disabled && !isUploading}>
-                <IconButton
-                  className="shrink-0"
-                  tone="danger"
-                  size="sm"
-                  tooltip={false}
-                  type="button"
-                  aria-label={t('clear')}
-                  onClick={() => onRemove(index)}
-                >
-                  <XCircleIcon size={14} />
-                </IconButton>
+                <Tag size="sm" label={file.name} onRemove={() => onRemove(index)}>
+                  <span className="max-w-36 truncate">{file.name}</span>
+                </Tag>
               </Conditional.If>
-            </Tag>
+
+              <Conditional.Else>
+                <Tag size="sm">
+                  <span className="max-w-36 truncate">{file.name}</span>
+                </Tag>
+              </Conditional.Else>
+            </Conditional>
           ))}
         </div>
 

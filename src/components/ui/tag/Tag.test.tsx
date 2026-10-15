@@ -10,6 +10,15 @@ import '../../../i18n';
 afterEach(cleanup);
 
 describe('Tag', () => {
+  it('a removable tag with element children takes its remove name from label', () => {
+    render(
+      <Tag label="report.pdf" onRemove={() => undefined}>
+        <span className="truncate">report.pdf</span>
+      </Tag>,
+    );
+    expect(screen.getByRole('button', { name: 'Remove report.pdf' })).toBeTruthy();
+  });
+
   it('a toggle tag forwards extra props to its button', () => {
     render(
       <Tag data-testid="toggle" title="Filter" onClick={() => undefined}>

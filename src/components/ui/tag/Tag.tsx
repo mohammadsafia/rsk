@@ -54,20 +54,24 @@ type ToggleTagProps = TagBaseProps & {
   onClick?: MouseEventHandler<HTMLButtonElement>;
   selected?: boolean;
   onRemove?: never;
+  label?: never;
 };
 
 type RemovableTagProps = TagBaseProps & {
   onRemove: () => void;
+  /** Names the remove button when children are not plain text. */
+  label?: string;
   onClick?: never;
   selected?: never;
 };
 
 export type TagProps = ToggleTagProps | RemovableTagProps;
 
-const Tag: FC<TagProps> = ({ className, tone, size, children, onClick, selected, onRemove, ...props }) => {
+const Tag: FC<TagProps> = ({ className, tone, size, children, onClick, selected, onRemove, label, ...props }) => {
   const { t } = useAppTranslation('common');
 
-  const removeLabel = typeof children === 'string' ? t('removeItem', { item: children }) : t('remove');
+  const itemName = label ?? (typeof children === 'string' ? children : undefined);
+  const removeLabel = itemName ? t('removeItem', { item: itemName }) : t('remove');
   const isToggle = Boolean(onClick);
 
   const classes = cn(
