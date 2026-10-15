@@ -293,15 +293,16 @@ export function FormNumberTextareaDemo() {
 export function FormWithValidationDemo() {
   const [disabled, setDisabled] = useState(false);
   const schema = z.object({
-    email: z.string(),
+    email: z.string().email('Enter a complete email address'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
-    age: z.string().transform(Number).pipe(z.number().min(18, 'Must be at least 18 years old').transform(Number)),
+    age: z.coerce.number().min(18, 'Must be at least 18 years old'),
     notes: z.string().optional(),
   });
 
   type FormData = z.infer<typeof schema>;
 
   const form = useForm<FormData>({
+    resolver: zodResolver(schema),
     defaultValues: { email: '', password: '', age: 18, notes: 'Test notes' },
   });
 

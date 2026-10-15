@@ -112,6 +112,27 @@ describe('clean primitives', () => {
     const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) => file.startsWith('src/components/tables/data-table-filters/'));
     expect(offenders).toEqual([]);
   });
+
+  it('Plan A shared folders contain no forbidden patterns', () => {
+    const folders = ['src/components/shared/confirm-dialog/', 'src/components/shared/count-tooltip/', 'src/components/ui/'];
+    const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) => folders.some((folder) => file.startsWith(folder)));
+    expect(offenders).toEqual([]);
+  });
+
+  it('Plan A retired components are gone', () => {
+    const retired = [
+      'form-control',
+      'form-label',
+      'form-message',
+      'error-tooltip',
+      'form-submit-buttons',
+      'field-section',
+      'prime-card',
+      'collapsible-card',
+    ];
+    const present = componentFolders(`${REPO_ROOT}src/components`).filter((name) => retired.includes(name));
+    expect(present).toEqual([]);
+  });
 });
 
 /** Folders SP2 replaced (addendum §1, §8, §10). None may come back under src/components. */
