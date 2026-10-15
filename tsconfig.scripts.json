@@ -11,5 +11,5 @@
     "strict": true,
     "types": ["node"]
   },
-  "include": ["scripts"]
+  "include": ["scripts", "tests"]
 }
