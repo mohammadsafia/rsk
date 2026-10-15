@@ -40,7 +40,7 @@ const Indicator = ({ className, children, ...props }: CheckboxGroupIndicatorProp
 );
 
 const CheckboxGroup: CheckboxGroupComponent = ({ className, children, ...props }) => (
-  <div data-slot="checkbox-group" className={cn('grid w-full gap-3', className)} {...props}>
+  <div role="group" data-slot="checkbox-group" className={cn('grid w-full gap-3', className)} {...props}>
     {children}
   </div>
 );

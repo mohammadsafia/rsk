@@ -10,6 +10,15 @@ import '../../../i18n';
 afterEach(cleanup);
 
 describe('Tag', () => {
+  it('a toggle tag forwards extra props to its button', () => {
+    render(
+      <Tag data-testid="toggle" title="Filter" onClick={() => undefined}>
+        Cardiology
+      </Tag>,
+    );
+    expect(screen.getByTestId('toggle').getAttribute('title')).toBe('Filter');
+  });
+
   it('renders a static tag as a span', () => {
     render(<Tag>Asthma</Tag>);
     expect(screen.getByText('Asthma').tagName).toBe('SPAN');

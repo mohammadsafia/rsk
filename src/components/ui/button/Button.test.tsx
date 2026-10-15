@@ -1,13 +1,28 @@
 // @vitest-environment happy-dom
 import { MemoryRouter, Link } from 'react-router-dom';
 import { cleanup, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Button } from '@components/ui';
 
 afterEach(cleanup);
 
 describe('Button', () => {
+  it('disabled asChild leaves the tab order and swallows activation', () => {
+    const handleClick = vi.fn();
+    render(
+      <Button asChild disabled onClick={handleClick}>
+        <a href="/members">Members</a>
+      </Button>,
+    );
+    const link = screen.getByRole('link', { name: 'Members' });
+    expect(link.getAttribute('tabindex')).toBe('-1');
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+    link.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(handleClick).not.toHaveBeenCalled();
+  });
+
   it('defaults to solid / neutral / md', () => {
     render(<Button>Save</Button>);
     const button = screen.getByRole('button', { name: 'Save' });

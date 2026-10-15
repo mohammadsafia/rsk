@@ -1,4 +1,4 @@
-import { type ComponentProps, type FC, forwardRef } from 'react';
+import { type ComponentProps, type FC, forwardRef, type MouseEvent } from 'react';
 
 import { Slot, Slottable } from '@radix-ui/react-slot';
 
@@ -82,12 +82,23 @@ const Button: FC<ButtonProps> = ({
   loading = false,
   disabled,
   children,
+  onClick,
+  tabIndex,
   ...props
 }) => {
   const { t } = useAppTranslation('common');
 
   const Comp = asChild ? Slot : 'button';
   const isDisabled = Boolean(disabled) || loading;
+
+  // A slotted child (e.g. a link) cannot be natively disabled, so block activation and tab focus by hand.
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    if (asChild && isDisabled) {
+      event.preventDefault();
+      return;
+    }
+    onClick?.(event);
+  };
 
   return (
     <Comp
@@ -98,6 +109,8 @@ const Button: FC<ButtonProps> = ({
       aria-busy={loading || undefined}
       aria-disabled={isDisabled || undefined}
       disabled={asChild ? undefined : isDisabled}
+      tabIndex={asChild && isDisabled ? -1 : tabIndex}
+      onClick={handleClick}
       className={cn(buttonVariants({ variant, tone, size, fullWidth }), className)}
       {...props}
     >

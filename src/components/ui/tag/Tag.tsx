@@ -78,7 +78,14 @@ const Tag: FC<TagProps> = ({ className, tone, size, children, onClick, selected,
   return (
     <Conditional>
       <Conditional.If condition={isToggle}>
-        <button type="button" data-slot="tag" aria-pressed={selected} onClick={onClick} className={classes}>
+        <button
+          type="button"
+          data-slot="tag"
+          aria-pressed={selected}
+          onClick={onClick}
+          className={classes}
+          {...(props as ComponentPropsWithoutRef<'button'>)}
+        >
           {children}
         </button>
       </Conditional.If>
