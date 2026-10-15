@@ -95,3 +95,32 @@ describe('nextBaseline', () => {
     expect(nextBaseline(current, committed, { allowIncrease: true }).baseline).toEqual(current);
   });
 });
+
+/** Plan A (SP2 batches 0–3) primitives must stay free of every forbidden pattern. */
+const CLEAN_UI_FOLDERS = [
+  'button',
+  'icon-button',
+  'badge',
+  'tag',
+  'alert',
+  'progress',
+  'skeleton',
+  'divider',
+  'input',
+  'checkbox',
+  'checkbox-group',
+  'radio-group',
+  'switch',
+  'select',
+  'command',
+  'toggle-group',
+] as const;
+
+describe('clean primitives', () => {
+  it('Plan A ui folders contain no forbidden patterns', () => {
+    const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) =>
+      CLEAN_UI_FOLDERS.some((folder) => file.startsWith(`src/components/ui/${folder}/`)),
+    );
+    expect(offenders).toEqual([]);
+  });
+});
