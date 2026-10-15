@@ -1,0 +1,39 @@
+---
+id: tag
+title: Tag
+section: Components
+category: UI
+description: 'Interactive label: a toggle (selected / onClick) or a removable token (onRemove). Use Badge for static status.'
+tags: [ui, tag, chip, filter, token]
+---
+
+import { Tag } from '@components/ui';
+
+## Demo
+
+<div className="flex flex-wrap items-center gap-2">
+  <Tag>Asthma</Tag>
+  <Tag tone="accent">Cardiology</Tag>
+  <Tag onRemove={() => undefined}>Penicillin</Tag>
+  <Tag selected onClick={() => undefined}>Selected filter</Tag>
+  <Tag size="sm">Small</Tag>
+</div>
+
+## Rules
+
+- A tag is either a toggle (`onClick`, optional `selected` → `aria-pressed`) or removable (`onRemove`), never both.
+- The remove button is announced as "Remove {text}" (translated) when the tag's content is plain text.
+- 6px corners, hairline border — no pill shapes.
+
+## Imports
+
+```tsx
+import { Tag } from '@components/ui';
+```
+
+## Code
+
+```tsx
+<Tag onRemove={() => removeAllergy(id)}>Penicillin</Tag>
+<Tag selected={isActive} onClick={toggleFilter}>Cardiology</Tag>
+```

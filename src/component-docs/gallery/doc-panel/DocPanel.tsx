@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 
 import { MDXProvider } from '@mdx-js/react';
 
-import { Card, Chip, Divider, ScrollArea } from '@components/ui';
+import { Card, Tag, Divider, ScrollArea } from '@components/ui';
 import { DocsLayout } from '@component-docs';
 
 import { componentDocsErrors } from '@component-docs/registry';
@@ -47,9 +47,9 @@ const DocPanel = (props: DocPanelProps) => {
                 {selectedDocTags.length ? (
                   <div className="flex flex-wrap justify-end gap-1.5">
                     {selectedDocTags.slice(0, 4).map((tagLabel) => (
-                      <Chip key={tagLabel} variant="default" size="xs">
+                      <Tag tone="accent" size="sm" key={tagLabel}>
                         {tagLabel}
-                      </Chip>
+                      </Tag>
                     ))}
 
                     {selectedDocTags.length > 4 ? (

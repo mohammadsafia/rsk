@@ -2,7 +2,7 @@ import { type SetStateAction, useCallback, useMemo, useState } from 'react';
 
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 
-import { Button, Chip, Tabs, IconButton } from '@components/ui';
+import { Button, Tag, Tabs, IconButton } from '@components/ui';
 import {
   buildCategoryTabOptions,
   DocPanel,
@@ -159,9 +159,7 @@ const ComponentDocsGalleryPage = () => {
                 <Tabs.Trigger key={tab.key} value={tab.key} className="gap-2">
                   <span>{tab.label}</span>
 
-                  <Chip variant={isActive ? 'default' : 'muted'} size="default">
-                    {count}
-                  </Chip>
+                  <Tag tone={isActive ? 'accent' : 'neutral'}>{count}</Tag>
                 </Tabs.Trigger>
               );
             })}

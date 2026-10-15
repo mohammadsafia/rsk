@@ -14,7 +14,7 @@ import {
   useState,
 } from 'react';
 
-import { Button, Chip, ScrollArea, IconButton } from '@components/ui';
+import { Button, Tag, ScrollArea, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -223,7 +223,7 @@ const FileUploaderFileList: FC<FileUploaderFileListProps> = ({ variant = 'list',
       <ScrollArea>
         <div data-slot="file-uploader-file-list" className={cn('flex max-h-16 flex-wrap items-center gap-1', className)}>
           {files.map((file, index) => (
-            <Chip key={`${file.name}-${index}`} variant="muted" size="xs" className="justify-between gap-1">
+            <Tag size="sm" key={`${file.name}-${index}`} className="justify-between gap-1">
               <span className="max-w-36 truncate">{file.name}</span>
 
               <Conditional.If condition={!disabled && !isUploading}>
@@ -239,7 +239,7 @@ const FileUploaderFileList: FC<FileUploaderFileListProps> = ({ variant = 'list',
                   <XCircleIcon size={14} />
                 </IconButton>
               </Conditional.If>
-            </Chip>
+            </Tag>
           ))}
         </div>
 

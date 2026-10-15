@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { MDXProvider } from '@mdx-js/react';
 import { ChevronRight } from 'lucide-react';
 
-import { Chip } from '@components/ui';
+import { Tag } from '@components/ui';
 import { DocsLayout } from '@component-docs';
 import { getComponentDocsRegistry, componentDocsErrors } from '@component-docs/registry';
 import { useSelectedDocComponent } from '@component-docs/gallery';
@@ -62,9 +62,9 @@ const ComponentDetailPage = () => {
           {tags.length > 0 ? (
             <div className="mt-3 flex flex-wrap gap-1.5">
               {tags.map((tag) => (
-                <Chip key={tag} variant="muted" size="xs">
+                <Tag size="sm" key={tag}>
                   {tag}
-                </Chip>
+                </Tag>
               ))}
             </div>
           ) : null}

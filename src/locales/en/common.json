@@ -49,5 +49,7 @@
     "rowsPerPage": "Rows per page",
     "pageOf": "Page {{current}} of {{total}}"
   },
-  "openCalendar": "Open calendar"
+  "openCalendar": "Open calendar",
+  "remove": "Remove",
+  "removeItem": "Remove {{item}}"
 }

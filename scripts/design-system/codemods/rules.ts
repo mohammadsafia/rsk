@@ -109,8 +109,27 @@ const statusPillRule: TagRule = {
   },
 };
 
+const chipRule: TagRule = {
+  tag: 'Chip',
+  renameTo: 'Tag',
+  importRename: { source: '@components/ui', from: 'Chip', to: 'Tag' },
+  keys: ['variant', 'size'],
+  transform: (attrs) => {
+    if (attrs.size === 'unstyled') return 'manual';
+    const out: Record<string, AttrValue> = {};
+    const tone = lookup(CHIP_TONES, attrs.variant ?? 'default', 'Chip variant');
+    if (tone) out.tone = tone;
+    if (attrs.size !== undefined) {
+      const size = lookup(CHIP_SIZES, attrs.size, 'Chip size');
+      if (size !== 'md') out.size = size;
+    }
+    return out;
+  },
+};
+
 /** Rule sets applied with `pnpm ds:migrate <set>`. Each Plan A task adds its set. */
 export const RULE_SETS: Record<string, ReadonlyArray<TagRule>> = {
   button: [buttonRule('Button'), buttonRule('LoadingButton', 'Button')],
   badge: [badgeRule, statusPillRule],
+  tag: [chipRule],
 };

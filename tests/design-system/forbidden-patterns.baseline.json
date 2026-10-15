@@ -121,9 +121,6 @@
     "legacy-color-ramp": 2,
     "legacy-color-name": 1
   },
-  "src/component-docs/ui/Chip.mdx": {
-    "legacy-color-name": 2
-  },
   "src/component-docs/ui/Command.mdx": {
     "arbitrary-length": 1
   },
@@ -379,10 +376,6 @@
   "src/components/ui/checkbox/Checkbox.tsx": {
     "legacy-color-ramp": 6,
     "legacy-color-name": 12
-  },
-  "src/components/ui/chip/Chip.tsx": {
-    "legacy-color-ramp": 11,
-    "legacy-color-name": 10
   },
   "src/components/ui/command/Command.tsx": {
     "legacy-color-ramp": 5,

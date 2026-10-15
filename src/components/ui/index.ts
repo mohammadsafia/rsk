@@ -16,7 +16,7 @@ export * from './tabs';
 export * from './divider';
 export * from './table';
 export * from './badge';
-export * from './chip';
+export * from './tag';
 export * from './calendar';
 export * from './checkbox';
 export * from './checkbox-group';

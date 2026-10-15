@@ -9,7 +9,7 @@ tags: [calendar, calendar-grid, schedule, compound, day-view, week-view, month-v
 
 import { useMemo, useState } from 'react';
 
-import { Chip, Divider, Table, IconButton } from '@components/ui';
+import { Tag, Divider, Table, IconButton } from '@components/ui';
 import { MetaCard } from '@components/shared';
 import { CalendarGrid } from '@components/calendar';
 import { Conditional } from '@components/utils';
@@ -178,7 +178,7 @@ export const CalendarGridDemo = () => {
                 <div className="flex flex-col gap-2">
                   <span className="text-sm font-bold">{event.patient}</span>
 
-                  <Chip variant="muted" className="w-fit">{TYPE_LABELS[event.type]}</Chip>
+                  <Tag className="w-fit">{TYPE_LABELS[event.type]}</Tag>
                 </div>
 
                 <div className="flex items-center gap-1">

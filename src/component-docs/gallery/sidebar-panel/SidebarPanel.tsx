@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useRef } from 'react';
 
-import { Card, Chip, Divider, Input, ScrollArea } from '@components/ui';
+import { Card, Tag, Divider, Input, ScrollArea } from '@components/ui';
 
 import { formatCategoryLabel } from '@component-docs/gallery/utils';
 
@@ -16,11 +16,11 @@ const TagFilterChip = ({
   onToggle,
 }: Readonly<{ tag: string; count: number; on: boolean; onToggle: (tag: string) => void }>) => (
   <button type="button" onClick={() => onToggle(tag)} aria-pressed={on}>
-    <Chip variant={on ? 'default' : 'muted'} size="sm" className="cursor-pointer gap-1.5">
+    <Tag tone={on ? 'accent' : 'neutral'} size="sm" className="cursor-pointer gap-1.5">
       <span>{tag}</span>
 
       <span className="text-2xs opacity-60">{count}</span>
-    </Chip>
+    </Tag>
   </button>
 );
 
@@ -45,9 +45,9 @@ const DocListItem = forwardRef<
       {tags.length ? (
         <div className="mt-1 flex items-center gap-1.5">
           {tags.slice(0, 3).map((tag) => (
-            <Chip key={tag} variant="muted" size="xs">
+            <Tag size="sm" key={tag}>
               {tag}
-            </Chip>
+            </Tag>
           ))}
 
           {tags.length > 3 ? <span className="text-muted-400 text-2xs">+{tags.length - 3}</span> : null}

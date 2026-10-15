@@ -98,3 +98,12 @@ describe('badge rules', () => {
     expect(run(input)).toBe(expected);
   });
 });
+
+describe('tag rules', () => {
+  it('renames Chip to Tag with tones and sizes', () => {
+    const source = 'import { Chip } from \'@components/ui\';\n<Chip variant="muted" size="xs">a</Chip>\n<Chip variant="default">b</Chip>';
+    expect(migrateSource(source, RULE_SETS.tag).output).toBe(
+      'import { Tag } from \'@components/ui\';\n<Tag size="sm">a</Tag>\n<Tag tone="accent">b</Tag>',
+    );
+  });
+});
