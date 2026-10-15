@@ -97,13 +97,13 @@ const Header: FC<CardHeaderProps> = ({ className, children, ...props }) => {
 const Title: FC<CardTitleProps> = ({ className, ...props }) => (
   <h3
     data-slot="card-title"
-    className={cn('text-fg text-md flex items-center gap-1.5 leading-tight font-semibold', className)}
+    className={cn('text-fg text-md col-start-1 flex items-center gap-1.5 leading-tight font-semibold', className)}
     {...props}
   />
 );
 
 const Description: FC<CardDescriptionProps> = ({ className, ...props }) => (
-  <p data-slot="card-description" className={cn('text-fg-muted text-sm', className)} {...props} />
+  <p data-slot="card-description" className={cn('text-fg-muted col-start-1 text-sm', className)} {...props} />
 );
 
 const Actions: FC<CardActionsProps> = ({ className, ...props }) => (

@@ -58,4 +58,17 @@ describe('choice fields', () => {
     const ids = screen.getAllByRole('radio').map((radio) => radio.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
+
+  it('FormCheckbox shows its tooltip and required marker without leaking either into the name or the DOM', () => {
+    render(
+      <FormHarness defaultValues={{ agree: false }}>
+        <FormCheckbox name="agree" label="I agree to the terms" tooltip="Why we ask" required />
+      </FormHarness>,
+    );
+    const checkbox = screen.getByRole('checkbox', { name: 'I agree to the terms' });
+    expect(checkbox.hasAttribute('tooltip')).toBe(false);
+    const info = screen.getByRole('button', { name: 'More information' });
+    expect(info.closest('label')).toBeNull();
+    expect(document.querySelector('[data-slot="form-checkbox-card"] [aria-hidden="true"]')?.textContent).toBe('*');
+  });
 });

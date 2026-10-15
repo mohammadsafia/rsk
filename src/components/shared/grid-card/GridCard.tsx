@@ -76,7 +76,13 @@ const Item: FC<GridCardItemProps> = ({ className, children, ...props }) => {
 
 const Header: FC<GridCardHeaderProps> = ({ className, children, ...props }) => {
   return (
-    <Card.Header className={cn('text-muted-300 flex flex-col items-center justify-center gap-y-1 px-0 py-0', className)} {...props}>
+    <Card.Header
+      className={cn(
+        'text-muted-300 flex flex-col items-center justify-center gap-y-1 px-0 py-0 not-last:border-b-0 not-last:pb-0',
+        className,
+      )}
+      {...props}
+    >
       {children}
     </Card.Header>
   );

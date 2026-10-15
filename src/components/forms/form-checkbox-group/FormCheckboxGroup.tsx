@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef } from 'react';
+import { type ComponentPropsWithoutRef, useId } from 'react';
 import { Controller, type FieldValues } from 'react-hook-form';
 
 import { CheckboxGroup } from '@components/ui';
@@ -34,6 +34,9 @@ function FormCheckboxGroup<TFieldValues extends FieldValues, TOption = FormSelec
   getOptionValue,
   ...props
 }: FormCheckboxGroupProps<TFieldValues, TOption>) {
+  // Unique per instance: two forms on one page may share a field name.
+  const fieldId = `${name}-${useId()}`;
+
   return (
     <Controller<TFieldValues>
       name={name}
@@ -47,7 +50,7 @@ function FormCheckboxGroup<TFieldValues extends FieldValues, TOption = FormSelec
         };
 
         return (
-          <FormField id={name} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+          <FormField id={fieldId} label={label} description={description} tooltip={tooltip} required={required} error={error}>
             {(fieldControl) => (
               <CheckboxGroup {...fieldControl} className={cn('flex flex-wrap gap-3', className)} {...props}>
                 {options.map((option, index) => {

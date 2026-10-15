@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef } from 'react';
+import { type ComponentPropsWithoutRef, useId } from 'react';
 import { Controller, type FieldValues } from 'react-hook-form';
 
 import { RadioGroup } from '@components/ui';
@@ -32,13 +32,16 @@ function FormRadioGroup<TFieldValues extends FieldValues, TOption = FormSelectOp
   getOptionValue,
   ...props
 }: FormRadioGroupProps<TFieldValues, TOption>) {
+  // Unique per instance: two forms on one page may share a field name.
+  const fieldId = `${name}-${useId()}`;
+
   return (
     <Controller<TFieldValues>
       name={name}
       control={control}
       rules={rules}
       render={({ field, fieldState: { error } }) => (
-        <FormField id={name} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+        <FormField id={fieldId} label={label} description={description} tooltip={tooltip} required={required} error={error}>
           {(fieldControl) => (
             <RadioGroup
               {...fieldControl}

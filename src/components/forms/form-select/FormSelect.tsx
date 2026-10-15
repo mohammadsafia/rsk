@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef, Fragment } from 'react';
+import { type ComponentPropsWithoutRef, Fragment, useId } from 'react';
 import { Controller, type FieldValues } from 'react-hook-form';
 
 import { Select } from '@components/ui';
@@ -45,6 +45,9 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
   optionMapper,
   ...props
 }: FormSelectProps<TFieldValues, TOption>) {
+  // Unique per instance: two forms on one page may share a field name.
+  const fieldId = `${name}-${useId()}`;
+
   const mappedOptions = options.map((option) => (optionMapper ? optionMapper(option) : option));
 
   const findOptionByValue = (value: string): TOption | undefined => {
@@ -68,7 +71,7 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
         };
 
         return (
-          <FormField id={name} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+          <FormField id={fieldId} label={label} description={description} tooltip={tooltip} required={required} error={error}>
             {(fieldControl) => (
               <Select value={internalValue ?? ''} onValueChange={onValueChange} {...field} {...props}>
                 <Select.Trigger ref={ref} {...fieldControl} className={className} disabled={field.disabled || props.disabled}>

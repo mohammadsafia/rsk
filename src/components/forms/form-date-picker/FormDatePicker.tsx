@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useId } from 'react';
 import { type FieldValues, useController } from 'react-hook-form';
 
 import { Calendar, type CalendarProps, fieldVariants, Popover, IconButton } from '@components/ui';
@@ -36,6 +36,9 @@ function FormDatePicker<TFieldValues extends FieldValues>({
   formatDate,
   ...props
 }: FormDatePickerProps<TFieldValues>) {
+  // Unique per instance: two forms on one page may share a field name.
+  const fieldId = `${name}-${useId()}`;
+
   const { t } = useAppTranslation('common');
 
   const [isOpen, setIsOpen] = useState(false);
@@ -168,7 +171,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
   const displayPlaceholder = placeholder || maskPlaceholder;
 
   return (
-    <FormField id={name} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+    <FormField id={fieldId} label={label} description={description} tooltip={tooltip} required={required} error={error}>
       {(fieldControl) => (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <div

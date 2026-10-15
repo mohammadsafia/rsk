@@ -1,4 +1,4 @@
-import { type FC, type RefCallback, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type FC, type RefCallback, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { type DateRange } from 'react-day-picker';
 import { type FieldError, type FieldPath, type FieldValues, useController } from 'react-hook-form';
@@ -85,6 +85,8 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
   ...props
 }) => {
   const { t } = useAppTranslation('common');
+  // Unique per instance: two forms on one page may share a field name.
+  const fieldId = `${name}-${useId()}`;
 
   const [isOpen, setIsOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState<Date | undefined>(undefined);
@@ -186,7 +188,7 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
   const hasValue = dateRange?.from || dateRange?.to;
 
   return (
-    <FormField id={name} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+    <FormField id={fieldId} label={label} description={description} tooltip={tooltip} required={required} error={error}>
       {(fieldControl) => (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <div

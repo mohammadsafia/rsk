@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { Controller, type FieldValues } from 'react-hook-form';
 
 import { FormField } from '@components/forms';
@@ -25,6 +26,9 @@ function FormTimePicker<TFieldValues extends FieldValues>({
   use24hFormat,
   ...props
 }: FormTimePickerProps<TFieldValues>) {
+  // Unique per instance: two forms on one page may share a field name.
+  const fieldId = `${name}-${useId()}`;
+
   const { toFormat, constants } = useDate();
 
   const displayFormat = use24hFormat ? constants.TimeFormats.HOUR_MINUTES_24 : constants.TimeFormats.HOUR_MINUTES_12;
@@ -50,7 +54,7 @@ function FormTimePicker<TFieldValues extends FieldValues>({
         };
 
         return (
-          <FormField id={name} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+          <FormField id={fieldId} label={label} description={description} tooltip={tooltip} required={required} error={error}>
             {(fieldControl) => (
               <TimePicker
                 name={name}

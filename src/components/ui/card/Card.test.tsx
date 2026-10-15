@@ -85,3 +85,21 @@ describe('Card shortcuts and states', () => {
     expect(card.className).toContain('bg-success-subtle');
   });
 });
+
+describe('Card collapsible header layout', () => {
+  it('keeps Title and Description in the first column when there are no Actions', () => {
+    render(
+      <Tooltip.Provider>
+        <Card collapsible>
+          <Card.Header>
+            <Card.Title>Billable lines</Card.Title>
+            <Card.Description>Draft</Card.Description>
+          </Card.Header>
+          <Card.Content>Body</Card.Content>
+        </Card>
+      </Tooltip.Provider>,
+    );
+    expect(screen.getByRole('heading', { name: 'Billable lines' }).className).toContain('col-start-1');
+    expect(screen.getByText('Draft').className).toContain('col-start-1');
+  });
+});

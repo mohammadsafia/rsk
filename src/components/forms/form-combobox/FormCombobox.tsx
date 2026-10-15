@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useId } from 'react';
 
 import { type FieldValues, useController } from 'react-hook-form';
 
@@ -56,6 +56,9 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
   debounceMs = 500,
   pageSize = 20,
 }: FormComboboxProps<TFieldValues, TOption>) {
+  // Unique per instance: two forms on one page may share a field name.
+  const fieldId = `${name}-${useId()}`;
+
   const {
     field: { ref, value, onChange, ...field },
     fieldState: { error },
@@ -129,7 +132,7 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
   };
 
   return (
-    <FormField id={name} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+    <FormField id={fieldId} label={label} description={description} tooltip={tooltip} required={required} error={error}>
       {(fieldControl) => (
         <Combobox open={open} onOpenChange={setOpen}>
           <Combobox.Trigger ref={ref} {...fieldControl} className={className} disabled={field.disabled || disabled} onBlur={field.onBlur}>
