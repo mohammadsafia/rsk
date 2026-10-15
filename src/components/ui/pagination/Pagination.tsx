@@ -1,79 +1,91 @@
 import { type ComponentProps, type FC } from 'react';
 
+import { Button, type ButtonProps, IconButton, type IconButtonProps } from '@components/ui';
+
+import { useAppTranslation } from '@hooks/shared';
+
 import { cn } from '@utils';
+
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from 'lucide-react';
 
 type PaginationProps = ComponentProps<'nav'>;
 type PaginationListProps = ComponentProps<'ol'>;
 type PaginationItemProps = ComponentProps<'li'>;
-type PaginationLinkProps = { isActive?: boolean } & ComponentProps<'button'>;
+type PaginationNavButtonProps = Omit<ButtonProps, 'variant' | 'tone' | 'size'> & { isActive?: boolean };
+type PaginationStepProps = Omit<IconButtonProps, 'children' | 'aria-label'> & { 'aria-label'?: string };
 type PaginationEllipsisProps = ComponentProps<'span'>;
 
 type PaginationComponents = FC<PaginationProps> & {
   List: FC<PaginationListProps>;
   Item: FC<PaginationItemProps>;
-  NavButton: FC<PaginationLinkProps>;
-  Previous: FC<ComponentProps<typeof NavButton>>;
-  Next: FC<ComponentProps<typeof NavButton>>;
+  NavButton: FC<PaginationNavButtonProps>;
+  Previous: FC<PaginationStepProps>;
+  Next: FC<PaginationStepProps>;
   Ellipsis: FC<PaginationEllipsisProps>;
 };
 
-const List = ({ className, ...props }: PaginationListProps) => (
-  <ol data-slot="pagination-content" className={cn('flex items-center gap-2', className)} {...props} />
+const List: FC<PaginationListProps> = ({ className, ...props }) => (
+  <ol data-slot="pagination-content" className={cn('flex items-center gap-1', className)} {...props} />
 );
 
-const Item = ({ ...props }: PaginationItemProps) => <li data-slot="pagination-item" {...props} />;
+const Item: FC<PaginationItemProps> = (props) => <li data-slot="pagination-item" {...props} />;
 
-const NavButton = ({ className, isActive, ...props }: PaginationLinkProps) => (
-  <button
+const NavButton: FC<PaginationNavButtonProps> = ({ className, isActive = false, ...props }) => (
+  <Button
     type="button"
-    aria-current={isActive ? 'page' : undefined}
     data-slot="pagination-link"
     data-active={isActive}
-    className={cn(
-      'inline-flex cursor-pointer items-center justify-center rounded-full px-3 py-2 text-xs font-medium transition-colors',
-      'size-9 outline-none',
-      'disabled:pointer-events-none disabled:opacity-50',
-      isActive ? 'bg-primary text-primary-foreground dark:bg-primary-300' : 'text-muted-400 hover:text-primary-900 hover:bg-muted-50',
-      className,
-    )}
+    aria-current={isActive ? 'page' : undefined}
+    variant={isActive ? 'solid' : 'ghost'}
+    size="sm"
+    className={cn('min-w-control-sm px-1.5 font-mono tabular-nums', className)}
     {...props}
   />
 );
 
-const Previous = ({ className, ...props }: ComponentProps<typeof NavButton>) => (
-  <NavButton aria-label="Go to previous page" className={cn('text-primary size-6 rounded-lg p-0', className)} {...props}>
-    <ChevronLeftIcon className="size-6" strokeWidth={1.5} />
-  </NavButton>
-);
+const Previous: FC<PaginationStepProps> = ({ 'aria-label': ariaLabel, ...props }) => {
+  const { t } = useAppTranslation('common');
 
-const Next = ({ className, ...props }: ComponentProps<typeof NavButton>) => (
-  <NavButton aria-label="Go to next page" className={cn('text-primary size-6 rounded-lg p-0', className)} {...props}>
-    <ChevronRightIcon className="size-6" strokeWidth={1.5} />
-  </NavButton>
-);
+  return (
+    <IconButton data-slot="pagination-previous" size="sm" tooltip={false} aria-label={ariaLabel ?? t('pagination.previousPage')} {...props}>
+      <ChevronLeftIcon className="rtl:rotate-180" />
+    </IconButton>
+  );
+};
 
-const Ellipsis = ({ className, ...props }: PaginationEllipsisProps) => (
-  <span
-    aria-hidden
-    data-slot="pagination-ellipsis"
-    className={cn('text-muted-400 flex size-5 items-center justify-center', className)}
-    {...props}
-  >
-    <MoreHorizontalIcon className="size-4" />
-    <span className="sr-only">More pages</span>
-  </span>
-);
+const Next: FC<PaginationStepProps> = ({ 'aria-label': ariaLabel, ...props }) => {
+  const { t } = useAppTranslation('common');
 
-const Pagination: PaginationComponents = ({ className, ...props }: PaginationProps) => (
-  <nav
-    role="navigation"
-    aria-label="pagination"
-    data-slot="pagination"
-    className={cn('flex w-full items-center justify-end gap-3 rounded-2xl px-6 py-2', className)}
-    {...props}
-  />
-);
+  return (
+    <IconButton data-slot="pagination-next" size="sm" tooltip={false} aria-label={ariaLabel ?? t('pagination.nextPage')} {...props}>
+      <ChevronRightIcon className="rtl:rotate-180" />
+    </IconButton>
+  );
+};
+
+const Ellipsis: FC<PaginationEllipsisProps> = ({ className, ...props }) => {
+  const { t } = useAppTranslation('common');
+
+  return (
+    <span data-slot="pagination-ellipsis" className={cn('text-fg-subtle flex size-7 items-center justify-center', className)} {...props}>
+      <MoreHorizontalIcon aria-hidden="true" className="size-4" />
+      <span className="sr-only">{t('pagination.morePages')}</span>
+    </span>
+  );
+};
+
+const Pagination: PaginationComponents = ({ className, ...props }) => {
+  const { t } = useAppTranslation('common');
+
+  return (
+    <nav
+      aria-label={t('pagination.label')}
+      data-slot="pagination"
+      className={cn('flex w-full items-center justify-end gap-3', className)}
+      {...props}
+    />
+  );
+};
 
 Pagination.List = List;
 Pagination.Item = Item;

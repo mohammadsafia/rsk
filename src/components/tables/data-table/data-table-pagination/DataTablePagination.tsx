@@ -95,11 +95,7 @@ const DataTablePagination: FC<PaginationProps> = ({ pageSizeOptions = [30, 50, 1
 
               <Conditional.Else>
                 <Pagination.Item>
-                  <Pagination.NavButton
-                    className="size-8.5"
-                    onClick={() => table.setPageIndex((page as number) - 1)}
-                    isActive={page === currentPage}
-                  >
+                  <Pagination.NavButton onClick={() => table.setPageIndex((page as number) - 1)} isActive={page === currentPage}>
                     {page.toString().padStart(2, '0')}
                   </Pagination.NavButton>
                 </Pagination.Item>

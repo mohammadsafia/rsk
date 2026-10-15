@@ -117,9 +117,6 @@
   "src/component-docs/ui/Layout.mdx": {
     "legacy-color-name": 3
   },
-  "src/component-docs/ui/Pagination.mdx": {
-    "legacy-color-name": 3
-  },
   "src/component-docs/ui/Progress.mdx": {
     "legacy-color-name": 2
   },
@@ -313,10 +310,6 @@
   "src/components/ui/layout/Layout.tsx": {
     "prime-component": 2,
     "legacy-color-name": 2
-  },
-  "src/components/ui/pagination/Pagination.tsx": {
-    "legacy-color-ramp": 5,
-    "legacy-color-name": 4
   },
   "src/components/ui/scroll-area/ScrollArea.tsx": {
     "legacy-color-name": 1
