@@ -121,6 +121,7 @@ const CLEAN_UI_FOLDERS = [
   'toast',
   'card',
   'tabs',
+  'table',
 ] as const;
 
 describe('clean primitives', () => {

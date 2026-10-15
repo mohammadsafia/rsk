@@ -133,9 +133,6 @@
   "src/component-docs/ui/Switch.mdx": {
     "legacy-color-name": 3
   },
-  "src/component-docs/ui/Table.mdx": {
-    "legacy-color-ramp": 2
-  },
   "src/component-docs/ui/ToggleGroup.mdx": {
     "legacy-color-name": 3
   },
@@ -323,11 +320,6 @@
   },
   "src/components/ui/scroll-area/ScrollArea.tsx": {
     "legacy-color-name": 1
-  },
-  "src/components/ui/table/Table.tsx": {
-    "prime-component": 2,
-    "legacy-color-ramp": 12,
-    "legacy-color-name": 3
   },
   "src/components/ui/time-picker/TimePicker.tsx": {
     "legacy-color-ramp": 7,

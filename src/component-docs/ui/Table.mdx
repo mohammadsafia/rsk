@@ -11,7 +11,7 @@ import { Table, Tag } from '@components/ui';
 
 ## Demo
 
-<div className="border-muted-200 w-full overflow-hidden rounded-2xl border">
+<div className="border-border w-full overflow-hidden rounded-2xl border">
   <Table>
     <Table.Header>
       <Table.Row>
@@ -96,7 +96,7 @@ import { Table, Tag } from '@components/ui';
 ## Code
 
 ```tsx
-<div className="border-muted-200 overflow-hidden rounded-2xl border">
+<div className="border-border overflow-hidden rounded-2xl border">
   <Table>
     <Table.Header>
       <Table.Row>
@@ -141,4 +141,32 @@ import { Table, Tag } from '@components/ui';
     <Table.Loader isLoading={true} colSpan={5} rows={3} />
   </Table.Body>
 </Table>;
+```
+
+## Numeric columns
+
+`numeric` on `Table.Head` and `Table.Cell` end-aligns the column and renders digits in the mono face with tabular figures. The value keeps its left-to-right order in Arabic.
+
+<Table>
+  <Table.Header>
+    <Table.Row>
+      <Table.Head>Invoice</Table.Head>
+      <Table.Head numeric>Amount</Table.Head>
+    </Table.Row>
+  </Table.Header>
+  <Table.Body>
+    <Table.Row>
+      <Table.Cell>INV-2026-0142</Table.Cell>
+      <Table.Cell numeric>1,240.50</Table.Cell>
+    </Table.Row>
+    <Table.Row data-state="selected">
+      <Table.Cell>INV-2026-0143</Table.Cell>
+      <Table.Cell numeric>87.00</Table.Cell>
+    </Table.Row>
+  </Table.Body>
+</Table>
+
+```tsx
+<Table.Head numeric>Amount</Table.Head>
+<Table.Cell numeric>1,240.50</Table.Cell>
 ```
