@@ -15,7 +15,7 @@
   --secondary-foreground: var(--fg);
   --muted: var(--border-strong);
   --muted-foreground: var(--fg-muted);
-  --destructive: var(--danger);
+  --destructive: var(--vermilion-8);
   --destructive-foreground: var(--danger-fg);
   --success-foreground: var(--success-fg);
   --warning-foreground: var(--warning-fg);
@@ -56,16 +56,17 @@
   --destructive-400: var(--vermilion-6);
   --warning-200: var(--amber-1);
   --warning-300: var(--amber-2);
-  --warning-400: var(--amber-3);
+  --warning-400: var(--warning);
 }
 
 .dark {
+  --destructive: var(--danger);
   --primary-15: var(--oxblood-11);
   --primary-25: var(--oxblood-11);
   --primary-50: var(--oxblood-10);
   --primary-100: var(--oxblood-10);
-  --primary-200: var(--oxblood-9);
-  --primary-300: var(--oxblood-8);
+  --primary-200: var(--oxblood-6);
+  --primary-300: var(--accent);
   --primary-400: var(--oxblood-7);
   --primary-600: var(--oxblood-6);
   --primary-700: var(--oxblood-5);
@@ -92,7 +93,7 @@
   --success-400: var(--green-7);
   --destructive-200: var(--vermilion-12);
   --destructive-300: var(--vermilion-10);
-  --destructive-400: var(--vermilion-8);
+  --destructive-400: var(--danger);
   --warning-200: var(--amber-11);
   --warning-300: var(--amber-9);
   --warning-400: var(--amber-6);

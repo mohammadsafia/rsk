@@ -140,3 +140,13 @@ describe('shape, motion and states', () => {
     );
   });
 });
+
+describe('retired meanings', () => {
+  it('uses no text-surface: "surface" no longer means always-white, it is the card background', () => {
+    const offenders = listFiles(SRC_DIR)
+      .filter((file) => /\.(tsx|mdx)$/.test(file))
+      .filter((file) => /(?:^|[\s:'"`])text-surface(?![-\w])/.test(readFileSync(file, 'utf8')))
+      .map((file) => file.replace(SRC_DIR, 'src/'));
+    expect(offenders).toEqual([]);
+  });
+});

@@ -62,3 +62,45 @@ describe('semantic token contrast (WCAG AA)', () => {
     });
   }
 });
+
+/**
+ * The legacy bridge (deleted in sub-project 2) re-points old names at the new palette.
+ * Its pairs are what most components still render today, so they get the same AA guard.
+ * Variables are merged the way <html class="light|dark"> resolves them: palette → tokens → bridge.
+ */
+const paletteCss = readProjectFile('src/styles/palette.css');
+const legacyCss = readProjectFile('src/styles/legacy-tokens.css');
+
+const resolvedVars = (mode: '.light' | '.dark') => ({
+  ...extractBlock(paletteCss, ':root'),
+  ...extractBlock(tokensCss, '.light'),
+  ...extractBlock(legacyCss, '.light'),
+  ...(mode === '.dark' ? { ...extractBlock(tokensCss, '.dark'), ...extractBlock(legacyCss, '.dark') } : {}),
+});
+
+/** [foreground, background, modes] — legacy pairs used by Button, Calendar, Chip and Badge today. */
+const LEGACY_PAIRS: ReadonlyArray<readonly [string, string, ReadonlyArray<'.light' | '.dark'>]> = [
+  ['primary-foreground', 'primary', ['.light', '.dark']],
+  ['primary-foreground', 'primary-600', ['.light']],
+  ['primary-foreground', 'primary-300', ['.dark']],
+  ['primary-foreground', 'primary-200', ['.dark']],
+  ['destructive-foreground', 'destructive', ['.light', '.dark']],
+  ['destructive-foreground', 'destructive-400', ['.dark']],
+  ['success-foreground', 'success', ['.light', '.dark']],
+  ['warning-foreground', 'warning-400', ['.light', '.dark']],
+  ['destructive', 'destructive-200', ['.light', '.dark']],
+  ['foreground', 'background', ['.light', '.dark']],
+  ['muted-foreground', 'background', ['.light', '.dark']],
+];
+
+describe('legacy bridge contrast (WCAG AA text)', () => {
+  for (const [foreground, background, modes] of LEGACY_PAIRS) {
+    for (const mode of modes) {
+      it(`${mode} ${foreground} on ${background} ≥ ${TEXT}:1`, () => {
+        const vars = resolvedVars(mode);
+        const ratio = contrastRatio(opaqueRgb(vars, foreground), opaqueRgb(vars, background));
+        expect(ratio).toBeGreaterThanOrEqual(TEXT);
+      });
+    }
+  }
+});
