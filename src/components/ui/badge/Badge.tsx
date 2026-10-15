@@ -1,44 +1,68 @@
 import { type ComponentPropsWithoutRef } from 'react';
 
-import { cva, type VariantProps } from 'class-variance-authority';
+import { Conditional } from '@components/utils';
 
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
-export type BadgeProps = ComponentPropsWithoutRef<'div'> & VariantProps<typeof badgeVariants>;
-
-export const badgeVariants = cva('inline-flex items-center gap-1 font-normal text-muted-foreground', {
+export const badgeVariants = cva('inline-flex shrink-0 items-center gap-1.5 rounded-md font-medium whitespace-nowrap', {
   variants: {
-    size: {
-      default: 'p-0 text-xs',
-      xs: 'px-2 py-0.5 text-xs',
-      sm: 'px-2.5 py-1 text-sm',
-      md: 'px-3 py-1.5 text-md',
-      lg: 'px-3.5 py-2 text-lg',
-    },
     variant: {
-      default: `**:data-[slot=badge-dot]:text-primary`,
-      success: `**:data-[slot=badge-dot]:text-success`,
-      destructive: `**:data-[slot=badge-dot]:text-destructive`,
-      warning: `**:data-[slot=badge-dot]:text-warning`,
-      muted: `**:data-[slot=badge-dot]:text-muted-foreground`,
-      secondary: `**:data-[slot=badge-dot]:text-secondary-600`,
-      neutral: `**:data-[slot=badge-dot]:text-primary-900`,
-      accent: `**:data-[slot=badge-dot]:text-primary-400`,
+      dot: 'border-border text-fg border',
+      soft: '',
+    },
+    tone: {
+      neutral: '',
+      accent: '',
+      success: '',
+      warning: '',
+      danger: '',
+      info: '',
+    },
+    size: {
+      sm: 'h-5 px-1.5 text-2xs',
+      md: 'h-5.5 px-2 text-xs',
     },
   },
+  compoundVariants: [
+    { variant: 'dot', tone: 'neutral', className: '*:data-[slot=badge-dot]:bg-fg-muted' },
+    { variant: 'dot', tone: 'accent', className: '*:data-[slot=badge-dot]:bg-accent' },
+    { variant: 'dot', tone: 'success', className: '*:data-[slot=badge-dot]:bg-success' },
+    { variant: 'dot', tone: 'warning', className: '*:data-[slot=badge-dot]:bg-warning' },
+    { variant: 'dot', tone: 'danger', className: '*:data-[slot=badge-dot]:bg-danger' },
+    { variant: 'dot', tone: 'info', className: '*:data-[slot=badge-dot]:bg-info' },
+    { variant: 'soft', tone: 'neutral', className: 'bg-surface-sunken text-fg' },
+    { variant: 'soft', tone: 'accent', className: 'bg-accent-subtle text-accent' },
+    { variant: 'soft', tone: 'success', className: 'bg-success-subtle text-success' },
+    { variant: 'soft', tone: 'warning', className: 'bg-warning-subtle text-warning' },
+    { variant: 'soft', tone: 'danger', className: 'bg-danger-subtle text-danger' },
+    { variant: 'soft', tone: 'info', className: 'bg-info-subtle text-info' },
+  ],
   defaultVariants: {
-    size: 'default',
-    variant: 'default',
+    variant: 'dot',
+    tone: 'neutral',
+    size: 'md',
   },
 });
 
-const Badge = ({ className, variant, size, children, ...props }: BadgeProps) => {
-  return (
-    <div data-slot="badge" className={cn(badgeVariants({ variant, size }), className)} {...props}>
-      <span data-slot="badge-dot" className="h-2 w-2 shrink-0 rounded-full bg-current" />
-      {children}
-    </div>
-  );
-};
+export type BadgeVariants = VariantProps<typeof badgeVariants>;
+
+export type BadgeProps = ComponentPropsWithoutRef<'span'> & BadgeVariants;
+
+const Badge = ({ className, variant, tone, size, children, ...props }: BadgeProps) => (
+  <span
+    data-slot="badge"
+    data-variant={variant ?? 'dot'}
+    data-tone={tone ?? 'neutral'}
+    className={cn(badgeVariants({ variant, tone, size }), className)}
+    {...props}
+  >
+    <Conditional.If condition={(variant ?? 'dot') === 'dot'}>
+      <span data-slot="badge-dot" aria-hidden="true" className="size-1.5 shrink-0 rounded-full" />
+    </Conditional.If>
+
+    {children}
+  </span>
+);
 
 export default Badge;

@@ -48,10 +48,10 @@ const STATUS_OPTIONS: Option[] = [
   { id: 'Suspended', labelKey: 'statuses.Suspended' },
 ];
 
-const STATUS_VARIANT: Record<Member['status'], 'success' | 'warning' | 'destructive'> = {
+const STATUS_TONE: Record<Member['status'], 'success' | 'warning' | 'danger'> = {
   Active: 'success',
   Invited: 'warning',
-  Suspended: 'destructive',
+  Suspended: 'danger',
 };
 
 const FIRST_NAMES = ['Sarah', 'Alex', 'Jordan', 'Taylor', 'Chris', 'Morgan', 'Jamie', 'Casey', 'Riley', 'Avery', 'Quinn', 'Sam'];
@@ -120,7 +120,7 @@ const buildColumns = (t: TranslateFn): ColumnDef<Member>[] => {
       accessorKey: 'status',
       header: t('columns.status'),
       filterFn: inSelectedValues,
-      cell: ({ row }) => <Badge variant={STATUS_VARIANT[row.original.status]}>{t(`statuses.${row.original.status}`)}</Badge>,
+      cell: ({ row }) => <Badge tone={STATUS_TONE[row.original.status]}>{t(`statuses.${row.original.status}`)}</Badge>,
       meta: {
         label: t('columns.status'),
         filterMeta: createFilterMeta({

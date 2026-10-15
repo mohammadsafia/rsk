@@ -10,7 +10,7 @@ import {
   useState,
 } from 'react';
 
-import { Avatar, Card, Chip, IconButton } from '@components/ui';
+import { Avatar, Card, Badge, IconButton } from '@components/ui';
 import { Combobox, ComposedButton, FileIcon, type NormalizedExtension, PrimeDropdown, PrimeTooltip } from '@components/shared';
 import { Conditional } from '@components/utils';
 
@@ -82,7 +82,7 @@ type FileCardComponents = (<TEntry>(props: FileCardProps<TEntry>) => ReactNode) 
   Preview: <TEntry>(props: PreviewProps<TEntry>) => ReactNode;
   FileShape: FC<FileShapeProps>;
   FolderShape: FC<FolderShapeProps>;
-  StatusPill: typeof Chip;
+  StatusPill: typeof Badge;
   ApprovalPrompt: FC<ApprovalPromptProps>;
   Approve: FC<ApproveProps>;
   Reject: FC<RejectProps>;
@@ -429,7 +429,7 @@ FileCard.Separator = PrimeDropdown.Separator;
 FileCard.Preview = Preview;
 FileCard.FileShape = FileShape;
 FileCard.FolderShape = FolderShape;
-FileCard.StatusPill = Chip;
+FileCard.StatusPill = Badge;
 FileCard.ApprovalPrompt = ApprovalPrompt;
 // React 18 bridge — remove forwardRef wrapper when upgrading to React 19
 FileCard.Approve = forwardRef<HTMLButtonElement, ApproveProps>((props, ref) => Approve({ ...props, ref }));

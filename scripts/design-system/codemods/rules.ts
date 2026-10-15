@@ -54,7 +54,63 @@ const buttonRule = (tag: string, renameTo?: string): TagRule => ({
   },
 });
 
+const BADGE_TONES: Readonly<Record<string, string | null>> = {
+  default: null,
+  secondary: null,
+  muted: null,
+  neutral: null,
+  accent: 'accent',
+  success: 'success',
+  warning: 'warning',
+  destructive: 'danger',
+};
+
+const BADGE_SIZES: Readonly<Record<string, 'sm' | 'md'>> = { default: 'sm', xs: 'sm', sm: 'sm', md: 'md', lg: 'md' };
+
+/** Chip variants (also used by FileCard.StatusPill) → tone. */
+const CHIP_TONES: Readonly<Record<string, string | null>> = {
+  default: 'accent',
+  secondary: null,
+  muted: null,
+  success: 'success',
+  destructive: 'danger',
+  warning: 'warning',
+  accent: 'info',
+};
+
+const CHIP_SIZES: Readonly<Record<string, 'sm' | 'md'>> = { xxs: 'sm', xs: 'sm', sm: 'sm', default: 'md', md: 'md', lg: 'md' };
+
+const lookup = <T>(table: Readonly<Record<string, T>>, value: string, label: string): T => {
+  if (!(value in table)) throw new Error(`Unknown ${label} "${value}"`);
+  return table[value];
+};
+
+const badgeRule: TagRule = {
+  tag: 'Badge',
+  keys: ['variant', 'size'],
+  transform: (attrs) => {
+    const out: Record<string, AttrValue> = {};
+    const tone = lookup(BADGE_TONES, attrs.variant ?? 'default', 'Badge variant');
+    if (tone) out.tone = tone;
+    if (attrs.size !== undefined) out.size = lookup(BADGE_SIZES, attrs.size, 'Badge size');
+    return out;
+  },
+};
+
+const statusPillRule: TagRule = {
+  tag: 'FileCard.StatusPill',
+  keys: ['variant', 'size'],
+  transform: (attrs) => {
+    const out: Record<string, AttrValue> = { variant: 'soft' };
+    const tone = lookup(CHIP_TONES, attrs.variant ?? 'default', 'StatusPill variant');
+    if (tone) out.tone = tone;
+    if (attrs.size !== undefined) out.size = lookup(CHIP_SIZES, attrs.size, 'StatusPill size');
+    return out;
+  },
+};
+
 /** Rule sets applied with `pnpm ds:migrate <set>`. Each Plan A task adds its set. */
 export const RULE_SETS: Record<string, ReadonlyArray<TagRule>> = {
   button: [buttonRule('Button'), buttonRule('LoadingButton', 'Button')],
+  badge: [badgeRule, statusPillRule],
 };

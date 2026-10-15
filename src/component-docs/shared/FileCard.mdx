@@ -90,7 +90,7 @@ export const ApprovedDemo = () => {
       <FileCard.Preview>
         {(entry) => (
           <FileCard.FileShape>
-            <FileCard.StatusPill variant="success">Approved</FileCard.StatusPill>
+            <FileCard.StatusPill variant="soft" tone="success">Approved</FileCard.StatusPill>
           </FileCard.FileShape>
         )}
       </FileCard.Preview>
@@ -120,7 +120,7 @@ export const RejectedDemo = () => {
       <FileCard.Preview>
         {(entry) => (
           <FileCard.FileShape>
-            <FileCard.StatusPill variant="destructive">Rejected</FileCard.StatusPill>
+            <FileCard.StatusPill variant="soft" tone="danger">Rejected</FileCard.StatusPill>
           </FileCard.FileShape>
         )}
       </FileCard.Preview>
@@ -227,13 +227,13 @@ File shape with no overlay. Status pill / approval prompt only render when consu
 
 ## Variant — Approved
 
-`<FileCard.StatusPill variant="success">` mounted inside the file shape — content sits in front of the watermark icon.
+`<FileCard.StatusPill variant="soft" tone="success">` mounted inside the file shape — content sits in front of the watermark icon.
 
 <ApprovedDemo />
 
 ## Variant — Rejected
 
-`<FileCard.StatusPill variant="destructive">`.
+`<FileCard.StatusPill variant="soft" tone="danger">`.
 
 <RejectedDemo />
 
@@ -341,7 +341,7 @@ import { FileCard, type FileCardAccessors } from '@components/shared';
 | `<FileCard.Preview>` | reads context, render-prop children | preview region container |
 | `<FileCard.FileShape>` | visual primitive | document watermark icon with content overlay |
 | `<FileCard.FolderShape>` | visual primitive | folder shape with `count` |
-| `<FileCard.StatusPill>` | alias of `Badge` | DS Badge with full variant set (default / success / destructive / warning / muted / secondary / neutral / accent) + size set |
+| `<FileCard.StatusPill>` | alias of `Badge` | Soft status badge: `tone` (neutral / accent / success / warning / danger / info) and `size` (sm / md) |
 | `<FileCard.ApprovalPrompt>` | visual primitive | text styling for approval-required copy |
 | `<FileCard.Approve>` | wraps `ComposedButton` (outline-success) | `forwardRef` — works as `Dialog.Trigger asChild` |
 | `<FileCard.Reject>` | wraps `ComposedButton` (outline-destructive) | `forwardRef` — works as `Dialog.Trigger asChild` |

@@ -82,3 +82,19 @@ describe('button rules', () => {
     expect(() => run('<Button variant="sparkly">')).toThrow('Unknown Button variant "sparkly"');
   });
 });
+
+describe('badge rules', () => {
+  const run = (source: string) => migrateSource(source, RULE_SETS.badge, 'x.tsx').output;
+
+  it.each([
+    ['<Badge variant="default">', '<Badge>'],
+    ['<Badge variant="muted" size="xs">', '<Badge size="sm">'],
+    ['<Badge variant="destructive" size="lg">', '<Badge tone="danger" size="md">'],
+    ['<Badge variant="accent">', '<Badge tone="accent">'],
+    ['<FileCard.StatusPill variant="success">', '<FileCard.StatusPill variant="soft" tone="success">'],
+    ['<FileCard.StatusPill variant="destructive">', '<FileCard.StatusPill variant="soft" tone="danger">'],
+    ['<FileCard.StatusPill variant="default">', '<FileCard.StatusPill variant="soft" tone="accent">'],
+  ])('%s → %s', (input, expected) => {
+    expect(run(input)).toBe(expected);
+  });
+});

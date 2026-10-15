@@ -58,9 +58,7 @@ function FacetedFilter({ title, name, control, filterVariant = 'text', filterOpt
             <Conditional.If condition={selectedCount > 0}>
               <Divider orientation="vertical" className="mx-2 h-4" />
 
-              <Badge variant="secondary" className="rounded-sm px-1 font-normal lg:hidden">
-                {selectedCount}
-              </Badge>
+              <Badge className="rounded-sm px-1 font-normal lg:hidden">{selectedCount}</Badge>
 
               <div className="hidden space-x-1 lg:flex">
                 <Conditional>
@@ -68,16 +66,14 @@ function FacetedFilter({ title, name, control, filterVariant = 'text', filterOpt
                     {filterOptions
                       .filter((opt) => selectedValues.includes(opt.value))
                       .map((opt) => (
-                        <Badge key={opt.value} variant="secondary" className="rounded-sm px-1 font-normal">
+                        <Badge key={opt.value} className="rounded-sm px-1 font-normal">
                           {opt.label}
                         </Badge>
                       ))}
                   </Conditional.If>
 
                   <Conditional.Else>
-                    <Badge variant="secondary" className="rounded-sm px-1 font-normal">
-                      {selectedCount} selected
-                    </Badge>
+                    <Badge className="rounded-sm px-1 font-normal">{selectedCount} selected</Badge>
                   </Conditional.Else>
                 </Conditional>
               </div>

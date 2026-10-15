@@ -62,7 +62,8 @@ describe('index.css import order', () => {
 
 describe('legacy accent migration', () => {
   it('leaves no usage of the old soft-hover accent utilities in src/', () => {
-    const legacyAccent = /\b(?:bg|text|border|ring)-accent-(?:foreground|200|300|400)\b|(?:focus|hover|data-\[[^\]]+\]):bg-accent(?![-\w])/;
+    const legacyAccent =
+      /\b(?:bg|text|border|ring)-accent-(?:foreground|200|300|400)\b|(?:focus|hover|data-\[(?!slot=)[^\]]+\]):bg-accent(?![-\w])/;
     const offenders = listFiles(SRC_DIR)
       .filter((file) => /\.(tsx|ts|mdx)$/.test(file))
       .filter((file) => legacyAccent.test(readFileSync(file, 'utf8')))
