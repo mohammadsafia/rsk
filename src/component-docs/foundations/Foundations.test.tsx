@@ -27,6 +27,12 @@ describe('TypeScale', () => {
     expect(container.querySelectorAll('[data-slot="type-scale-row"]')).toHaveLength(TEXT_SCALE.length);
     expect(container.querySelectorAll('[dir="rtl"]')).toHaveLength(TEXT_SCALE.length);
   });
+
+  it('isolates IDs as LTR inside Arabic samples so digit groups keep their order', () => {
+    const { container } = render(<TypeScale />);
+    const isolatedIds = [...container.querySelectorAll('[dir="rtl"] [dir="ltr"]')].map((node) => node.textContent);
+    expect(isolatedIds).toEqual(TEXT_SCALE.map(() => '2981-4410-22'));
+  });
 });
 
 describe('FoundationScales', () => {

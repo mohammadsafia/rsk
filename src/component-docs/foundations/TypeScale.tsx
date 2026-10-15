@@ -11,7 +11,7 @@ const TypeScale = () => (
         <span className={step.token}>Patient records — 2981-4410-22</span>
 
         <span dir="rtl" className={step.token}>
-          سجلات المرضى — 2981-4410-22
+          سجلات المرضى — <span dir="ltr">2981-4410-22</span>
         </span>
       </div>
     ))}
