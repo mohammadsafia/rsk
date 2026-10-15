@@ -231,6 +231,13 @@ const toggleRule = (tag: string): TagRule => ({
 });
 
 /** Rule sets applied with `pnpm ds:migrate <set>`. Each Plan A task adds its set. */
+const cardRule: TagRule = {
+  tag: 'Card',
+  keys: ['shadow'],
+  // Cards no longer have a resting shadow (addendum §9); every value is dropped.
+  transform: () => ({}),
+};
+
 export const RULE_SETS: Record<string, ReadonlyArray<TagRule>> = {
   button: [buttonRule('Button'), buttonRule('LoadingButton', 'Button')],
   badge: [badgeRule, statusPillRule],
@@ -238,4 +245,5 @@ export const RULE_SETS: Record<string, ReadonlyArray<TagRule>> = {
   alert: [alertRule],
   feedback: [progressRule, skeletonRule, switchRule, checkboxRule],
   menus: [toggleRule('ToggleGroup'), toggleRule('ToggleGroup.Item')],
+  card: [cardRule],
 };

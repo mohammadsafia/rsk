@@ -88,7 +88,7 @@ const SidebarPanel = (props: SidebarPanelProps) => {
   }, []);
 
   return (
-    <Card shadow="sm" className="border-primary-100 col-span-12 overflow-hidden border lg:col-span-4">
+    <Card className="border-primary-100 col-span-12 overflow-hidden border lg:col-span-4">
       <Card.Header className="px-5 pt-5 pb-0">
         <div className="flex items-center justify-between">
           <div>

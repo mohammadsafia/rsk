@@ -144,3 +144,14 @@ describe('menus rules', () => {
     expect(migrateSource(input, RULE_SETS.menus).output.replace(/\s+/g, ' ')).toBe(expected);
   });
 });
+describe('card rules', () => {
+  const run = (source: string) => migrateSource(source, RULE_SETS.card, 'x.tsx').output;
+
+  it.each([
+    ['<Card shadow="sm" className="x">', '<Card className="x">'],
+    ['<Card shadow="none">', '<Card>'],
+    ['<Card>', '<Card>'],
+  ])('%s → %s', (input, expected) => {
+    expect(run(input)).toBe(expected);
+  });
+});

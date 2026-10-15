@@ -15,10 +15,7 @@ const DocPanel = (props: DocPanelProps) => {
   const { hasSelected, selectedDoc, selectedDocTags, SelectedDocComponent, sidebarOpen = true } = props;
 
   return (
-    <Card
-      shadow="sm"
-      className={`border-primary-100 col-span-12 overflow-hidden border ${sidebarOpen ? 'lg:col-span-8' : 'lg:col-span-12'}`}
-    >
+    <Card className={`border-primary-100 col-span-12 overflow-hidden border ${sidebarOpen ? 'lg:col-span-8' : 'lg:col-span-12'}`}>
       <ScrollArea className="h-[calc(100vh-240px)]">
         {componentDocsErrors.length ? (
           <div className="border-destructive/30 bg-destructive-200 m-4 rounded-xl border p-4 text-sm">

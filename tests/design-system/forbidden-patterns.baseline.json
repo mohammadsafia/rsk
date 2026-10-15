@@ -312,11 +312,6 @@
     "legacy-color-name": 15,
     "arbitrary-length": 4
   },
-  "src/components/ui/card/Card.tsx": {
-    "legacy-color-ramp": 1,
-    "legacy-color-name": 1,
-    "legacy-shadow": 9
-  },
   "src/components/ui/formatted-number/FormattedNumber.tsx": {
     "legacy-color-ramp": 4,
     "legacy-color-name": 8

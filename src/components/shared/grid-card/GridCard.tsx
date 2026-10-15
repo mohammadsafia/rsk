@@ -68,7 +68,7 @@ const List: FC<GridCardListProps> = ({ className, variant, orientation, children
 
 const Item: FC<GridCardItemProps> = ({ className, children, ...props }) => {
   return (
-    <Card shadow="none" className={cn('flex flex-col items-center justify-start gap-3 px-6 py-3 text-center', className)} {...props}>
+    <Card className={cn('flex flex-col items-center justify-start gap-3 px-6 py-3 text-center', className)} {...props}>
       {children}
     </Card>
   );

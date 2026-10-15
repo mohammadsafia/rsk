@@ -66,7 +66,7 @@ const MetaCard: CardComponent = ({
   if (isLoading) return <MetaCardLoader />;
 
   return (
-    <Card shadow="none" className={cn('max-w-full', metaCardVariants({ direction }), className)} {...props}>
+    <Card className={cn('max-w-full', metaCardVariants({ direction }), className)} {...props}>
       <Card.Header className={cn(metaCardHeaderVariants({ direction }))}>
         <Card.Title className="text-muted-400 text-sm font-normal">{title}</Card.Title>
 

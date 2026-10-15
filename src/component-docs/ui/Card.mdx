@@ -3,7 +3,7 @@ id: card
 title: Card
 section: Components
 category: UI
-description: 'Container with header, content, and footer sections.'
+description: 'Flat surface with a hairline border: header (title, description, trailing actions), content and footer. No resting shadow.'
 tags: [ui, layout, card]
 ---
 
@@ -19,6 +19,21 @@ import { Card, Button } from '@components/ui';
     </Card.Header>
     <Card.Content>
       <p className="text-sm">This is the card content area.</p>
+    </Card.Content>
+  </Card>
+
+  <Card className="w-full">
+    <Card.Header>
+      <Card.Title>Patients</Card.Title>
+      <Card.Description>Seen this week</Card.Description>
+      <Card.Actions>
+        <Button variant="outline" size="sm">
+          Export
+        </Button>
+      </Card.Actions>
+    </Card.Header>
+    <Card.Content>
+      <p className="text-sm">Actions sit in the header's trailing slot.</p>
     </Card.Content>
   </Card>
 
@@ -56,6 +71,17 @@ import { Card, Button } from '@components/ui';
   <Card.Content>Content</Card.Content>
 </Card>
 
+// With header actions
+<Card>
+  <Card.Header>
+    <Card.Title>Patients</Card.Title>
+    <Card.Description>Seen this week</Card.Description>
+    <Card.Actions>
+      <Button variant="outline" size="sm">Export</Button>
+    </Card.Actions>
+  </Card.Header>
+</Card>
+
 // With Footer
 <Card>
   <Card.Header>
@@ -65,3 +91,15 @@ import { Card, Button } from '@components/ui';
   <Card.Footer>Footer content</Card.Footer>
 </Card>
 ```
+
+## Parts
+
+| Part | Element | Notes |
+|---|---|---|
+| `Card` | `article` | `bg-surface`, hairline border, 10px radius, no resting shadow |
+| `Card.Header` | `header` | Grid; gains a trailing column when it holds `Card.Actions` |
+| `Card.Title` | `h3` | `text-md` semibold |
+| `Card.Description` | `p` | `text-fg-muted` |
+| `Card.Actions` | `div` | Header trailing slot |
+| `Card.Content` | `section` | Body |
+| `Card.Footer` | `footer` | Top hairline, inline actions |
