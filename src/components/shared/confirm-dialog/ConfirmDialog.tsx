@@ -2,14 +2,14 @@ import { Children, type ReactNode, useCallback, useState } from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { Button, type ButtonVariants, Dialog } from '@components/ui';
+import { Button, type ButtonVariants, Dialog, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
 
-import { AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, XCircle, XIcon } from 'lucide-react';
 
 export type ConfirmDialogVariants = VariantProps<typeof confirmDialogVariants>;
 
@@ -188,6 +188,15 @@ function ConfirmDialog({
         dismissible={dismissible}
         className={cn(confirmDialogVariants({ variant }), className)}
       >
+        {/* Escape and outside clicks stay blocked when not dismissible, but a visible ✕ always offers a way out (e.g. after a failed async confirm). */}
+        <Conditional.If condition={!dismissible}>
+          <Dialog.Close asChild>
+            <IconButton size="sm" tooltip={false} aria-label={t('close')} className="absolute end-3 top-3">
+              <XIcon />
+            </IconButton>
+          </Dialog.Close>
+        </Conditional.If>
+
         <Conditional.If condition={!!title}>
           <div className="flex flex-col items-center gap-y-1.5 text-center">
             <Icon className={confirmDialogIconVariants({ variant })} size={48} />

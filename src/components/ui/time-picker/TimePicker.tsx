@@ -198,6 +198,14 @@ const TimePickerContent: FC<TimePickerContentProps> = ({
 
   const handleSelect = (next: number) => onTempValueChange(formatTime(next, use24hFormat));
 
+  // Snap a seed that is off the grid or out of range (e.g. TimeFilter's "08:00 AM" with min 09:00) to the option shown,
+  // so confirming without touching the columns emits exactly what is highlighted.
+  useEffect(() => {
+    if (tempValue === '' || selected === null) return;
+    const normalized = formatTime(selected, use24hFormat);
+    if (normalized !== tempValue) onTempValueChange(normalized);
+  }, [tempValue, selected, use24hFormat, onTempValueChange]);
+
   return (
     <Popover.Content data-slot="time-picker-content" side="bottom" align="start" className={cn('w-fit p-2', className)} {...props}>
       <Conditional.If condition={selected !== null}>

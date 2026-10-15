@@ -34,12 +34,15 @@ describe('FormattedNumber', () => {
     expect((screen.getByRole('button', { name: 'Increase' }) as HTMLButtonElement).disabled).toBe(true);
   });
 
-  it('has the same field shape and height as Input, in an LTR island, and exposes invalid', () => {
+  it('has the same field shape and height as Input, keeps digits LTR without flipping the control, and exposes invalid', () => {
     renderNumber({ invalid: true });
     const input = screen.getByRole('textbox', { name: 'Quantity' });
     expect(input.className).toContain('h-control-md');
     expect(input.className).toContain('tabular-nums');
-    expect(input.getAttribute('dir')).toBe('ltr');
+    // Digits stay LTR through plaintext bidi; the control itself follows the page direction so siblings (error icon, steppers) line up.
+    expect(input.className).toContain('[unicode-bidi:plaintext]');
+    expect(input.getAttribute('dir')).toBeNull();
+    expect(input.closest('[data-slot="formatted-number"]')?.getAttribute('dir')).toBeNull();
     expect(input.getAttribute('aria-invalid')).toBe('true');
   });
 

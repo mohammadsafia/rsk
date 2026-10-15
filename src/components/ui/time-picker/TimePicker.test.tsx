@@ -2,7 +2,7 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { TimePicker, Tooltip } from '@components/ui';
+import { Popover, TimePicker, Tooltip } from '@components/ui';
 
 import '../../../i18n';
 
@@ -59,5 +59,18 @@ describe('TimePicker', () => {
     expect(tabbable.map((option) => option.textContent)).toEqual(['10']);
     fireEvent.keyDown(tabbable[0], { key: 'ArrowDown' });
     expect(within(hours).getByRole('option', { name: '11' }).getAttribute('aria-selected')).toBe('true');
+  });
+
+  it('snaps an off-range seed onto the grid so confirm emits what is shown', () => {
+    const handleTempChange = vi.fn();
+    render(
+      <Tooltip.Provider>
+        <Popover open>
+          <Popover.Trigger>Open</Popover.Trigger>
+          <TimePicker.Content tempValue="08:00 AM" onTempValueChange={handleTempChange} onConfirm={() => undefined} min="09:00" step={15} />
+        </Popover>
+      </Tooltip.Provider>,
+    );
+    expect(handleTempChange).toHaveBeenCalledWith('09:00 AM');
   });
 });

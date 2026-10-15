@@ -77,15 +77,20 @@ const FormattedNumber: FC<FormattedNumberProps> = ({
     if (event.key === 'ArrowDown' && !isDecrementDisabled) handleDecrement();
   };
 
-  // The whole control is an LTR island: a signed or grouped number must not be reordered by the bidi algorithm (addendum §11).
+  // Plaintext bidi keeps a signed or grouped number in LTR order (addendum §11) while the control itself follows the
+  // page direction, so padding, step buttons and a form's error icon all sit on the same side.
   return (
-    <div data-slot="formatted-number" dir="ltr" className="relative w-full">
+    <div data-slot="formatted-number" className="relative w-full">
       <NumericFormat
         data-slot="formatted-number-input"
-        dir="ltr"
         aria-invalid={invalid || undefined}
         disabled={disabled}
-        className={cn(fieldVariants({ size }), 'text-end font-mono tabular-nums', showStepButtons && 'pe-16', className)}
+        className={cn(
+          fieldVariants({ size }),
+          'text-end font-mono tabular-nums [unicode-bidi:plaintext]',
+          showStepButtons && 'pe-16',
+          className,
+        )}
         getInputRef={ref}
         value={value}
         thousandSeparator={thousandSeparator}
