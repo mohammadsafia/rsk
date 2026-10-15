@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { SEMANTIC_COLOR_ROLES } from '../../src/lib/constants/DesignTokens';
+import { FONT_FAMILIES, SEMANTIC_COLOR_ROLES, TEXT_SCALE } from '../../src/lib/constants/DesignTokens';
 import { extractBlock, readProjectFile } from './css-tokens';
 
 const SRC_DIR = fileURLToPath(new URL('../../src/', import.meta.url));
@@ -59,5 +59,39 @@ describe('legacy accent migration', () => {
       .filter((file) => legacyAccent.test(readFileSync(file, 'utf8')))
       .map((file) => file.replace(SRC_DIR, 'src/'));
     expect(offenders).toEqual([]);
+  });
+});
+
+describe('typography', () => {
+  it('loads exactly the three approved families', () => {
+    const fontImport = indexCss.split('\n')[0];
+    expect(fontImport).toContain('family=Schibsted+Grotesk');
+    expect(fontImport).toContain('family=Noto+Kufi+Arabic');
+    expect(fontImport).toContain('family=Spline+Sans+Mono');
+    expect(fontImport).not.toMatch(/DM\+Sans|Fraunces|IBM\+Plex/);
+  });
+
+  it('exposes the sans and mono stacks', () => {
+    expect(themeCss).toContain(`--font-sans: ${FONT_FAMILIES.sans};`);
+    expect(themeCss).toContain(`--font-mono: ${FONT_FAMILIES.mono};`);
+    expect(themeCss).not.toContain('--font-family-sans');
+  });
+
+  for (const step of TEXT_SCALE) {
+    it(`defines ${step.token} = ${step.px}px with an RTL-aware line height`, () => {
+      expect(themeCss).toContain(`--${step.token}: ${step.size};`);
+      expect(themeCss).toContain(`--${step.token}--line-height: calc(${step.lineHeight} + var(--leading-rtl-boost));`);
+    });
+  }
+
+  it('boosts leading only under [dir=rtl]', () => {
+    expect(extractBlock(tokensCss, ':root')['leading-rtl-boost']).toBe('0em');
+    expect(extractBlock(tokensCss, "[dir='rtl']")['leading-rtl-boost']).toBe('0.2em');
+  });
+
+  it('uses the sans stack on body', () => {
+    const bodyApply = /body \{\s*@apply ([^;]+);/.exec(indexCss)?.[1].split(/\s+/) ?? [];
+    expect(bodyApply).toEqual(expect.arrayContaining(['bg-canvas', 'text-fg', 'font-sans']));
+    expect(bodyApply).not.toContain('font-family-sans');
   });
 });

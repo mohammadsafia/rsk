@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 import { useAppTranslation } from '@hooks/shared';
 
@@ -10,8 +10,6 @@ import { ThemeSwitcher } from '@components/shared';
 /* -------------------------------------------------------------------------- */
 /*  Type & helpers                                                            */
 /* -------------------------------------------------------------------------- */
-
-const display: CSSProperties = { fontFamily: "'Fraunces', Georgia, serif" };
 
 function getFadeUp(prefersReduced: boolean | null, delay = 0) {
   if (prefersReduced) return {};
@@ -175,10 +173,7 @@ function Hero() {
           <motion.div {...getFadeUp(pr)}>
             <Eyebrow>{t('hero.eyebrow')}</Eyebrow>
 
-            <h1
-              style={display}
-              className="text-foreground mt-6 mb-6 text-[clamp(2.6rem,6.2vw,4.6rem)] leading-[1.02] font-medium tracking-[-0.02em] text-balance"
-            >
+            <h1 className="text-foreground mt-6 mb-6 text-[clamp(2.6rem,6.2vw,4.6rem)] leading-[1.02] font-medium tracking-[-0.02em] text-balance">
               {t('hero.titleLead')}
               <span className="text-primary italic">{t('hero.titleEmphasis')}</span>
               {t('hero.titleTrail')}
@@ -210,9 +205,7 @@ function Hero() {
           >
             {STATS.map((stat) => (
               <div key={stat.labelKey}>
-                <p style={display} className="text-foreground text-[2.4rem] leading-none font-medium">
-                  {stat.value}
-                </p>
+                <p className="text-foreground text-[2.4rem] leading-none font-medium">{stat.value}</p>
                 <p className="text-muted-foreground mt-2 text-[10px] tracking-[0.14em] uppercase">{t(stat.labelKey)}</p>
               </div>
             ))}
@@ -257,7 +250,7 @@ function Features() {
     <section id="features" className="mx-auto max-w-6xl px-6 py-24 lg:px-8 lg:py-32">
       <motion.div className="mb-12 max-w-2xl" {...getFadeUp(pr)}>
         <Eyebrow>{t('features.eyebrow')}</Eyebrow>
-        <h2 style={display} className="text-foreground mt-5 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]">
+        <h2 className="text-foreground mt-5 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]">
           {t('features.title')}
         </h2>
       </motion.div>
@@ -274,11 +267,7 @@ function Features() {
             {feature.large && <div className="bg-primary absolute inset-x-0 top-0 h-0.5" />}
             <h3 className={`text-foreground font-semibold ${feature.large ? 'text-lg' : 'text-[15px]'}`}>{t(feature.titleKey)}</h3>
             <p className="text-muted-foreground mt-2 text-[13px] leading-relaxed">{t(feature.descKey)}</p>
-            {feature.large && (
-              <p style={display} className="text-primary/15 mt-auto hidden pt-10 text-6xl font-medium md:block">
-                01
-              </p>
-            )}
+            {feature.large && <p className="text-primary/15 mt-auto hidden pt-10 text-6xl font-medium md:block">01</p>}
           </motion.div>
         ))}
       </div>
@@ -299,10 +288,7 @@ function ComponentShowcase() {
       <div className="grid items-center gap-12 md:grid-cols-[0.8fr_1.2fr] md:gap-16">
         <motion.div {...getFadeUp(pr)}>
           <Eyebrow>{t('showcase.eyebrow')}</Eyebrow>
-          <h2
-            style={display}
-            className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]"
-          >
+          <h2 className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]">
             {t('showcase.title')}
           </h2>
           <p className="text-muted-foreground mb-6 text-[15px] leading-relaxed">{t('showcase.desc')}</p>
@@ -406,10 +392,7 @@ function CliSection() {
 
         <motion.div className="order-1 md:order-2" {...getFadeUp(pr, 0.15)}>
           <Eyebrow>{t('cli.eyebrow')}</Eyebrow>
-          <h2
-            style={display}
-            className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]"
-          >
+          <h2 className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]">
             {t('cli.title')}
           </h2>
           <p className="text-muted-foreground text-[15px] leading-relaxed">{t('cli.desc')}</p>
@@ -432,10 +415,7 @@ function Architecture() {
       <div className="grid items-center gap-12 md:grid-cols-2 md:gap-16">
         <motion.div {...getFadeUp(pr)}>
           <Eyebrow>{t('architecture.eyebrow')}</Eyebrow>
-          <h2
-            style={display}
-            className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]"
-          >
+          <h2 className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]">
             {t('architecture.title')}
           </h2>
           <p className="text-muted-foreground text-[15px] leading-relaxed">{t('architecture.desc')}</p>
@@ -481,10 +461,7 @@ function GettingStarted() {
       <div className="mx-auto max-w-6xl px-6 py-24 lg:px-8 lg:py-32">
         <motion.div className="mb-12 max-w-2xl" {...getFadeUp(pr)}>
           <Eyebrow>{t('gettingStarted.eyebrow')}</Eyebrow>
-          <h2
-            style={display}
-            className="text-foreground mt-5 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]"
-          >
+          <h2 className="text-foreground mt-5 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]">
             {t('gettingStarted.title')}
           </h2>
         </motion.div>
@@ -493,9 +470,7 @@ function GettingStarted() {
           {GETTING_STARTED_STEPS.map((step, i) => (
             <motion.div key={step.titleKey} className="border-border bg-secondary/30 border p-6" {...getFadeUp(pr, i * 0.1)}>
               <div className="mb-4 flex items-baseline gap-3">
-                <span style={display} className="text-primary text-2xl font-medium">
-                  {step.number}
-                </span>
+                <span className="text-primary text-2xl font-medium">{step.number}</span>
                 <h3 className="text-foreground text-[15px] font-semibold">{t(step.titleKey)}</h3>
               </div>
               <div className="bg-code-surface overflow-x-auto rounded-lg px-4 py-3" dir="ltr">

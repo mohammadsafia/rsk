@@ -55,21 +55,26 @@
   --color-code-foreground: var(--code-foreground);
   --color-code-muted: var(--code-muted);
 
-  /* fonts + type scale (pre-redesign values; replaced in Task 4) */
-  --font-family-sans: 'DM Sans', 'IBM Plex Sans Arabic', sans-serif;
+  /* fonts — per-glyph fallback: Latin + digits render in Schibsted, Arabic in Noto Kufi */
+  --font-sans: 'Schibsted Grotesk', 'Noto Kufi Arabic', system-ui, sans-serif;
+  --font-mono: 'Spline Sans Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* type scale — line heights grow by --leading-rtl-boost under [dir='rtl'] (tokens.css) */
   --text-*: initial;
-  --text-2xs: 0.625rem;
-  --text-2xs--line-height: 1rem;
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: calc(1rem + var(--leading-rtl-boost));
   --text-xs: 0.75rem;
-  --text-xs--line-height: 1.125rem;
-  --text-sm: 0.875rem;
-  --text-sm--line-height: 1.25rem;
-  --text-base: 1rem;
-  --text-base--line-height: 1.5rem;
+  --text-xs--line-height: calc(1rem + var(--leading-rtl-boost));
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: calc(1.25rem + var(--leading-rtl-boost));
+  --text-base: 0.875rem;
+  --text-base--line-height: calc(1.375rem + var(--leading-rtl-boost));
+  --text-md: 1rem;
+  --text-md--line-height: calc(1.5rem + var(--leading-rtl-boost));
   --text-lg: 1.125rem;
-  --text-lg--line-height: 1.625rem;
-  --text-xl: 1.25rem;
-  --text-xl--line-height: 1.75rem;
-  --text-2xl: 1.5rem;
-  --text-2xl--line-height: 2rem;
+  --text-lg--line-height: calc(1.625rem + var(--leading-rtl-boost));
+  --text-xl: 1.375rem;
+  --text-xl--line-height: calc(1.75rem + var(--leading-rtl-boost));
+  --text-2xl: 1.75rem;
+  --text-2xl--line-height: calc(2.125rem + var(--leading-rtl-boost));
 }

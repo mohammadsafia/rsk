@@ -1,11 +1,9 @@
 import { useAppTranslation } from '@hooks/shared';
 import { ArrowRight } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 const SIDEBAR_ITEMS = ['Button', 'Card', 'Dialog', 'Input', 'Select', 'Tabs', 'Toast'];
-
-const display: CSSProperties = { fontFamily: "'Fraunces', Georgia, serif" };
 
 function getFadeUp(prefersReduced: boolean | null, delay = 0) {
   if (prefersReduced) return {};
@@ -34,10 +32,7 @@ export default function ComponentShowcase() {
       <div className="grid items-center gap-12 md:grid-cols-[0.8fr_1.2fr] md:gap-16">
         <motion.div {...getFadeUp(pr)}>
           <Eyebrow>{t('showcase.eyebrow')}</Eyebrow>
-          <h2
-            style={display}
-            className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]"
-          >
+          <h2 className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]">
             {t('showcase.title')}
           </h2>
           <p className="text-muted-foreground mb-6 text-[15px] leading-relaxed">{t('showcase.desc')}</p>
