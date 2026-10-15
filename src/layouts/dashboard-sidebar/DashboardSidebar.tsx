@@ -144,7 +144,7 @@ function DashboardSidebar() {
         {/* User profile */}
         <div className="border-border shrink-0 border-t p-3">
           <div className={cn('flex items-center gap-3 rounded-lg px-2 py-1.5', collapse && 'md:justify-center md:px-0')}>
-            <Avatar className="h-8 w-8 shrink-0">
+            <Avatar size="md" className="shrink-0">
               <Conditional.If condition={!!currentUser?.picture}>
                 <Avatar.Image src={currentUser?.picture} alt="User avatar" />
               </Conditional.If>

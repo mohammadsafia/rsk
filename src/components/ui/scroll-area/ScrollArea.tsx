@@ -21,13 +21,13 @@ const Bar: FC<ScrollBarProps> = ({ className, orientation = 'vertical', ...props
     className={cn(
       'flex touch-none transition-colors select-none',
       'data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:animate-in data-[state=visible]:fade-in duration-150',
-      orientation === 'vertical' && 'h-full w-2 border-s border-s-transparent p-px',
-      orientation === 'horizontal' && 'h-2 flex-col border-t border-t-transparent p-px',
+      orientation === 'vertical' && 'h-full w-1.5 border-s border-s-transparent p-px',
+      orientation === 'horizontal' && 'h-1.5 flex-col border-t border-t-transparent p-px',
       className,
     )}
     {...props}
   >
-    <ScrollAreaPrimitive.ScrollAreaThumb data-slot="scroll-area-thumb" className="bg-primary relative flex-1 rounded-md" />
+    <ScrollAreaPrimitive.ScrollAreaThumb data-slot="scroll-area-thumb" className="bg-border-strong relative flex-1 rounded-full" />
   </ScrollAreaPrimitive.ScrollAreaScrollbar>
 );
 

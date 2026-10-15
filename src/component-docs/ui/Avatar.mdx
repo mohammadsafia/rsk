@@ -14,9 +14,9 @@ import { User } from 'lucide-react';
 
 <div className="space-y-4">
   <div>
-    <p className="text-muted-foreground mb-2 text-xs font-medium">With Image</p>
+    <p className="text-fg-muted mb-2 text-xs font-medium">With Image</p>
     <div className="flex gap-2">
-      <Avatar className="h-8 w-8">
+      <Avatar size="sm">
         <Avatar.Image src="https://github.com/shadcn.png" alt="User" />
         <Avatar.Fallback>SM</Avatar.Fallback>
       </Avatar>
@@ -26,7 +26,7 @@ import { User } from 'lucide-react';
         <Avatar.Fallback>MD</Avatar.Fallback>
       </Avatar>
 
-      <Avatar className="h-12 w-12">
+      <Avatar size="lg">
         <Avatar.Image src="https://github.com/shadcn.png" alt="User" />
         <Avatar.Fallback>LG</Avatar.Fallback>
       </Avatar>
@@ -35,7 +35,7 @@ import { User } from 'lucide-react';
   </div>
 
   <div>
-    <p className="text-muted-foreground mb-2 text-xs font-medium">Fallback (Text & Icon)</p>
+    <p className="text-fg-muted mb-2 text-xs font-medium">Fallback (Text & Icon)</p>
     <div className="flex gap-2">
       <Avatar>
         <Avatar.Image alt="User" />
@@ -70,7 +70,7 @@ import { User } from 'lucide-react';
 </Avatar>
 
 // Custom Size
-<Avatar className="h-12 w-12">
+<Avatar size="lg">
   <Avatar.Image src="..." alt="User" />
   <Avatar.Fallback>LG</Avatar.Fallback>
 </Avatar>
@@ -83,3 +83,11 @@ import { User } from 'lucide-react';
   </Avatar.Fallback>
 </Avatar>
 ```
+
+## API
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | 24px · 32px · 40px |
+
+The fallback shows initials in `text-fg-muted` on the hover tint.

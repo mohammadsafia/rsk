@@ -60,7 +60,7 @@ function DashboardHeader() {
         <DropdownMenu>
           <DropdownMenu.Trigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0" aria-label={t('openUserMenu')}>
-              <Avatar className="ring-primary/20 h-8 w-8 ring-2 transition-all hover:ring-2">
+              <Avatar size="md" className="ring-primary/20 ring-2 transition-all hover:ring-2">
                 <Conditional.If condition={!!currentUser?.picture}>
                   <Avatar.Image src={currentUser?.picture} alt="User avatar" />
                 </Conditional.If>

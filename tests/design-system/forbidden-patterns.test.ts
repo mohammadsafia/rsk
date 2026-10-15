@@ -123,6 +123,10 @@ const CLEAN_UI_FOLDERS = [
   'tabs',
   'table',
   'pagination',
+  'accordion',
+  'collapsible',
+  'scroll-area',
+  'avatar',
 ] as const;
 
 describe('clean primitives', () => {

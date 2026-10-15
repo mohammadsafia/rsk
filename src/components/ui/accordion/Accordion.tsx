@@ -16,27 +16,23 @@ const Trigger: FC<ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>> =
     <AccordionPrimitive.Trigger
       data-slot="accordion-trigger"
       className={cn(
-        'flex flex-1 cursor-pointer items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180',
+        'focus-ring text-fg flex min-h-11 flex-1 cursor-pointer items-center justify-between gap-2 rounded-sm py-2 text-start text-sm font-medium [&[data-state=open]>svg]:rotate-180',
         className,
       )}
       {...props}
     >
       {children}
 
-      <ChevronDown className="bg-primary-400 text-background h-6 w-6 shrink-0 rounded-sm transition-transform duration-200" />
+      <ChevronDown
+        aria-hidden="true"
+        className="text-fg-muted duration-base size-4 shrink-0 transition-transform motion-reduce:transition-none"
+      />
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 );
 
 const Item: FC<ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>> = ({ className, ...props }) => (
-  <AccordionPrimitive.Item
-    data-slot="accordion-item"
-    className={cn(
-      'bg-background border-b-muted border-b px-4 first:rounded-ss-md first:rounded-se-md last:rounded-ee-md last:rounded-es-md last:border-b-0',
-      className,
-    )}
-    {...props}
-  />
+  <AccordionPrimitive.Item data-slot="accordion-item" className={cn('border-border-subtle border-b', className)} {...props} />
 );
 
 const Content: FC<ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>> = ({ className, children, ...props }) => (
@@ -45,7 +41,7 @@ const Content: FC<ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>> =
     className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden text-sm transition-all"
     {...props}
   >
-    <div className={cn('pt-0 pb-4', className)}>{children}</div>
+    <div className={cn('text-fg-muted pb-4 text-sm', className)}>{children}</div>
   </AccordionPrimitive.Content>
 );
 

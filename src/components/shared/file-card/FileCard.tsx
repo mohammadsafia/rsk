@@ -335,7 +335,7 @@ const Assignee = <TOption,>({
         )}
         disabled={disabled}
       >
-        <Avatar className="text-2xs ring-primary-25 size-7 shrink-0 font-bold ring-2">
+        <Avatar size="sm" className="text-2xs ring-primary-25 shrink-0 font-bold ring-2">
           <Avatar.Image src={selectedAvatarUrl} alt={selectedLabel} />
 
           <Avatar.Fallback className="bg-primary text-primary-foreground">{selectedInitials}</Avatar.Fallback>
@@ -370,7 +370,7 @@ const Assignee = <TOption,>({
               >
                 <Combobox.Indicator />
 
-                <Avatar className="text-2xs ring-primary-25 size-6 font-bold ring-2">
+                <Avatar size="sm" className="text-2xs ring-primary-25 font-bold ring-2">
                   <Avatar.Image src={getOptionAvatar?.(option)} alt={getOptionLabel(option)} />
 
                   <Avatar.Fallback className="bg-primary text-primary-foreground">
