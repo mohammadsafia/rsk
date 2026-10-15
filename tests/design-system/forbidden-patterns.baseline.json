@@ -378,10 +378,6 @@
     "legacy-color-ramp": 5,
     "legacy-color-name": 4
   },
-  "src/components/ui/popover/Popover.tsx": {
-    "legacy-color-ramp": 1,
-    "legacy-color-name": 2
-  },
   "src/components/ui/scroll-area/ScrollArea.tsx": {
     "legacy-color-name": 1
   },

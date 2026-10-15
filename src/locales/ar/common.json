@@ -44,12 +44,31 @@
     "emptyDescription": "لا توجد نتائج لبحثك. يرجى المحاولة مرة أخرى بكلمات مختلفة."
   },
   "pagination": {
+    "label": "التنقل بين الصفحات",
     "previous": "السابق",
     "next": "التالي",
+    "previousPage": "الانتقال إلى الصفحة السابقة",
+    "nextPage": "الانتقال إلى الصفحة التالية",
+    "morePages": "صفحات أخرى",
     "rowsPerPage": "صفوف لكل صفحة",
     "pageOf": "صفحة {{current}} من {{total}}"
   },
   "openCalendar": "فتح التقويم",
   "remove": "إزالة",
-  "removeItem": "إزالة {{item}}"
+  "removeItem": "إزالة {{item}}",
+  "moreInfo": "مزيد من المعلومات",
+  "calendar": {
+    "previousMonth": "الشهر السابق",
+    "nextMonth": "الشهر التالي"
+  },
+  "timePicker": {
+    "placeholder": "اختر الوقت",
+    "hours": "الساعات",
+    "minutes": "الدقائق",
+    "period": "صباحًا أو مساءً"
+  },
+  "number": {
+    "increment": "زيادة",
+    "decrement": "إنقاص"
+  }
 }

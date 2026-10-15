@@ -114,6 +114,7 @@ const CLEAN_UI_FOLDERS = [
   'select',
   'command',
   'toggle-group',
+  'popover',
 ] as const;
 
 describe('clean primitives', () => {

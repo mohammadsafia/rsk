@@ -44,12 +44,31 @@
     "emptyDescription": "No results found for your search. Please try again with different keywords."
   },
   "pagination": {
+    "label": "Pagination",
     "previous": "Previous",
     "next": "Next",
+    "previousPage": "Go to previous page",
+    "nextPage": "Go to next page",
+    "morePages": "More pages",
     "rowsPerPage": "Rows per page",
     "pageOf": "Page {{current}} of {{total}}"
   },
   "openCalendar": "Open calendar",
   "remove": "Remove",
-  "removeItem": "Remove {{item}}"
+  "removeItem": "Remove {{item}}",
+  "moreInfo": "More information",
+  "calendar": {
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month"
+  },
+  "timePicker": {
+    "placeholder": "Select time",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "period": "AM or PM"
+  },
+  "number": {
+    "increment": "Increase",
+    "decrement": "Decrease"
+  }
 }

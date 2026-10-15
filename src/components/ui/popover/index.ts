@@ -1,1 +1,1 @@
-export { default as Popover } from './Popover';
+export { default as Popover, floatingMotionClassName, floatingSurfaceClassName } from './Popover';
