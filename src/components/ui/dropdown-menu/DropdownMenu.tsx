@@ -64,7 +64,7 @@ const SubTrigger: FC<DropdownMenuSubTriggerProps> = ({ className, inset, childre
   <DropdownMenuPrimitive.SubTrigger
     data-slot="dropdown-subtrigger"
     className={cn(
-      'focus:bg-accent data-[state=open]:bg-accent flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none',
+      'focus:bg-hover data-[state=open]:bg-hover flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none',
       inset && 'ps-8',
       className,
     )}
@@ -124,7 +124,7 @@ const CheckboxItem: FC<DropdownMenuCheckboxItemProps> = ({ className, children, 
   <DropdownMenuPrimitive.CheckboxItem
     data-slot="dropdown-checkbox-item"
     className={cn(
-      'focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center rounded-sm py-1.5',
+      'focus:bg-hover focus:text-fg relative flex cursor-default items-center rounded-sm py-1.5',
       'ps-8 pe-2 text-sm transition-colors outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50',
       className,
     )}
@@ -145,7 +145,7 @@ const RadioItem: FC<DropdownMenuRadioItemProps> = ({ className, children, ...pro
   <DropdownMenuPrimitive.RadioItem
     data-slot="dropdown-radio-item"
     className={cn(
-      'focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center rounded-sm py-1.5',
+      'focus:bg-hover focus:text-fg relative flex cursor-default items-center rounded-sm py-1.5',
       'ps-8 pe-2 text-sm transition-colors outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50',
       className,
     )}

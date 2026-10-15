@@ -29,7 +29,7 @@ function DashboardHeader() {
         type="button"
         onClick={toggle}
         aria-label={t('openCommandPalette')}
-        className="text-muted-foreground bg-secondary border-border hover:bg-accent hover:text-foreground flex h-9 w-full max-w-xs items-center gap-2 rounded-lg border px-3 text-sm transition-colors"
+        className="text-muted-foreground bg-secondary border-border hover:bg-hover hover:text-foreground flex h-9 w-full max-w-xs items-center gap-2 rounded-lg border px-3 text-sm transition-colors"
       >
         <Search className="h-4 w-4 shrink-0" />
 

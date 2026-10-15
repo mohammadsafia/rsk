@@ -44,7 +44,7 @@ const primeCardVariants = cva('', {
       success: 'bg-success-200',
       destructive: 'bg-destructive-200',
       warning: 'bg-warning-200',
-      info: 'bg-accent-200',
+      info: 'bg-info-subtle',
       outline:
         'border-2 border-primary bg-transparent transition-colors hover:bg-primary-600 hover:text-primary-foreground dark:hover:bg-primary-300',
       'outline-secondary':

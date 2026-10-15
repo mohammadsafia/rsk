@@ -39,7 +39,7 @@ function CalendarDayButton({ className, day, modifiers, ...props }: ComponentPro
         // Selected date styling
         isSelected && 'bg-primary text-primary-foreground rounded-md dark:bg-primary-300',
         // Range styling
-        'data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary dark:data-[range-start=true]:bg-primary-300 data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary dark:data-[range-end=true]:bg-primary-300 data-[range-end=true]:text-primary-foreground',
+        'data-[range-middle=true]:bg-accent-subtle data-[range-middle=true]:text-fg data-[range-start=true]:bg-primary dark:data-[range-start=true]:bg-primary-300 data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary dark:data-[range-end=true]:bg-primary-300 data-[range-end=true]:text-primary-foreground',
         // Focus and layout
         'group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px]',
         // Range border radius
@@ -199,10 +199,10 @@ function Calendar({
             : '[&:first-child[data-selected=true]_button]:rounded-s-md',
           defaultClassNames.day,
         ),
-        range_start: cn('rounded-s-md bg-accent', defaultClassNames.range_start),
+        range_start: cn('rounded-s-md bg-accent-subtle', defaultClassNames.range_start),
         range_middle: cn('rounded-none', defaultClassNames.range_middle),
-        range_end: cn('rounded-e-md bg-accent', defaultClassNames.range_end),
-        today: cn('bg-accent text-accent-foreground rounded-md', defaultClassNames.today),
+        range_end: cn('rounded-e-md bg-accent-subtle', defaultClassNames.range_end),
+        today: cn('bg-hover text-fg rounded-md', defaultClassNames.today),
         outside: cn('text-muted-foreground aria-selected:text-muted-foreground', defaultClassNames.outside),
         disabled: cn('text-muted-foreground opacity-50', defaultClassNames.disabled),
         hidden: cn('invisible', defaultClassNames.hidden),

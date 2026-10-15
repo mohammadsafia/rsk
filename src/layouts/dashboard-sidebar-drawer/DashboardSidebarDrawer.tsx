@@ -38,7 +38,7 @@ function DesktopSidebarDrawer(props: DashboardSidebarDrawerProps) {
       size="icon"
       variant="ghost"
       className={cn(
-        'bg-background border-border text-muted-foreground hover:bg-accent hover:text-foreground absolute -inset-e-4 top-20 z-50 hidden h-8 w-8 rounded-full border shadow-sm transition-all duration-200 hover:scale-110 md:inline-flex',
+        'bg-background border-border text-muted-foreground hover:bg-hover hover:text-foreground absolute -inset-e-4 top-20 z-50 hidden h-8 w-8 rounded-full border shadow-sm transition-all duration-200 hover:scale-110 md:inline-flex',
         props.className,
       )}
       onClick={props.onCollapse}

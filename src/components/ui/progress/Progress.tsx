@@ -21,7 +21,7 @@ const progressVariants = cva('relative w-full overflow-hidden rounded-full', {
       lg: 'h-6',
     },
     variant: {
-      default: 'bg-accent',
+      default: 'bg-border',
       success: 'bg-success',
       destructive: 'bg-destructive',
       secondary: 'bg-secondary',
