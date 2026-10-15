@@ -127,10 +127,11 @@ const TimePickerTrigger = forwardRef<HTMLButtonElement, TimePickerTriggerProps>(
       ref={ref}
       type="button"
       disabled={disabled}
-      data-slot="time-picker-trigger"
       aria-invalid={invalid || undefined}
       className={cn(fieldVariants({ size }), 'group cursor-pointer gap-2 text-start', className)}
       {...props}
+      // After the spread: Popover.Trigger asChild injects its own data-slot.
+      data-slot="time-picker-trigger"
     >
       <Clock4Icon aria-hidden="true" className="text-fg-muted group-data-[state=open]:text-accent size-4 shrink-0" />
 

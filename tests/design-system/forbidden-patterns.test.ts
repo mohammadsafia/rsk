@@ -133,6 +133,7 @@ const CLEAN_UI_FOLDERS = [
   'calendar-event',
   'time-picker',
   'formatted-number',
+  'layout',
 ] as const;
 
 describe('clean primitives', () => {

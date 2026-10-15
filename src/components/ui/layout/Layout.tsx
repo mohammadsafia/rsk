@@ -1,9 +1,11 @@
 import { createContext, type FC, type HTMLAttributes, Suspense, useContext, useEffect, useRef, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
-import { PrimeLoader } from '@components/shared';
+import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
+
+import { Loader2Icon } from 'lucide-react';
 
 type LayoutState = {
   offset: number;
@@ -50,7 +52,7 @@ const Header: FC<HeaderProps> = ({ className, sticky = false, ...props }) => {
     <header
       data-slot="layout.header"
       className={cn(
-        'bg-background flex items-center gap-4 p-4',
+        'bg-surface flex items-center gap-4 p-4',
         offset > 10 && sticky ? 'shadow-sm' : 'shadow-none',
         fixed && '',
         sticky && 'sticky top-0 z-10',
@@ -67,9 +69,20 @@ const Sidebar: FC<SidebarProps> = ({ className, ...props }) => {
   return (
     <aside
       data-slot="layout.sidebar"
-      className={cn('bg-background relative z-50 transition-[width]', fixed && 'sticky top-0', className)}
+      className={cn('bg-surface relative z-50 transition-[width]', fixed && 'sticky top-0', className)}
       {...props}
     />
+  );
+};
+
+const ContentFallback: FC = () => {
+  const { t } = useAppTranslation('common');
+
+  return (
+    <div role="status" data-slot="layout.loading" className="grid min-h-40 place-items-center">
+      <Loader2Icon aria-hidden="true" className="text-fg-muted size-6 animate-spin motion-reduce:animate-none" />
+      <span className="sr-only">{t('loading')}</span>
+    </div>
   );
 };
 
@@ -78,7 +91,7 @@ const Content: FC<ContentProps> = ({ className, children, ...props }) => {
 
   return (
     <main data-slot="layout.content" className={cn('relative p-2 md:px-10 md:py-4', fixed && className)} {...props}>
-      <Suspense fallback={<PrimeLoader />}>{children || <Outlet />}</Suspense>
+      <Suspense fallback={<ContentFallback />}>{children || <Outlet />}</Suspense>
     </main>
   );
 };

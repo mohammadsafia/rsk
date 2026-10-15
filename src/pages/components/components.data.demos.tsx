@@ -1232,3 +1232,34 @@ export function FormCheckboxGroupDemo() {
     </FormContainer>
   );
 }
+
+export function FieldFamilyDemo() {
+  const form = useForm({ defaultValues: { name: '', role: '', time: null, amount: null, visit: null, doctor: '' } });
+
+  return (
+    <FormContainer formContext={form} onSuccess={() => {}}>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <FormInput name="name" label="Name" placeholder="Layla Haddad" />
+        <FormSelect
+          name="role"
+          label="Role"
+          control={form.control}
+          options={[{ label: 'Admin', value: 'admin' }]}
+          getOptionLabel={(option) => option.label}
+          getOptionValue={(option) => option.value}
+        />
+        <FormTimePicker name="time" label="Time" control={form.control} />
+        <FormNumber name="amount" label="Amount" control={form.control} showStepButtons />
+        <FormDatePicker name="visit" label="Visit" control={form.control} />
+        <FormCombobox
+          name="doctor"
+          label="Doctor"
+          control={form.control}
+          options={[{ label: 'Dr. Haddad', value: 'haddad' }]}
+          getOptionLabel={(option) => option.label}
+          getOptionValue={(option) => option.value}
+        />
+      </div>
+    </FormContainer>
+  );
+}

@@ -237,10 +237,6 @@
     "legacy-color-ramp": 4,
     "legacy-color-name": 4
   },
-  "src/components/ui/layout/Layout.tsx": {
-    "prime-component": 2,
-    "legacy-color-name": 2
-  },
   "src/layouts/auth-guard/AuthGuard.tsx": {
     "prime-component": 1
   },
