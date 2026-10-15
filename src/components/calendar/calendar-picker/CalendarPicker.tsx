@@ -10,11 +10,10 @@ import {
   useState,
 } from 'react';
 
-import { Calendar, type CalendarRange, Popover } from '@components/ui';
-import { TooltipButton } from '@components/shared';
+import { Calendar, type CalendarRange, Popover, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
 
-import { type DateInput, useDate } from '@hooks/shared';
+import { type DateInput, useAppTranslation, useDate } from '@hooks/shared';
 
 import { cn } from '@utils';
 
@@ -122,6 +121,8 @@ const CalendarPickerContent: FC<CalendarPickerContentSlotProps> = ({ className, 
 };
 
 const CalendarPicker: CalendarPickerComponent = (props) => {
+  const { t } = useAppTranslation('common');
+
   const {
     open: controlledOpen,
     onOpenChange,
@@ -206,9 +207,9 @@ const CalendarPicker: CalendarPickerComponent = (props) => {
 
           <Conditional.Else>
             <CalendarPickerTrigger>
-              <TooltipButton title={triggerTooltip} type="button" variant="ghost" size="icon-sm">
+              <IconButton size="sm" type="button" aria-label={triggerTooltip ?? t('openCalendar')}>
                 {triggerIcon ?? <CalendarIcon size={20} />}
-              </TooltipButton>
+              </IconButton>
             </CalendarPickerTrigger>
           </Conditional.Else>
         </Conditional>

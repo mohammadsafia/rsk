@@ -24,17 +24,17 @@ function ErrorBoundary() {
         <p className="text-muted-foreground mt-3 text-[15px] leading-relaxed">{t('boundary.description')}</p>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Button onClick={() => window.location.reload()} size="lg" variant="default">
+          <Button size="lg" onClick={() => window.location.reload()}>
             <RefreshCw className="me-2 h-4 w-4" />
             {t('boundary.refresh')}
           </Button>
 
-          <Button onClick={() => navigate(-1)} size="lg" variant="ghost-muted">
+          <Button variant="ghost" size="lg" onClick={() => navigate(-1)}>
             <ArrowLeft className="me-2 h-4 w-4" />
             {t('boundary.goBack')}
           </Button>
 
-          <Button asChild size="lg" variant="ghost-muted">
+          <Button variant="ghost" size="lg" asChild>
             <Link to={FULL_ROUTES_PATH.HOME.INDEX}>
               <Home className="me-2 h-4 w-4" />
               {t('boundary.home')}

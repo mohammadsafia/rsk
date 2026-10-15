@@ -105,7 +105,7 @@ const MonthView: FC = () => {
               <Conditional.If condition={overflowEvents.length > 0}>
                 <Popover>
                   <Popover.Trigger asChild>
-                    <Button variant="link" className="text-2xs h-auto p-0 font-medium">
+                    <Button variant="link" tone="accent" className="text-2xs h-auto p-0 font-medium">
                       +{overflowEvents.length} more
                     </Button>
                   </Popover.Trigger>

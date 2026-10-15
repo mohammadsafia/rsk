@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { type DateRange } from 'react-day-picker';
 import { CalendarIcon, Check, ChevronsUpDown, Circle, Square, Star, StarOffIcon, Trash2, X } from 'lucide-react';
-import { Button, Calendar, CheckboxGroup, Command, Popover, RadioGroup, TimePicker } from '@components/ui';
+import { Button, Calendar, CheckboxGroup, Command, Popover, RadioGroup, TimePicker, IconButton } from '@components/ui';
 import { Dialog } from '@components/ui/dialog';
 import {
   FormCheckbox,
@@ -20,7 +20,7 @@ import {
   FormTextarea,
   FormTimePicker,
 } from '@components/forms';
-import { ConfirmDialog, DateNavigation, FacetedFilter, PrimeDialog, TooltipButton } from '@components/shared';
+import { ConfirmDialog, DateNavigation, FacetedFilter, PrimeDialog } from '@components/shared';
 
 import { useToast } from '@hooks/shared';
 import { LookupHandler as LookupService } from '@api/handlers';
@@ -35,7 +35,7 @@ export function DialogDemo() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <Button variant="secondary">Open Dialog</Button>
+        <Button variant="outline">Open Dialog</Button>
       </Dialog.Trigger>
 
       <Dialog.Panel>
@@ -64,7 +64,7 @@ export function PopoverDemo() {
   return (
     <Popover>
       <Popover.Trigger asChild>
-        <Button variant="secondary">Open Popover</Button>
+        <Button variant="outline">Open Popover</Button>
       </Popover.Trigger>
       <Popover.Content>
         <div className="space-y-2">
@@ -592,9 +592,9 @@ export function ConfirmDialogDemo() {
         description="Are you sure you want to make this change? This action cannot be undone."
         onConfirm={onConfirm}
       >
-        <TooltipButton title="Confirm" variant="outline-success" size="icon">
+        <IconButton variant="outline" aria-label="Confirm">
           <Check size={18} />
-        </TooltipButton>
+        </IconButton>
       </ConfirmDialog>
 
       {/* Uncontrolled + async onConfirm */}
@@ -605,12 +605,12 @@ export function ConfirmDialogDemo() {
         confirmLabel="Delete"
         onConfirm={onDelete}
       >
-        <TooltipButton title="Delete" variant="outline-destructive" size="icon">
+        <IconButton variant="outline" tone="danger" aria-label="Delete">
           <Trash2 size={18} />
-        </TooltipButton>
+        </IconButton>
       </ConfirmDialog>
 
-      <TooltipButton onClick={onSubmit}>Submit Form</TooltipButton>
+      <Button onClick={onSubmit}>Submit Form</Button>
 
       {/* Controlled + custom actions */}
       <ConfirmDialog
@@ -645,7 +645,7 @@ export function ConfirmDialogDemo() {
 
       {/* Success variant */}
       <ConfirmDialog variant="success" title="Operation Successful" description="Your changes have been saved." confirmLabel="OK">
-        <Button variant="success">Success</Button>
+        <Button>Success</Button>
       </ConfirmDialog>
 
       {/* Info variant */}
@@ -678,7 +678,7 @@ export function ConfirmDialogDemo() {
 
       {/* Loading variant */}
       <ConfirmDialog variant="warning" title="External Loading" description="This is an async external loading action." loading>
-        <Button variant="secondary">External Loading</Button>
+        <Button variant="outline">External Loading</Button>
       </ConfirmDialog>
 
       {/* Dismissable variant by default (false) */}
@@ -688,7 +688,7 @@ export function ConfirmDialogDemo() {
         description="This is a dismissable via espace-key or backdrop example."
         dismissible={true}
       >
-        <Button variant="muted">Dismissable</Button>
+        <Button variant="outline">Dismissable</Button>
       </ConfirmDialog>
     </div>
   );
@@ -751,7 +751,7 @@ export function PrimeDialogDemo() {
     <div className="flex flex-wrap gap-2">
       <PrimeDialog dialogMode="Create" open={openCreate} onOpenChange={setOpenCreate}>
         <PrimeDialog.Trigger asChild>
-          <Button variant="secondary">Create Mode</Button>
+          <Button variant="outline">Create Mode</Button>
         </PrimeDialog.Trigger>
 
         <PrimeDialog.Panel>
@@ -769,7 +769,7 @@ export function PrimeDialogDemo() {
 
       <PrimeDialog dialogMode="Update" open={openUpdate} onOpenChange={setOpenUpdate}>
         <PrimeDialog.Trigger asChild>
-          <Button variant="secondary">Update Mode</Button>
+          <Button variant="outline">Update Mode</Button>
         </PrimeDialog.Trigger>
 
         <PrimeDialog.Panel>
@@ -785,7 +785,7 @@ export function PrimeDialogDemo() {
 
       <PrimeDialog dialogMode="View" open={openView} onOpenChange={setOpenView}>
         <PrimeDialog.Trigger asChild>
-          <Button variant="secondary">View Mode</Button>
+          <Button variant="outline">View Mode</Button>
         </PrimeDialog.Trigger>
 
         <PrimeDialog.Panel>
@@ -801,7 +801,7 @@ export function PrimeDialogDemo() {
 
       <PrimeDialog>
         <PrimeDialog.Trigger asChild>
-          <Button variant="secondary">Dismissable Dialog</Button>
+          <Button variant="outline">Dismissable Dialog</Button>
         </PrimeDialog.Trigger>
 
         <PrimeDialog.Panel dismissible>
@@ -819,7 +819,7 @@ export function PrimeDialogDemo() {
 
       <PrimeDialog>
         <PrimeDialog.Trigger asChild>
-          <Button variant="secondary">Prime Dialog With no Actions</Button>
+          <Button variant="outline">Prime Dialog With no Actions</Button>
         </PrimeDialog.Trigger>
 
         <PrimeDialog.Panel dismissible>
@@ -904,10 +904,8 @@ export function ToastDemo() {
   return (
     <div className="flex flex-wrap gap-2">
       <Button onClick={showDefaultToast}>Default</Button>
-      <Button variant="success" onClick={showSuccessToast}>
-        Success
-      </Button>
-      <Button variant="destructive" onClick={showErrorToast}>
+      <Button onClick={showSuccessToast}>Success</Button>
+      <Button tone="danger" onClick={showErrorToast}>
         Destructive
       </Button>
       <Button variant="ghost" onClick={showWarningToast}>
@@ -916,10 +914,10 @@ export function ToastDemo() {
       <Button variant="outline" onClick={showInfoToast}>
         Info
       </Button>
-      <Button variant="muted" onClick={showToastWithAction}>
+      <Button variant="outline" onClick={showToastWithAction}>
         Action & top-center
       </Button>
-      <Button variant="outline-destructive" onClick={showToastWithBottomPosition}>
+      <Button variant="outline" tone="danger" onClick={showToastWithBottomPosition}>
         bottom-end
       </Button>
     </div>

@@ -1,8 +1,8 @@
 import type { ComponentPropsWithoutRef, FC, MouseEvent, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Button } from '@components/ui';
-import { ComposedTooltipButton } from '@components/shared';
+import { Button, IconButton } from '@components/ui';
+import { ComposedButton } from '@components/shared';
 
 import { useAppTranslation } from '@hooks/shared';
 
@@ -18,7 +18,7 @@ type TitleProps = ComponentPropsWithoutRef<'h2'>;
 
 type ActionsProps = ComponentPropsWithoutRef<'div'>;
 
-type ActionProps = ComponentPropsWithoutRef<typeof ComposedTooltipButton> & {
+type ActionProps = ComponentPropsWithoutRef<typeof ComposedButton> & {
   icon?: ReactNode;
 };
 
@@ -47,9 +47,9 @@ const ActionPanelBack: FC<BackButtonProps> = ({ className, onClick, ...props }) 
   };
 
   return (
-    <Button size="icon-sm" variant="ghost-muted" className={cn(className)} aria-label={t('goBack')} onClick={handleClick} {...props}>
+    <IconButton size="sm" className={cn(className)} aria-label={t('goBack')} onClick={handleClick} {...props}>
       <ChevronLeft size={20} />
-    </Button>
+    </IconButton>
   );
 };
 
@@ -75,9 +75,9 @@ const ActionPanelActions: FC<ActionsProps> = ({ className, children, ...props })
 
 const ActionPanelAction: FC<ActionProps> = ({ className, icon, children, ...props }) => {
   return (
-    <ComposedTooltipButton className={cn('flex items-center gap-2', className)} {...props}>
+    <ComposedButton className={cn('flex items-center gap-2', className)} {...props}>
       {icon} {children}
-    </ComposedTooltipButton>
+    </ComposedButton>
   );
 };
 

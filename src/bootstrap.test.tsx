@@ -11,6 +11,9 @@ vi.mock('@contexts', () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
   AppDirectionProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
+vi.mock('@components/ui', () => ({
+  Tooltip: { Provider: ({ children }: { children: React.ReactNode }) => children },
+}));
 vi.mock('./i18n', () => ({}));
 vi.mock('./index.css', () => ({}));
 

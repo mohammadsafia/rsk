@@ -343,7 +343,7 @@ function ComponentShowcase() {
                   <span className="text-muted-foreground rounded-md px-3 py-1.5 text-[12px] font-medium">{t('showcase.variantGhost')}</span>
                 </div>
                 <div className="bg-code-surface rounded-md p-3">
-                  <code className="text-code-foreground text-[11px]">{'<Button variant="default">Click me</Button>'}</code>
+                  <code className="text-code-foreground text-[11px]">{'<Button>Click me</Button>'}</code>
                 </div>
               </div>
             </div>

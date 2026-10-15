@@ -1,4 +1,4 @@
-import { Button } from '@components/ui';
+import { Button, IconButton } from '@components/ui';
 
 import { useAppTranslation } from '@hooks/shared';
 
@@ -18,15 +18,13 @@ function MobileSidebarDrawer(props: DashboardSidebarDrawerProps) {
   const { t } = useAppTranslation('nav');
 
   return (
-    <Button
-      size="icon"
-      variant="ghost"
-      className={cn('text-sidebar-foreground hover:bg-sidebar-accent h-9 w-9 md:hidden', props.className)}
+    <IconButton
+      className={cn('md:hidden', props.className)}
       onClick={props.onCollapse}
       aria-label={props.collapse ? t('closeMenu') : t('openMenu')}
     >
       {props.collapse ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-    </Button>
+    </IconButton>
   );
 }
 
@@ -34,11 +32,11 @@ function DesktopSidebarDrawer(props: DashboardSidebarDrawerProps) {
   const { t } = useAppTranslation('nav');
 
   return (
-    <Button
-      size="icon"
-      variant="ghost"
+    <IconButton
+      variant="outline"
+      size="sm"
       className={cn(
-        'bg-background border-border text-muted-foreground hover:bg-hover hover:text-foreground absolute -inset-e-4 top-20 z-50 hidden h-8 w-8 rounded-full border shadow-sm transition-all duration-200 hover:scale-110 md:inline-flex',
+        'bg-surface absolute -inset-e-4 top-20 z-50 hidden rounded-full transition-all duration-200 hover:scale-110 md:inline-flex',
         props.className,
       )}
       onClick={props.onCollapse}
@@ -48,7 +46,7 @@ function DesktopSidebarDrawer(props: DashboardSidebarDrawerProps) {
         size={props.iconSize ?? 14}
         className={cn('transition-transform duration-200 rtl:scale-x-[-1]', !props.collapse && 'rotate-180')}
       />
-    </Button>
+    </IconButton>
   );
 }
 

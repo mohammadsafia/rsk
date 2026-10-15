@@ -2,7 +2,7 @@ import { type SetStateAction, useCallback, useMemo, useState } from 'react';
 
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 
-import { Button, Chip, Tabs } from '@components/ui';
+import { Button, Chip, Tabs, IconButton } from '@components/ui';
 import {
   buildCategoryTabOptions,
   DocPanel,
@@ -142,9 +142,9 @@ const ComponentDocsGalleryPage = () => {
             <p className="text-muted-400 mt-1 text-sm">{t('gallery.subtitle')}</p>
           </div>
 
-          <Button variant="ghost-muted" size="icon-sm" onClick={toggleSidebar} className="mt-1">
+          <IconButton size="sm" aria-label={t('gallery.toggleSidebar')} onClick={toggleSidebar} className="mt-1">
             {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
-          </Button>
+          </IconButton>
         </header>
 
         <Tabs value={activeCategoryKey} onValueChange={handleCategoryChange} className="mb-6">

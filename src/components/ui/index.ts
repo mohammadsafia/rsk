@@ -1,6 +1,7 @@
 export * from './layout';
 export * from './alert';
 export * from './button';
+export * from './icon-button';
 export * from './toast';
 export * from './avatar';
 export * from './pagination';

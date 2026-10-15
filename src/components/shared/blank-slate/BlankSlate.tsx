@@ -1,6 +1,6 @@
 import { Children, type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, isValidElement, type ReactNode } from 'react';
 
-import { ComposedTooltipButton } from '@components/shared/composed-components';
+import { ComposedButton } from '@components/shared/composed-components';
 import { Conditional } from '@components/utils';
 
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -16,7 +16,7 @@ type BlankSlateDescriptionProps = ComponentPropsWithoutRef<'p'>;
 
 type BlankSlateActionsProps = ComponentPropsWithoutRef<'div'>;
 
-type BlankSlateActionProps = ComponentProps<typeof ComposedTooltipButton>;
+type BlankSlateActionProps = ComponentProps<typeof ComposedButton>;
 
 type BlankSlateProps = ComponentPropsWithoutRef<'div'> &
   VariantProps<typeof blankSlateVariants> & {
@@ -69,7 +69,7 @@ const Actions: FC<BlankSlateActionsProps> = ({ className, ...props }) => (
 );
 
 const Action: FC<BlankSlateActionProps> = ({ ref, className, ...props }) => (
-  <ComposedTooltipButton ref={ref} variant="outline" className={cn('flex items-center gap-2', className)} {...props} />
+  <ComposedButton ref={ref} variant="outline" className={cn('flex items-center gap-2', className)} {...props} />
 );
 
 const BlankSlate: BlankSlateComponent = ({ icon, title, description, when, size, className, children, ...props }) => {

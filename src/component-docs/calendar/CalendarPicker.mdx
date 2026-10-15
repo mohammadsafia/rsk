@@ -18,7 +18,7 @@ import { CalendarRange, Filter, X } from 'lucide-react';
 
 ## Default — single mode (zero config)
 
-The bare picker. TooltipButton with a calendar icon as the default trigger; clicking opens a single-mode Calendar; clicking a day fires `onChange(iso)` and auto-closes.
+The bare picker. An IconButton with a calendar icon as the default trigger; clicking opens a single-mode Calendar; clicking a day fires `onChange(iso)` and auto-closes.
 
 export const SingleDefaultDemo = () => {
   const [iso, setIso] = useState(null);
@@ -181,10 +181,10 @@ export const ContentFunctionDemo = () => {
 
               <div className="flex flex-col gap-1">
                 {presets.map((date) => (
-                  <Button
+                  <Button variant="outline" size="sm"
                     key={date}
-                    size="sm"
-                    variant="outline"
+                   
+                   
                     onClick={() => {
                       onSelect(date);
                       close();
@@ -222,7 +222,7 @@ export const ControlledOpenDemo = () => {
       <CalendarPicker value={iso} onChange={setIso} open={open} onOpenChange={setOpen}>
         <CalendarPicker.Trigger>
           {({ isOpen }) => (
-            <Button size="sm" variant="outline">
+            <Button variant="outline" size="sm">
               {isOpen ? 'Close picker' : 'Open picker'}
             </Button>
           )}
@@ -259,7 +259,7 @@ export const NonDismissableDemo = () => {
       >
         <CalendarPicker.Trigger>
           {({ isOpen }) => (
-            <Button size="sm" variant="outline">
+            <Button variant="outline" size="sm">
               {isOpen ? 'Close picker' : 'Open picker'}
             </Button>
           )}
@@ -316,7 +316,7 @@ export const CloseOnNeverDemo = () => {
         triggerTooltip="Stays open after pick"
       />
 
-      <Button size="sm" variant="outline" onClick={() => setOpen(false)}>
+      <Button variant="outline" size="sm" onClick={() => setOpen(false)}>
         Done
       </Button>
 
@@ -353,10 +353,10 @@ export const BothSlotsRangeDemo = () => {
           {({ onSelect, close }) => (
             <div className="flex flex-col gap-1 p-3">
               {presets.map((preset) => (
-                <Button
+                <Button variant="outline" size="sm"
                   key={preset.label}
-                  size="sm"
-                  variant="outline"
+                 
+                 
                   onClick={() => {
                     onSelect(preset.range);
                     close();
@@ -395,7 +395,7 @@ export const FilterSingleClearDemo = () => {
       />
 
       {filterDate && (
-        <Button size="sm" variant="ghost" onClick={() => setFilterDate(null)}>
+        <Button variant="ghost" size="sm" onClick={() => setFilterDate(null)}>
           <X size={14} className="me-1" />
 
           Clear
@@ -430,7 +430,7 @@ export const FilterRangeClearDemo = () => {
       />
 
       {range && (
-        <Button size="sm" variant="ghost" onClick={() => setRange(null)}>
+        <Button variant="ghost" size="sm" onClick={() => setRange(null)}>
           <X size={14} className="me-1" />
 
           Clear
@@ -489,8 +489,8 @@ export const DateTimePickerDemo = () => {
                 />
               </div>
 
-              <Button
-                size="sm"
+              <Button size="sm"
+               
                 onClick={() => {
                   if (pendingDate) setDateTime(`${pendingDate}T${pendingTime}:00`);
                   close();

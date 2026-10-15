@@ -14,8 +14,7 @@ import {
   useState,
 } from 'react';
 
-import { Button, Chip, ScrollArea } from '@components/ui';
-import { TooltipButton } from '@components/shared';
+import { Button, Chip, ScrollArea, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -190,28 +189,31 @@ const FileUploaderActions: FC<FileUploaderActionsProps> = ({ onDownload, clearab
   return (
     <div data-slot="file-uploader-actions" className={cn('relative z-10 flex shrink-0 items-center gap-2', className)} {...props}>
       <Conditional.If condition={showDownload}>
-        <TooltipButton asChild title={t('download')} variant="ghost" size="unstyled" type="button" onClick={onDownload}>
-          <DownloadIcon size={16} className="text-primary" />
-        </TooltipButton>
+        <DownloadIcon
+          size={16}
+          role="button"
+          aria-label={t('download')}
+          className="text-accent shrink-0 cursor-pointer"
+          onClick={onDownload}
+        />
       </Conditional.If>
 
       <Conditional.If condition={showClear}>
-        <TooltipButton
-          asChild
-          title={t('clear')}
-          variant="ghost-muted-destructive"
-          size="unstyled"
-          type="button"
+        <XCircleIcon
+          size={16}
+          role="button"
+          aria-label={t('clear')}
+          className="text-fg-muted hover:text-danger shrink-0 cursor-pointer"
           onClick={() => onRemove(0)}
-        >
-          <XCircleIcon size={16} />
-        </TooltipButton>
+        />
       </Conditional.If>
     </div>
   );
 };
 
 const FileUploaderFileList: FC<FileUploaderFileListProps> = ({ variant = 'list', className }) => {
+  const { t } = useAppTranslation('common');
+
   const { files, onRemove, disabled, isUploading } = useFileUploaderContext();
 
   if (files.length === 0) return null;
@@ -225,9 +227,17 @@ const FileUploaderFileList: FC<FileUploaderFileListProps> = ({ variant = 'list',
               <span className="max-w-36 truncate">{file.name}</span>
 
               <Conditional.If condition={!disabled && !isUploading}>
-                <Button className="shrink-0" variant="ghost-destructive" size="unstyled" type="button" onClick={() => onRemove(index)}>
+                <IconButton
+                  className="shrink-0"
+                  tone="danger"
+                  size="sm"
+                  tooltip={false}
+                  type="button"
+                  aria-label={t('clear')}
+                  onClick={() => onRemove(index)}
+                >
                   <XCircleIcon size={14} />
-                </Button>
+                </IconButton>
               </Conditional.If>
             </Chip>
           ))}
@@ -252,9 +262,9 @@ const FileUploaderFileList: FC<FileUploaderFileListProps> = ({ variant = 'list',
             <span className="text-muted-400 shrink-0 text-xs">{formatFileSize(file.size)}</span>
 
             <Conditional.If condition={!disabled && !isUploading}>
-              <Button variant="ghost-muted-destructive" size="unstyled" type="button" onClick={() => onRemove(index)}>
+              <IconButton tone="danger" size="sm" tooltip={false} type="button" aria-label={t('clear')} onClick={() => onRemove(index)}>
                 <XCircleIcon size={16} />
-              </Button>
+              </IconButton>
             </Conditional.If>
           </li>
         ))}
@@ -266,6 +276,8 @@ const FileUploaderFileList: FC<FileUploaderFileListProps> = ({ variant = 'list',
 };
 
 const FileUploaderImagePreview: FC<FileUploaderImagePreviewProps> = ({ className, ...props }) => {
+  const { t } = useAppTranslation('common');
+
   const { files, onRemove, multiple, disabled, isUploading } = useFileUploaderContext();
 
   const [urls, setUrls] = useState<string[]>([]);
@@ -309,15 +321,18 @@ const FileUploaderImagePreview: FC<FileUploaderImagePreviewProps> = ({ className
               />
 
               <Conditional.If condition={multiple && !disabled && !isUploading}>
-                <Button
-                  className="absolute inset-e-1 inset-bs-1 hidden items-center justify-center rounded-full group-hover/file-uploader-image-preview:flex"
-                  variant="outline-destructive"
-                  size="unstyled"
+                <IconButton
+                  className="bg-surface absolute inset-e-1 inset-bs-1 hidden rounded-full group-hover/file-uploader-image-preview:flex"
+                  variant="outline"
+                  tone="danger"
+                  size="sm"
+                  tooltip={false}
                   type="button"
+                  aria-label={t('clear')}
                   onClick={() => onRemove(index)}
                 >
                   <XIcon size={16} />
-                </Button>
+                </IconButton>
               </Conditional.If>
             </div>
           );

@@ -8,7 +8,7 @@ tags: [shared, prime-dropdown, dropdown, menu, actions]
 ---
 
 import { PrimeDropdown } from '@components/shared';
-import { Button } from '@components/ui';
+import { Button, IconButton } from '@components/ui';
 import { Copy, LogOut, Pencil, PlusCircle, Settings, Trash2, User } from 'lucide-react';
 
 ## Simple Mode
@@ -35,7 +35,7 @@ Use `PrimeDropdown.Trigger` for explicit trigger control and `PrimeDropdown.List
 
 <PrimeDropdown>
   <PrimeDropdown.Trigger asChild>
-    <Button variant="outline" size="icon"><Settings size={16} /></Button>
+    <IconButton variant="outline" aria-label="Settings"><Settings size={16} /></IconButton>
   </PrimeDropdown.Trigger>
 
   <PrimeDropdown.List className="w-48">

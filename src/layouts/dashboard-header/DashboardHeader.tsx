@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-import { Avatar, Button, DropdownMenu } from '@components/ui';
+import { Avatar, Button, DropdownMenu, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { LanguageSwitcher, ThemeSwitcher } from '@components/shared';
 
@@ -43,14 +43,9 @@ function DashboardHeader() {
       {/* Right Section: Actions */}
       <div className="flex items-center gap-1">
         {/* Notifications */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-muted-foreground hover:text-foreground relative h-9 w-9"
-          aria-label={t('notifications')}
-        >
+        <IconButton className="relative" aria-label={t('notifications')}>
           <Bell className="h-4 w-4" />
-        </Button>
+        </IconButton>
 
         {/* Theme Switcher */}
         <ThemeSwitcher />

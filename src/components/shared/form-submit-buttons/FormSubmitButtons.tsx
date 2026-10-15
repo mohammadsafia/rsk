@@ -2,7 +2,7 @@ import type { PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@components/ui';
-import { ConfirmDialog, FormSubmitButton } from '@components/shared';
+import { ConfirmDialog } from '@components/shared';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -53,7 +53,7 @@ function FormSubmitButtons({ align, className, ...props }: FormActionButtonsProp
         confirmLabel="Yes, Cancel"
         onConfirm={() => navigate(-1)}
       >
-        <Button size="lg" variant="muted" type="button">
+        <Button variant="outline" size="lg" type="button">
           Cancel
         </Button>
       </ConfirmDialog>
@@ -62,12 +62,9 @@ function FormSubmitButtons({ align, className, ...props }: FormActionButtonsProp
         <Conditional.If condition={!!props.children}>{props.children}</Conditional.If>
 
         <Conditional.Else>
-          <FormSubmitButton
-            className="lg:ms-0"
-            size="lg"
-            loading={props.defaultPrimaryLoading}
-            textContent={props.defaultPrimaryText || (props.defaultPrimaryCreateUpdate ? 'Update' : 'Create')}
-          />
+          <Button type="submit" className="lg:ms-0" size="lg" loading={props.defaultPrimaryLoading}>
+            {props.defaultPrimaryText || (props.defaultPrimaryCreateUpdate ? 'Update' : 'Create')}
+          </Button>
         </Conditional.Else>
       </Conditional>
     </div>

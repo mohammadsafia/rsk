@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useRef } from 'react';
 
-import { Button, Card, Chip, Divider, Input, ScrollArea } from '@components/ui';
+import { Card, Chip, Divider, Input, ScrollArea } from '@components/ui';
 
 import { formatCategoryLabel } from '@component-docs/gallery/utils';
 
@@ -15,13 +15,13 @@ const TagFilterChip = ({
   on,
   onToggle,
 }: Readonly<{ tag: string; count: number; on: boolean; onToggle: (tag: string) => void }>) => (
-  <Button variant="unstyled" size="unstyled" onClick={() => onToggle(tag)} aria-pressed={on}>
+  <button type="button" onClick={() => onToggle(tag)} aria-pressed={on}>
     <Chip variant={on ? 'default' : 'muted'} size="sm" className="cursor-pointer gap-1.5">
       <span>{tag}</span>
 
       <span className="text-2xs opacity-60">{count}</span>
     </Chip>
-  </Button>
+  </button>
 );
 
 const DocListItem = forwardRef<
@@ -31,10 +31,9 @@ const DocListItem = forwardRef<
   const tags = doc.tags ?? [];
 
   return (
-    <Button
+    <button
+      type="button"
       ref={ref}
-      variant="unstyled"
-      size="unstyled"
       onClick={() => onSelect(doc.id)}
       data-active={isActive}
       className="bg-muted-50 hover:bg-muted-200 data-[active=true]:bg-primary data-[active=true]:text-primary-foreground border-muted-200 flex w-full flex-col items-start gap-1 rounded-lg border px-4 py-3 text-left transition-all data-[active=true]:border-transparent"
@@ -54,7 +53,7 @@ const DocListItem = forwardRef<
           {tags.length > 3 ? <span className="text-muted-400 text-2xs">+{tags.length - 3}</span> : null}
         </div>
       ) : null}
-    </Button>
+    </button>
   );
 });
 
@@ -101,14 +100,13 @@ const SidebarPanel = (props: SidebarPanelProps) => {
           </div>
 
           {hasActiveFilters ? (
-            <Button
-              variant="unstyled"
-              size="unstyled"
+            <button
+              type="button"
               onClick={clearFilters}
               className="text-destructive hover:bg-destructive-200 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors"
             >
               Clear filters
-            </Button>
+            </button>
           ) : null}
         </div>
       </Card.Header>

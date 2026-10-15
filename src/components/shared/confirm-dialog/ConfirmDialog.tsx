@@ -2,9 +2,8 @@ import { Children, type ReactNode, useCallback, useState } from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { type ButtonVariants, Dialog } from '@components/ui';
+import { Button, type ButtonVariants, Dialog } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { LoadingButton } from '@components/shared';
 
 import { useAppTranslation } from '@hooks/shared';
 
@@ -21,8 +20,8 @@ export type ConfirmDialogProps = {
   onOpenChange?: (open: boolean) => void;
   /** @default 'destructive' */
   variant?: ConfirmDialogVariant;
-  /** Overrides the auto-mapped button variant. @see {@link confirmDialogVariantToButtonVariantMapping} */
-  primaryVariant?: ButtonVariants['variant'];
+  /** Overrides the auto-mapped button tone. @see {@link confirmDialogVariantToButtonToneMapping} */
+  primaryTone?: ButtonVariants['tone'];
   title?: ReactNode;
   description?: ReactNode;
   /** @default 'Confirm' */
@@ -49,11 +48,11 @@ const confirmDialogVariantToIconsMapping: Record<ConfirmDialogVariant, typeof Al
   info: Info,
 };
 
-const confirmDialogVariantToButtonVariantMapping: Record<ConfirmDialogVariant, ButtonVariants['variant']> = {
-  destructive: 'destructive',
-  success: 'success',
-  warning: 'default',
-  info: 'default',
+const confirmDialogVariantToButtonToneMapping: Record<ConfirmDialogVariant, ButtonVariants['tone']> = {
+  destructive: 'danger',
+  success: 'neutral',
+  warning: 'neutral',
+  info: 'neutral',
 };
 
 export const confirmDialogIconVariants = cva('mb-4', {
@@ -104,7 +103,7 @@ export const confirmDialogVariants = cva('border-t-4', {
  *
  * The confirm button variant is auto-mapped from the dialog variant:
  * `destructive → destructive`, `success → success`, `warning → default`, `info → default`.
- * Override with `primaryVariant`.
+ * Override with `primaryTone`.
  *
  * @see {@link ConfirmDialogProps} for prop details and defaults.
  */
@@ -112,7 +111,7 @@ function ConfirmDialog({
   open,
   onOpenChange,
   variant = 'destructive',
-  primaryVariant,
+  primaryTone,
   title,
   description,
   confirmLabel,
@@ -218,20 +217,20 @@ function ConfirmDialog({
             <Conditional.Else>
               <Conditional.If condition={variant !== 'success' && variant !== 'info'}>
                 <Dialog.Close asChild>
-                  <LoadingButton variant="muted" size="lg">
+                  <Button variant="outline" size="lg">
                     {resolvedCancelLabel}
-                  </LoadingButton>
+                  </Button>
                 </Dialog.Close>
               </Conditional.If>
 
-              <LoadingButton
-                variant={primaryVariant ?? confirmDialogVariantToButtonVariantMapping[variant]}
+              <Button
+                tone={primaryTone ?? confirmDialogVariantToButtonToneMapping[variant]}
                 size="lg"
                 loading={isLoading}
                 onClick={handleConfirm}
               >
                 {resolvedConfirmLabel}
-              </LoadingButton>
+              </Button>
             </Conditional.Else>
           </Conditional>
         </Dialog.Footer>

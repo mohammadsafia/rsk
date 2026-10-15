@@ -48,5 +48,6 @@
     "next": "التالي",
     "rowsPerPage": "صفوف لكل صفحة",
     "pageOf": "صفحة {{current}} من {{total}}"
-  }
+  },
+  "openCalendar": "فتح التقويم"
 }

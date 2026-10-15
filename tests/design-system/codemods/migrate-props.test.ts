@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import { migrateSource, type TagRule } from '../../../scripts/design-system/codemods/migrate-props';
+import { RULE_SETS } from '../../../scripts/design-system/codemods/rules';
 
 const pillRule: TagRule = {
   tag: 'Pill',
@@ -50,5 +51,34 @@ describe('migrateSource', () => {
     };
     const source = 'import { Button, Chip } from \'@components/ui\';\n<Chip variant="loud">x</Chip>';
     expect(migrateSource(source, [rule]).output).toBe('import { Button, Tag } from \'@components/ui\';\n<Tag tone="danger">x</Tag>');
+  });
+});
+
+describe('button rules', () => {
+  const run = (source: string) => migrateSource(source, RULE_SETS.button, 'x.tsx');
+
+  it.each([
+    ['<Button variant="default">', '<Button>'],
+    ['<Button variant="destructive">', '<Button tone="danger">'],
+    ['<Button variant="outline">', '<Button variant="outline">'],
+    ['<Button variant="secondary">', '<Button variant="outline">'],
+    ['<Button variant="ghost-muted-primary">', '<Button variant="ghost" tone="accent">'],
+    ['<Button variant="outline-destructive">', '<Button variant="outline" tone="danger">'],
+    ['<Button variant="link">', '<Button variant="link" tone="accent">'],
+    ['<Button size="xs">', '<Button size="sm">'],
+    ['<Button size="default">', '<Button>'],
+    ['<Button size="full">', '<Button fullWidth>'],
+    ['<LoadingButton variant="muted" loading>', '<Button variant="outline" loading>'],
+  ])('%s → %s', (input, expected) => {
+    expect(run(input).output).toBe(expected);
+  });
+
+  it('reports icon sizes and unstyled for manual migration', () => {
+    expect(run('<Button size="icon">').manual).toHaveLength(1);
+    expect(run('<Button variant="unstyled">').manual).toHaveLength(1);
+  });
+
+  it('fails loudly on unknown variants', () => {
+    expect(() => run('<Button variant="sparkly">')).toThrow('Unknown Button variant "sparkly"');
   });
 });

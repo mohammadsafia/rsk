@@ -1,5 +1,5 @@
-import { Button } from '@components/ui';
-import { useDate } from '@hooks/shared';
+import { Button, IconButton } from '@components/ui';
+import { useAppTranslation, useDate } from '@hooks/shared';
 
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
@@ -11,23 +11,25 @@ type DateNavigationProps = {
 };
 
 function DateNavigation({ handlePrevious, handleNext, onSetDate, date }: DateNavigationProps) {
+  const { t } = useAppTranslation('common');
   const { toDate, constants } = useDate();
 
   return (
     <div className="flex items-center space-x-2">
-      <Button onClick={handlePrevious} variant="outline" className="md:h-9 md:w-9 md:py-2" size="icon">
+      <IconButton variant="outline" aria-label={t('previous')} onClick={handlePrevious}>
         <ArrowLeft size={16} />
-      </Button>
+      </IconButton>
 
-      <Button onClick={handleNext} variant="outline" className="md:h-9 md:w-9 md:py-2" size="icon">
+      <IconButton variant="outline" aria-label={t('next')} onClick={handleNext}>
         <ArrowRight size={16} />
-      </Button>
+      </IconButton>
 
       <Button
-        className="md:h-9 md:px-4 md:py-2"
-        size="sm"
-        onClick={() => onSetDate(toDate(undefined, constants.DateFormats.ISO_DATE))}
         variant="outline"
+        size="sm"
+        className="md:h-9 md:px-4 md:py-2"
+
+        onClick={() => onSetDate(toDate(undefined, constants.DateFormats.ISO_DATE))}
       >
         Today
       </Button>

@@ -48,5 +48,6 @@
     "next": "Next",
     "rowsPerPage": "Rows per page",
     "pageOf": "Page {{current}} of {{total}}"
-  }
+  },
+  "openCalendar": "Open calendar"
 }

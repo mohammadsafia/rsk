@@ -3,7 +3,6 @@ import { Controller, type FieldValues } from 'react-hook-form';
 
 import { Select } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { TooltipButton } from '@components/shared';
 import { FormControl, FormLabel, FormMessage } from '@components/forms';
 
 import { cn } from '@utils';
@@ -91,20 +90,18 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
                   <Select.Value placeholder={placeholder} />
 
                   <Conditional.If condition={!!internalValue && !field.disabled && !props.disabled && clearable}>
-                    <TooltipButton
-                      asChild
-                      title="Clear"
-                      variant="ghost-muted-destructive"
-                      size="unstyled"
+                    <XIcon
+                      size={16}
+                      role="button"
+                      aria-label="Clear"
+                      className="text-fg-muted hover:text-danger shrink-0 cursor-pointer"
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
                         onClear();
                       }}
-                    >
-                      <XIcon size={16} />
-                    </TooltipButton>
+                    />
                   </Conditional.If>
 
                   <Select.Icon />

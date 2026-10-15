@@ -12,7 +12,6 @@ import {
 
 import { Button, Popover, ScrollSelector } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { TooltipButton } from '@components/shared';
 
 import { useDebounce, useTime } from '@hooks/shared';
 
@@ -65,16 +64,20 @@ export type TimePickerProps = {
 const TimePickerClear: FC<TimePickerClearProps> = ({ onClear, disabled, hasValue }) => {
   if (!hasValue || !onClear || disabled) return null;
 
-  const handleClear = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClear = (e: React.MouseEvent<SVGSVGElement>) => {
     e.preventDefault();
     e.stopPropagation();
     onClear();
   };
 
   return (
-    <TooltipButton asChild title="Clear" variant="ghost-muted-destructive" size="unstyled" onClick={handleClear}>
-      <XIcon size={16} />
-    </TooltipButton>
+    <XIcon
+      size={16}
+      role="button"
+      aria-label="Clear"
+      className="text-fg-muted hover:text-danger shrink-0 cursor-pointer"
+      onClick={handleClear}
+    />
   );
 };
 
@@ -246,7 +249,7 @@ const TimePickerContent: FC<TimePickerContentProps> = ({
         </Conditional.If>
       </div>
       <div className="mt-4 flex justify-end pb-2">
-        <Button size="sm" variant="ghost" className="h-auto px-2 py-1" onClick={onConfirm}>
+        <Button variant="ghost" size="sm" className="h-auto px-2 py-1" onClick={onConfirm}>
           <Check size={20} className="text-primary" />
         </Button>
       </div>

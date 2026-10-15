@@ -95,8 +95,9 @@ const FormattedNumber: FC<FormattedNumberProps> = ({
           <Conditional.If condition={!showStepButtons}>
             <div className="absolute inset-e-2 inset-bs-1/2 z-10 flex h-fit -translate-y-1/2 flex-col justify-center">
               <Button
+                variant="ghost"
                 type="button"
-                variant="ghost-muted"
+
                 className="bg-background h-fit rounded-none rounded-t-md p-0"
                 onClick={onIncrement}
                 disabled={props.disabled || isIncrementDisabled}
@@ -105,8 +106,9 @@ const FormattedNumber: FC<FormattedNumberProps> = ({
               </Button>
 
               <Button
+                variant="ghost"
                 type="button"
-                variant="ghost-muted"
+
                 className="bg-background h-fit rounded-none rounded-b-md p-0"
                 onClick={onDecrement}
                 disabled={props.disabled || isDecrementDisabled}

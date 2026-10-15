@@ -1,7 +1,6 @@
 import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type PropsWithChildren } from 'react';
 
 import { Command, type CommandProps, Popover } from '@components/ui';
-import { TooltipButton } from '@components/shared';
 
 import { cn } from '@utils';
 
@@ -85,20 +84,18 @@ const ComboboxClear: FC<ComboboxClearProps> = ({ when, title = 'Clear', onClear 
   if (!when) return null;
 
   return (
-    <TooltipButton
-      asChild
-      title={title}
-      variant="ghost-muted-destructive"
-      size="unstyled"
+    <XIcon
+      size={16}
+      role="button"
+      aria-label={title}
+      className="text-fg-muted hover:text-danger shrink-0 cursor-pointer"
       onPointerDown={(e) => e.stopPropagation()}
       onClick={(e) => {
         e.stopPropagation();
         e.preventDefault();
         onClear();
       }}
-    >
-      <XIcon size={16} />
-    </TooltipButton>
+    />
   );
 };
 

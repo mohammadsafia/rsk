@@ -9,8 +9,8 @@ tags: [calendar, calendar-grid, schedule, compound, day-view, week-view, month-v
 
 import { useMemo, useState } from 'react';
 
-import { Chip, Divider, Table } from '@components/ui';
-import { MetaCard, TooltipButton } from '@components/shared';
+import { Chip, Divider, Table, IconButton } from '@components/ui';
+import { MetaCard } from '@components/shared';
 import { CalendarGrid } from '@components/calendar';
 import { Conditional } from '@components/utils';
 
@@ -182,13 +182,13 @@ export const CalendarGridDemo = () => {
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <TooltipButton title="Reschedule" type="button" variant="ghost" size="icon-sm" onClick={onClose}>
+                  <IconButton size="sm" type="button" aria-label="Reschedule" onClick={onClose}>
                     <CalendarClock size={16} />
-                  </TooltipButton>
+                  </IconButton>
 
-                  <TooltipButton title="Close" type="button" variant="ghost" size="icon-sm" onClick={onClose}>
+                  <IconButton size="sm" type="button" aria-label="Close" onClick={onClose}>
                     <X size={16} />
-                  </TooltipButton>
+                  </IconButton>
                 </div>
               </div>
 
@@ -500,9 +500,9 @@ const LEGEND_ITEMS: CalendarLegendItem[] = [
         <div className="flex items-start justify-between">
           <span className="text-sm font-bold">{event.patient}</span>
 
-          <TooltipButton title="Close" type="button" variant="ghost" size="icon-sm" onClick={onClose}>
+          <IconButton size="sm" type="button" aria-label="Close" onClick={onClose}>
             <X size={16} />
-          </TooltipButton>
+          </IconButton>
         </div>
 
         <MetaCard direction="horizontal" title="Doctor" description={event.doctor} />

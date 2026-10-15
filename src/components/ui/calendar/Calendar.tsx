@@ -1,13 +1,13 @@
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { type DateRange, DayButton, DayPicker, type DropdownProps, getDefaultClassNames } from 'react-day-picker';
-import { Button, buttonVariants, Select } from '@components/ui';
+import { buttonVariants, type ButtonVariants, Select } from '@components/ui';
 import { cn } from '@utils';
 import { type ChangeEvent, type ComponentProps, useEffect, useRef } from 'react';
 
 export type CalendarRange = DateRange;
 
 export type CalendarProps = ComponentProps<typeof DayPicker> & {
-  buttonVariant?: ComponentProps<typeof Button>['variant'];
+  buttonVariant?: ButtonVariants['variant'];
 };
 
 function CalendarDayButton({ className, day, modifiers, ...props }: ComponentProps<typeof DayButton>) {
@@ -23,9 +23,8 @@ function CalendarDayButton({ className, day, modifiers, ...props }: ComponentPro
   const isTodayOnly = isToday && !isSelected;
 
   return (
-    <Button
-      variant="unstyled"
-      size="icon"
+    <button
+      type="button"
       data-day={day.date.toLocaleDateString()}
       data-selected-single={isSelected}
       data-today={isToday}
@@ -34,6 +33,7 @@ function CalendarDayButton({ className, day, modifiers, ...props }: ComponentPro
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
+        'inline-flex cursor-pointer items-center justify-center rounded-full text-sm',
         // Today styling (only when not selected) — soft highlight, readable + distinct from selected
         isTodayOnly && 'bg-primary-15 text-primary font-semibold rounded-md',
         // Selected date styling

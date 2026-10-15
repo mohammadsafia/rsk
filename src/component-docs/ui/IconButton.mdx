@@ -1,0 +1,48 @@
+---
+id: icon-button
+title: IconButton
+section: Components
+category: UI
+description: 'Square icon-only action with a required accessible label that doubles as its tooltip.'
+tags: [ui, button, icon, actions, tooltip]
+---
+
+import { IconButton } from '@components/ui';
+import { Copy, Pencil, Trash2 } from 'lucide-react';
+
+## Demo
+
+<div className="flex flex-wrap items-center gap-2">
+  <IconButton size="sm" aria-label="Edit">
+    <Pencil />
+  </IconButton>
+  <IconButton variant="outline" aria-label="Duplicate">
+    <Copy />
+  </IconButton>
+  <IconButton variant="solid" tone="danger" size="lg" aria-label="Delete">
+    <Trash2 />
+  </IconButton>
+</div>
+
+## Rules
+
+- `aria-label` is required by the type and becomes the tooltip text; pass `tooltip={false}` only when the button sits inside another trigger.
+- Same `variant` / `tone` / `size` as `Button`; the default variant is `ghost`.
+- Use `asChild` (with `tooltip={false}`) when the icon must render as a non-button element inside another button, such as a field's clear control.
+
+## Imports
+
+```tsx
+import { IconButton } from '@components/ui';
+```
+
+## Code
+
+```tsx
+<IconButton aria-label="Edit">
+  <Pencil />
+</IconButton>
+<IconButton variant="outline" tone="danger" aria-label="Delete">
+  <Trash2 />
+</IconButton>
+```

@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type FieldValues, useController } from 'react-hook-form';
 
-import { Calendar, type CalendarProps, Popover } from '@components/ui';
+import { Calendar, type CalendarProps, Popover, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { TooltipButton } from '@components/shared';
 import { FormControl, FormLabel, FormMessage } from '@components/forms';
 
 import { DATE_INPUT_FORMATS, type DateInputFormat, useDateMask } from '@hooks/shared';
@@ -235,9 +234,9 @@ function FormDatePicker<TFieldValues extends FieldValues>({
 
             <div className="flex shrink-0 items-center gap-2">
               <Conditional.If condition={!!date && !disabled}>
-                <TooltipButton tabIndex={-1} title="Clear" variant="ghost-muted-destructive" size="unstyled" onClick={handleClear}>
+                <IconButton tabIndex={-1} tone="danger" size="sm" aria-label="Clear" onClick={handleClear}>
                   <XIcon size={16} />
-                </TooltipButton>
+                </IconButton>
               </Conditional.If>
             </div>
           </div>

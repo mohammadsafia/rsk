@@ -274,9 +274,9 @@ DataTable supports row click navigation via `onRowClick` on the root component:
   meta: { disableRowClick: true },
   cell: ({ row }) => (
     <PrimeDropdown>
-      <Button variant="ghost-muted" size="icon-sm">
+      <IconButton size="sm" aria-label="Row actions">
         <More size={20} />
-      </Button>
+      </IconButton>
       <PrimeDropdown.Item icon={<Eye size={16} />} onSelect={() => navigate(`/profile/${row.original.id}`)}>
         View Profile
       </PrimeDropdown.Item>

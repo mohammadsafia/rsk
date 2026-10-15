@@ -70,9 +70,6 @@
     "legacy-color-ramp": 4,
     "legacy-color-name": 1
   },
-  "src/component-docs/shared/LoadingButton.mdx": {
-    "legacy-color-name": 3
-  },
   "src/component-docs/shared/PrimeCard.mdx": {
     "prime-component": 43,
     "legacy-color-name": 1
@@ -95,8 +92,7 @@
     "legacy-color-name": 1
   },
   "src/component-docs/tables/DataTable.mdx": {
-    "prime-component": 6,
-    "removed-button-variant": 1
+    "prime-component": 6
   },
   "src/component-docs/ui/Alert.mdx": {
     "legacy-color-name": 7,
@@ -107,11 +103,6 @@
   },
   "src/component-docs/ui/Badge.mdx": {
     "legacy-color-name": 2
-  },
-  "src/component-docs/ui/Button.mdx": {
-    "legacy-color-ramp": 1,
-    "legacy-color-name": 20,
-    "removed-button-variant": 24
   },
   "src/component-docs/ui/Calendar.mdx": {
     "legacy-color-name": 2
@@ -170,9 +161,6 @@
   "src/component-docs/ui/ToggleGroup.mdx": {
     "legacy-color-name": 3
   },
-  "src/component-docs/ui/TooltipButton.mdx": {
-    "legacy-color-name": 3
-  },
   "src/components/calendar/calendar-grid/CalendarGrid.tsx": {
     "legacy-color-ramp": 2,
     "legacy-color-name": 2
@@ -200,13 +188,11 @@
   },
   "src/components/forms/form-date-picker/FormDatePicker.tsx": {
     "legacy-color-ramp": 6,
-    "legacy-color-name": 10,
-    "removed-button-variant": 1
+    "legacy-color-name": 10
   },
   "src/components/forms/form-date-range/FormDateRange.tsx": {
     "legacy-color-ramp": 6,
-    "legacy-color-name": 10,
-    "removed-button-variant": 1
+    "legacy-color-name": 10
   },
   "src/components/forms/form-file-uploader/FormFileUploader.tsx": {
     "legacy-color-name": 3
@@ -223,8 +209,7 @@
     "legacy-color-name": 1
   },
   "src/components/forms/form-multi-combobox/FormMultiCombobox.tsx": {
-    "legacy-color-name": 6,
-    "removed-button-variant": 1
+    "legacy-color-name": 6
   },
   "src/components/forms/form-number/FormNumber.tsx": {
     "legacy-color-name": 6
@@ -233,8 +218,7 @@
     "legacy-color-name": 11
   },
   "src/components/forms/form-select/FormSelect.tsx": {
-    "legacy-color-name": 6,
-    "removed-button-variant": 1
+    "legacy-color-name": 6
   },
   "src/components/forms/form-textarea/FormTextarea.tsx": {
     "legacy-color-ramp": 4,
@@ -244,8 +228,7 @@
     "legacy-color-name": 4
   },
   "src/components/shared/action-panel/ActionPanel.tsx": {
-    "legacy-color-name": 1,
-    "removed-button-variant": 1
+    "legacy-color-name": 1
   },
   "src/components/shared/blank-slate/BlankSlate.tsx": {
     "legacy-color-ramp": 3
@@ -261,8 +244,7 @@
   },
   "src/components/shared/combobox/Combobox.tsx": {
     "legacy-color-ramp": 7,
-    "legacy-color-name": 9,
-    "removed-button-variant": 1
+    "legacy-color-name": 9
   },
   "src/components/shared/confirm-dialog/ConfirmDialog.tsx": {
     "legacy-color-name": 2
@@ -285,8 +267,7 @@
   "src/components/shared/file-card/FileCard.tsx": {
     "prime-component": 17,
     "legacy-color-ramp": 11,
-    "legacy-color-name": 5,
-    "removed-button-variant": 2
+    "legacy-color-name": 4
   },
   "src/components/shared/file-icon/FileIcon.tsx": {
     "legacy-color-ramp": 2,
@@ -294,8 +275,7 @@
   },
   "src/components/shared/file-uploader/FileUploader.tsx": {
     "legacy-color-ramp": 7,
-    "legacy-color-name": 6,
-    "removed-button-variant": 4
+    "legacy-color-name": 4
   },
   "src/components/shared/form-submit-buttons/FormSubmitButtons.tsx": {
     "legacy-color-name": 1,
@@ -304,12 +284,6 @@
   "src/components/shared/grid-card/GridCard.tsx": {
     "prime-component": 3,
     "legacy-color-ramp": 4
-  },
-  "src/components/shared/language-switcher/LanguageSwitcher.tsx": {
-    "legacy-color-name": 2
-  },
-  "src/components/shared/link-button/LinkButton.tsx": {
-    "legacy-color-name": 1
   },
   "src/components/shared/meta-card/MetaCard.tsx": {
     "prime-component": 3,
@@ -342,9 +316,6 @@
   "src/components/shared/stepper/Stepper.tsx": {
     "legacy-color-ramp": 4
   },
-  "src/components/shared/theme-switcher/ThemeSwitcher.tsx": {
-    "legacy-color-name": 2
-  },
   "src/components/tables/data-table-filters/async-select-filter/AsyncSelectFilter.tsx": {
     "legacy-color-ramp": 3
   },
@@ -370,8 +341,7 @@
   },
   "src/components/tables/data-table/data-table-toolbar/DataTableToolbar.tsx": {
     "legacy-color-ramp": 4,
-    "legacy-color-name": 4,
-    "removed-button-variant": 1
+    "legacy-color-name": 4
   },
   "src/components/ui/accordion/Accordion.tsx": {
     "legacy-color-ramp": 1,
@@ -387,10 +357,6 @@
   "src/components/ui/badge/Badge.tsx": {
     "legacy-color-ramp": 3,
     "legacy-color-name": 4
-  },
-  "src/components/ui/button/Button.tsx": {
-    "legacy-color-ramp": 29,
-    "legacy-color-name": 37
   },
   "src/components/ui/calendar-month-grid/CalendarMonthGrid.tsx": {
     "legacy-color-ramp": 7,
@@ -439,8 +405,7 @@
   },
   "src/components/ui/formatted-number/FormattedNumber.tsx": {
     "legacy-color-ramp": 4,
-    "legacy-color-name": 8,
-    "removed-button-variant": 2
+    "legacy-color-name": 8
   },
   "src/components/ui/input/Input.tsx": {
     "legacy-color-ramp": 4,
@@ -496,7 +461,6 @@
   "src/components/ui/time-picker/TimePicker.tsx": {
     "legacy-color-ramp": 7,
     "legacy-color-name": 11,
-    "removed-button-variant": 1,
     "arbitrary-length": 2
   },
   "src/components/ui/toast/Toast.tsx": {
@@ -520,15 +484,12 @@
   },
   "src/layouts/dashboard-header/DashboardHeader.tsx": {
     "legacy-color-ramp": 1,
-    "legacy-color-name": 13,
+    "legacy-color-name": 11,
     "arbitrary-length": 1
   },
   "src/layouts/dashboard-layout/DashboardLayout.tsx": {
     "prime-component": 2,
     "legacy-shadow": 1
-  },
-  "src/layouts/dashboard-sidebar-drawer/DashboardSidebarDrawer.tsx": {
-    "legacy-color-name": 3
   },
   "src/layouts/dashboard-sidebar-link/DashboardSidebarLink.tsx": {
     "legacy-color-name": 2,
@@ -541,7 +502,6 @@
   },
   "src/layouts/error-boundary/ErrorBoundary.tsx": {
     "legacy-color-name": 5,
-    "removed-button-variant": 2,
     "arbitrary-length": 1
   },
   "src/pages/components/ComponentDetailPage.tsx": {
@@ -550,14 +510,12 @@
   },
   "src/pages/components/ComponentsGalleryPage.tsx": {
     "legacy-color-ramp": 3,
-    "legacy-color-name": 1,
-    "removed-button-variant": 1
+    "legacy-color-name": 1
   },
   "src/pages/components/components.data.demos.tsx": {
     "prime-component": 68,
     "legacy-color-ramp": 43,
-    "legacy-color-name": 44,
-    "removed-button-variant": 3,
+    "legacy-color-name": 42,
     "arbitrary-length": 5
   },
   "src/pages/dashboard/DashboardPage.tsx": {

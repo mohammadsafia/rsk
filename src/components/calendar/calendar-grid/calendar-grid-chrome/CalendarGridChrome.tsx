@@ -1,7 +1,6 @@
 import { type ComponentPropsWithoutRef, type FC, useMemo } from 'react';
 
-import { Tabs, ToggleGroup } from '@components/ui';
-import { TooltipButton } from '@components/shared';
+import { Tabs, ToggleGroup, IconButton } from '@components/ui';
 import { type CalendarLegendItem, CalendarPicker, type CalendarPickerSelected, useCalendarGridContext } from '@components/calendar';
 
 import { useDate } from '@hooks/shared';
@@ -38,15 +37,15 @@ const Navigation: FC = () => {
 
   return (
     <div data-slot="calendar-grid-navigation" className="flex items-center gap-2">
-      <TooltipButton title="Previous" type="button" variant="ghost" size="icon-sm" onClick={goPrev}>
+      <IconButton size="sm" type="button" aria-label="Previous" onClick={goPrev}>
         <ChevronLeft size={20} className="text-muted-400" />
-      </TooltipButton>
+      </IconButton>
 
       <span className="text-foreground text-sm font-bold">{navigationLabel}</span>
 
-      <TooltipButton title="Next" type="button" variant="ghost" size="icon-sm" onClick={goNext}>
+      <IconButton size="sm" type="button" aria-label="Next" onClick={goNext}>
         <ChevronRight size={20} className="text-muted-400" />
-      </TooltipButton>
+      </IconButton>
     </div>
   );
 };

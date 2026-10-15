@@ -164,19 +164,18 @@ function FormMultiCombobox<TFieldValues extends FieldValues, TOption = FormSelec
                         {getOptionLabel(opt)}
 
                         <Conditional.If condition={!field.disabled && !disabled}>
-                          <Button
-                            asChild
-                            variant="ghost-muted-destructive"
-                            size="unstyled"
+                          <XIcon
+                            size={12}
+                            role="button"
+                            aria-label="Clear"
+                            className="text-fg-muted hover:text-danger shrink-0 cursor-pointer"
                             onPointerDown={(e) => e.stopPropagation()}
                             onClick={(e) => {
                               e.stopPropagation();
                               e.preventDefault();
                               onToggleValue(getOptionValue(opt));
                             }}
-                          >
-                            <XIcon size={12} />
-                          </Button>
+                          />
                         </Conditional.If>
                       </Badge>
                     ))}

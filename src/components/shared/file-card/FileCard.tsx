@@ -10,16 +10,8 @@ import {
   useState,
 } from 'react';
 
-import { Avatar, Card, Chip } from '@components/ui';
-import {
-  Combobox,
-  ComposedLoadingButton,
-  FileIcon,
-  type NormalizedExtension,
-  PrimeDropdown,
-  PrimeTooltip,
-  TooltipButton,
-} from '@components/shared';
+import { Avatar, Card, Chip, IconButton } from '@components/ui';
+import { Combobox, ComposedButton, FileIcon, type NormalizedExtension, PrimeDropdown, PrimeTooltip } from '@components/shared';
 import { Conditional } from '@components/utils';
 
 import { type ComboboxOptionsParams, type DateInput, useAppTranslation, useComboboxOptions, useDate } from '@hooks/shared';
@@ -49,8 +41,8 @@ type PreviewProps<TEntry> = { children: FileCardSlotChildren<TEntry>; className?
 type FileShapeProps = ComponentPropsWithoutRef<'div'>;
 type FolderShapeProps = Omit<ComponentPropsWithoutRef<'div'>, 'children'> & { count: number };
 type ApprovalPromptProps = ComponentPropsWithoutRef<'p'>;
-type ApproveProps = ComponentProps<typeof ComposedLoadingButton>;
-type RejectProps = ComponentProps<typeof ComposedLoadingButton>;
+type ApproveProps = ComponentProps<typeof ComposedButton>;
+type RejectProps = ComponentProps<typeof ComposedButton>;
 type StatusProps<TOption> = Omit<ComboboxOptionsParams<TOption>, 'open'> & {
   value: TOption | null;
   getOptionLabel: (option: TOption) => string;
@@ -138,9 +130,9 @@ const Actions = <TEntry,>({ children, align = 'end' }: ActionsProps<TEntry>): Re
   return (
     <PrimeDropdown align={align}>
       <PrimeDropdown.Trigger asChild>
-        <TooltipButton title={t('actions')} type="button" variant="ghost" size="icon-sm">
+        <IconButton size="sm" type="button" aria-label={t('actions')}>
           <MoreHorizontal size={16} />
-        </TooltipButton>
+        </IconButton>
       </PrimeDropdown.Trigger>
 
       <PrimeDropdown.List>{children(entry)}</PrimeDropdown.List>
@@ -194,15 +186,15 @@ const ApprovalPrompt: FC<ApprovalPromptProps> = ({ className, children, ...props
 );
 
 const Approve: FC<ApproveProps> = ({ children = 'Approve', ...props }) => (
-  <ComposedLoadingButton variant="outline-success" size="lg" {...props}>
+  <ComposedButton variant="outline" size="lg" {...props}>
     {children}
-  </ComposedLoadingButton>
+  </ComposedButton>
 );
 
 const Reject: FC<RejectProps> = ({ children = 'Reject', ...props }) => (
-  <ComposedLoadingButton variant="outline-destructive" size="lg" {...props}>
+  <ComposedButton variant="outline" tone="danger" size="lg" {...props}>
     {children}
-  </ComposedLoadingButton>
+  </ComposedButton>
 );
 
 const Status = <TOption,>({

@@ -3,8 +3,7 @@ import { type FC, type RefCallback, useCallback, useEffect, useMemo, useRef, use
 import { type DateRange } from 'react-day-picker';
 import { type FieldError, type FieldPath, type FieldValues, useController } from 'react-hook-form';
 
-import { Calendar, type CalendarProps, Popover } from '@components/ui';
-import { TooltipButton } from '@components/shared';
+import { Calendar, type CalendarProps, Popover, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { FormControl, FormLabel, FormMessage } from '@components/forms';
 
@@ -252,9 +251,9 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
 
             <div className="flex shrink-0 items-center gap-2">
               <Conditional.If condition={!!hasValue && !disabled}>
-                <TooltipButton tabIndex={-1} title="Clear" variant="ghost-muted-destructive" size="unstyled" onClick={handleClear}>
+                <IconButton tabIndex={-1} tone="danger" size="sm" aria-label="Clear" onClick={handleClear}>
                   <XIcon size={16} />
-                </TooltipButton>
+                </IconButton>
               </Conditional.If>
             </div>
           </div>

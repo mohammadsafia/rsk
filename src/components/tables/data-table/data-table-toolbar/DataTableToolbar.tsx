@@ -119,7 +119,7 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
             </div>
 
             <Conditional.If condition={isFiltered}>
-              <Button variant="ghost-primary" size="xs" aria-label="Clear all filters" onClick={onReset}>
+              <Button variant="ghost" tone="accent" size="sm" aria-label="Clear all filters" onClick={onReset}>
                 Clear All
               </Button>
             </Conditional.If>

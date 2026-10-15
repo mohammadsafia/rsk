@@ -1,7 +1,8 @@
 {
   "gallery": {
     "title": "Components Gallery",
-    "subtitle": "Browse and explore components with live demos and usage examples."
+    "subtitle": "Browse and explore components with live demos and usage examples.",
+    "toggleSidebar": "Toggle sidebar"
   },
   "detail": {
     "notFoundTitle": "Component not found",

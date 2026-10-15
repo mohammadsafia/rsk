@@ -12,7 +12,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-import { Button } from '@components/ui';
+import { Button, IconButton } from '@components/ui';
 import { DataTable } from '@components/tables';
 import { CollapsibleCard, ConfirmDialog } from '@components/shared';
 import { FormContainer, FormInput, FormSelect } from '@components/forms';
@@ -129,21 +129,21 @@ export const RowActions = ({ row }) => {
   if (isEditing(rowId)) {
     return (
       <div className="flex gap-1">
-        <Button variant="ghost" size="icon" onClick={() => save(rowId, localPersist)} aria-label="Save">
+        <IconButton onClick={() => save(rowId, localPersist)} aria-label="Save">
           <Check className="text-success size-4" />
-        </Button>
+        </IconButton>
 
-        <Button type="button" variant="ghost" size="icon" onClick={() => cancel(rowId)} aria-label="Cancel">
+        <IconButton type="button" onClick={() => cancel(rowId)} aria-label="Cancel">
           <X className="text-muted size-4" />
-        </Button>
+        </IconButton>
       </div>
     );
   }
   return (
     <div className="flex gap-1">
-      <Button type="button" variant="ghost" size="icon" disabled={isAnyEditing} onClick={() => enterEdit(rowId)} aria-label="Edit">
+      <IconButton type="button" disabled={isAnyEditing} onClick={() => enterEdit(rowId)} aria-label="Edit">
         <Edit className="size-4" />
-      </Button>
+      </IconButton>
 
       <ConfirmDialog
         variant="destructive"
@@ -152,9 +152,9 @@ export const RowActions = ({ row }) => {
         confirmLabel="Delete"
         onConfirm={() => removeRow(rowId)}
       >
-        <Button type="button" variant="ghost" size="icon" disabled={isAnyEditing} aria-label="Delete">
+        <IconButton type="button" disabled={isAnyEditing} aria-label="Delete">
           <Trash className="text-destructive size-4" />
-        </Button>
+        </IconButton>
       </ConfirmDialog>
     </div>
   );
@@ -207,10 +207,10 @@ export const ChargeCell = ({ row }) => {
 export const AddRowButton = () => {
   const { isAnyEditing, addRow } = useRowEditingContext();
   return (
-    <Button
+    <Button variant="outline" size="sm"
       type="button"
-      variant="outline"
-      size="sm"
+     
+     
       disabled={isAnyEditing}
       onClick={() => addRow({ units: '', charge: '' })}
     >

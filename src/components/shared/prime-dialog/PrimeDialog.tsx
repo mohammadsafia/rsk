@@ -1,8 +1,7 @@
 import { type ComponentProps, createContext, type FC, useContext, useEffect, useState } from 'react';
 
-import { Dialog } from '@components/ui';
+import { Button, type ButtonProps, Dialog } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { LoadingButton, type LoadingButtonProps } from '@components/shared';
 
 import { useAppTranslation } from '@hooks/shared';
 
@@ -30,8 +29,8 @@ type ContentProps = ComponentProps<typeof Dialog.Content>;
 
 type ActionsProps = ComponentProps<typeof Dialog.Footer> &
   DialogBaseProps & {
-    primaryButtonProps?: Omit<LoadingButtonProps, 'loading'>;
-    secondaryButtonProps?: Omit<LoadingButtonProps, 'loading'>;
+    primaryButtonProps?: Omit<ButtonProps, 'loading'>;
+    secondaryButtonProps?: Omit<ButtonProps, 'loading'>;
   };
 
 type PrimeDialogProps = Omit<ComponentProps<typeof Dialog>, 'onOpenChange'> &
@@ -127,24 +126,25 @@ const Actions: FC<ActionsProps> = ({ className, isLoading, dialogMode, primaryBu
 
         <Conditional.Else>
           <Dialog.Close asChild>
-            <LoadingButton
-              type="reset"
+            <Button
               variant="outline"
+              type="reset"
+
               className={cn(context.dialogMode !== 'View' && 'grow', secondaryButtonProps?.className)}
               {...secondaryButtonProps}
             >
               {secondaryButtonProps?.children || 'Cancel'}
-            </LoadingButton>
+            </Button>
           </Dialog.Close>
 
-          <LoadingButton
+          <Button
             type="submit"
             loading={isLoading ?? context.isLoading}
             className={cn('grow', context.dialogMode === 'View' && 'hidden', primaryButtonProps?.className)}
             {...primaryButtonProps}
           >
             {primaryButtonProps?.children || (dialogMode ?? (getDialogModeText(context.dialogMode) || 'Create'))}
-          </LoadingButton>
+          </Button>
         </Conditional.Else>
       </Conditional>
     </Dialog.Footer>
