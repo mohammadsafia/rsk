@@ -1,8 +1,10 @@
 // @vitest-environment happy-dom
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
-import { Card } from '@components/ui';
+import { Card, Tooltip } from '@components/ui';
+
+import '../../../i18n';
 
 afterEach(cleanup);
 
@@ -30,5 +32,56 @@ describe('Card', () => {
     expect(card.className).toContain('bg-surface');
     expect(card.className).toContain('border-border');
     expect(card.className).not.toMatch(/\bshadow/);
+  });
+});
+
+describe('Card shortcuts and states', () => {
+  it('builds the header from title, description, icon and tooltip', () => {
+    render(
+      <Tooltip.Provider>
+        <Card title="Patients" description="Seen this week" icon={<svg data-testid="icon" />} tooltip="Counts unique visits">
+          <Card.Content>Body</Card.Content>
+        </Card>
+      </Tooltip.Provider>,
+    );
+    expect(screen.getByRole('heading', { name: 'Patients' })).toBeTruthy();
+    expect(screen.getByText('Seen this week')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'More information' })).toBeTruthy();
+    expect(screen.getByTestId('icon').closest('[data-slot="card-header"]')).not.toBeNull();
+  });
+
+  it('collapses and removes its body from the tab order', () => {
+    render(
+      <Tooltip.Provider>
+        <Card title="Billable lines" collapsible>
+          <Card.Content>
+            <button type="button">Add row</button>
+          </Card.Content>
+        </Card>
+      </Tooltip.Provider>,
+    );
+    const toggle = screen.getByRole('button', { name: 'Show or hide content' });
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByRole('button', { name: 'Add row' })).toBeNull();
+  });
+
+  it('shows skeletons while loading', () => {
+    render(
+      <Card title="Patients" loading>
+        <Card.Content>Real body</Card.Content>
+      </Card>,
+    );
+    expect(screen.queryByText('Real body')).toBeNull();
+    expect(document.querySelector('[data-slot="card-content"]')?.getAttribute('aria-busy')).toBe('true');
+    expect(document.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
+  });
+
+  it('tints the whole card by tone', () => {
+    render(<Card tone="success" data-testid="card" />);
+    const card = screen.getByTestId('card');
+    expect(card.dataset.tone).toBe('success');
+    expect(card.className).toContain('bg-success-subtle');
   });
 });

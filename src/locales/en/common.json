@@ -83,5 +83,8 @@
     "discardDescription": "Your changes on this form will be lost.",
     "discardConfirm": "Discard",
     "keepEditing": "Keep editing"
+  },
+  "card": {
+    "toggle": "Show or hide content"
   }
 }

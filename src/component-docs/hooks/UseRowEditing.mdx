@@ -12,9 +12,9 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-import { Button, IconButton } from '@components/ui';
+import { Button, Card, IconButton } from '@components/ui';
 import { DataTable } from '@components/tables';
-import { CollapsibleCard, ConfirmDialog } from '@components/shared';
+import { ConfirmDialog } from '@components/shared';
 import { FormContainer, FormInput, FormSelect } from '@components/forms';
 
 import { RowEditingProvider, useDataTable, useRowEditing, useRowEditingContext } from '@hooks/utils';
@@ -60,27 +60,24 @@ const { table } = useDataTable({
 return (
   <FormContainer formContext={form} onSuccess={handleSubmit}>
     <RowEditingProvider edit={edit}>
-      <CollapsibleCard>
-        <CollapsibleCard.Header>
-          <CollapsibleCard.Leading>
-            <FileCode2 className="text-primary size-5" />
-            <CollapsibleCard.Title>Billable Lines</CollapsibleCard.Title>
-          </CollapsibleCard.Leading>
+      <Card collapsible>
+        <Card.Header>
+          <Card.Title>
+            <FileCode2 className="text-fg-muted size-4" aria-hidden="true" />
+            Billable Lines
+          </Card.Title>
 
-          <div className="flex items-center gap-2">
+          <Card.Actions>
             <AddRowButton />
-            <CollapsibleCard.Trigger>
-              <CollapsibleCard.TriggerIcon />
-            </CollapsibleCard.Trigger>
-          </div>
-        </CollapsibleCard.Header>
+          </Card.Actions>
+        </Card.Header>
 
-        <CollapsibleCard.Content className="p-0">
+        <Card.Content className="p-0">
           <DataTable table={table}>
             <DataTable.Content className="rounded-t-none" emptyState={{ title: 'No lines' }} />
           </DataTable>
-        </CollapsibleCard.Content>
-      </CollapsibleCard>
+        </Card.Content>
+      </Card>
     </RowEditingProvider>
   </FormContainer>
 );
@@ -250,33 +247,27 @@ export const Demo = () => {
   return (
     <FormContainer formContext={form} onSuccess={(v) => console.log('submit', v)}>
       <RowEditingProvider edit={edit}>
-        <CollapsibleCard>
-          <CollapsibleCard.Header>
-            <CollapsibleCard.Leading>
-              <FileCode2 className="text-primary size-5" aria-hidden="true" />
+        <Card collapsible>
+          <Card.Header>
+            <Card.Title>
+              <FileCode2 className="text-fg-muted size-4" aria-hidden="true" />
+              Billable Lines
+            </Card.Title>
 
-              <CollapsibleCard.Title>Billable Lines</CollapsibleCard.Title>
-
-            </CollapsibleCard.Leading>
-
-            <div className="flex items-center gap-2">
+            <Card.Actions>
               <AddRowButton />
+            </Card.Actions>
+          </Card.Header>
 
-              <CollapsibleCard.Trigger>
-                <CollapsibleCard.TriggerIcon />
-              </CollapsibleCard.Trigger>
-            </div>
-          </CollapsibleCard.Header>
-
-          <CollapsibleCard.Content className="p-0">
+          <Card.Content className="p-0">
             <DataTable table={table}>
               <DataTable.Content
                 className="rounded-t-none"
                 emptyState={{ title: 'No lines yet', description: 'Click "Add diagnosis code" to start.' }}
               />
             </DataTable>
-          </CollapsibleCard.Content>
-        </CollapsibleCard>
+          </Card.Content>
+        </Card>
       </RowEditingProvider>
     </FormContainer>
   );

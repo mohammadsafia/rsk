@@ -37,13 +37,10 @@
     "legacy-color-name": 5
   },
   "src/component-docs/hooks/UseRowEditing.mdx": {
-    "legacy-color-name": 4
+    "legacy-color-name": 2
   },
   "src/component-docs/shared/BlankSlate.mdx": {
     "legacy-color-ramp": 11
-  },
-  "src/component-docs/shared/CollapsibleCard.mdx": {
-    "legacy-color-name": 6
   },
   "src/component-docs/shared/Conditional.mdx": {
     "legacy-color-name": 1
@@ -54,9 +51,6 @@
   "src/component-docs/shared/FileIcon.mdx": {
     "legacy-color-ramp": 4,
     "legacy-color-name": 1
-  },
-  "src/component-docs/shared/PrimeCard.mdx": {
-    "prime-component": 43
   },
   "src/component-docs/shared/PrimeLoader.mdx": {
     "prime-component": 4
@@ -122,10 +116,6 @@
     "legacy-color-ramp": 1,
     "legacy-color-name": 1
   },
-  "src/components/shared/collapsible-card/CollapsibleCard.tsx": {
-    "legacy-color-ramp": 21,
-    "legacy-color-name": 18
-  },
   "src/components/shared/faceted-filter/FacetedFilter.tsx": {
     "legacy-color-name": 3,
     "arbitrary-length": 4
@@ -147,9 +137,6 @@
   },
   "src/components/shared/meta-card/MetaCard.tsx": {
     "legacy-color-ramp": 1
-  },
-  "src/components/shared/prime-card/PrimeCard.tsx": {
-    "prime-component": 56
   },
   "src/components/shared/prime-loader/PrimeLoader.tsx": {
     "prime-component": 4,
