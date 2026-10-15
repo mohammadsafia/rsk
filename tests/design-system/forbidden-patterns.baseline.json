@@ -346,11 +346,6 @@
     "legacy-color-name": 11,
     "arbitrary-length": 2
   },
-  "src/components/ui/toast/Toast.tsx": {
-    "legacy-color-ramp": 4,
-    "legacy-color-name": 8,
-    "legacy-shadow": 1
-  },
   "src/layouts/auth-guard/AuthGuard.tsx": {
     "prime-component": 1
   },

@@ -1,22 +1,72 @@
 import { type ComponentPropsWithoutRef, createContext, type FC, useContext } from 'react';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 
+// !Direct import: toastVariants reads this at module load, before the ui barrel reaches ./popover
+import { floatingSurfaceClassName } from '@components/ui/popover/Popover';
+
+import { useAppTranslation } from '@hooks/shared';
+
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
-import { AlertCircle, CheckCircle2, Info, X, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info, X, XCircle } from 'lucide-react';
+
+export type ToastTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
+
+const viewportVariants = cva('fixed z-100 flex w-full flex-col gap-2 p-3 md:max-w-max', {
+  variants: {
+    position: {
+      'top-start': 'top-16 inset-s-0',
+      'top-center': 'top-16 inset-x-0 mx-auto',
+      'top-end': 'top-16 inset-e-0',
+      'bottom-start': 'bottom-0 inset-s-0',
+      'bottom-center': 'bottom-0 inset-x-0 mx-auto',
+      'bottom-end': 'bottom-0 inset-e-0',
+    },
+  },
+  defaultVariants: {
+    position: 'top-end',
+  },
+});
+
+const toastVariants = cva(
+  [
+    floatingSurfaceClassName,
+    'group pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden p-3 pe-10 md:w-96',
+    'data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-(--radix-toast-swipe-end-x) data-[swipe=move]:translate-x-(--radix-toast-swipe-move-x)',
+    'data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out',
+    'duration-base data-[state=closed]:fade-out-0 motion-reduce:data-[state=open]:slide-in-from-top-0 motion-reduce:data-[state=open]:slide-in-from-bottom-0',
+  ],
+  {
+    variants: {
+      position: {
+        'top-start': 'data-[state=open]:slide-in-from-top-2',
+        'top-center': 'data-[state=open]:slide-in-from-top-2',
+        'top-end': 'data-[state=open]:slide-in-from-top-2',
+        'bottom-start': 'data-[state=open]:slide-in-from-bottom-2',
+        'bottom-center': 'data-[state=open]:slide-in-from-bottom-2',
+        'bottom-end': 'data-[state=open]:slide-in-from-bottom-2',
+      },
+    },
+    defaultVariants: {
+      position: 'top-end',
+    },
+  },
+);
 
 export type ToastPosition = VariantProps<typeof viewportVariants>['position'];
 
-type ToastContextValue = VariantProps<typeof toastVariants>;
+export type ToastProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Root> & {
+  tone?: ToastTone;
+  position?: ToastPosition;
+};
 
 type ToastViewportProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport> & VariantProps<typeof viewportVariants>;
 type ToastTitleProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Title>;
 type ToastDescriptionProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Description>;
 type ToastCloseProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Close>;
-type ToastIconProps = Partial<VariantProps<typeof toastVariants>>;
+type ToastIconProps = { tone?: ToastTone };
 type ToastActionProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Action>;
-export type ToastProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Root> & VariantProps<typeof toastVariants>;
 
 type ToastComponent = FC<ToastProps> & {
   Provider: typeof ToastPrimitives.Provider;
@@ -28,122 +78,70 @@ type ToastComponent = FC<ToastProps> & {
   Action: FC<ToastActionProps>;
 };
 
-const viewportVariants = cva('fixed z-100 w-full md:max-w-max', {
-  variants: {
-    position: {
-      'top-start': 'top-20 inset-s-3',
-      'top-center': 'top-20 inset-s-1/2 -translate-x-1/2',
-      'top-end': 'top-20 inset-e-3',
-      'bottom-start': 'bottom-2 inset-s-3',
-      'bottom-center': 'bottom-2 inset-s-1/2 -translate-x-1/2',
-      'bottom-end': 'bottom-2 inset-e-3',
-    },
-  },
-  defaultVariants: {
-    position: 'top-end',
-  },
-});
+const ToastContext = createContext<{ tone: ToastTone }>({ tone: 'neutral' });
 
-const toastVariants = cva(
-  `
-    group pointer-events-auto relative flex w-full items-center justify-between overflow-hidden
-    rounded-md p-4 pe-10 shadow-boundary-ghost transition-all
-    data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)]
-    data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out
-    data-[state=closed]:fade-out-80
-  `,
-  {
-    variants: {
-      variant: {
-        default: 'bg-primary-400 text-primary-foreground',
-        success: 'bg-success-200 text-foreground',
-        destructive: 'bg-destructive-200 text-foreground',
-        warning: 'bg-warning-200 text-foreground',
-        info: 'bg-background text-foreground',
-      },
-      position: {
-        'top-start': 'data-[state=open]:slide-in-from-top-full data-[state=closed]:slide-out-to-start-full',
-        'top-center': 'data-[state=open]:slide-in-from-top-full data-[state=closed]:slide-out-to-top-full',
-        'top-end': 'data-[state=open]:slide-in-from-top-full data-[state=closed]:slide-out-to-end-full',
-        'bottom-start': 'data-[state=open]:slide-in-from-bottom-full data-[state=closed]:slide-out-to-start-full',
-        'bottom-center': 'data-[state=open]:slide-in-from-bottom-full data-[state=closed]:slide-out-to-bottom-full',
-        'bottom-end': 'data-[state=open]:slide-in-from-bottom-full data-[state=closed]:slide-out-to-end-full',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      position: 'top-end',
-    },
-  },
-);
+const TONE_ICON: Record<ToastTone, { Icon: typeof Info; className: string }> = {
+  neutral: { Icon: Info, className: 'text-fg-muted' },
+  info: { Icon: Info, className: 'text-info' },
+  success: { Icon: CheckCircle2, className: 'text-success' },
+  warning: { Icon: AlertTriangle, className: 'text-warning' },
+  danger: { Icon: XCircle, className: 'text-danger' },
+};
 
-const ToastContext = createContext<ToastContextValue>({ variant: 'default', position: 'top-end' });
-
-const ToastViewport = ({ className, position, ...props }: ToastViewportProps) => (
+const ToastViewport: FC<ToastViewportProps> = ({ className, position, ...props }) => (
   <ToastPrimitives.Viewport data-slot="toast-viewport" className={cn(viewportVariants({ position }), className)} {...props} />
 );
 
-const ToastTitle = ({ className, ...props }: ToastTitleProps) => (
-  <ToastPrimitives.Title data-slot="toast-title" className={cn('text-sm font-semibold', className)} {...props} />
+const ToastTitle: FC<ToastTitleProps> = ({ className, ...props }) => (
+  <ToastPrimitives.Title data-slot="toast-title" className={cn('text-fg text-sm font-semibold', className)} {...props} />
 );
 
-const ToastDescription = ({ className, ...props }: ToastDescriptionProps) => (
+const ToastDescription: FC<ToastDescriptionProps> = ({ className, ...props }) => (
   <ToastPrimitives.Description
     data-slot="toast-description"
-    className={cn('text-sm whitespace-pre-line opacity-90 select-text md:max-w-[30dvw]', className)}
+    className={cn('text-fg-muted text-sm whitespace-pre-line select-text', className)}
     {...props}
   />
 );
 
-const ToastClose = ({ className, ...props }: ToastCloseProps) => (
-  <ToastPrimitives.Close
-    aria-label="Close"
-    data-slot="toast-close"
-    className={cn(
-      'absolute inset-e-2 top-2 cursor-pointer rounded-md p-1 text-inherit opacity-0',
-      'transition-opacity group-hover:opacity-100 focus:opacity-100 focus:outline-none',
-      className,
-    )}
-    toast-close=""
-    {...props}
-  >
-    <X size={16} />
-  </ToastPrimitives.Close>
-);
+const ToastClose: FC<ToastCloseProps> = ({ className, ...props }) => {
+  const { t } = useAppTranslation('common');
 
-const ToastIcon: FC<ToastIconProps> = ({ variant }) => {
-  const context = useContext(ToastContext);
-
-  const resolvedVariant = variant ?? context.variant;
-  const iconClass = 'shrink-0 size-5';
-
-  switch (resolvedVariant) {
-    case 'success':
-      return <CheckCircle2 className={cn(iconClass, 'text-success')} />;
-    case 'destructive':
-      return <XCircle className={cn(iconClass, 'text-destructive')} />;
-    case 'warning':
-      return <AlertCircle className={cn(iconClass, 'text-warning')} />;
-    case 'info':
-      return <Info className={cn(iconClass, 'text-primary')} />;
-    default:
-      return <Info className={cn(iconClass, 'text-inherit')} />;
-  }
-};
-
-const ToastAction = ({ className, ...props }: ToastActionProps) => (
-  <ToastPrimitives.Action data-slot="toast-action" className={cn('ms-4', className)} {...props} />
-);
-
-const Toast: ToastComponent = ({ className, variant, position, children, ...props }: ToastProps) => {
   return (
-    <ToastContext.Provider value={{ variant, position }}>
-      <ToastPrimitives.Root data-slot="toast" className={cn('outline-none', toastVariants({ variant, position }), className)} {...props}>
-        {children}
-      </ToastPrimitives.Root>
-    </ToastContext.Provider>
+    <ToastPrimitives.Close
+      aria-label={t('close')}
+      data-slot="toast-close"
+      className={cn(
+        'focus-ring text-fg-muted hover:text-fg absolute end-2 top-2 cursor-pointer rounded-sm p-1',
+        'opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100',
+        className,
+      )}
+      toast-close=""
+      {...props}
+    >
+      <X size={16} aria-hidden="true" />
+    </ToastPrimitives.Close>
   );
 };
+
+const ToastIcon: FC<ToastIconProps> = ({ tone }) => {
+  const context = useContext(ToastContext);
+  const { Icon, className } = TONE_ICON[tone ?? context.tone];
+
+  return <Icon data-slot="toast-icon" aria-hidden="true" className={cn('mt-0.5 size-4 shrink-0', className)} />;
+};
+
+const ToastAction: FC<ToastActionProps> = ({ className, ...props }) => (
+  <ToastPrimitives.Action data-slot="toast-action" className={cn('ms-auto shrink-0', className)} {...props} />
+);
+
+const Toast: ToastComponent = ({ className, tone = 'neutral', position, children, ...props }) => (
+  <ToastContext.Provider value={{ tone }}>
+    <ToastPrimitives.Root data-slot="toast" data-tone={tone} className={cn(toastVariants({ position }), className)} {...props}>
+      {children}
+    </ToastPrimitives.Root>
+  </ToastContext.Provider>
+);
 
 Toast.Provider = ToastPrimitives.Provider;
 Toast.Viewport = ToastViewport;

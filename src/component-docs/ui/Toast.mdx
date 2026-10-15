@@ -3,7 +3,7 @@ id: toast
 title: Toast
 section: Components
 category: UI
-description: 'Notification toasts with multiple variants: default, success, and destructive.'
+description: 'Notification toasts on the raised surface. tone (neutral, info, success, warning, danger) colors only the icon; no tinted backgrounds.'
 tags: [ui, toast, notification]
 ---
 
@@ -33,20 +33,19 @@ const { toast } = useToast();
 toast({
   title: 'Default Toast',
   description: 'This is a default toast notification.',
-  variant: 'default',
 });
 
 // Success toast
 toast({
   title: 'Success!',
   description: 'Operation completed successfully.',
-  variant: 'success',
+  tone: 'success',
 });
 
 // Destructive toast
 toast({
   title: 'Error',
   description: 'Something went wrong.',
-  variant: 'destructive',
+  tone: 'danger',
 });
 ```

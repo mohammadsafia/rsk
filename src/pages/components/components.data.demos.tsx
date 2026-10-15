@@ -768,7 +768,6 @@ export function ToastDemo() {
     toast({
       title: 'Default Toast',
       description: 'This is a default toast notification.',
-      variant: 'default',
     });
   };
 
@@ -776,7 +775,7 @@ export function ToastDemo() {
     toast({
       title: 'Toast Info',
       description: 'Operation completed successfully.',
-      variant: 'success',
+      tone: 'success',
     });
   };
 
@@ -784,7 +783,7 @@ export function ToastDemo() {
     toast({
       title: 'Toast Error',
       description: 'Something went wrong. Please try again.',
-      variant: 'destructive',
+      tone: 'danger',
     });
   };
 
@@ -792,7 +791,7 @@ export function ToastDemo() {
     toast({
       title: 'Toast Warning',
       description: 'This action is irreversible. Please proceed with caution.',
-      variant: 'warning',
+      tone: 'warning',
     });
   };
 
@@ -800,7 +799,7 @@ export function ToastDemo() {
     toast({
       title: 'Toast Info',
       description: 'Your session is about to expire. Please save your work.',
-      variant: 'info',
+      tone: 'info',
     });
   };
 
@@ -808,7 +807,7 @@ export function ToastDemo() {
     toast({
       title: 'Toast with Action & position variant',
       description: 'Your session is about to expire. Please save your work.',
-      variant: 'info',
+      tone: 'info',
       action: (
         <Button variant="outline" size="sm" onClick={() => alert('Retrying...')}>
           Retry
@@ -822,7 +821,7 @@ export function ToastDemo() {
     toast({
       title: 'Toast bottom position',
       description: 'Something went wrong. Please try again.',
-      variant: 'destructive',
+      tone: 'danger',
       action: <h1>Retry again!</h1>,
       position: 'bottom-end',
     });
