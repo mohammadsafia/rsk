@@ -10,12 +10,8 @@ import { resolveFromRoot } from './path.js';
 let fmtOptionsPromise: Promise<FormatConfig> | undefined;
 
 function loadFmtOptions(): Promise<FormatConfig> {
-  fmtOptionsPromise ??= loadConfigFromFile(
-    { command: 'build', mode: 'production' },
-    resolveFromRoot('vite.config.ts'),
-  ).then((loaded) => {
-    const { ignorePatterns: _ignored, ...options } = ((loaded?.config as { fmt?: FormatConfig & { ignorePatterns?: string[] } })
-      ?.fmt ?? {});
+  fmtOptionsPromise ??= loadConfigFromFile({ command: 'build', mode: 'production' }, resolveFromRoot('vite.config.ts')).then((loaded) => {
+    const { ignorePatterns: _ignored, ...options } = (loaded?.config as { fmt?: FormatConfig & { ignorePatterns?: string[] } })?.fmt ?? {};
     return options;
   });
   return fmtOptionsPromise;

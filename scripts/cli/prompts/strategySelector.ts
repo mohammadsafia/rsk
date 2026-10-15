@@ -21,11 +21,7 @@ export async function selectEnumStrategy(): Promise<EnumStrategy> {
   });
 }
 
-type AdditionalOption =
-  | 'format'
-  | 'lint'
-  | 'dryRun'
-  | 'saveConfig';
+type AdditionalOption = 'format' | 'lint' | 'dryRun' | 'saveConfig';
 
 export type AdditionalOptions = {
   format: boolean;

@@ -15,7 +15,8 @@ export const chipVariants = cva(
         default: 'bg-primary-25 text-primary-700 hover:text-primary-foreground hover:bg-primary dark:hover:bg-primary-300',
         secondary: 'bg-secondary-25 text-foreground hover:text-secondary-foreground hover:bg-secondary-400',
         success: 'bg-success-200 text-success hover:text-success-foreground hover:bg-success',
-        destructive: 'bg-destructive-200 text-destructive hover:text-destructive-foreground hover:bg-destructive dark:hover:bg-destructive-400',
+        destructive:
+          'bg-destructive-200 text-destructive hover:text-destructive-foreground hover:bg-destructive dark:hover:bg-destructive-400',
         warning: 'bg-warning-200 text-foreground hover:text-warning-foreground hover:bg-warning-400',
         accent: 'bg-accent-200 text-accent-foreground hover:bg-accent-400',
         muted: 'bg-muted-200 text-foreground hover:bg-muted',

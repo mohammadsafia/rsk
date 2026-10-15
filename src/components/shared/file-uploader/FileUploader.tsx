@@ -196,7 +196,14 @@ const FileUploaderActions: FC<FileUploaderActionsProps> = ({ onDownload, clearab
       </Conditional.If>
 
       <Conditional.If condition={showClear}>
-        <TooltipButton asChild title={t('clear')} variant="ghost-muted-destructive" size="unstyled" type="button" onClick={() => onRemove(0)}>
+        <TooltipButton
+          asChild
+          title={t('clear')}
+          variant="ghost-muted-destructive"
+          size="unstyled"
+          type="button"
+          onClick={() => onRemove(0)}
+        >
           <XCircleIcon size={16} />
         </TooltipButton>
       </Conditional.If>

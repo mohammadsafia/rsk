@@ -43,7 +43,12 @@ function DashboardHeader() {
       {/* Right Section: Actions */}
       <div className="flex items-center gap-1">
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground relative h-9 w-9" aria-label={t('notifications')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-muted-foreground hover:text-foreground relative h-9 w-9"
+          aria-label={t('notifications')}
+        >
           <Bell className="h-4 w-4" />
         </Button>
 
@@ -67,9 +72,7 @@ function DashboardHeader() {
 
                 <Avatar.Fallback className="bg-primary/10 text-primary text-xs font-medium">
                   <Conditional>
-                    <Conditional.If condition={!!currentUser?.name}>
-                      {currentUser?.name?.charAt(0)?.toUpperCase()}
-                    </Conditional.If>
+                    <Conditional.If condition={!!currentUser?.name}>{currentUser?.name?.charAt(0)?.toUpperCase()}</Conditional.If>
 
                     <Conditional.Else>
                       <User className="h-3.5 w-3.5" />

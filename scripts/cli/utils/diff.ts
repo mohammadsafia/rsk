@@ -9,7 +9,7 @@ import { formatTs } from './format.js';
 export async function computeSchemaDiffs(
   schemas: Map<string, IRSchema>,
   outputDir: string,
-  enumStrategy: EnumStrategy
+  enumStrategy: EnumStrategy,
 ): Promise<Map<string, SchemaDiffResult>> {
   const registry = GeneratorRegistry.createDefault();
   const codeGen = new CodeGenerator(registry);

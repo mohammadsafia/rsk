@@ -19,9 +19,7 @@ export function createLintPlugin(): Plugin {
         if (!ctx.config.formatting.lint) return;
         if (ctx.config.dryRun) return;
 
-        const changedFiles = ctx.generatedFiles
-          .filter((f) => f.changed)
-          .map((f) => f.path);
+        const changedFiles = ctx.generatedFiles.filter((f) => f.changed).map((f) => f.path);
 
         if (changedFiles.length === 0) return;
 
@@ -30,9 +28,7 @@ export function createLintPlugin(): Plugin {
             cwd: getProjectRoot(),
           });
         } catch (error) {
-          logger.warn(
-            `Oxlint fix failed: ${error instanceof Error ? error.message : String(error)}`
-          );
+          logger.warn(`Oxlint fix failed: ${error instanceof Error ? error.message : String(error)}`);
         }
       },
     },

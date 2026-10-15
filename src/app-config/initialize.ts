@@ -3,7 +3,6 @@
  * This module provides structured initialization of all application services
  */
 
-
 /**
  * Types of initialization modules
  */
@@ -38,9 +37,7 @@ const initializers: Record<InitializationType, (() => void | Promise<void>) | un
 /**
  * Order of initialization - defines the sequence
  */
-const initializationOrder = [
-  InitializationType.CHUNK_RELOAD,
-];
+const initializationOrder = [InitializationType.CHUNK_RELOAD];
 
 /**
  * Main initialization function that orchestrates the initialization process

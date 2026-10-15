@@ -7,7 +7,11 @@ const REQUIRED_FRONTMATTER_KEYS = ['id', 'title', 'section', 'category', 'descri
 export const componentDocsErrors: string[] = [];
 
 export function normalizeCategoryKey(raw: string | undefined | null): string {
-  return String(raw ?? 'UI').trim().toUpperCase() || 'UI';
+  return (
+    String(raw ?? 'UI')
+      .trim()
+      .toUpperCase() || 'UI'
+  );
 }
 
 let mdxFrontmatter: Record<string, Frontmatter> | undefined;
@@ -50,7 +54,11 @@ function buildRegistry(): ReadonlyArray<ComponentDocEntry> {
     .map((path) => {
       const fm: Frontmatter = mdxFrontmatter[path] ?? {};
 
-      const idFromPath = path.split('/').pop()?.replace(/\.mdx$/, '') ?? path;
+      const idFromPath =
+        path
+          .split('/')
+          .pop()
+          ?.replace(/\.mdx$/, '') ?? path;
       const id = fm.id ?? idFromPath;
 
       const error = validateFrontmatter(path, id, fm);

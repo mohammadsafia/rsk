@@ -38,12 +38,8 @@ type SearchableCheckboxTheme = {
     searchTerm: (text: string) => string;
     resultCount: (text: string) => string;
     selectedCount: (text: string) => string;
-    renderSelectedChoices: <T>(
-      selectedChoices: ReadonlyArray<NormalizedChoice<T>>
-    ) => string;
-    keysHelpTip: (
-      keys: [key: string, action: string][]
-    ) => string | undefined;
+    renderSelectedChoices: <T>(selectedChoices: ReadonlyArray<NormalizedChoice<T>>) => string;
+    keysHelpTip: (keys: [key: string, action: string][]) => string | undefined;
   };
 };
 
@@ -82,23 +78,14 @@ const defaultTheme: SearchableCheckboxTheme = {
     searchTerm: (text: string) => chalk.cyan(text),
     resultCount: (text: string) => chalk.dim(text),
     selectedCount: (text: string) => chalk.yellow(text),
-    renderSelectedChoices: (selectedChoices) =>
-      selectedChoices.map((choice) => choice.short).join(', '),
-    keysHelpTip: (keys) =>
-      keys
-        .map(
-          ([key, action]) =>
-            `${chalk.bold(key)} ${chalk.dim(action)}`
-        )
-        .join(chalk.dim(' • ')),
+    renderSelectedChoices: (selectedChoices) => selectedChoices.map((choice) => choice.short).join(', '),
+    keysHelpTip: (keys) => keys.map(([key, action]) => `${chalk.bold(key)} ${chalk.dim(action)}`).join(chalk.dim(' • ')),
   },
 };
 
 // ── Helpers ────────────────────────────────────────────────────────
 
-function normalizeChoices<Value>(
-  choices: ReadonlyArray<Choice<Value> | string>
-): NormalizedChoice<Value>[] {
+function normalizeChoices<Value>(choices: ReadonlyArray<Choice<Value> | string>): NormalizedChoice<Value>[] {
   return choices.map((choice) => {
     if (typeof choice === 'string') {
       return {
@@ -126,10 +113,7 @@ type FilteredEntry<Value> = {
 
 // ── Prompt ─────────────────────────────────────────────────────────
 
-const searchableCheckbox = createPrompt<
-  string[],
-  SearchableCheckboxConfig<string>
->((config, done) => {
+const searchableCheckbox = createPrompt<string[], SearchableCheckboxConfig<string>>((config, done) => {
   const { pageSize = 15, required } = config;
   const theme = makeTheme<SearchableCheckboxTheme>(defaultTheme, config.theme);
 
@@ -148,9 +132,7 @@ const searchableCheckbox = createPrompt<
     }
 
     const term = searchTerm.toLowerCase();
-    return items
-      .map((item, i) => ({ item, originalIndex: i }))
-      .filter(({ item }) => item.name.toLowerCase().includes(term));
+    return items.map((item, i) => ({ item, originalIndex: i })).filter(({ item }) => item.name.toLowerCase().includes(term));
   }, [items, searchTerm]);
 
   // Reset active cursor when filtered list changes
@@ -161,10 +143,7 @@ const searchableCheckbox = createPrompt<
     }
   }
 
-  const selectedCount = useMemo(
-    () => items.filter((item) => item.checked).length,
-    [items]
-  );
+  const selectedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
 
   useKeypress((key, rl) => {
     if (isEnterKey(key)) {
@@ -203,13 +182,7 @@ const searchableCheckbox = createPrompt<
       if (!entry) return;
 
       setError(undefined);
-      setItems(
-        items.map((item, i) =>
-          i === entry.originalIndex
-            ? { ...item, checked: !item.checked }
-            : item
-        )
-      );
+      setItems(items.map((item, i) => (i === entry.originalIndex ? { ...item, checked: !item.checked } : item)));
       return;
     }
 
@@ -220,17 +193,9 @@ const searchableCheckbox = createPrompt<
 
       if (searchTerm) {
         // Toggle only filtered items
-        const filteredIndices = new Set(
-          filtered.map((f) => f.originalIndex)
-        );
+        const filteredIndices = new Set(filtered.map((f) => f.originalIndex));
         const selectFiltered = filtered.some(({ item }) => !item.checked);
-        setItems(
-          items.map((item, i) =>
-            filteredIndices.has(i)
-              ? { ...item, checked: selectFiltered }
-              : item
-          )
-        );
+        setItems(items.map((item, i) => (filteredIndices.has(i) ? { ...item, checked: selectFiltered } : item)));
       } else {
         // Toggle all items
         const selectAll = items.some((item) => !item.checked);
@@ -253,9 +218,7 @@ const searchableCheckbox = createPrompt<
 
   if (status === 'done') {
     const selection = items.filter((item) => item.checked);
-    const answer = theme.style.answer(
-      theme.style.renderSelectedChoices(selection)
-    );
+    const answer = theme.style.answer(theme.style.renderSelectedChoices(selection));
     return [prefix, message, answer].filter(Boolean).join(' ');
   }
 
@@ -268,9 +231,7 @@ const searchableCheckbox = createPrompt<
     renderItem({ item: entry, isActive }: { item: FilteredEntry<string>; isActive: boolean }) {
       const { item } = entry;
       const cursor = isActive ? theme.icon.cursor : ' ';
-      const checkbox = item.checked
-        ? theme.icon.checked
-        : theme.icon.unchecked;
+      const checkbox = item.checked ? theme.icon.checked : theme.icon.unchecked;
       const color = isActive ? theme.style.highlight : (x: string) => x;
       return color(`${cursor}${checkbox} ${item.name}`);
     },
@@ -278,19 +239,11 @@ const searchableCheckbox = createPrompt<
     loop: true,
   });
 
-  const selectedLine =
-    selectedCount > 0
-      ? theme.style.selectedCount(`  ${selectedCount} selected`)
-      : '';
+  const selectedLine = selectedCount > 0 ? theme.style.selectedCount(`  ${selectedCount} selected`) : '';
 
-  const countLine = theme.style.resultCount(
-    `  ${filtered.length} of ${items.length} schemas`
-  );
+  const countLine = theme.style.resultCount(`  ${filtered.length} of ${items.length} schemas`);
 
-  const noResults =
-    filtered.length === 0 && searchTerm
-      ? chalk.dim('  No schemas match your search')
-      : '';
+  const noResults = filtered.length === 0 && searchTerm ? chalk.dim('  No schemas match your search') : '';
 
   const keys: [string, string][] = [
     ['↑↓', 'navigate'],
@@ -300,15 +253,7 @@ const searchableCheckbox = createPrompt<
   ];
   const helpLine = theme.style.keysHelpTip(keys);
 
-  const body = [
-    selectedLine,
-    countLine,
-    '',
-    noResults || page,
-    '',
-    errorMsg ? theme.style.error(errorMsg) : '',
-    helpLine,
-  ]
+  const body = [selectedLine, countLine, '', noResults || page, '', errorMsg ? theme.style.error(errorMsg) : '', helpLine]
     .filter((line) => line !== undefined)
     .join('\n')
     .trimEnd();

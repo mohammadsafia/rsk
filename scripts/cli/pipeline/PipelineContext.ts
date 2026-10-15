@@ -2,13 +2,7 @@
  * PipelineContext — Shared mutable state passed through all pipeline steps.
  */
 
-import type {
-  DtoGenConfig,
-  IRSchema,
-  GeneratedFile,
-  PipelineStats,
-  OpenAPIDocument,
-} from '../types/index.js';
+import type { DtoGenConfig, IRSchema, GeneratedFile, PipelineStats, OpenAPIDocument } from '../types/index.js';
 
 export type PipelineContext = {
   config: DtoGenConfig;

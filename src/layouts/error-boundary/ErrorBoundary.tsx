@@ -15,7 +15,7 @@ function ErrorBoundary() {
   return (
     <div className="bg-background flex min-h-dvh items-center justify-center p-6 md:p-12">
       <div className="w-full max-w-lg text-center">
-        <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-destructive/10">
+        <div className="bg-destructive/10 mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-2xl">
           <AlertTriangle className="text-destructive h-8 w-8" strokeWidth={1.5} />
         </div>
 

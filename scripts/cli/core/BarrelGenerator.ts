@@ -13,13 +13,8 @@ export class BarrelGenerator {
   /**
    * Generate a barrel index.ts content from a list of schema names.
    */
-  generate(
-    schemas: IRSchema[],
-    enumStrategy: EnumStrategy
-  ): string {
-    const sortedSchemas = [...schemas].sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
+  generate(schemas: IRSchema[], enumStrategy: EnumStrategy): string {
+    const sortedSchemas = [...schemas].sort((a, b) => a.name.localeCompare(b.name));
 
     const exports = sortedSchemas.map((schema) => {
       // Enums use value export; types use type-only export
@@ -34,11 +29,7 @@ export class BarrelGenerator {
   /**
    * Generate a barrel for a list of filenames (without reading IR).
    */
-  generateFromFilenames(
-    filenames: string[],
-    enumStrategy: EnumStrategy,
-    enumNames: Set<string> = new Set()
-  ): string {
+  generateFromFilenames(filenames: string[], enumStrategy: EnumStrategy, enumNames: Set<string> = new Set()): string {
     const sorted = [...filenames].sort();
 
     const exports = sorted.map((name) => {

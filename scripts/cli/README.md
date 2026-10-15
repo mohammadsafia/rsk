@@ -24,13 +24,13 @@ npm run dto:clean
 
 ## npm Scripts
 
-| Script | Description |
-|---|---|
-| `npm run dto:gen` | Interactive diff-aware mode (prompts for version, schemas, strategy) |
-| `npm run dto:list` | List available schemas with kinds and property counts |
-| `npm run dto:diff` | Show diff between BE schemas and local files |
-| `npm run dto:init` | Create a `.dto-gen.json` config file |
-| `npm run dto:clean` | Delete orphaned local files not in BE swagger and create manifest |
+| Script              | Description                                                          |
+| ------------------- | -------------------------------------------------------------------- |
+| `npm run dto:gen`   | Interactive diff-aware mode (prompts for version, schemas, strategy) |
+| `npm run dto:list`  | List available schemas with kinds and property counts                |
+| `npm run dto:diff`  | Show diff between BE schemas and local files                         |
+| `npm run dto:init`  | Create a `.dto-gen.json` config file                                 |
+| `npm run dto:clean` | Delete orphaned local files not in BE swagger and create manifest    |
 
 ---
 
@@ -44,15 +44,15 @@ Generate DTOs from Swagger specs.
 dto-gen generate [options]
 ```
 
-| Flag | Description | Default |
-|---|---|---|
-| `-i, --interactive` | Launch interactive mode with prompts | `false` |
-| `-c, --config <path>` | Path to config file | `.dto-gen.json` |
-| `-v, --version <version>` | API version to generate (`v1`, `v2`, `all`) | `all` |
-| `-s, --schemas <schemas>` | Comma-separated schema names to generate | all schemas |
-| `-e, --enum-strategy <strategy>` | `type-literal` or `enum` | `type-literal` |
-| `--diff` | Pre-compute diff and show status badges in interactive selection | `false` |
-| `--dry-run` | Preview changes without writing files | `false` |
+| Flag                             | Description                                                      | Default         |
+| -------------------------------- | ---------------------------------------------------------------- | --------------- |
+| `-i, --interactive`              | Launch interactive mode with prompts                             | `false`         |
+| `-c, --config <path>`            | Path to config file                                              | `.dto-gen.json` |
+| `-v, --version <version>`        | API version to generate (`v1`, `v2`, `all`)                      | `all`           |
+| `-s, --schemas <schemas>`        | Comma-separated schema names to generate                         | all schemas     |
+| `-e, --enum-strategy <strategy>` | `type-literal` or `enum`                                         | `type-literal`  |
+| `--diff`                         | Pre-compute diff and show status badges in interactive selection | `false`         |
+| `--dry-run`                      | Preview changes without writing files                            | `false`         |
 
 ### `list` (alias: `ls`)
 
@@ -62,11 +62,11 @@ List available schemas from Swagger.
 dto-gen list [options]
 ```
 
-| Flag | Description | Default |
-|---|---|---|
-| `-v, --version <version>` | API version (`v1`, `v2`, `all`) | `all` |
-| `--json` | Output as JSON | `false` |
-| `--diff` | Show diff status per schema (`new`, `updated`, `unchanged`) | `false` |
+| Flag                      | Description                                                 | Default |
+| ------------------------- | ----------------------------------------------------------- | ------- |
+| `-v, --version <version>` | API version (`v1`, `v2`, `all`)                             | `all`   |
+| `--json`                  | Output as JSON                                              | `false` |
+| `--diff`                  | Show diff status per schema (`new`, `updated`, `unchanged`) | `false` |
 
 ### `clean`
 
@@ -76,10 +76,10 @@ Delete local model files that are not present in the BE swagger spec. Creates a 
 dto-gen clean [options]
 ```
 
-| Flag | Description | Default |
-|---|---|---|
-| `-v, --version <version>` | API version (`v1`, `v2`, `all`) | `all` |
-| `--dry-run` | Preview deletions without modifying files | `false` |
+| Flag                      | Description                               | Default |
+| ------------------------- | ----------------------------------------- | ------- |
+| `-v, --version <version>` | API version (`v1`, `v2`, `all`)           | `all`   |
+| `--dry-run`               | Preview deletions without modifying files | `false` |
 
 ### `init`
 
@@ -89,8 +89,8 @@ Initialize a `.dto-gen.json` config file in the project root.
 dto-gen init [options]
 ```
 
-| Flag | Description | Default |
-|---|---|---|
+| Flag          | Description               | Default |
+| ------------- | ------------------------- | ------- |
 | `-f, --force` | Overwrite existing config | `false` |
 
 ---
@@ -106,6 +106,7 @@ npm run dto:gen
 ```
 
 Schemas are labeled with diff status badges:
+
 - `[new]` — exists in BE but no local file
 - `[updated]` — local file differs from BE schema
 - `(no diff)` — local file matches BE schema
@@ -172,11 +173,13 @@ npx tsx scripts/cli/bin-cli/dto-gen.ts list --json
 The `--diff` flag compares what the generator would produce against what exists on disk. It uses Oxfmt formatting (with the `fmt` options from `vite.config.ts`) on the generated content and blank-line-insensitive comparison to avoid false positives from cosmetic formatting differences.
 
 Statuses:
+
 - **new** — schema exists in BE swagger but no corresponding local `.ts` file
 - **updated** — local file content differs from what the generator would produce
 - **unchanged** — local file matches the generated output
 
 The diff is available in two places:
+
 1. `dto:diff` (`list --diff`) — standalone diff report
 2. `dto:gen` (`generate --diff -i`) — badges shown in the interactive schema picker
 
@@ -287,31 +290,31 @@ The tool reads `.dto-gen.json` from the project root. Run `npm run dto:init` to 
     {
       "name": "v1",
       "url": "https://dev-api.qlinica.app/med-legal/swagger/v1/swagger.json",
-      "outputDir": "src/types/api"
+      "outputDir": "src/types/api",
     },
     {
       "name": "v2",
       "url": "https://dev-api.qlinica.app/med-legal/swagger/v2/swagger.json",
-      "outputDir": "src/types/api-v2"
-    }
+      "outputDir": "src/types/api-v2",
+    },
   ],
-  "enumStrategy": "type-literal",   // "type-literal" | "enum"
+  "enumStrategy": "type-literal", // "type-literal" | "enum"
   "formatting": {
-    "format": true,                  // Run Oxfmt on generated files
-    "lint": true                     // Run Oxlint --fix (vp lint) on generated files
-  }
+    "format": true, // Run Oxfmt on generated files
+    "lint": true, // Run Oxlint --fix (vp lint) on generated files
+  },
 }
 ```
 
-| Field | Type | Description |
-|---|---|---|
-| `endpoints` | `SwaggerEndpoint[]` | Swagger JSON URLs and output directories |
-| `endpoints[].name` | `string` | Label used for version filtering (`v1`, `v2`, etc.) |
-| `endpoints[].url` | `string` | Full URL to the `swagger.json` |
-| `endpoints[].outputDir` | `string` | Output directory relative to project root |
-| `enumStrategy` | `"type-literal" \| "enum"` | How to generate enum-like schemas |
-| `formatting.format` | `boolean` | Run Oxfmt after generation (legacy key: `prettier`) |
-| `formatting.lint` | `boolean` | Run Oxlint `--fix` after writing (legacy key: `eslint`) |
+| Field                   | Type                       | Description                                             |
+| ----------------------- | -------------------------- | ------------------------------------------------------- |
+| `endpoints`             | `SwaggerEndpoint[]`        | Swagger JSON URLs and output directories                |
+| `endpoints[].name`      | `string`                   | Label used for version filtering (`v1`, `v2`, etc.)     |
+| `endpoints[].url`       | `string`                   | Full URL to the `swagger.json`                          |
+| `endpoints[].outputDir` | `string`                   | Output directory relative to project root               |
+| `enumStrategy`          | `"type-literal" \| "enum"` | How to generate enum-like schemas                       |
+| `formatting.format`     | `boolean`                  | Run Oxfmt after generation (legacy key: `prettier`)     |
+| `formatting.lint`       | `boolean`                  | Run Oxlint `--fix` after writing (legacy key: `eslint`) |
 
 ---
 
@@ -323,28 +326,28 @@ The tool uses a **pipeline pattern** with seven sequential steps. Each step tran
 Fetch ─> Parse ─> Filter ─> Resolve ─> Generate ─> Format ─> Write
 ```
 
-| Step | Responsibility |
-|---|---|
-| **Fetch** | Downloads Swagger JSON from configured endpoints |
-| **Parse** | Converts OpenAPI schemas into an Intermediate Representation (IR) using a Visitor pattern |
-| **Filter** | Narrows schemas to the user's selection (or keeps all) |
-| **Resolve** | BFS over `$ref` imports to auto-include transitive dependencies |
-| **Generate** | Dispatches each IR schema to the correct generator via the Registry pattern |
-| **Format** | Runs Oxfmt on generated code (Oxlint runs as a post-write plugin) |
-| **Write** | Writes files to disk with hash-based change detection, updates manifest, auto-deletes orphans |
+| Step         | Responsibility                                                                                |
+| ------------ | --------------------------------------------------------------------------------------------- |
+| **Fetch**    | Downloads Swagger JSON from configured endpoints                                              |
+| **Parse**    | Converts OpenAPI schemas into an Intermediate Representation (IR) using a Visitor pattern     |
+| **Filter**   | Narrows schemas to the user's selection (or keeps all)                                        |
+| **Resolve**  | BFS over `$ref` imports to auto-include transitive dependencies                               |
+| **Generate** | Dispatches each IR schema to the correct generator via the Registry pattern                   |
+| **Format**   | Runs Oxfmt on generated code (Oxlint runs as a post-write plugin)                             |
+| **Write**    | Writes files to disk with hash-based change detection, updates manifest, auto-deletes orphans |
 
 ### Design Patterns
 
-| Pattern | Where |
-|---|---|
-| **Pipeline / Middleware** | `Pipeline.ts` orchestrates steps with before/after hooks |
-| **Visitor** | `SchemaVisitor.ts` + `SchemaParser.ts` traverse OpenAPI nodes |
-| **Strategy** | `DtoGenerator`, `EnumGenerator`, `TypeLiteralGenerator` are swappable strategies |
-| **Registry** | `GeneratorRegistry.ts` maps schema kinds to generators |
-| **Plugin + Hooks** | `PluginManager.ts` runs lifecycle hooks (`beforeFetch`, `afterGenerate`, etc.) |
-| **Builder** | `BarrelGenerator.ts` constructs `index.ts` barrel exports |
-| **IR (Intermediate Representation)** | `ir.ts` decouples OpenAPI schema from output format |
-| **Template** | Handlebars `.hbs` files for code generation |
+| Pattern                              | Where                                                                            |
+| ------------------------------------ | -------------------------------------------------------------------------------- |
+| **Pipeline / Middleware**            | `Pipeline.ts` orchestrates steps with before/after hooks                         |
+| **Visitor**                          | `SchemaVisitor.ts` + `SchemaParser.ts` traverse OpenAPI nodes                    |
+| **Strategy**                         | `DtoGenerator`, `EnumGenerator`, `TypeLiteralGenerator` are swappable strategies |
+| **Registry**                         | `GeneratorRegistry.ts` maps schema kinds to generators                           |
+| **Plugin + Hooks**                   | `PluginManager.ts` runs lifecycle hooks (`beforeFetch`, `afterGenerate`, etc.)   |
+| **Builder**                          | `BarrelGenerator.ts` constructs `index.ts` barrel exports                        |
+| **IR (Intermediate Representation)** | `ir.ts` decouples OpenAPI schema from output format                              |
+| **Template**                         | Handlebars `.hbs` files for code generation                                      |
 
 ---
 

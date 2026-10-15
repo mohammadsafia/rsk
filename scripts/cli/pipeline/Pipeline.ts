@@ -88,9 +88,7 @@ export class Pipeline {
       rows.push(['Files skipped (untracked)', ctx.stats.filesSkippedUntracked]);
     }
 
-    rows.push(
-      ['Duration', `${(ctx.stats.durationMs / 1000).toFixed(2)}s`],
-    );
+    rows.push(['Duration', `${(ctx.stats.durationMs / 1000).toFixed(2)}s`]);
 
     logger.table(rows);
     logger.blank();

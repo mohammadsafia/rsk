@@ -10,14 +10,14 @@ RSK is built on five architectural pillars. Every decision — from folder struc
 
 ### Component Hierarchy
 
-| Tier   | Location                      | Purpose                              |
-|--------|-------------------------------|--------------------------------------|
-| Pages  | `src/pages/`                  | Route-level components; logic lives here |
-| Views  | `src/views/<feature>/`        | Reusable across 2+ pages             |
-| Shared | `src/components/shared/`      | Compound pattern                     |
-| UI     | `src/components/ui/`          | Radix primitives + CVA               |
-| Forms  | `src/components/forms/`       | React Hook Form wrappers             |
-| Tables | `src/components/tables/`      | TanStack wrappers                    |
+| Tier   | Location                 | Purpose                                  |
+| ------ | ------------------------ | ---------------------------------------- |
+| Pages  | `src/pages/`             | Route-level components; logic lives here |
+| Views  | `src/views/<feature>/`   | Reusable across 2+ pages                 |
+| Shared | `src/components/shared/` | Compound pattern                         |
+| UI     | `src/components/ui/`     | Radix primitives + CVA                   |
+| Forms  | `src/components/forms/`  | React Hook Form wrappers                 |
+| Tables | `src/components/tables/` | TanStack wrappers                        |
 
 Shared components follow the compound component pattern: every sub-component accepts a `className` prop, uses `cn()` for class merging, spreads `...props` to the underlying element, and adds a `data-slot` attribute to enable parent-driven styling without prop drilling.
 
@@ -42,13 +42,13 @@ Flow: `ApiEndpoints.ts` → `handlers/` → `hooks/queries/` & `hooks/mutations/
 
 DTO naming conventions:
 
-| Suffix          | Usage                        |
-|-----------------|------------------------------|
-| `ForReadDto`    | GET responses                |
-| `ForCreateDto`  | POST payloads                |
-| `ForUpdateDto`  | PUT/PATCH payloads           |
-| `ListDto`       | Item shape inside a list     |
-| `ParamsDto`     | Query string parameters      |
+| Suffix         | Usage                    |
+| -------------- | ------------------------ |
+| `ForReadDto`   | GET responses            |
+| `ForCreateDto` | POST payloads            |
+| `ForUpdateDto` | PUT/PATCH payloads       |
+| `ListDto`      | Item shape inside a list |
+| `ParamsDto`    | Query string parameters  |
 
 Key rules: `queryKey` is a plain `string`, not an array. Every handler response is fully typed — `any` is not permitted.
 
@@ -64,11 +64,11 @@ RSK uses the OKLCH color space with a warm earth palette centered on hue 55–65
 
 ### Routing & Layouts
 
-| Zone      | Layout            | Guard                         | Purpose                            |
-|-----------|-------------------|-------------------------------|------------------------------------|
-| Public    | None              | None                          | Landing page, public content       |
-| Auth      | `AuthLayout`      | Redirects if authenticated    | Login, register                    |
-| Protected | `DashboardLayout` | `AuthGuard`                   | Dashboard, components, settings    |
+| Zone      | Layout            | Guard                      | Purpose                         |
+| --------- | ----------------- | -------------------------- | ------------------------------- |
+| Public    | None              | None                       | Landing page, public content    |
+| Auth      | `AuthLayout`      | Redirects if authenticated | Login, register                 |
+| Protected | `DashboardLayout` | `AuthGuard`                | Dashboard, components, settings |
 
 All page components are code-split with `React.lazy` + `Suspense`. Route constants live in `FULL_ROUTES_PATH` and the sidebar navigation is driven by `APP_MENU`, where each entry carries a Lucide icon (`LayoutDashboard`, `Component`, `Settings`).
 
@@ -87,18 +87,18 @@ All page components are code-split with `React.lazy` + `Suspense`. Route constan
 
 ## Tech Stack
 
-| Domain        | Stack                                                              |
-|---------------|--------------------------------------------------------------------|
-| Core          | React, TypeScript, Vite (SWC), Tailwind CSS                       |
-| UI Primitives | Radix UI (15+ primitives), CVA, lucide-react                      |
-| Forms         | React Hook Form + Zod + 18 form components                        |
-| Data          | TanStack React Query + React Table, Axios                         |
-| State         | MobX (client state), React Query (server state)                   |
-| Auth          | OIDC (Microsoft), AuthGuard HOC                                   |
-| i18n          | i18next with browser detection                                    |
-| Monitoring    | Sentry (error tracking), Firebase (push notifications)            |
-| Docs          | MDX + rehype-pretty-code + Shiki (component gallery)              |
-| Tooling       | Vite+ (`vp`: Vite, Rolldown, Vitest, Oxlint, Oxfmt), DTO CLI      |
+| Domain        | Stack                                                        |
+| ------------- | ------------------------------------------------------------ |
+| Core          | React, TypeScript, Vite (SWC), Tailwind CSS                  |
+| UI Primitives | Radix UI (15+ primitives), CVA, lucide-react                 |
+| Forms         | React Hook Form + Zod + 18 form components                   |
+| Data          | TanStack React Query + React Table, Axios                    |
+| State         | MobX (client state), React Query (server state)              |
+| Auth          | OIDC (Microsoft), AuthGuard HOC                              |
+| i18n          | i18next with browser detection                               |
+| Monitoring    | Sentry (error tracking), Firebase (push notifications)       |
+| Docs          | MDX + rehype-pretty-code + Shiki (component gallery)         |
+| Tooling       | Vite+ (`vp`: Vite, Rolldown, Vitest, Oxlint, Oxfmt), DTO CLI |
 
 ---
 
@@ -170,10 +170,7 @@ const TaskCategoryForm = ({ initialCategory }: TaskCategoryFormProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   // 6. Computed values
-  const activeCategories = useMemo(
-    () => TASK_CATEGORIES.filter((c) => c.isActive),
-    [],
-  );
+  const activeCategories = useMemo(() => TASK_CATEGORIES.filter((c) => c.isActive), []);
 
   // 7. Callbacks (handle* prefix)
   const handleSubmit = (data: TaskCategory) => {
@@ -262,23 +259,23 @@ Opens on http://localhost:3000.
 
 ### Scripts
 
-| Command           | Description                                                     |
-|-------------------|-----------------------------------------------------------------|
-| `pnpm dev`        | Start the Vite development server                               |
-| `pnpm build`      | Type-check and build for production                             |
-| `pnpm build:dev`  | Build with the development mode flag                            |
-| `pnpm preview`    | Serve the production build locally                              |
-| `pnpm test`       | Run the Vitest test suite                                       |
-| `pnpm lint`       | Lint the codebase with Oxlint (type-aware)                      |
-| `vp check`        | Format check (Oxfmt), lint, and type-check in one pass          |
-| `vp fmt`          | Format the codebase with Oxfmt                                  |
-| `pnpm dto:gen`    | Interactive DTO generation with diff badges                     |
-| `pnpm dto:list`   | List all tracked schemas in the manifest                        |
-| `pnpm dto:diff`   | Show schemas that have changed since last generation            |
-| `pnpm dto:clean`  | Remove orphaned generated files and update the manifest         |
-| `pnpm dto:init`   | Scaffold the `.dto-gen.json` configuration file                 |
-| `pnpm docs:new`   | Scaffold a new MDX component documentation file                 |
-| `pnpm docs:lint`  | Validate completeness of component documentation                |
+| Command          | Description                                             |
+| ---------------- | ------------------------------------------------------- |
+| `pnpm dev`       | Start the Vite development server                       |
+| `pnpm build`     | Type-check and build for production                     |
+| `pnpm build:dev` | Build with the development mode flag                    |
+| `pnpm preview`   | Serve the production build locally                      |
+| `pnpm test`      | Run the Vitest test suite                               |
+| `pnpm lint`      | Lint the codebase with Oxlint (type-aware)              |
+| `vp check`       | Format check (Oxfmt), lint, and type-check in one pass  |
+| `vp fmt`         | Format the codebase with Oxfmt                          |
+| `pnpm dto:gen`   | Interactive DTO generation with diff badges             |
+| `pnpm dto:list`  | List all tracked schemas in the manifest                |
+| `pnpm dto:diff`  | Show schemas that have changed since last generation    |
+| `pnpm dto:clean` | Remove orphaned generated files and update the manifest |
+| `pnpm dto:init`  | Scaffold the `.dto-gen.json` configuration file         |
+| `pnpm docs:new`  | Scaffold a new MDX component documentation file         |
+| `pnpm docs:lint` | Validate completeness of component documentation        |
 
 ### Important Notes
 
@@ -309,19 +306,20 @@ The DTO generator runs a seven-step pipeline for each generation:
 **Fetch → Parse → Filter → Resolve → Generate → Format → Write**
 
 Features:
+
 - Interactive schema selection with real-time diff badges showing what has changed
 - Auto-dependency resolution via BFS — selecting a schema automatically includes all referenced schemas
 - Flexible enum strategies — generate as TypeScript `type` literals or native `enum` declarations
 - Manifest tracking — the generator records every generated file and automatically removes orphans on clean
 - Post-generation formatting with Oxfmt and Oxlint (via Vite+) to ensure generated files match project standards
 
-| Command           | Description                                                     |
-|-------------------|-----------------------------------------------------------------|
-| `pnpm dto:gen`    | Run interactive DTO generation with diff badges                 |
-| `pnpm dto:list`   | List all schemas currently tracked in the manifest              |
-| `pnpm dto:diff`   | Show which tracked schemas have upstream changes                |
-| `pnpm dto:clean`  | Delete orphaned generated files and sync the manifest           |
-| `pnpm dto:init`   | Scaffold `.dto-gen.json` with a guided setup prompt             |
+| Command          | Description                                           |
+| ---------------- | ----------------------------------------------------- |
+| `pnpm dto:gen`   | Run interactive DTO generation with diff badges       |
+| `pnpm dto:list`  | List all schemas currently tracked in the manifest    |
+| `pnpm dto:diff`  | Show which tracked schemas have upstream changes      |
+| `pnpm dto:clean` | Delete orphaned generated files and sync the manifest |
+| `pnpm dto:init`  | Scaffold `.dto-gen.json` with a guided setup prompt   |
 
 ### Component Docs
 
@@ -343,14 +341,14 @@ The interactive CLI prompts for category, component id (kebab-case), description
 
 **MDX frontmatter** (all 5 fields required):
 
-| Field | Example |
-|-------|---------|
-| `id` | `alert` (kebab-case, unique) |
-| `title` | `Alert` |
-| `section` | `Components` (always) |
-| `category` | `UI` (must match folder name) |
+| Field         | Example                                                      |
+| ------------- | ------------------------------------------------------------ |
+| `id`          | `alert` (kebab-case, unique)                                 |
+| `title`       | `Alert`                                                      |
+| `section`     | `Components` (always)                                        |
+| `category`    | `UI` (must match folder name)                                |
 | `description` | `Display important messages with different severity levels.` |
-| `tags` | `[ui, alert, feedback]` (optional, auto-generated by CLI) |
+| `tags`        | `[ui, alert, feedback]` (optional, auto-generated by CLI)    |
 
 **MDX sections:** Each doc includes a `## Demo` section with live JSX, a `## Imports` section with the import statement, and a `## Code` section with usage examples. See any file under `src/component-docs/ui/` for reference.
 

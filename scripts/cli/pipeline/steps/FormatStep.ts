@@ -16,9 +16,7 @@ export function createFormatStep(): PipelineStep {
         return;
       }
 
-      const spinner = logger.spinner(
-        `Formatting ${ctx.generatedFiles.length} file(s) with Oxfmt...`
-      );
+      const spinner = logger.spinner(`Formatting ${ctx.generatedFiles.length} file(s) with Oxfmt...`);
 
       try {
         for (const file of ctx.generatedFiles) {
@@ -28,9 +26,7 @@ export function createFormatStep(): PipelineStep {
         spinner.succeed('Files formatted with Oxfmt.');
       } catch (error) {
         spinner.fail('Oxfmt formatting failed.');
-        logger.warn(
-          `Oxfmt error: ${error instanceof Error ? error.message : String(error)}`
-        );
+        logger.warn(`Oxfmt error: ${error instanceof Error ? error.message : String(error)}`);
       }
     },
   };

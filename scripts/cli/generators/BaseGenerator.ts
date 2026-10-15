@@ -31,10 +31,7 @@ export abstract class BaseGenerator {
   /**
    * Render a Handlebars template by name.
    */
-  protected renderTemplate(
-    templateName: string,
-    data: Record<string, unknown>
-  ): string {
+  protected renderTemplate(templateName: string, data: Record<string, unknown>): string {
     const template = this.loadTemplate(templateName);
     return template({ ...data, fileHeader: FILE_HEADER });
   }

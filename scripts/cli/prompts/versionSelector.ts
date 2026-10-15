@@ -5,9 +5,7 @@
 import { checkbox } from '@inquirer/prompts';
 import type { SwaggerEndpoint } from '../types/index.js';
 
-export async function selectVersions(
-  endpoints: SwaggerEndpoint[]
-): Promise<SwaggerEndpoint[]> {
+export async function selectVersions(endpoints: SwaggerEndpoint[]): Promise<SwaggerEndpoint[]> {
   const selected = await checkbox({
     message: 'Select API version(s) to generate:',
     choices: endpoints.map((ep) => ({

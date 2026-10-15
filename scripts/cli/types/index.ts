@@ -8,12 +8,6 @@ export type {
   ListCommandOptions,
   CleanCommandOptions,
 } from './config.js';
-export type {
-  GeneratorOptions,
-  GeneratorResult,
-  GeneratedFile,
-  PipelineStats,
-  GeneratorEntry,
-} from './generator.js';
+export type { GeneratorOptions, GeneratorResult, GeneratedFile, PipelineStats, GeneratorEntry } from './generator.js';
 export type { OpenAPIDocument, OpenAPISchemaObject } from './openapi.js';
 export type { DiffStatus, DiffLine, SchemaDiffResult } from './diff.js';

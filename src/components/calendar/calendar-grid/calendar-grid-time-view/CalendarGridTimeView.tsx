@@ -319,7 +319,7 @@ const DayView: FC = () => {
     <div data-slot="calendar-grid-day-view" className="flex min-h-0 flex-1 flex-col">
       <div
         data-slot="calendar-grid-header-row"
-        className="flex shrink-0 overflow-y-scroll [scrollbar-color:var(--color-muted-50)_var(--color-muted-50)] [scrollbar-gutter:stable] [scrollbar-width:thin]"
+        className="flex shrink-0 [scrollbar-width:thin] [scrollbar-color:var(--color-muted-50)_var(--color-muted-50)] [scrollbar-gutter:stable] overflow-y-scroll"
       >
         <CalendarTimeGrid.Spacer />
 
@@ -328,7 +328,7 @@ const DayView: FC = () => {
 
       <div
         data-slot="calendar-grid-body-row"
-        className="flex min-h-128 flex-1 overflow-y-auto [scrollbar-color:var(--color-muted-200)_transparent] [scrollbar-gutter:stable] [scrollbar-width:thin]"
+        className="flex min-h-128 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--color-muted-200)_transparent] [scrollbar-gutter:stable] overflow-y-auto"
       >
         <TimeAxis />
 
@@ -362,7 +362,7 @@ const WeekView: FC = () => {
     <div data-slot="calendar-grid-week-view" className="flex min-h-0 flex-1 flex-col">
       <div
         data-slot="calendar-grid-header-row"
-        className="flex shrink-0 overflow-y-scroll [scrollbar-color:var(--color-muted-50)_var(--color-muted-50)] [scrollbar-gutter:stable] [scrollbar-width:thin]"
+        className="flex shrink-0 [scrollbar-width:thin] [scrollbar-color:var(--color-muted-50)_var(--color-muted-50)] [scrollbar-gutter:stable] overflow-y-scroll"
       >
         <CalendarTimeGrid.Spacer />
 
@@ -375,7 +375,7 @@ const WeekView: FC = () => {
 
       <div
         data-slot="calendar-grid-body-row"
-        className="flex min-h-128 flex-1 overflow-y-auto [scrollbar-color:var(--color-muted-200)_transparent] [scrollbar-gutter:stable] [scrollbar-width:thin]"
+        className="flex min-h-128 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--color-muted-200)_transparent] [scrollbar-gutter:stable] overflow-y-auto"
       >
         <TimeAxis />
 

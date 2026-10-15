@@ -18,9 +18,7 @@ export async function listCommand(options: ListCommandOptions): Promise<void> {
     }
 
     for (const endpoint of endpoints) {
-      const spinner = logger.spinner(
-        `Fetching schemas from ${endpoint.name}...`
-      );
+      const spinner = logger.spinner(`Fetching schemas from ${endpoint.name}...`);
 
       const doc = await fetcher.fetch(endpoint.url);
       const schemas = parser.parse(doc);
@@ -33,9 +31,7 @@ export async function listCommand(options: ListCommandOptions): Promise<void> {
 
       logger.heading(`${endpoint.name} (${schemas.size} schemas)`);
 
-      const sorted = Array.from(schemas.entries()).sort(([a], [b]) =>
-        a.localeCompare(b)
-      );
+      const sorted = Array.from(schemas.entries()).sort(([a], [b]) => a.localeCompare(b));
 
       if (options.json) {
         const jsonOutput = sorted.map(([name, schema]) => ({
@@ -54,11 +50,7 @@ export async function listCommand(options: ListCommandOptions): Promise<void> {
 
       for (const [name, schema] of sorted) {
         const kindLabel =
-          schema.kind === 'enum'
-            ? chalk.yellow('[enum]  ')
-            : schema.kind === 'alias'
-              ? chalk.blue('[alias] ')
-              : chalk.green('[dto]   ');
+          schema.kind === 'enum' ? chalk.yellow('[enum]  ') : schema.kind === 'alias' ? chalk.blue('[alias] ') : chalk.green('[dto]   ');
 
         const detail =
           schema.kind === 'enum'
@@ -83,9 +75,7 @@ export async function listCommand(options: ListCommandOptions): Promise<void> {
       ]);
     }
   } catch (error) {
-    logger.error(
-      error instanceof Error ? error.message : String(error)
-    );
+    logger.error(error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
@@ -94,7 +84,7 @@ async function renderDiffMode(
   schemas: Map<string, import('../types/index.js').IRSchema>,
   outputDir: string,
   endpointName: string,
-  enumStrategy: import('../types/index.js').EnumStrategy
+  enumStrategy: import('../types/index.js').EnumStrategy,
 ): Promise<void> {
   const diffSpinner = logger.spinner('Computing diffs...');
   const diffs = await computeSchemaDiffs(schemas, outputDir, enumStrategy);
@@ -108,10 +98,11 @@ async function renderDiffMode(
   }
 
   logger.heading(
-    `${endpointName} — ${schemas.size} schemas (${chalk.green(`${counts.new} new`)}, ${chalk.yellow(`${counts.updated} updated`)}, ${chalk.cyan(`${counts.unchanged} unchanged`)})`
+    `${endpointName} — ${schemas.size} schemas (${chalk.green(`${counts.new} new`)}, ${chalk.yellow(`${counts.updated} updated`)}, ${chalk.cyan(`${counts.unchanged} unchanged`)})`,
   );
 
-  const allEntries: { name: string; schema: import('../types/index.js').IRSchema; diff: import('../types/index.js').SchemaDiffResult }[] = [];
+  const allEntries: { name: string; schema: import('../types/index.js').IRSchema; diff: import('../types/index.js').SchemaDiffResult }[] =
+    [];
 
   for (const [name, schema] of schemas.entries()) {
     const diff = diffs.get(name);
@@ -127,11 +118,7 @@ async function renderDiffMode(
 
   for (const { name, schema, diff } of allEntries) {
     const kindLabel =
-      schema.kind === 'enum'
-        ? chalk.dim('[enum]  ')
-        : schema.kind === 'alias'
-          ? chalk.dim('[alias] ')
-          : chalk.dim('[dto]   ');
+      schema.kind === 'enum' ? chalk.dim('[enum]  ') : schema.kind === 'alias' ? chalk.dim('[alias] ') : chalk.dim('[dto]   ');
 
     const detail =
       schema.kind === 'enum'
@@ -141,11 +128,7 @@ async function renderDiffMode(
           : chalk.dim(` → ${schema.aliasType ?? 'unknown'}`);
 
     const statusLabel =
-      diff.status === 'new'
-        ? chalk.green('  (new)')
-        : diff.status === 'updated'
-          ? chalk.yellow('  (updated)')
-          : chalk.cyan('  (no diff)');
+      diff.status === 'new' ? chalk.green('  (new)') : diff.status === 'updated' ? chalk.yellow('  (updated)') : chalk.cyan('  (no diff)');
 
     console.log(`  ${kindLabel} ${name}${detail}${statusLabel}`);
   }

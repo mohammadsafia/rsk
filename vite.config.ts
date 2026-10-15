@@ -168,7 +168,9 @@ export default defineConfig({
     arrowParens: 'always',
     sortPackageJson: false,
     sortTailwindcss: {},
-    ignorePatterns: [],
+    // *.hbs: DTO generator templates; formatting them as HTML corrupts generated output.
+    // *.mdx: oxfmt mangles inline `export const` JSX blocks in component docs.
+    ignorePatterns: ['**/*.hbs', '**/*.mdx'],
   },
   plugins: lazyPlugins(() => [mdxPlugin, react(), tailwindcss()]),
   server: {

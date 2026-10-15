@@ -14,7 +14,7 @@ function PrimeLoader({ withOverlay = true, message = 'Please Wait ...', ..._ }: 
       <div className="animate-out fade-out direction-alternate repeat-infinite fill-mode-both duration-[3s]">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="-466.4 259.6 280.2 47.3" width={300}>
           <polyline
-            className="fill-none stroke-primary-400 stroke-[4px] [stroke-linecap:square] [stroke-miterlimit:10] [stroke-dasharray:600] animate-prime-loader-move"
+            className="stroke-primary-400 animate-prime-loader-move fill-none stroke-[4px] [stroke-dasharray:600] [stroke-linecap:square] [stroke-miterlimit:10]"
             points="-465.4,281 -436,281 -418.9,281 -423.9,281 -363.2,281 -355.2,269 -345.2,303 -335.2,263 -325.2,291 -319.2,281 -187.2,281"
           />
         </svg>

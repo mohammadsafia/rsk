@@ -37,9 +37,7 @@ export async function initCommand(options: InitCommandOptions): Promise<void> {
     logger.success(`Created ${CONFIG_FILENAME} with default configuration.`);
     logger.dim('Edit this file to customize endpoints, enum strategy, and selected schemas.');
   } catch (error) {
-    logger.error(
-      error instanceof Error ? error.message : String(error)
-    );
+    logger.error(error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }

@@ -1,11 +1,7 @@
 import chalk from 'chalk';
 import type { DtoGenConfig, IRSchema, SchemaDiffResult, SwaggerEndpoint } from '../types/index.js';
 import { selectVersions } from './versionSelector.js';
-import {
-  selectGenerationMode,
-  selectSchemas,
-  filterSchemasByMode,
-} from './schemaSelector.js';
+import { selectGenerationMode, selectSchemas, filterSchemasByMode } from './schemaSelector.js';
 import { selectEnumStrategy, selectAdditionalOptions } from './strategySelector.js';
 import { SwaggerFetcher } from '../core/SwaggerFetcher.js';
 import { SchemaParser } from '../core/SchemaParser.js';
@@ -18,9 +14,7 @@ export type InteractiveResult = {
   selectedSchemas: string[];
 };
 
-export async function runInteractiveFlow(
-  baseConfig: DtoGenConfig
-): Promise<InteractiveResult> {
+export async function runInteractiveFlow(baseConfig: DtoGenConfig): Promise<InteractiveResult> {
   console.log();
   console.log(chalk.bold.cyan('  DTO Generator'));
   console.log(chalk.dim('  Generate TypeScript DTOs from OpenAPI/Swagger specs'));
@@ -84,10 +78,7 @@ export async function runInteractiveFlow(
   if (options.saveConfig) {
     const configToSave: DtoGenConfig = {
       ...config,
-      selectedSchemas: buildSelectedSchemasMap(
-        selectedEndpoints,
-        selectedSchemaNames
-      ),
+      selectedSchemas: buildSelectedSchemasMap(selectedEndpoints, selectedSchemaNames),
     };
     saveConfig(configToSave);
   }
@@ -98,10 +89,7 @@ export async function runInteractiveFlow(
   };
 }
 
-function buildSelectedSchemasMap(
-  endpoints: SwaggerEndpoint[],
-  schemaNames: string[]
-): Record<string, string[] | 'all'> {
+function buildSelectedSchemasMap(endpoints: SwaggerEndpoint[], schemaNames: string[]): Record<string, string[] | 'all'> {
   if (schemaNames.length === 0) {
     return Object.fromEntries(endpoints.map((ep) => [ep.name, 'all']));
   }

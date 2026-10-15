@@ -19,9 +19,7 @@ import { createFormatStep } from '../pipeline/steps/FormatStep.js';
 import { createWriteStep } from '../pipeline/steps/WriteStep.js';
 import { logger } from '../utils/logger.js';
 
-export async function generateCommand(
-  options: GenerateCommandOptions
-): Promise<void> {
+export async function generateCommand(options: GenerateCommandOptions): Promise<void> {
   try {
     let config = loadConfig(options.config);
     let selectedSchemas: string[] = [];
@@ -61,29 +59,20 @@ export async function generateCommand(
 
     Pipeline.printSummary(result);
   } catch (error) {
-    logger.error(
-      error instanceof Error ? error.message : String(error)
-    );
+    logger.error(error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
 
-function applyCLIOverrides(
-  config: DtoGenConfig,
-  options: GenerateCommandOptions
-): DtoGenConfig {
+function applyCLIOverrides(config: DtoGenConfig, options: GenerateCommandOptions): DtoGenConfig {
   const updated = { ...config };
 
   // Filter endpoints by version
   if (options.version && options.version !== 'all') {
-    updated.endpoints = config.endpoints.filter(
-      (ep) => ep.name === options.version
-    );
+    updated.endpoints = config.endpoints.filter((ep) => ep.name === options.version);
 
     if (updated.endpoints.length === 0) {
-      logger.warn(
-        `No endpoint found for version "${options.version}". Available: ${config.endpoints.map((e) => e.name).join(', ')}`
-      );
+      logger.warn(`No endpoint found for version "${options.version}". Available: ${config.endpoints.map((e) => e.name).join(', ')}`);
       updated.endpoints = config.endpoints;
     }
   }

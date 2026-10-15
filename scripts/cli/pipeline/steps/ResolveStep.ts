@@ -70,10 +70,7 @@ export function createResolveStep(): PipelineStep {
 /**
  * Build and print a visual dependency tree from the parent→children map.
  */
-function printDependencyTree(
-  roots: Set<string>,
-  childrenMap: Map<string, string[]>
-): void {
+function printDependencyTree(roots: Set<string>, childrenMap: Map<string, string[]>): void {
   logger.blank();
   logger.dim('  Dependency tree:');
 
@@ -90,12 +87,7 @@ function printDependencyTree(
 /**
  * Recursively build a TreeNode from the childrenMap.
  */
-function buildTreeNode(
-  key: string,
-  label: string,
-  childrenMap: Map<string, string[]>,
-  visited: Set<string>
-): TreeNode {
+function buildTreeNode(key: string, label: string, childrenMap: Map<string, string[]>, visited: Set<string>): TreeNode {
   if (visited.has(key)) {
     return { label: `${label} (circular)` };
   }

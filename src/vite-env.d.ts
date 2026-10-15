@@ -58,7 +58,6 @@ interface ImportMetaEnv {
   readonly VITE_APP_MAX_UPLOAD_BATCH_SIZE: string;
   readonly VITE_MAX_UPLOAD_BATCH_SIZE: string;
 
-
   // Monitoring
   readonly VITE_SENTRY_DSN: string;
   readonly VITE_SENTRY_ENVIRONMENT: string;
@@ -81,4 +80,3 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
-

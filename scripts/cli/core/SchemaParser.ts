@@ -3,13 +3,7 @@
  * Uses the Visitor pattern to traverse schema nodes.
  */
 
-import type {
-  OpenAPIDocument,
-  OpenAPISchemaObject,
-  IRSchema,
-  IRProperty,
-  IRImport,
-} from '../types/index.js';
+import type { OpenAPIDocument, OpenAPISchemaObject, IRSchema, IRProperty, IRImport } from '../types/index.js';
 import { type SchemaNodeVisitor, walkSchema } from './SchemaVisitor.js';
 import { extractRefName } from '../utils/naming.js';
 
@@ -25,10 +19,7 @@ type PropertyResult = {
  * Visitor that converts an OpenAPI property schema into a PropertyResult.
  */
 class PropertyVisitor implements SchemaNodeVisitor<PropertyResult> {
-  visitObject(
-    _name: string,
-    schema: OpenAPISchemaObject
-  ): PropertyResult {
+  visitObject(_name: string, schema: OpenAPISchemaObject): PropertyResult {
     // Map type: additionalProperties defines the value type (e.g., Record<string, Array<SlotTimeRange>>)
     if (schema.additionalProperties && typeof schema.additionalProperties === 'object') {
       const valueResult = walkSchema('value', schema.additionalProperties, this);
@@ -49,11 +40,7 @@ class PropertyVisitor implements SchemaNodeVisitor<PropertyResult> {
     };
   }
 
-  visitEnum(
-    _name: string,
-    schema: OpenAPISchemaObject,
-    values: string[]
-  ): PropertyResult {
+  visitEnum(_name: string, schema: OpenAPISchemaObject, values: string[]): PropertyResult {
     const type = values.map((v) => `'${v}'`).join(' | ');
     return {
       type,
@@ -63,11 +50,7 @@ class PropertyVisitor implements SchemaNodeVisitor<PropertyResult> {
     };
   }
 
-  visitArray(
-    _name: string,
-    schema: OpenAPISchemaObject,
-    items: OpenAPISchemaObject
-  ): PropertyResult {
+  visitArray(_name: string, schema: OpenAPISchemaObject, items: OpenAPISchemaObject): PropertyResult {
     const inner = walkSchema('items', items, this);
     return {
       type: `Array<${inner.type}>`,
@@ -78,10 +61,7 @@ class PropertyVisitor implements SchemaNodeVisitor<PropertyResult> {
     };
   }
 
-  visitPrimitive(
-    _name: string,
-    schema: OpenAPISchemaObject
-  ): PropertyResult {
+  visitPrimitive(_name: string, schema: OpenAPISchemaObject): PropertyResult {
     return {
       type: mapPrimitiveType(schema),
       isArray: false,
@@ -101,11 +81,7 @@ class PropertyVisitor implements SchemaNodeVisitor<PropertyResult> {
     };
   }
 
-  visitAllOf(
-    _name: string,
-    schema: OpenAPISchemaObject,
-    allOf: OpenAPISchemaObject[]
-  ): PropertyResult {
+  visitAllOf(_name: string, schema: OpenAPISchemaObject, allOf: OpenAPISchemaObject[]): PropertyResult {
     // For property-level allOf, merge into a single type
     // If there's a single $ref, use that; otherwise intersection
     const refs = allOf.filter((s) => s.$ref);
@@ -129,11 +105,7 @@ class PropertyVisitor implements SchemaNodeVisitor<PropertyResult> {
     };
   }
 
-  visitOneOf(
-    _name: string,
-    schema: OpenAPISchemaObject,
-    oneOf: OpenAPISchemaObject[]
-  ): PropertyResult {
+  visitOneOf(_name: string, schema: OpenAPISchemaObject, oneOf: OpenAPISchemaObject[]): PropertyResult {
     const types = oneOf.map((s) => walkSchema('oneOf', s, this).type);
     return {
       type: types.join(' | '),
@@ -155,11 +127,7 @@ export class SchemaParser {
     const result = new Map<string, IRSchema>();
 
     for (const [name, schema] of Object.entries(rawSchemas)) {
-      const irSchema = this.parseSchema(
-        name,
-        schema as OpenAPISchemaObject,
-        rawSchemas as Record<string, OpenAPISchemaObject>
-      );
+      const irSchema = this.parseSchema(name, schema as OpenAPISchemaObject, rawSchemas as Record<string, OpenAPISchemaObject>);
       result.set(name, irSchema);
     }
 
@@ -169,11 +137,7 @@ export class SchemaParser {
   /**
    * Parse a single schema into IR.
    */
-  private parseSchema(
-    name: string,
-    schema: OpenAPISchemaObject,
-    _allSchemas: Record<string, OpenAPISchemaObject>
-  ): IRSchema {
+  private parseSchema(name: string, schema: OpenAPISchemaObject, _allSchemas: Record<string, OpenAPISchemaObject>): IRSchema {
     // Enum type
     if (schema.enum && schema.enum.length > 0) {
       return {
@@ -200,9 +164,7 @@ export class SchemaParser {
       kind: 'alias',
       properties: [],
       aliasType: result.type,
-      imports: result.referenceName
-        ? [{ name: result.referenceName, from: result.referenceName }]
-        : [],
+      imports: result.referenceName ? [{ name: result.referenceName, from: result.referenceName }] : [],
       deprecated: schema.deprecated,
     };
   }
@@ -210,10 +172,7 @@ export class SchemaParser {
   /**
    * Parse an object schema, handling allOf composition.
    */
-  private parseObjectSchema(
-    name: string,
-    schema: OpenAPISchemaObject
-  ): IRSchema {
+  private parseObjectSchema(name: string, schema: OpenAPISchemaObject): IRSchema {
     let mergedProperties: Record<string, OpenAPISchemaObject> = {};
     let mergedRequired: string[] = [];
     const imports: IRImport[] = [];

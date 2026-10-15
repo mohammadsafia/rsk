@@ -1,4 +1,3 @@
-
 import { ApiEndpoints, httpClient } from '@api/config';
 
 import { pathBuilder } from '@utils';

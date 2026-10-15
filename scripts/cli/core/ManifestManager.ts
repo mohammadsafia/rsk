@@ -22,10 +22,12 @@ export class ManifestManager {
   }
 
   save(): void {
-    const sorted = Object.keys(this.manifest).sort().reduce<Manifest>((acc, key) => {
-      acc[key] = this.manifest[key];
-      return acc;
-    }, {});
+    const sorted = Object.keys(this.manifest)
+      .sort()
+      .reduce<Manifest>((acc, key) => {
+        acc[key] = this.manifest[key];
+        return acc;
+      }, {});
     fs.writeFileSync(this.manifestPath, JSON.stringify(sorted, null, 2) + '\n', 'utf-8');
   }
 

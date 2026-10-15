@@ -15,7 +15,10 @@ const DocPanel = (props: DocPanelProps) => {
   const { hasSelected, selectedDoc, selectedDocTags, SelectedDocComponent, sidebarOpen = true } = props;
 
   return (
-    <Card shadow="sm" className={`col-span-12 overflow-hidden border border-primary-100 ${sidebarOpen ? 'lg:col-span-8' : 'lg:col-span-12'}`}>
+    <Card
+      shadow="sm"
+      className={`border-primary-100 col-span-12 overflow-hidden border ${sidebarOpen ? 'lg:col-span-8' : 'lg:col-span-12'}`}
+    >
       <ScrollArea className="h-[calc(100vh-240px)]">
         {componentDocsErrors.length ? (
           <div className="border-destructive/30 bg-destructive-200 m-4 rounded-xl border p-4 text-sm">
@@ -36,7 +39,9 @@ const DocPanel = (props: DocPanelProps) => {
                 <div className="min-w-0">
                   <Card.Title className="text-2xl">{selectedDoc.title}</Card.Title>
 
-                  {selectedDoc.description ? <Card.Description className="mt-1.5 text-sm">{selectedDoc.description}</Card.Description> : null}
+                  {selectedDoc.description ? (
+                    <Card.Description className="mt-1.5 text-sm">{selectedDoc.description}</Card.Description>
+                  ) : null}
                 </div>
 
                 {selectedDocTags.length ? (
@@ -64,7 +69,9 @@ const DocPanel = (props: DocPanelProps) => {
             </Suspense>
           </>
         ) : (
-          <div className="text-muted-400 flex h-full items-center justify-center p-8 text-sm">Select a component to view its documentation.</div>
+          <div className="text-muted-400 flex h-full items-center justify-center p-8 text-sm">
+            Select a component to view its documentation.
+          </div>
         )}
 
         <ScrollArea.Bar />

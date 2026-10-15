@@ -47,28 +47,28 @@ top down.
 
 ## Error types and fixes
 
-| Error | What it means | How to fix |
-|---|---|---|
-| `missing required frontmatter field "X"` | A required key is missing or empty in frontmatter | Add the missing field and ensure it is not empty |
-| `invalid frontmatter` | Frontmatter exists but fails Zod schema validation (wrong type/shape) | Fix field types (strings for required fields, `tags` as string array) |
-| `frontmatter id must be kebab case` | `id` contains spaces, uppercase, or invalid characters | Change `id` to kebab case (example: `toggle-group`) |
-| `category mismatch` | Folder category does not match frontmatter `category` after normalization | Move the file into the correct folder, or update `category` in frontmatter to match |
-| `duplicate id "X"` | Another doc already uses the same `id` | Pick a new unique `id` (and update filename if needed) |
-| `still contains template placeholder text` | The doc still has one or more placeholder markers | Replace all placeholder text with real content |
+| Error                                      | What it means                                                             | How to fix                                                                          |
+| ------------------------------------------ | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `missing required frontmatter field "X"`   | A required key is missing or empty in frontmatter                         | Add the missing field and ensure it is not empty                                    |
+| `invalid frontmatter`                      | Frontmatter exists but fails Zod schema validation (wrong type/shape)     | Fix field types (strings for required fields, `tags` as string array)               |
+| `frontmatter id must be kebab case`        | `id` contains spaces, uppercase, or invalid characters                    | Change `id` to kebab case (example: `toggle-group`)                                 |
+| `category mismatch`                        | Folder category does not match frontmatter `category` after normalization | Move the file into the correct folder, or update `category` in frontmatter to match |
+| `duplicate id "X"`                         | Another doc already uses the same `id`                                    | Pick a new unique `id` (and update filename if needed)                              |
+| `still contains template placeholder text` | The doc still has one or more placeholder markers                         | Replace all placeholder text with real content                                      |
 
 ### Required frontmatter
 
 Every MDX doc must contain these fields:
 
-* `id`
-* `title`
-* `section`
-* `category`
-* `description`
+- `id`
+- `title`
+- `section`
+- `category`
+- `description`
 
 Optional:
 
-* `tags`
+- `tags`
 
 Example:
 
@@ -79,7 +79,7 @@ title: Toggle Group
 section: Components
 category: UI
 description: A group of toggleable buttons.
-tags: ["ui", "toggle", "group"]
+tags: ['ui', 'toggle', 'group']
 ---
 ```
 
@@ -87,9 +87,9 @@ tags: ["ui", "toggle", "group"]
 
 Both the folder name and frontmatter `category` are normalized before comparison:
 
-* trimmed
-* uppercased
-* defaults to `UI` if empty or missing
+- trimmed
+- uppercased
+- defaults to `UI` if empty or missing
 
 The folder category is inferred from the first path segment relative to `src/component-docs/`. For example,
 `src/component-docs/ui/Button.mdx` has folder category `ui`, normalized to `UI`.
@@ -98,10 +98,10 @@ The folder category is inferred from the first path segment relative to `src/com
 
 The linter checks if the raw file content contains any of these strings:
 
-* `component-id`
-* `Component Name`
-* `RealComponentName`
-* `Replace these placeholders`
+- `component-id`
+- `Component Name`
+- `RealComponentName`
+- `Replace these placeholders`
 
 If any are found, the file fails with the "template placeholder text" error. Replace them with actual component-specific
 content.
@@ -120,22 +120,22 @@ pnpm docs:lint
 
 Common fixes:
 
-* Ensure the frontmatter block starts at the very top of the file
-* Ensure required fields are not blank
-* Ensure `category` matches the folder name (normalized to uppercase)
-* Ensure `tags` is an array of strings (not a comma string)
-* Replace all template placeholder text before linting
+- Ensure the frontmatter block starts at the very top of the file
+- Ensure required fields are not blank
+- Ensure `category` matches the folder name (normalized to uppercase)
+- Ensure `tags` is an array of strings (not a comma string)
+- Replace all template placeholder text before linting
 
 Note: duplicate errors are deduplicated in the output. If you see the same error only once, it may come from multiple
 files — fix and re-run to reveal remaining issues.
 
 ## Summary
 
-* Run `pnpm docs:lint` before committing
-* Only `_*` directories are excluded from scanning
-* Validation is ordered — fix missing fields first before other errors appear
-* Fix errors using the "Error types and fixes" table
-* The linter enforces ids, categories, schema, and template cleanup
+- Run `pnpm docs:lint` before committing
+- Only `_*` directories are excluded from scanning
+- Validation is ordered — fix missing fields first before other errors appear
+- Fix errors using the "Error types and fixes" table
+- The linter enforces ids, categories, schema, and template cleanup
 
 ## Maintenance notes
 

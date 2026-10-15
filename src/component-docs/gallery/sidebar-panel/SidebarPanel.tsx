@@ -115,7 +115,7 @@ const SidebarPanel = (props: SidebarPanelProps) => {
 
       <Card.Content className="space-y-4 px-5 pt-4 pb-4">
         <div className="relative">
-          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2" />
+          <Search className="text-muted-foreground pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2" />
 
           <Input
             aria-label="Search components"

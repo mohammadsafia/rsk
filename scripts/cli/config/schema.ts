@@ -27,9 +27,7 @@ export const DtoGenConfigSchema = z.object({
   endpoints: z.array(SwaggerEndpointSchema).min(1),
   enumStrategy: z.enum(['type-literal', 'enum']).default('type-literal'),
   formatting: FormattingConfigSchema.default({}),
-  selectedSchemas: z
-    .record(z.union([z.array(z.string()), z.literal('all')]))
-    .optional(),
+  selectedSchemas: z.record(z.union([z.array(z.string()), z.literal('all')])).optional(),
   dryRun: z.boolean().default(false),
 });
 

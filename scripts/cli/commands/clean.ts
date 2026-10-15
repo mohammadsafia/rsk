@@ -44,7 +44,7 @@ export async function cleanCommand(options: CleanCommandOptions): Promise<void> 
       const enumNames = new Set(
         Array.from(schemas.entries())
           .filter(([, s]) => s.kind === 'enum')
-          .map(([name]) => name)
+          .map(([name]) => name),
       );
 
       for (const file of fs.readdirSync(modelsDir).sort()) {
@@ -71,11 +71,7 @@ export async function cleanCommand(options: CleanCommandOptions): Promise<void> 
 
       if (!options.dryRun) {
         const barrelGen = new BarrelGenerator();
-        const barrelContent = barrelGen.generateFromFilenames(
-          remainingFiles,
-          config.enumStrategy,
-          enumNames
-        );
+        const barrelContent = barrelGen.generateFromFilenames(remainingFiles, config.enumStrategy, enumNames);
         const barrelPath = resolveFromRoot(endpoint.outputDir, 'index.ts');
         const writer = new FileWriter();
         const changed = writer.writeSingle(barrelPath, barrelContent, false);

@@ -120,7 +120,9 @@ function Navbar() {
     <nav className="border-border bg-background/70 fixed inset-x-0 top-0 z-40 border-b backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 lg:px-8">
         <a href="/" className="flex items-center gap-2.5" aria-label={t('nav.logoAlt')}>
-          <span className="bg-primary text-primary-foreground flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold">R</span>
+          <span className="bg-primary text-primary-foreground flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold">
+            R
+          </span>
           <span className="text-foreground text-sm font-semibold tracking-tight">{t('nav.brand')}</span>
         </a>
 
@@ -156,13 +158,17 @@ function Hero() {
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10"
         style={{
-          backgroundImage: 'linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)',
+          backgroundImage:
+            'linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)',
           backgroundSize: '56px 56px',
           maskImage: 'radial-gradient(ellipse 75% 60% at 50% 0%, #000 35%, transparent 100%)',
           WebkitMaskImage: 'radial-gradient(ellipse 75% 60% at 50% 0%, #000 35%, transparent 100%)',
         }}
       />
-      <div aria-hidden className="bg-primary/10 pointer-events-none absolute -top-32 end-[-10%] -z-10 h-[28rem] w-[28rem] rounded-full blur-[120px]" />
+      <div
+        aria-hidden
+        className="bg-primary/10 pointer-events-none absolute end-[-10%] -top-32 -z-10 h-[28rem] w-[28rem] rounded-full blur-[120px]"
+      />
 
       <div className="mx-auto max-w-6xl px-6 pt-36 pb-20 lg:px-8 lg:pt-44 lg:pb-28">
         <div className="grid items-end gap-14 md:grid-cols-[1.7fr_1fr]">
@@ -198,7 +204,10 @@ function Hero() {
           </motion.div>
 
           {/* Stats — asymmetric editorial column */}
-          <motion.div className="border-border grid grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-1 md:border-s md:ps-10" {...getFadeUp(pr, 0.15)}>
+          <motion.div
+            className="border-border grid grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-1 md:border-s md:ps-10"
+            {...getFadeUp(pr, 0.15)}
+          >
             {STATS.map((stat) => (
               <div key={stat.labelKey}>
                 <p style={display} className="text-foreground text-[2.4rem] leading-none font-medium">
@@ -290,11 +299,17 @@ function ComponentShowcase() {
       <div className="grid items-center gap-12 md:grid-cols-[0.8fr_1.2fr] md:gap-16">
         <motion.div {...getFadeUp(pr)}>
           <Eyebrow>{t('showcase.eyebrow')}</Eyebrow>
-          <h2 style={display} className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]">
+          <h2
+            style={display}
+            className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]"
+          >
             {t('showcase.title')}
           </h2>
           <p className="text-muted-foreground mb-6 text-[15px] leading-relaxed">{t('showcase.desc')}</p>
-          <a href="/components" className="text-primary hover:text-primary-600 inline-flex items-center gap-1.5 text-sm font-medium transition-colors">
+          <a
+            href="/components"
+            className="text-primary hover:text-primary-600 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+          >
             {t('showcase.cta')}
             <ArrowRight size={15} className="rtl:rotate-180" />
           </a>
@@ -311,7 +326,9 @@ function ComponentShowcase() {
 
             <div className="flex">
               <div className="border-border hidden w-44 border-e p-4 md:block">
-                <div className="bg-secondary text-muted-foreground mb-3 rounded-md px-3 py-1.5 text-[11px]">{t('showcase.searchPlaceholder')}</div>
+                <div className="bg-secondary text-muted-foreground mb-3 rounded-md px-3 py-1.5 text-[11px]">
+                  {t('showcase.searchPlaceholder')}
+                </div>
                 <div className="flex flex-col gap-0.5">
                   {SIDEBAR_ITEMS.map((item, idx) => (
                     <div
@@ -331,8 +348,12 @@ function ComponentShowcase() {
                 <p className="text-muted-foreground mb-4 text-[12px]">{t('showcase.buttonDesc')}</p>
                 <div className="bg-border mb-4 h-px" />
                 <div className="mb-4 flex flex-wrap gap-2">
-                  <span className="bg-primary text-primary-foreground rounded-md px-3 py-1.5 text-[12px] font-medium">{t('showcase.variantDefault')}</span>
-                  <span className="border-border text-foreground rounded-md border px-3 py-1.5 text-[12px] font-medium">{t('showcase.variantOutline')}</span>
+                  <span className="bg-primary text-primary-foreground rounded-md px-3 py-1.5 text-[12px] font-medium">
+                    {t('showcase.variantDefault')}
+                  </span>
+                  <span className="border-border text-foreground rounded-md border px-3 py-1.5 text-[12px] font-medium">
+                    {t('showcase.variantOutline')}
+                  </span>
                   <span className="text-muted-foreground rounded-md px-3 py-1.5 text-[12px] font-medium">{t('showcase.variantGhost')}</span>
                 </div>
                 <div className="bg-code-surface rounded-md p-3">
@@ -385,7 +406,10 @@ function CliSection() {
 
         <motion.div className="order-1 md:order-2" {...getFadeUp(pr, 0.15)}>
           <Eyebrow>{t('cli.eyebrow')}</Eyebrow>
-          <h2 style={display} className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]">
+          <h2
+            style={display}
+            className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]"
+          >
             {t('cli.title')}
           </h2>
           <p className="text-muted-foreground text-[15px] leading-relaxed">{t('cli.desc')}</p>
@@ -408,7 +432,10 @@ function Architecture() {
       <div className="grid items-center gap-12 md:grid-cols-2 md:gap-16">
         <motion.div {...getFadeUp(pr)}>
           <Eyebrow>{t('architecture.eyebrow')}</Eyebrow>
-          <h2 style={display} className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]">
+          <h2
+            style={display}
+            className="text-foreground mt-5 mb-4 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]"
+          >
             {t('architecture.title')}
           </h2>
           <p className="text-muted-foreground text-[15px] leading-relaxed">{t('architecture.desc')}</p>
@@ -454,7 +481,10 @@ function GettingStarted() {
       <div className="mx-auto max-w-6xl px-6 py-24 lg:px-8 lg:py-32">
         <motion.div className="mb-12 max-w-2xl" {...getFadeUp(pr)}>
           <Eyebrow>{t('gettingStarted.eyebrow')}</Eyebrow>
-          <h2 style={display} className="text-foreground mt-5 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]">
+          <h2
+            style={display}
+            className="text-foreground mt-5 text-[clamp(1.8rem,3.5vw,2.6rem)] leading-tight font-medium tracking-[-0.01em]"
+          >
             {t('gettingStarted.title')}
           </h2>
         </motion.div>
@@ -490,7 +520,9 @@ function Footer() {
     <footer className="border-border bg-background border-t py-10">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 sm:flex-row lg:px-8">
         <div className="flex items-center gap-2.5">
-          <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-md text-[10px] font-bold">R</span>
+          <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-md text-[10px] font-bold">
+            R
+          </span>
           <p className="text-muted-foreground text-[13px]">{t('footer.builtBy')}</p>
         </div>
         <a
