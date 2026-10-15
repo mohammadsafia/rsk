@@ -1,12 +1,13 @@
 import { Toast } from '@components/ui';
 
-import { useToast } from '@hooks/shared';
+import { useAppTranslation, useToast } from '@hooks/shared';
 
 function Toaster() {
   const { toasts } = useToast();
+  const { t } = useAppTranslation('common');
 
   return (
-    <Toast.Provider duration={5000}>
+    <Toast.Provider duration={5000} label={t('toast.label')}>
       {toasts.map(({ id, title, description, action, ...props }) => (
         <Toast key={id} {...props}>
           <Toast.Icon />
@@ -27,7 +28,7 @@ function Toaster() {
         </Toast>
       ))}
 
-      <Toast.Viewport position={toasts[0]?.position} />
+      <Toast.Viewport label={t('toast.region')} position={toasts[0]?.position} />
     </Toast.Provider>
   );
 }

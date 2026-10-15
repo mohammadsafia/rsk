@@ -29,4 +29,9 @@ describe('CalendarTimeGrid', () => {
     render(<CalendarTimeGrid.NowLine percent={40} mode="always" data-testid="now" />);
     expect(screen.getByTestId('now').className).toContain('bg-accent');
   });
+
+  it('isolates axis labels as LTR so times keep their order in Arabic', () => {
+    render(<CalendarTimeGrid.Axis rows={[{ label: '9:00 AM', isHourMark: true }]} />);
+    expect(screen.getByText('9:00 AM').closest('bdi')?.getAttribute('dir')).toBe('ltr');
+  });
 });

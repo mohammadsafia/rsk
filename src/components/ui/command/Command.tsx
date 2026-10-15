@@ -3,6 +3,8 @@ import { type ComponentPropsWithoutRef, type FC, type HTMLAttributes } from 'rea
 import { Command as CommandPrimitive } from 'cmdk';
 import { Dialog } from '@components/ui';
 
+import { useAppTranslation } from '@hooks/shared';
+
 import { cn } from '@utils';
 
 import { CheckIcon, Search } from 'lucide-react';
@@ -56,13 +58,18 @@ const CommandInput: FC<CommandInputProps> = ({ className, children, ...props }) 
   </div>
 );
 
-const CommandList: FC<CommandListProps> = ({ className, ...props }) => (
-  <CommandPrimitive.List
-    data-slot="command-list"
-    className={cn('flex max-h-96 flex-col overflow-x-hidden overflow-y-auto', className)}
-    {...props}
-  />
-);
+const CommandList: FC<CommandListProps> = ({ className, ...props }) => {
+  const { t } = useAppTranslation('common');
+
+  return (
+    <CommandPrimitive.List
+      data-slot="command-list"
+      label={t('command.suggestions')}
+      className={cn('flex max-h-96 flex-col overflow-x-hidden overflow-y-auto', className)}
+      {...props}
+    />
+  );
+};
 
 const CommandEmpty: FC<CommandEmptyProps> = ({ when, ...props }) => {
   if (!when) return null;
@@ -121,6 +128,7 @@ const CommandDialog: FC<CommandDialogProps> = ({ title, children, ...props }) =>
   <Dialog {...props}>
     <Dialog.Content title={title} hideTitle className="gap-0 overflow-hidden p-0">
       <Command
+        label={title}
         className={cn(
           '**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium',
           '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5',

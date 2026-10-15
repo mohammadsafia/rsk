@@ -4,9 +4,9 @@ import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { Toaster } from '@components/shared';
 
-import { toast } from '@hooks/shared';
+import i18n from '../../../i18n';
 
-import '../../../i18n';
+import { toast } from '@hooks/shared';
 
 afterEach(cleanup);
 
@@ -24,5 +24,12 @@ describe('Toaster', () => {
     // @ts-expect-error — `variant` was replaced by `tone`
     const call = () => toast({ title: 'x', variant: 'destructive' });
     expect(call).toBeTypeOf('function');
+  });
+
+  it('names the notifications region in the app language', async () => {
+    await act(() => i18n.changeLanguage('ar'));
+    render(<Toaster />);
+    expect(screen.getByRole('region', { name: /الإشعارات/ })).toBeTruthy();
+    await act(() => i18n.changeLanguage('en'));
   });
 });

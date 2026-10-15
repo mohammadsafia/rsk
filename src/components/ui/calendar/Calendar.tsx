@@ -54,7 +54,7 @@ function CalendarDayButton({ className, day, modifiers, ...props }: ComponentPro
   );
 }
 
-function CalendarMonthsDropdown({ options, value, onChange, disabled }: DropdownProps) {
+function CalendarMonthsDropdown({ options, value, onChange, disabled, 'aria-label': ariaLabel }: DropdownProps) {
   if (!options || options.length === 0) return <></>;
 
   const selectOptions = options.map((option) => ({
@@ -72,7 +72,7 @@ function CalendarMonthsDropdown({ options, value, onChange, disabled }: Dropdown
 
   return (
     <Select value={value !== null ? String(value) : ''} onValueChange={handleValueChange} disabled={disabled}>
-      <Select.Trigger size="sm" className="justify-center">
+      <Select.Trigger size="sm" aria-label={ariaLabel} className="justify-center">
         <Select.Value className="text-center" />
 
         <Select.Icon />
@@ -94,7 +94,7 @@ function CalendarMonthsDropdown({ options, value, onChange, disabled }: Dropdown
   );
 }
 
-function CalendarYearsDropdown({ options, value, onChange, disabled }: DropdownProps) {
+function CalendarYearsDropdown({ options, value, onChange, disabled, 'aria-label': ariaLabel }: DropdownProps) {
   if (!options || options.length === 0) return <></>;
 
   const selectOptions = options.map((option) => ({
@@ -111,7 +111,7 @@ function CalendarYearsDropdown({ options, value, onChange, disabled }: DropdownP
 
   return (
     <Select value={value !== null ? String(value) : ''} onValueChange={handleValueChange} disabled={disabled}>
-      <Select.Trigger size="sm" className="justify-center">
+      <Select.Trigger size="sm" aria-label={ariaLabel} className="justify-center">
         <Select.Value className="text-center" />
 
         <Select.Icon />

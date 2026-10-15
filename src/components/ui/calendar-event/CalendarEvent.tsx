@@ -48,12 +48,12 @@ const CalendarEvent: FC<CalendarEventProps> = ({ className, tone, past = false, 
       data-slot="calendar-event"
       data-tone={resolvedTone}
       data-past={past || undefined}
-      className={cn(calendarEventVariants({ tone: resolvedTone }), past && 'text-fg-muted', className)}
+      className={cn(calendarEventVariants({ tone: resolvedTone }), className)}
       {...props}
     >
       <span aria-hidden="true" className={cn('mt-1 size-1.5 shrink-0 rounded-full', DOT[resolvedTone])} />
 
-      <span className="min-w-0 truncate">{children}</span>
+      <span className={cn('min-w-0 truncate', past && 'decoration-fg-muted line-through')}>{children}</span>
     </div>
   );
 };

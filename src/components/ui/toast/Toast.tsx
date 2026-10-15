@@ -113,7 +113,7 @@ const ToastClose: FC<ToastCloseProps> = ({ className, ...props }) => {
       data-slot="toast-close"
       className={cn(
         'focus-ring text-fg-muted hover:text-fg absolute end-2 top-2 cursor-pointer rounded-sm p-1',
-        'opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100',
+        'transition-opacity pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 pointer-fine:focus-visible:opacity-100',
         className,
       )}
       toast-close=""

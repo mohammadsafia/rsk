@@ -42,4 +42,19 @@ describe('FormattedNumber', () => {
     expect(input.getAttribute('dir')).toBe('ltr');
     expect(input.getAttribute('aria-invalid')).toBe('true');
   });
+
+  it('lets you type through values below min and clamps to min on blur', () => {
+    const handleChange = vi.fn();
+    const { rerender } = renderNumber({ min: 10, max: 99, onChange: handleChange });
+    const input = screen.getByRole('textbox', { name: 'Quantity' });
+    fireEvent.change(input, { target: { value: '1' } });
+    expect(handleChange).toHaveBeenLastCalledWith(1);
+    rerender(
+      <Tooltip.Provider>
+        <FormattedNumber aria-label="Quantity" min={10} max={99} value={1} onChange={handleChange} />
+      </Tooltip.Provider>,
+    );
+    fireEvent.blur(screen.getByRole('textbox', { name: 'Quantity' }));
+    expect(handleChange).toHaveBeenLastCalledWith(10);
+  });
 });

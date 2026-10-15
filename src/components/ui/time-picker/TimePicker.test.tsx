@@ -48,4 +48,16 @@ describe('TimePicker', () => {
     fireEvent.click(clear);
     expect(handleChange).toHaveBeenCalledWith(undefined);
   });
+
+  it('uses one tab stop per column and moves with the arrow keys', async () => {
+    renderPicker({ use24hFormat: true, value: '10:00', step: 30 });
+    fireEvent.click(screen.getByRole('button', { name: /10:00/ }));
+    const hours = await screen.findByRole('listbox', { name: 'Hours' });
+    const tabbable = within(hours)
+      .getAllByRole('option')
+      .filter((option) => option.getAttribute('tabindex') === '0');
+    expect(tabbable.map((option) => option.textContent)).toEqual(['10']);
+    fireEvent.keyDown(tabbable[0], { key: 'ArrowDown' });
+    expect(within(hours).getByRole('option', { name: '11' }).getAttribute('aria-selected')).toBe('true');
+  });
 });

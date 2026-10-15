@@ -70,5 +70,12 @@
   "number": {
     "increment": "زيادة",
     "decrement": "إنقاص"
+  },
+  "toast": {
+    "label": "إشعار",
+    "region": "الإشعارات ({hotkey})"
+  },
+  "command": {
+    "suggestions": "اقتراحات"
   }
 }

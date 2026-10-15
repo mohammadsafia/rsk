@@ -82,7 +82,11 @@ const Axis: FC<AxisProps> = ({ rows, showStepLabels = false, className, style, .
   >
     {rows.map((row, idx) => (
       <div key={idx} className="border-border-subtle flex items-start justify-end pe-2 pt-0.5 not-last:border-b">
-        {(showStepLabels || row.isHourMark) && <span className="text-fg-muted text-2xs tabular-nums">{row.label}</span>}
+        {(showStepLabels || row.isHourMark) && (
+          <span className="text-fg-muted text-2xs tabular-nums">
+            <bdi dir="ltr">{row.label}</bdi>
+          </span>
+        )}
       </div>
     ))}
   </div>

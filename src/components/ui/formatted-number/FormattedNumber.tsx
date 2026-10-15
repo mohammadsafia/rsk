@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef, type FC, forwardRef, type KeyboardEvent, type Ref } from 'react';
+import { type ComponentPropsWithoutRef, type FC, type FocusEvent, forwardRef, type KeyboardEvent, type Ref } from 'react';
 import { type NumberFormatValues, NumericFormat } from 'react-number-format';
 
 import { fieldVariants, type FieldVariants, IconButton } from '@components/ui';
@@ -51,6 +51,7 @@ const FormattedNumber: FC<FormattedNumberProps> = ({
   invalid = false,
   disabled,
   value,
+  onBlur,
   ...props
 }) => {
   const { t } = useAppTranslation('common');
@@ -63,6 +64,12 @@ const FormattedNumber: FC<FormattedNumberProps> = ({
   const handleIncrement = () => onChange?.(clampValue((value ?? 0) + stepper, min, max));
 
   const handleDecrement = () => onChange?.(clampValue((value ?? 0) - stepper, min, max));
+
+  // Values below min stay typeable (a 15 starts as 1); min is enforced when the field loses focus.
+  const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
+    if (value !== null && value !== undefined && value < min) onChange?.(min);
+    onBlur?.(event);
+  };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'ArrowUp' && !isIncrementDisabled) handleIncrement();
@@ -88,10 +95,11 @@ const FormattedNumber: FC<FormattedNumberProps> = ({
         allowNegative={min < 0}
         onValueChange={handleValueChange}
         onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
         isAllowed={({ floatValue }) => {
           if (floatValue === undefined) return true;
 
-          return (min === undefined || floatValue >= min) && (max === undefined || floatValue <= max);
+          return (floatValue >= 0 || floatValue >= min) && (max === undefined || floatValue <= max);
         }}
         {...props}
       />

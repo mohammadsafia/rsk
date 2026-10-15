@@ -70,5 +70,12 @@
   "number": {
     "increment": "Increase",
     "decrement": "Decrease"
+  },
+  "toast": {
+    "label": "Notification",
+    "region": "Notifications ({hotkey})"
+  },
+  "command": {
+    "suggestions": "Suggestions"
   }
 }

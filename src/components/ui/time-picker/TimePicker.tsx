@@ -1,4 +1,13 @@
-import { type ComponentPropsWithoutRef, type ComponentPropsWithRef, type FC, forwardRef, useEffect, useMemo, useState } from 'react';
+import {
+  type ComponentPropsWithoutRef,
+  type ComponentPropsWithRef,
+  type FC,
+  forwardRef,
+  type KeyboardEvent,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { Button, fieldVariants, type FieldVariants, IconButton, Popover } from '@components/ui';
 import { Conditional } from '@components/utils';
@@ -74,7 +83,25 @@ type TimeColumnProps<TValue extends number | string> = {
 
 const scrollSelectedIntoView = (node: HTMLButtonElement | null) => node?.scrollIntoView?.({ block: 'nearest' });
 
+const NEXT_INDEX: Record<string, (index: number, last: number) => number> = {
+  ArrowDown: (index, last) => Math.min(index + 1, last),
+  ArrowUp: (index) => Math.max(index - 1, 0),
+  Home: () => 0,
+  End: (_index, last) => last,
+};
+
+// One tab stop per column (the selected option); arrows, Home and End move the selection.
 function TimeColumn<TValue extends number | string>({ label, options, selected, onSelect }: TimeColumnProps<TValue>) {
+  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const move = NEXT_INDEX[event.key];
+    if (!move) return;
+
+    event.preventDefault();
+    const next = move(index, options.length - 1);
+    onSelect(options[next].value);
+    (event.currentTarget.parentElement?.children[next] as HTMLElement | undefined)?.focus();
+  };
+
   return (
     <div
       role="listbox"
@@ -82,18 +109,20 @@ function TimeColumn<TValue extends number | string>({ label, options, selected, 
       data-slot="time-picker-column"
       className="flex max-h-48 w-12 [scrollbar-width:thin] flex-col gap-0.5 overflow-y-auto font-mono text-sm"
     >
-      {options.map((option) => (
+      {options.map((option, index) => (
         <button
           key={option.value}
           type="button"
           role="option"
           aria-selected={option.value === selected}
+          tabIndex={option.value === selected ? 0 : -1}
           ref={option.value === selected ? scrollSelectedIntoView : undefined}
           className={cn(
             'focus-ring text-fg-muted hover:bg-hover hover:text-fg h-7 shrink-0 cursor-pointer rounded-md tabular-nums transition-colors',
             'aria-selected:bg-accent aria-selected:text-accent-fg aria-selected:hover:bg-accent aria-selected:hover:text-accent-fg',
           )}
           onClick={() => onSelect(option.value)}
+          onKeyDown={(event) => handleKeyDown(event, index)}
         >
           {option.label}
         </button>

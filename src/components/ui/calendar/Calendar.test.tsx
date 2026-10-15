@@ -43,4 +43,10 @@ describe('Calendar', () => {
       .join('');
     expect(digits).toMatch(/^[0-9]+$/);
   });
+
+  it('keeps the month and year dropdown labels', () => {
+    render(<Calendar mode="single" captionLayout="dropdown" defaultMonth={OCTOBER_2026} />);
+    expect(screen.getByRole('combobox', { name: /month/i })).toBeTruthy();
+    expect(screen.getByRole('combobox', { name: /year/i })).toBeTruthy();
+  });
 });

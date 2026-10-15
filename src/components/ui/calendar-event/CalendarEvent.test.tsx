@@ -23,4 +23,15 @@ describe('CalendarEvent', () => {
     expect(block.dataset.tone).toBe('neutral');
     expect(block.dataset.past).toBe('true');
   });
+
+  it('keeps past events at full text contrast and marks them with a strike', () => {
+    render(
+      <CalendarEvent tone="accent" past>
+        08:00 · Done
+      </CalendarEvent>,
+    );
+    const block = screen.getByText('08:00 · Done').closest('[data-slot="calendar-event"]') as HTMLElement;
+    expect(block.className).not.toContain('text-fg-muted');
+    expect(screen.getByText('08:00 · Done').className).toContain('line-through');
+  });
 });

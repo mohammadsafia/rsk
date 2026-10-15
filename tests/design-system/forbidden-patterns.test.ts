@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vite-plus/test';
@@ -97,55 +97,46 @@ describe('nextBaseline', () => {
 });
 
 /** Plan A (SP2 batches 0–3) primitives must stay free of every forbidden pattern. */
-const CLEAN_UI_FOLDERS = [
-  'button',
-  'icon-button',
-  'badge',
-  'tag',
-  'alert',
-  'progress',
-  'skeleton',
-  'divider',
-  'input',
-  'checkbox',
-  'checkbox-group',
-  'radio-group',
-  'switch',
-  'select',
-  'command',
-  'toggle-group',
-  'popover',
-  'dialog',
-  'tooltip',
-  'dropdown-menu',
-  'toast',
-  'card',
-  'tabs',
-  'table',
-  'pagination',
-  'accordion',
-  'collapsible',
-  'scroll-area',
-  'avatar',
-  'calendar',
-  'calendar-month-grid',
-  'calendar-time-grid',
-  'calendar-event',
-  'time-picker',
-  'formatted-number',
-  'layout',
-] as const;
-
 describe('clean primitives', () => {
-  it('Plan A ui folders contain no forbidden patterns', () => {
-    const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) =>
-      CLEAN_UI_FOLDERS.some((folder) => file.startsWith(`src/components/ui/${folder}/`)),
-    );
-    expect(offenders).toEqual([]);
-  });
-
   it('calendar views (user direction, Plan B) contain no forbidden patterns', () => {
     const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) => file.startsWith('src/components/calendar/'));
     expect(offenders).toEqual([]);
+  });
+});
+
+/** Folders SP2 replaced (addendum §1, §8, §10). None may come back under src/components. */
+const DELETED_COMPONENT_FOLDERS = [
+  'prime-dialog',
+  'prime-tooltip',
+  'prime-dropdown',
+  'scroll-selector',
+  'chip',
+  'radio-dot',
+  'loading-button',
+  'link-button',
+  'tooltip-button',
+] as const;
+
+const componentFolders = (dir: string): string[] =>
+  readdirSync(dir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .flatMap((entry) => [entry.name, ...componentFolders(`${dir}/${entry.name}`)]);
+
+describe('SP2 exit', () => {
+  it('src/components/ui contains no forbidden patterns', () => {
+    const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) => file.startsWith('src/components/ui/'));
+    expect(offenders).toEqual([]);
+  });
+
+  it('the baseline records nothing under src/components/ui', () => {
+    const baseline = JSON.parse(readFileSync(BASELINE_PATH, 'utf8')) as Baseline;
+    expect(Object.keys(baseline).filter((file) => file.startsWith('src/components/ui/'))).toEqual([]);
+  });
+
+  it('the replaced component folders are gone', () => {
+    const present = componentFolders(`${REPO_ROOT}src/components`).filter((name) =>
+      (DELETED_COMPONENT_FOLDERS as readonly string[]).includes(name),
+    );
+    expect(present).toEqual([]);
   });
 });

@@ -36,4 +36,19 @@ describe('Toast', () => {
     expect(toast?.className).toContain('bg-surface-raised');
     expect(screen.getByRole('button', { name: 'Close' })).toBeTruthy();
   });
+
+  it('keeps the close button visible on touch screens', () => {
+    render(
+      <Toast.Provider>
+        <Toast open>
+          <Toast.Title>Saved</Toast.Title>
+          <Toast.Close />
+        </Toast>
+        <Toast.Viewport />
+      </Toast.Provider>,
+    );
+    const close = screen.getByRole('button', { name: 'Close' });
+    expect(close.className).not.toMatch(/(^|\s)opacity-0(\s|$)/);
+    expect(close.className).toContain('pointer-fine:opacity-0');
+  });
 });
