@@ -93,22 +93,23 @@ Consequence of rule 4: **every design value must exist as a theme token** so com
 | Scrim | `overlay` | graphite 0 @ 70% | graphite 12 @ 40% |
 | Text | `fg` | `#E6E7E9` | `#16171A` |
 | Secondary text | `fg-muted` | `#8A8F98` | `#6B7079` |
-| Tertiary text | `fg-subtle` | `#5C616A` | `#9EA2AA` |
+| Tertiary text (disabled, decorative meta only — ≥3:1) | `fg-subtle` | `#616770` | `#8D9199` |
 | Text on inverse | `fg-inverse` | `#0F1012` | `#FFFFFF` |
-| Lines | `border` | `#26282D` | `#E3E4E8` |
-| Strong lines | `border-strong` | `#34363C` | `#C9CBD1` |
+| Decorative lines (cards, dividers) | `border` | `#26282D` | `#E3E4E8` |
+| Control boundaries (inputs, checkboxes — WCAG 1.4.11, ≥3:1) | `border-strong` | `#63656C` | `#8F9197` |
 | Row lines | `border-subtle` | `#1D1F23` | `#EEEFF2` |
 | Primary action | `inverse` / `inverse-fg` | `#E6E7E9` / `#0F1012` | `#16171A` / `#FFFFFF` |
 | Accent (Oxblood) | `accent` | `#E07B89` | `#8C2236` |
 | Text on accent | `accent-fg` | `#0F1012` | `#FFFFFF` |
 | Selection tint | `accent-subtle` | accent @ 11% | `#F8ECEE` |
-| Focus ring | `ring` | accent @ 28% | accent @ 20% |
-| Success | `success` / `-subtle` | `#4CC38A` / 12% | `#1F9D63` / `#E9F7EF` |
-| Warning | `warning` / `-subtle` | `#E5A93B` / 12% | `#B7791F` / `#FDF5E6` |
-| Danger (vermilion) | `danger` / `-subtle` | `#FF6A3D` / 12% | `#D2451E` / `#FCEDE8` |
+| Focus outline (solid, ≥3:1) | `ring` | = `accent` | = `accent` |
+| Focus glow (decorative) | `ring-subtle` | accent @ 25% | accent @ 20% |
+| Success | `success` / `-subtle` | `#4CC38A` / 12% | `#00844C` / `#E9F7EF` |
+| Warning | `warning` / `-subtle` | `#E5A93B` / 12% | `#A26500` / `#FDF5E6` |
+| Danger (vermilion) | `danger` / `-subtle` | `#FF6A3D` / 12% | `#CF421A` / `#FCEDE8` |
 | Info (steel, not blue) | `info` / `-subtle` | `#9AA4B2` / 12% | `#5B6573` / `#EFF1F4` |
 
-Each status also gets `-fg` (text on its solid fill). Hex values are the approved references; the plan converts them to OKLCH and may adjust lightness only to meet §7.8 contrast targets. Errors moved to **vermilion** so they never collide with the Oxblood accent. Info is **steel**, not blue, to stay off the AI palette.
+Each status also gets `-fg` (text on its solid fill): `#0F1012` in dark, `#FFFFFF` in light. Status colors are used as **text** (error messages, deltas), so each must reach 4.5:1 on `surface`; status *badges* use `fg` text with a status-colored dot (dot ≥3:1). Placeholders use `fg-muted`, never `fg-subtle`. The light success/warning/danger and both `fg-subtle`/`border-strong` values above were tuned during planning by a contrast script to meet these targets. Hex values are the approved references; the plan converts them to OKLCH and may adjust lightness only to meet §7.8 contrast targets. Errors moved to **vermilion** so they never collide with the Oxblood accent. Info is **steel**, not blue, to stay off the AI palette.
 
 **Sidebar and code-surface tokens** (`sidebar-*`, `code-*`) are rebuilt on layer 1.
 
@@ -136,7 +137,7 @@ Each status also gets `-fg` (text on its solid fill). Hex values are the approve
 ### 7.3 Shape & density
 
 - **Radius:** `rounded-sm` 4px (checkbox, kbd), `rounded-md` 6px (controls), `rounded-lg` 10px (cards, popovers, dialogs, sheets), `rounded-full` (switch, avatar, spinner).
-- **Control heights (the shared `size` prop):** `sm` 28px · `md` 32px (default) · `lg` 40px — exposed as `--size-control-*` and used by Button, IconButton, Input, Select, Combobox, Tabs, SegmentedControl, DatePicker triggers.
+- **Control heights (the shared `size` prop):** `sm` 28px · `md` 32px (default) · `lg` 40px — exposed as `--spacing-control-sm|md|lg` (Tailwind v4 spacing namespace → `h-control-md`, `min-h-control-sm`, …) and used by Button, IconButton, Input, Select, Combobox, Tabs, SegmentedControl, DatePicker triggers.
 - Spacing stays Tailwind's 4px scale; no arbitrary values.
 
 ### 7.4 Elevation
@@ -161,7 +162,7 @@ Each status also gets `-fg` (text on its solid fill). Hex values are the approve
 | Hover | `fg` overlay 4% (ghost/outline) or one surface step (solid) |
 | Pressed | `fg` overlay 8% + `scale(0.98)` |
 | Selected | `accent-subtle` background (rows, calendar ranges, list items) |
-| Focus | `:focus-visible` only. Buttons/links: 2px `ring` outline + 2px offset. Inputs: `accent` border + 3px `ring` glow |
+| Focus | `:focus-visible` only. Buttons/links: 2px solid `ring` outline + 2px offset. Inputs: `ring` border + 3px `ring-subtle` glow |
 | Invalid | `danger` border + `danger-subtle` glow + message text (never color alone) |
 | Disabled | 50% opacity, `pointer-events: none`, `aria-disabled` honored |
 | Loading | content replaced by Spinner, width preserved, `aria-busy` |
@@ -174,7 +175,7 @@ These are implemented once as Tailwind `@utility` helpers (e.g. `state-hover`, `
 
 ### 7.8 Foundations test guards
 
-1. **Contrast test (Vitest, Node):** parses semantic token pairs from `src/index.css` in both modes and asserts WCAG AA — text pairs ≥ 4.5:1 (`fg`/`canvas`, `fg-muted`/`surface`, `accent-fg`/`accent`, status `-fg`/fill…), UI pairs ≥ 3:1 (`border-strong`, `accent`, `ring` against `surface`).
+1. **Contrast test (Vitest, Node):** parses semantic token pairs from `src/index.css` in both modes and asserts WCAG AA — text pairs ≥ 4.5:1 (`fg` and `fg-muted` on `canvas`/`surface`/`surface-raised`/`surface-sunken`; `accent`, `success`, `warning`, `danger`, `info` on `surface`; `accent-fg`/`accent`, `fg-inverse`/`inverse`, each status `-fg` on its fill), UI pairs ≥ 3:1 (`border-strong`, `ring`, `fg-subtle` on `surface`).
 2. **Forbidden-pattern test — a ratchet (Vitest, Node):** scans `src/**/*.tsx` for: `Prime[A-Z]` identifiers; removed variant strings (§8.2); old ramp utilities (`(bg|text|border|ring)-(primary|secondary|accent|muted|surface)-\d+`); hex/rgb color literals; arbitrary **length** values (`-[<n>px|rem]`, e.g. `text-[12px]`). Layout brackets such as `grid-cols-[auto_1fr]` or `rounded-[inherit]` are allowed (README bans arbitrary *pixel* values, not brackets).
    - Foundations commits a **baseline** (`forbidden-patterns.baseline.json`: per-file counts of today's violations — at time of writing 60 arbitrary length values and 23 hex literals, plus all ramp/`Prime*` usages).
    - The test fails if any file's count **increases** or a new file introduces a violation; counts may only go down. Each sub-project lowers the baseline for what it migrates; sub-project 3 ends with an empty baseline for ramps, `Prime*`, removed variants and length values.
