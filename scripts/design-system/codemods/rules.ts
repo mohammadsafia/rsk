@@ -238,6 +238,32 @@ const cardRule: TagRule = {
   transform: () => ({}),
 };
 
+const TABS_LIST: Readonly<Record<string, { variant?: 'contained'; fullWidth?: true }>> = {
+  default: { variant: 'contained', fullWidth: true },
+  compact: { variant: 'contained' },
+  plain: { fullWidth: true },
+  compactPlain: {},
+};
+
+const tabsListRule: TagRule = {
+  tag: 'Tabs.List',
+  keys: ['variant'],
+  // A list without a variant used the old default, so it maps like `default`.
+  transform: (attrs) => {
+    const mapped = lookup(TABS_LIST, attrs.variant ?? 'default', 'Tabs.List variant');
+    const out: Record<string, AttrValue> = {};
+    if (mapped.variant) out.variant = mapped.variant;
+    if (mapped.fullWidth) out.fullWidth = true;
+    return out;
+  },
+};
+
+const tabsTriggerRule: TagRule = {
+  tag: 'Tabs.Trigger',
+  keys: ['variant'],
+  transform: () => ({}),
+};
+
 export const RULE_SETS: Record<string, ReadonlyArray<TagRule>> = {
   button: [buttonRule('Button'), buttonRule('LoadingButton', 'Button')],
   badge: [badgeRule, statusPillRule],
@@ -246,4 +272,5 @@ export const RULE_SETS: Record<string, ReadonlyArray<TagRule>> = {
   feedback: [progressRule, skeletonRule, switchRule, checkboxRule],
   menus: [toggleRule('ToggleGroup'), toggleRule('ToggleGroup.Item')],
   card: [cardRule],
+  tabs: [tabsListRule, tabsTriggerRule],
 };

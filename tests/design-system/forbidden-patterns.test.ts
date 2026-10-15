@@ -120,6 +120,7 @@ const CLEAN_UI_FOLDERS = [
   'dropdown-menu',
   'toast',
   'card',
+  'tabs',
 ] as const;
 
 describe('clean primitives', () => {

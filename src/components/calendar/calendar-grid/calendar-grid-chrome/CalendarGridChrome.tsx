@@ -62,7 +62,7 @@ const ViewTabs: FC = () => {
         if (value === 'day' || value === 'week' || value === 'month') setView(value);
       }}
     >
-      <Tabs.List>
+      <Tabs.List variant="contained" fullWidth>
         <Tabs.Trigger value="day">Day</Tabs.Trigger>
 
         <Tabs.Trigger value="week">Week</Tabs.Trigger>

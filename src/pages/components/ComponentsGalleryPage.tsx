@@ -148,7 +148,7 @@ const ComponentDocsGalleryPage = () => {
         </header>
 
         <Tabs value={activeCategoryKey} onValueChange={handleCategoryChange} className="mb-6">
-          <Tabs.List variant="default" className="border-primary-100">
+          <Tabs.List variant="contained" fullWidth className="border-primary-100">
             {categoryTabOptions.map((tab) => {
               const isActive = tab.key === activeCategoryKey;
               const count = searchText.trim()

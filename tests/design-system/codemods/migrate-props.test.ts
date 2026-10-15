@@ -155,3 +155,18 @@ describe('card rules', () => {
     expect(run(input)).toBe(expected);
   });
 });
+describe('tabs rules', () => {
+  const run = (source: string) => migrateSource(source, RULE_SETS.tabs, 'x.tsx').output;
+
+  it.each([
+    ['<Tabs.List>', '<Tabs.List variant="contained" fullWidth>'],
+    ['<Tabs.List variant="default" className="x">', '<Tabs.List variant="contained" fullWidth className="x">'],
+    ['<Tabs.List variant="compact">', '<Tabs.List variant="contained">'],
+    ['<Tabs.List variant="plain">', '<Tabs.List fullWidth>'],
+    ['<Tabs.List variant="compactPlain">', '<Tabs.List>'],
+    ['<Tabs.Trigger value="a" variant="fitContent">', '<Tabs.Trigger value="a">'],
+    ['<Tabs.Trigger value="a">', '<Tabs.Trigger value="a">'],
+  ])('%s → %s', (input, expected) => {
+    expect(run(input)).toBe(expected);
+  });
+});

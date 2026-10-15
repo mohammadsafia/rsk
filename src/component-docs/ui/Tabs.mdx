@@ -13,57 +13,46 @@ import { Tabs } from '@components/ui';
 
 <div className="space-y-6">
     <div>
-        <p className="text-muted-foreground mb-2 text-xs font-medium">List Variants</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Variants</p>
         <div className="space-y-4">
             <Tabs defaultValue="account" className="w-80">
-                <Tabs.List variant="default">
+                <Tabs.List variant="contained" fullWidth>
                     <Tabs.Trigger value="account">Account</Tabs.Trigger>
                     <Tabs.Trigger value="password">Password</Tabs.Trigger>
                 </Tabs.List>
-                <Tabs.Content value="account">Default variant tab content</Tabs.Content>
+                <Tabs.Content value="account">Contained, full width</Tabs.Content>
                 <Tabs.Content value="password">Password tab content</Tabs.Content>
             </Tabs>
 
             <Tabs defaultValue="account" className="w-80">
-                <Tabs.List variant="compact">
+                <Tabs.List variant="contained">
                     <Tabs.Trigger value="account">Account</Tabs.Trigger>
                     <Tabs.Trigger value="password">Password</Tabs.Trigger>
                 </Tabs.List>
-                <Tabs.Content value="account">Compact variant tab content</Tabs.Content>
+                <Tabs.Content value="account">Contained</Tabs.Content>
                 <Tabs.Content value="password">Password tab content</Tabs.Content>
             </Tabs>
 
             <Tabs defaultValue="account" className="w-80">
-                <Tabs.List variant="plain">
+                <Tabs.List fullWidth>
                     <Tabs.Trigger value="account">Account</Tabs.Trigger>
                     <Tabs.Trigger value="password">Password</Tabs.Trigger>
                 </Tabs.List>
-                <Tabs.Content value="account">Plain variant tab content</Tabs.Content>
+                <Tabs.Content value="account">Underline, full width</Tabs.Content>
                 <Tabs.Content value="password">Password tab content</Tabs.Content>
             </Tabs>
 
             <Tabs defaultValue="account" className="w-80">
-                <Tabs.List variant="compactPlain">
+                <Tabs.List>
                     <Tabs.Trigger value="account">Account</Tabs.Trigger>
                     <Tabs.Trigger value="password">Password</Tabs.Trigger>
                 </Tabs.List>
-                <Tabs.Content value="account">Compact Plain variant tab content</Tabs.Content>
+                <Tabs.Content value="account">Compact Underline, full width</Tabs.Content>
                 <Tabs.Content value="password">Password tab content</Tabs.Content>
             </Tabs>
         </div>
     </div>
 
-    <div>
-        <p className="text-muted-foreground mb-2 text-xs font-medium">Trigger Variants</p>
-        <Tabs defaultValue="account" className="w-80">
-            <Tabs.List>
-                <Tabs.Trigger value="account" variant="default">Default Trigger</Tabs.Trigger>
-                <Tabs.Trigger value="password" variant="fitContent">Fit Content</Tabs.Trigger>
-            </Tabs.List>
-            <Tabs.Content value="account">Account tab content</Tabs.Content>
-            <Tabs.Content value="password">Password tab content</Tabs.Content>
-        </Tabs>
-    </div>
 
 </div>
 
@@ -76,17 +65,18 @@ import { Tabs } from '@components/ui';
 ## Code
 
 ```tsx
-// List Variants
+// underline (default) · underline fullWidth · contained · contained fullWidth
 <Tabs defaultValue="account">
-  <Tabs.List variant="default">...</Tabs.List>
-  <Tabs.List variant="compact">...</Tabs.List>
-  <Tabs.List variant="plain">...</Tabs.List>
-  <Tabs.List variant="compactPlain">...</Tabs.List>
+  <Tabs.List variant="contained" fullWidth>...</Tabs.List>
+  <Tabs.List variant="contained">...</Tabs.List>
+  <Tabs.List fullWidth>...</Tabs.List>
+  <Tabs.List>...</Tabs.List>
 </Tabs>
-
-// Trigger Variants
-<Tabs.List>
-  <Tabs.Trigger value="account" variant="default">Default</Tabs.Trigger>
-  <Tabs.Trigger value="password" variant="fitContent">Fit Content</Tabs.Trigger>
-</Tabs.List>
 ```
+
+## API
+
+| Prop (`Tabs.List`) | Type | Default | Notes |
+|---|---|---|---|
+| `variant` | `'underline' \| 'contained'` | `'underline'` | Underline: 2px accent bar under the active tab. Contained: sunken track, active tab on the surface. |
+| `fullWidth` | `boolean` | `false` | Triggers share the full width. |
