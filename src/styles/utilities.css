@@ -14,14 +14,17 @@
 
 /* Motion durations */
 @utility duration-fast {
+  --tw-duration: var(--duration-fast);
   transition-duration: var(--duration-fast);
 }
 
 @utility duration-base {
+  --tw-duration: var(--duration-base);
   transition-duration: var(--duration-base);
 }
 
 @utility duration-slow {
+  --tw-duration: var(--duration-slow);
   transition-duration: var(--duration-slow);
 }
 
@@ -37,7 +40,9 @@
 
 /* Focus: text inputs and input-like triggers — ring border + soft glow. */
 @utility focus-ring-input {
-  outline: none;
+  /* transparent (not none) so forced-colors mode can still paint a focus outline */
+  outline: 2px solid transparent;
+  outline-offset: -2px;
 
   &:focus-visible,
   &:focus-within {

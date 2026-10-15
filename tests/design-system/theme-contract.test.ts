@@ -150,3 +150,23 @@ describe('retired meanings', () => {
     expect(offenders).toEqual([]);
   });
 });
+
+describe('utility behavior', () => {
+  const utilitiesCss = readProjectFile('src/styles/utilities.css');
+  const utilityBody = (name: string) => {
+    const start = utilitiesCss.indexOf(`@utility ${name} {`);
+    return utilitiesCss.slice(start, utilitiesCss.indexOf('\n}', start));
+  };
+
+  for (const speed of ['fast', 'base', 'slow']) {
+    it(`duration-${speed} also drives tw-animate enter/exit animations`, () => {
+      expect(utilityBody(`duration-${speed}`)).toContain(`--tw-duration: var(--duration-${speed});`);
+    });
+  }
+
+  it('focus-ring-input keeps a transparent outline so focus survives forced-colors mode', () => {
+    const body = utilityBody('focus-ring-input');
+    expect(body).toContain('outline: 2px solid transparent;');
+    expect(body).not.toContain('outline: none');
+  });
+});
