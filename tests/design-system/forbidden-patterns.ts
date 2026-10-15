@@ -70,7 +70,7 @@ export function listSourceFiles(repoRoot: string): string[] {
     });
 
   return walk(join(repoRoot, 'src'))
-    .filter((file) => /\.(tsx|mdx)$/.test(file) && !/\.test\.tsx$/.test(file))
+    .filter((file) => /\.(tsx|mdx)$/.test(file) && !file.endsWith('.test.tsx'))
     .map((file) => toPosix(relative(repoRoot, file)))
     .sort();
 }

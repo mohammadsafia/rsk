@@ -1,6 +1,6 @@
 # RSK — React Starter Kit
 
-A production-grade React + TypeScript starter template with an opinionated architecture, 78+ pre-built components, a warm earth design system in OKLCH, enforced code standards, and advanced tooling including a Swagger-to-TypeScript DTO generator and MDX component documentation. Built for teams that care about consistency, type safety, and developer experience.
+A production-grade React + TypeScript starter template with an opinionated architecture, 78+ pre-built components, the Graphite Instrument design system in OKLCH, enforced code standards, and advanced tooling including a Swagger-to-TypeScript DTO generator and MDX component documentation. Built for teams that care about consistency, type safety, and developer experience.
 
 ---
 
@@ -54,13 +54,14 @@ Key rules: `queryKey` is a plain `string`, not an array. Every handler response 
 
 ### Design System
 
-RSK uses the OKLCH color space with a warm earth palette centered on hue 55–65. This provides perceptually uniform lightness steps and vibrant, accessible color at every shade.
+RSK's visual system is **Graphite Instrument**: dark-first graphite neutrals with a hand-tuned light mode, one **Oxblood** accent, vermilion errors and steel info — all defined in OKLCH.
 
-- 14 primary tonal variations spanning L 10–98
-- Dual light/dark themes — every token is defined in both `:root` and `.dark` in `index.css`
-- Shadow system built with `color-mix()` for theme-aware depth
-- Shared a11y utilities exported from `src/lib/utils/tailwind.ts`: `FOCUS_RING`, `DISABLED_STYLES`, `TRANSITION_DEFAULT`
-- DM Sans variable font, type scale from `2xs` to `2xl`
+- Two token layers: raw ramps in `src/styles/palette.css`, semantic roles (`canvas`, `surface`, `fg-muted`, `border-strong`, `accent`, `danger`, …) in `src/styles/tokens.css`, exposed to Tailwind by `src/styles/theme.css`
+- Dual light/dark themes — every semantic token is defined in both `:root, .light` and `.dark`; WCAG AA contrast is enforced by `tests/design-system/contrast.test.ts`
+- Schibsted Grotesk + Noto Kufi Arabic + Spline Sans Mono; 14px body, type scale from `2xs` to `2xl`, extra leading under `dir="rtl"`
+- Radius 4 / 6 / 10, control heights 28 / 32 / 40 (`h-control-sm|md|lg`), borders on resting surfaces and `shadow-raised` / `shadow-overlay` for floating layers
+- State utilities in `src/styles/utilities.css`: `focus-ring`, `focus-ring-input`, `state-invalid`, `state-press`, `duration-fast|base|slow` (reduced-motion safe)
+- Browse it all on the **Foundations** tab of the component gallery (`/components`)
 
 ### Routing & Layouts
 
@@ -112,7 +113,7 @@ The codebase enforces a 12-category standards checklist. Here are the key princi
 
 **Conditional Rendering** — The `Conditional.If` component is mandatory. Never use `&&` or ternary operators for conditional rendering in JSX. Use the `fallback` prop for else-cases.
 
-**Styling** — Theme-aware tokens only (`bg-background`, not `bg-white`). Use `cn()` for conditional class merging. Tailwind scale values only — no arbitrary pixel values like `p-[24px]`. No hardcoded hex/rgb colors.
+**Styling** — Semantic tokens only (`bg-canvas`, `text-fg-muted`, `border-border-strong` — see the Foundations page in the gallery); never raw colors. Use `cn()` for conditional class merging. Tailwind scale values only — no arbitrary pixel values like `p-[24px]`. No hardcoded hex/rgb colors.
 
 **Component Order** — Strict internal hook ordering is enforced: core hooks → contexts → utility hooks → queries/mutations → refs → state → computed → callbacks → effects → JSX.
 
@@ -287,7 +288,7 @@ Opens on http://localhost:3000.
 
 - **DTO generator** — Requires a Swagger/OpenAPI endpoint configured in `.dto-gen.json`. Run `pnpm dto:init` to scaffold the config file before first use.
 
-- **Theming** — The default theme is dark. When adding new design tokens, define them in both `:root` (light) and `.dark` (dark) blocks in `index.css`.
+- **Theming** — The default theme is dark. Semantic tokens live in `src/styles/tokens.css` (light on `:root, .light`, dark on `.dark`) and are exposed to Tailwind in `src/styles/theme.css`; `pnpm test` enforces WCAG contrast for every pair.
 
 - **Component docs** — Run `pnpm docs:new` to scaffold MDX component documentation in `src/component-docs/`. The live demo gallery is driven by these files.
 

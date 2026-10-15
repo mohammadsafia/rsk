@@ -170,7 +170,8 @@ export default defineConfig({
     sortTailwindcss: {},
     // *.hbs: DTO generator templates; formatting them as HTML corrupts generated output.
     // *.mdx: oxfmt mangles inline `export const` JSX blocks in component docs.
-    ignorePatterns: ['**/*.hbs', '**/*.mdx'],
+    // .claude/skills: vendored Taste skills; reformatting breaks their skills-lock.json hashes.
+    ignorePatterns: ['**/*.hbs', '**/*.mdx', '.claude/skills/**'],
   },
   plugins: lazyPlugins(() => [mdxPlugin, react(), tailwindcss()]),
   server: {
