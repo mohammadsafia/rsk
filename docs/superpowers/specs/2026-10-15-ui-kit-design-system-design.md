@@ -56,8 +56,8 @@ The work is split into four sub-projects. **Each gets its own implementation pla
 | # | Sub-project | Scope | Visible breakage |
 |---|---|---|---|
 | 1 | **Foundations** | Token layers, fonts, type scale, radius, sizes, elevation, motion, state rules, test guards, Taste install | None by design (old ramp tokens are removed in #2, together with their call sites) |
-| 2 | **Primitives (`ui/`)** | Restyle + new API for every `ui/` component; migrate their call sites; remove old color ramps | Yes — migrated in the same PR |
-| 3 | **Composites (`forms/`, `shared/`, `tables/`, `calendar/`)** | Rebuild on new primitives; consolidation map (§8.2); uniform form-field contract | Yes — migrated in the same PR |
+| 2 | **Primitives (`ui/`)** | Restyle + new API for every `ui/` component; migrate their call sites; remove legacy color use inside `ui/` (addendum: `2026-10-15-ui-kit-primitives-design.md`) | Yes — migrated in the same PR |
+| 3 | **Composites (`forms/`, `shared/`, `tables/`, `calendar/`)** | Rebuild on new primitives; consolidation map (§8.2); uniform form-field contract; migrate remaining legacy color use (pages, layouts, docs) and **delete the legacy bridge** | Yes — migrated in the same PR |
 | 4 | **New components** | The 16 additions (§9) built natively in the system | None |
 
 This spec details **sub-project 1 fully** and fixes the binding rules for 2–4.
@@ -190,7 +190,7 @@ These are implemented once as Tailwind `@utility` helpers (e.g. `state-hover`, `
 - Contrast + forbidden-pattern tests; test deps installed.
 - Taste `redesign-skill` + `output-skill` installed project-locally (`npx skills add Leonxlnx/taste-skill --skill <name>`).
 - A **Foundations page** in the component gallery: color roles (both modes), type scale (EN + AR), radius, sizes, elevation, motion, states.
-- Until sub-project 2 lands, legacy ramp variables stay defined (mapped onto the new palette) so nothing renders broken in between; they are deleted in sub-project 2 together with their call sites.
+- Until sub-project 3 lands, legacy ramp variables stay defined (mapped onto the new palette) so nothing renders broken in between; they are deleted at the end of sub-project 3 together with their last call sites (amended 2026-10-15, see the SP2 addendum §2).
 
 ## 8. Binding Rules for Sub-projects 2–3
 
@@ -271,3 +271,7 @@ Each new component goes through §6 in full (variant matrix first).
 
 - Exact OKLCH conversions and the 12-step raw ramps (sub-project 1 plan).
 - Per-component variant matrices for layers 2–4 (produced in each plan's audit step, per §6).
+
+## 13. Amendments
+
+- **2026-10-15 (SP2 brainstorming):** legacy bridge deletion moved to the end of sub-project 3; duplicate tokens `inverse`/`inverse-fg` removed in favor of `fg`/`fg-inverse` (`fg-hover`/`fg-pressed`); colored side-stripe borders added to the banned patterns. Details: `docs/superpowers/specs/2026-10-15-ui-kit-primitives-design.md` §2.
