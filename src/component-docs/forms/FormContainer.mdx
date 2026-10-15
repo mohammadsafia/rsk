@@ -29,3 +29,23 @@ const form = useForm({ defaultValues: { name: '' } });
   {/* Form fields go here */}
 </FormContainer>;
 ```
+
+## Actions
+
+`FormContainer.Actions` renders the footer row: extra actions (children), then **Cancel** and **Save**. Save shows `loading` while the submit handler runs.
+
+```tsx
+<FormContainer formContext={form} onSuccess={handleSave}>
+  <FormInput name="name" label="Name" />
+  <FormContainer.Actions confirmOnCancel sticky />
+</FormContainer>
+```
+
+| Prop | Default | Notes |
+|---|---|---|
+| `submitLabel` | `t('save')` | Submit button text |
+| `cancelLabel` | `t('cancel')` | Cancel button text |
+| `onCancel` | `navigate(-1)` | Called on cancel (after confirmation when asked) |
+| `confirmOnCancel` | `false` | Ask before discarding — only when the form has unsaved changes |
+| `hideCancel` | `false` | Submit only |
+| `sticky` | `false` | Pin the row to the bottom of a scrolling form |

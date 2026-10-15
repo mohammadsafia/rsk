@@ -1,0 +1,37 @@
+---
+id: form-section
+title: FormSection
+section: Components
+category: Forms
+description: 'A titled group of fields; consecutive sections are separated by a hairline.'
+tags: [forms, section, layout]
+---
+
+import { FormSection } from '@components/forms';
+import { Input } from '@components/ui';
+
+## Demo
+
+<div className="max-w-lg">
+  <FormSection title="Patient" description="Who the visit is for">
+    <Input aria-label="Full name" placeholder="Full name" />
+    <Input aria-label="Phone" placeholder="Phone" />
+  </FormSection>
+  <FormSection title="Insurance">
+    <Input aria-label="Policy number" placeholder="Policy number" />
+  </FormSection>
+</div>
+
+## Imports
+
+```tsx
+import { FormSection } from '@components/forms';
+```
+
+## API
+
+| Prop | Type | Notes |
+|---|---|---|
+| `title` | `ReactNode` | Section heading |
+| `description` | `ReactNode` | Muted line under the heading |
+| `children` | fields | Laid out in a `gap-4` grid |

@@ -77,5 +77,11 @@
   },
   "command": {
     "suggestions": "Suggestions"
+  },
+  "form": {
+    "discardTitle": "Discard unsaved changes?",
+    "discardDescription": "Your changes on this form will be lost.",
+    "discardConfirm": "Discard",
+    "keepEditing": "Keep editing"
   }
 }

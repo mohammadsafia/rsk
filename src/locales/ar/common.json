@@ -77,5 +77,11 @@
   },
   "command": {
     "suggestions": "اقتراحات"
+  },
+  "form": {
+    "discardTitle": "تجاهل التغييرات غير المحفوظة؟",
+    "discardDescription": "ستفقد التغييرات التي أجريتها على هذا النموذج.",
+    "discardConfirm": "تجاهل",
+    "keepEditing": "متابعة التعديل"
   }
 }

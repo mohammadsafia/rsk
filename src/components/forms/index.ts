@@ -13,3 +13,4 @@ export * from './form-number';
 export * from './form-time-picker';
 export * from './form-checkbox-group';
 export * from './form-radio-group';
+export * from './form-section';
