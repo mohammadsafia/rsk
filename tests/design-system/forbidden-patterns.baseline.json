@@ -125,13 +125,6 @@
   "src/component-docs/ui/ToggleGroup.mdx": {
     "legacy-color-name": 3
   },
-  "src/components/forms/form-checkbox-group/FormCheckboxGroup.tsx": {
-    "legacy-color-name": 11
-  },
-  "src/components/forms/form-checkbox/FormCheckbox.tsx": {
-    "legacy-color-ramp": 10,
-    "legacy-color-name": 13
-  },
   "src/components/forms/form-file-uploader/FormFileUploader.tsx": {
     "legacy-color-name": 3
   },
@@ -140,9 +133,6 @@
   },
   "src/components/forms/form-message/FormMessage.tsx": {
     "legacy-color-name": 1
-  },
-  "src/components/forms/form-radio-group/FormRadioGroup.tsx": {
-    "legacy-color-name": 11
   },
   "src/components/shared/action-panel/ActionPanel.tsx": {
     "legacy-color-name": 1

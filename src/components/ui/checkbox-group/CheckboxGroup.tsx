@@ -9,7 +9,7 @@ type CheckboxGroupItemProps = ComponentProps<typeof CheckboxPrimitive.Root>;
 
 type CheckboxGroupIndicatorProps = ComponentPropsWithoutRef<typeof CheckboxPrimitive.Indicator>;
 
-type CheckboxGroupProps = ComponentPropsWithoutRef<'div'>;
+type CheckboxGroupProps = ComponentPropsWithoutRef<'div'> & { invalid?: boolean };
 
 type CheckboxGroupComponent = FC<CheckboxGroupProps> & {
   Item: FC<CheckboxGroupItemProps>;
@@ -24,6 +24,7 @@ const Item: FC<CheckboxGroupItemProps> = ({ ref, className, children, ...props }
       'group/checkbox-item border-border bg-surface text-fg flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition-colors',
       'focus-ring hover:not-disabled:border-border-strong',
       'data-[state=checked]:border-accent data-[state=checked]:bg-accent-subtle',
+      'in-aria-invalid:border-danger',
       'disabled:pointer-events-none disabled:opacity-50',
       className,
     )}
@@ -39,8 +40,14 @@ const Indicator = ({ className, children, ...props }: CheckboxGroupIndicatorProp
   </CheckboxPrimitive.Indicator>
 );
 
-const CheckboxGroup: CheckboxGroupComponent = ({ className, children, ...props }) => (
-  <div role="group" data-slot="checkbox-group" className={cn('grid w-full gap-3', className)} {...props}>
+const CheckboxGroup: CheckboxGroupComponent = ({ className, invalid, children, ...props }) => (
+  <div
+    role="group"
+    data-slot="checkbox-group"
+    aria-invalid={invalid || undefined}
+    className={cn('grid w-full gap-3', className)}
+    {...props}
+  >
     {children}
   </div>
 );

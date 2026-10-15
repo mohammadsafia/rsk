@@ -13,7 +13,7 @@ type RadioGroupDotProps = {
   className?: string;
 };
 
-type RadioGroupProps = ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>;
+type RadioGroupProps = ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root> & { invalid?: boolean };
 
 type RadioGroupComponent = FC<RadioGroupProps> & {
   Item: FC<RadioGroupItemProps>;
@@ -25,6 +25,7 @@ type RadioGroupComponent = FC<RadioGroupProps> & {
 const radioCircleClassName = [
   'border-border-strong bg-surface flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors',
   'after:size-2 after:rounded-full data-[state=checked]:border-accent data-[state=checked]:after:bg-accent',
+  'in-aria-invalid:border-danger',
 ].join(' ');
 
 const Item: FC<RadioGroupItemProps> = ({ ref, className, children, ...props }) => (
@@ -35,6 +36,7 @@ const Item: FC<RadioGroupItemProps> = ({ ref, className, children, ...props }) =
       'group/radio-item border-border bg-surface text-fg flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition-colors',
       'focus-ring hover:not-disabled:border-border-strong',
       'data-[state=checked]:border-accent data-[state=checked]:bg-accent-subtle',
+      'in-aria-invalid:border-danger',
       'disabled:pointer-events-none disabled:opacity-50',
       className,
     )}
@@ -60,8 +62,13 @@ const Dot: FC<RadioGroupDotProps> = ({ checked = false, className }) => (
   />
 );
 
-const RadioGroup: RadioGroupComponent = ({ className, ...props }) => (
-  <RadioGroupPrimitive.Root data-slot="radio-group" className={cn('grid w-full gap-3', className)} {...props} />
+const RadioGroup: RadioGroupComponent = ({ className, invalid, ...props }) => (
+  <RadioGroupPrimitive.Root
+    data-slot="radio-group"
+    aria-invalid={invalid || undefined}
+    className={cn('grid w-full gap-3', className)}
+    {...props}
+  />
 );
 
 // React 18 bridge — remove forwardRef wrapper when upgrading to React 19
