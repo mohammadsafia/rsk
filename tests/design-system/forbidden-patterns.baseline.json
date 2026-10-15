@@ -144,10 +144,6 @@
   "src/components/forms/form-radio-group/FormRadioGroup.tsx": {
     "legacy-color-name": 11
   },
-  "src/components/forms/form-textarea/FormTextarea.tsx": {
-    "legacy-color-ramp": 4,
-    "legacy-color-name": 12
-  },
   "src/components/shared/action-panel/ActionPanel.tsx": {
     "legacy-color-name": 1
   },

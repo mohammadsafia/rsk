@@ -1,0 +1,30 @@
+---
+id: textarea
+title: Textarea
+section: Components
+category: UI
+description: 'Multi-line field on the shared field shape; grows with its content.'
+tags: [ui, textarea, input]
+---
+
+import { Textarea } from '@components/ui';
+
+## Demo
+
+<div className="grid max-w-md gap-3">
+  <Textarea placeholder="Visit notes" />
+  <Textarea invalid defaultValue="Too short" />
+</div>
+
+## Imports
+
+```tsx
+import { Textarea } from '@components/ui';
+```
+
+## API
+
+| Prop | Type | Notes |
+|---|---|---|
+| `invalid` | `boolean` | Sets `aria-invalid` and the danger border |
+| native props | `textarea` attributes | `rows`, `placeholder`, `disabled`, … |

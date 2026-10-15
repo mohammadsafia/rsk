@@ -25,6 +25,7 @@ export * from './progress';
 export * from './scroll-area';
 export * from './formatted-number';
 export * from './input';
+export * from './textarea';
 export * from './select';
 export * from './skeleton';
 export * from './switch';
