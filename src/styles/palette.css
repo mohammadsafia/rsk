@@ -1,0 +1,82 @@
+/* Layer 1 — raw palette (mode-independent OKLCH ramps, step 1 = lightest).
+ * Components never use these directly; tokens.css and the legacy bridge do. */
+:root {
+  /* graphite */
+  --graphite-1: oklch(0.98 0.003 266);
+  --graphite-2: oklch(0.95 0.004 266);
+  --graphite-3: oklch(0.9 0.005 266);
+  --graphite-4: oklch(0.84 0.006 266);
+  --graphite-5: oklch(0.76 0.008 266);
+  --graphite-6: oklch(0.68 0.009 266);
+  --graphite-7: oklch(0.6 0.011 266);
+  --graphite-8: oklch(0.52 0.011 266);
+  --graphite-9: oklch(0.44 0.01 266);
+  --graphite-10: oklch(0.36 0.008 266);
+  --graphite-11: oklch(0.28 0.007 266);
+  --graphite-12: oklch(0.2 0.005 266);
+  /* oxblood */
+  --oxblood-1: oklch(0.98 0.008 14);
+  --oxblood-2: oklch(0.95 0.024 14);
+  --oxblood-3: oklch(0.9 0.052 14);
+  --oxblood-4: oklch(0.84 0.078 14);
+  --oxblood-5: oklch(0.76 0.098 14);
+  --oxblood-6: oklch(0.68 0.117 14);
+  --oxblood-7: oklch(0.6 0.138 14);
+  --oxblood-8: oklch(0.52 0.142 14);
+  --oxblood-9: oklch(0.44 0.122 14);
+  --oxblood-10: oklch(0.36 0.102 14);
+  --oxblood-11: oklch(0.28 0.082 14);
+  --oxblood-12: oklch(0.2 0.062 14);
+  /* green */
+  --green-1: oklch(0.98 0.03 157);
+  --green-2: oklch(0.95 0.047 157);
+  --green-3: oklch(0.9 0.058 157);
+  --green-4: oklch(0.84 0.072 157);
+  --green-5: oklch(0.76 0.091 157);
+  --green-6: oklch(0.68 0.11 157);
+  --green-7: oklch(0.6 0.128 157);
+  --green-8: oklch(0.52 0.123 157);
+  --green-9: oklch(0.44 0.104 157);
+  --green-10: oklch(0.36 0.086 157);
+  --green-11: oklch(0.28 0.067 157);
+  --green-12: oklch(0.2 0.05 157);
+  /* amber */
+  --amber-1: oklch(0.98 0.014 72);
+  --amber-2: oklch(0.95 0.037 72);
+  --amber-3: oklch(0.9 0.058 72);
+  --amber-4: oklch(0.84 0.072 72);
+  --amber-5: oklch(0.76 0.091 72);
+  --amber-6: oklch(0.68 0.11 72);
+  --amber-7: oklch(0.6 0.128 72);
+  --amber-8: oklch(0.52 0.111 72);
+  --amber-9: oklch(0.44 0.094 72);
+  --amber-10: oklch(0.36 0.078 72);
+  --amber-11: oklch(0.28 0.061 72);
+  --amber-12: oklch(0.2 0.046 72);
+  /* vermilion */
+  --vermilion-1: oklch(0.98 0.01 36);
+  --vermilion-2: oklch(0.95 0.025 36);
+  --vermilion-3: oklch(0.9 0.053 36);
+  --vermilion-4: oklch(0.84 0.088 36);
+  --vermilion-5: oklch(0.76 0.124 36);
+  --vermilion-6: oklch(0.68 0.149 36);
+  --vermilion-7: oklch(0.6 0.174 36);
+  --vermilion-8: oklch(0.52 0.178 36);
+  --vermilion-9: oklch(0.44 0.151 36);
+  --vermilion-10: oklch(0.36 0.124 36);
+  --vermilion-11: oklch(0.28 0.098 36);
+  --vermilion-12: oklch(0.2 0.075 36);
+  /* steel */
+  --steel-1: oklch(0.98 0.009 257);
+  --steel-2: oklch(0.95 0.01 257);
+  --steel-3: oklch(0.9 0.012 257);
+  --steel-4: oklch(0.84 0.016 257);
+  --steel-5: oklch(0.76 0.019 257);
+  --steel-6: oklch(0.68 0.024 257);
+  --steel-7: oklch(0.6 0.028 257);
+  --steel-8: oklch(0.52 0.028 257);
+  --steel-9: oklch(0.44 0.024 257);
+  --steel-10: oklch(0.36 0.02 257);
+  --steel-11: oklch(0.28 0.016 257);
+  --steel-12: oklch(0.2 0.012 257);
+}
