@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { contrastRatio, oklchToSrgb, parseOklch, relativeLuminance } from './color';
+import { compositeOver, contrastRatio, oklchToSrgb, parseOklch, relativeLuminance } from './color';
 import { extractBlock, readProjectFile, resolveToken } from './css-tokens';
 
 describe('parseOklch', () => {
@@ -65,5 +65,16 @@ describe('css-tokens', () => {
 
   it('reads files relative to the repo root', () => {
     expect(readProjectFile('package.json')).toContain('"name": "react-start-kit"');
+  });
+});
+
+describe('compositeOver', () => {
+  it('returns the top color when it is opaque', () => {
+    expect(compositeOver(parseOklch('oklch(1 0 0)'), [0, 0, 0])).toEqual(oklchToSrgb(parseOklch('oklch(1 0 0)')));
+  });
+
+  it('blends a translucent color over the background in gamma-encoded sRGB', () => {
+    const [r, g, b] = compositeOver(parseOklch('oklch(1 0 0 / 25%)'), [0, 0, 0]);
+    [r, g, b].forEach((channel) => expect(channel).toBeCloseTo(0.25, 3));
   });
 });

@@ -21,13 +21,12 @@
   --color-border-strong: var(--border-strong);
   --color-border-subtle: var(--border-subtle);
 
-  --color-inverse: var(--inverse);
-  --color-inverse-fg: var(--inverse-fg);
-  --color-inverse-hover: var(--inverse-hover);
-  --color-inverse-pressed: var(--inverse-pressed);
+  --color-fg-hover: var(--fg-hover);
+  --color-fg-pressed: var(--fg-pressed);
 
   --color-accent: var(--accent);
   --color-accent-fg: var(--accent-fg);
+  --color-accent-hover: var(--accent-hover);
   --color-accent-subtle: var(--accent-subtle);
   --color-ring: var(--ring);
   --color-ring-subtle: var(--ring-subtle);
@@ -41,6 +40,7 @@
   --color-danger: var(--danger);
   --color-danger-subtle: var(--danger-subtle);
   --color-danger-fg: var(--danger-fg);
+  --color-danger-hover: var(--danger-hover);
   --color-info: var(--info);
   --color-info-subtle: var(--info-subtle);
   --color-info-fg: var(--info-fg);

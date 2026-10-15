@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { contrastRatio, oklchToSrgb, parseOklch } from './color';
+import { compositeOver, contrastRatio, oklchToSrgb, parseOklch } from './color';
 import { extractBlock, readProjectFile, resolveToken } from './css-tokens';
 
 const TEXT = 4.5;
@@ -22,10 +22,11 @@ const PAIRS: ReadonlyArray<readonly [string, string, number]> = [
   ['danger', 'surface', TEXT],
   ['info', 'surface', TEXT],
   ['accent-fg', 'accent', TEXT],
-  ['inverse-fg', 'inverse', TEXT],
-  ['inverse-fg', 'inverse-hover', TEXT],
-  ['inverse-fg', 'inverse-pressed', TEXT],
-  ['fg-inverse', 'inverse', TEXT],
+  ['fg-inverse', 'fg', TEXT],
+  ['fg-inverse', 'fg-hover', TEXT],
+  ['fg-inverse', 'fg-pressed', TEXT],
+  ['accent-fg', 'accent-hover', TEXT],
+  ['danger-fg', 'danger-hover', TEXT],
   ['success-fg', 'success', TEXT],
   ['warning-fg', 'warning', TEXT],
   ['danger-fg', 'danger', TEXT],
@@ -100,6 +101,24 @@ describe('legacy bridge contrast (WCAG AA text)', () => {
         const vars = resolvedVars(mode);
         const ratio = contrastRatio(opaqueRgb(vars, foreground), opaqueRgb(vars, background));
         expect(ratio).toBeGreaterThanOrEqual(TEXT);
+      });
+    }
+  }
+});
+
+/** Status text on its own tint (Badge soft, Alert soft). Dark tints are translucent, so they are composited over surface first. */
+const TINT_PAIRS = ['success', 'warning', 'danger', 'info'] as const;
+
+describe('status text on its own tint (WCAG AA text)', () => {
+  for (const mode of ['.light', '.dark'] as const) {
+    const vars = extractBlock(tokensCss, mode);
+    const surface = oklchToSrgb(parseOklch(resolveToken(vars, 'surface')));
+
+    for (const status of TINT_PAIRS) {
+      it(`${mode} ${status} on ${status}-subtle ≥ ${TEXT}:1`, () => {
+        const text = oklchToSrgb(parseOklch(resolveToken(vars, status)));
+        const tint = compositeOver(parseOklch(resolveToken(vars, `${status}-subtle`)), surface);
+        expect(contrastRatio(text, tint)).toBeGreaterThanOrEqual(TEXT);
       });
     }
   }

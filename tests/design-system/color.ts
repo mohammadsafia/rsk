@@ -53,3 +53,9 @@ export function contrastRatio(first: Rgb, second: Rgb): number {
   const [lighter, darker] = [relativeLuminance(first), relativeLuminance(second)].sort((x, y) => y - x);
   return (lighter + 0.05) / (darker + 0.05);
 }
+
+/** Alpha-composites `top` over an opaque sRGB `bottom` the way browsers do (gamma-encoded sRGB). */
+export function compositeOver(top: Oklch, bottom: Rgb): Rgb {
+  const topRgb = oklchToSrgb(top);
+  return topRgb.map((channel, index) => channel * top.alpha + bottom[index] * (1 - top.alpha)) as Rgb;
+}

@@ -20,26 +20,26 @@
   --border-strong: oklch(0.657 0.009 271.3);
   --border-subtle: oklch(0.952 0.004 271.4);
 
-  --inverse: oklch(0.205 0.006 271.1);
-  --inverse-fg: oklch(1 0 0);
-  --inverse-hover: oklch(0.29 0.007 271.1);
-  --inverse-pressed: oklch(0.34 0.008 271.1);
+  --fg-hover: oklch(0.29 0.007 271.1);
+  --fg-pressed: oklch(0.34 0.008 271.1);
 
   --accent: oklch(0.43 0.141 14.9);
   --accent-fg: oklch(1 0 0);
+  --accent-hover: oklch(0.37 0.13 14.9);
   --accent-subtle: oklch(0.953 0.013 5.8);
   --ring: var(--accent);
   --ring-subtle: oklch(0.43 0.141 14.9 / 20%);
 
-  --success: oklch(0.536 0.137 157.2);
+  --success: oklch(0.5 0.13 157.2);
   --success-subtle: oklch(0.964 0.018 161.1);
   --success-fg: oklch(1 0 0);
-  --warning: oklch(0.561 0.125 70.4);
+  --warning: oklch(0.53 0.12 70.4);
   --warning-subtle: oklch(0.972 0.022 83.3);
   --warning-fg: oklch(1 0 0);
-  --danger: oklch(0.576 0.184 35.5);
+  --danger: oklch(0.55 0.18 35.5);
   --danger-subtle: oklch(0.957 0.018 39.4);
   --danger-fg: oklch(1 0 0);
+  --danger-hover: oklch(0.48 0.17 35.5);
   --info: oklch(0.503 0.026 256.8);
   --info-subtle: oklch(0.957 0.005 258.3);
   --info-fg: oklch(1 0 0);
@@ -77,13 +77,12 @@
   --border-strong: oklch(0.508 0.011 271.1);
   --border-subtle: oklch(0.239 0.008 264.4);
 
-  --inverse: oklch(0.928 0.003 264.5);
-  --inverse-fg: oklch(0.173 0.004 264.5);
-  --inverse-hover: oklch(0.86 0.004 264.5);
-  --inverse-pressed: oklch(0.8 0.005 264.5);
+  --fg-hover: oklch(0.86 0.004 264.5);
+  --fg-pressed: oklch(0.8 0.005 264.5);
 
   --accent: oklch(0.698 0.125 12);
   --accent-fg: oklch(0.173 0.004 264.5);
+  --accent-hover: oklch(0.75 0.11 12);
   --accent-subtle: oklch(0.698 0.125 12 / 11%);
   --ring: var(--accent);
   --ring-subtle: oklch(0.698 0.125 12 / 25%);
@@ -97,6 +96,7 @@
   --danger: oklch(0.704 0.192 37.1);
   --danger-subtle: oklch(0.704 0.192 37.1 / 12%);
   --danger-fg: oklch(0.173 0.004 264.5);
+  --danger-hover: oklch(0.76 0.17 37.1);
   --info: oklch(0.715 0.023 256.8);
   --info-subtle: oklch(0.715 0.023 256.8 / 12%);
   --info-fg: oklch(0.173 0.004 264.5);

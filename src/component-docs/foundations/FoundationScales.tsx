@@ -41,7 +41,7 @@ const FoundationScales = () => (
         {CONTROL_SIZES.map((size) => (
           <span
             key={size.token}
-            className={cn(HEIGHT_CLASS[size.token], 'bg-inverse text-inverse-fg inline-flex items-center rounded-md px-3 text-sm')}
+            className={cn(HEIGHT_CLASS[size.token], 'bg-fg text-fg-inverse inline-flex items-center rounded-md px-3 text-sm')}
           >
             {size.use}
           </span>
@@ -76,7 +76,7 @@ const FoundationScales = () => (
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
-          className="focus-ring state-press bg-inverse text-inverse-fg hover:bg-inverse-hover active:bg-inverse-pressed h-control-md rounded-md px-3 text-sm"
+          className="focus-ring state-press bg-fg text-fg-inverse hover:bg-fg-hover active:bg-fg-pressed h-control-md rounded-md px-3 text-sm"
         >
           Press or tab to me
         </button>
