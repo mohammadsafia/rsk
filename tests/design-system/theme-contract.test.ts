@@ -62,8 +62,8 @@ describe('index.css import order', () => {
 
 describe('legacy accent migration', () => {
   it('leaves no usage of the old soft-hover accent utilities in src/', () => {
-    const legacyAccent =
-      /\b(?:bg|text|border|ring)-accent-(?:foreground|200|300|400)\b|(?:focus|hover|data-\[(?!slot=)[^\]]+\]):bg-accent(?![-\w])/;
+    // The soft-hover meaning of `accent` is gone (SP1); state-scoped `bg-accent` is now the legitimate Oxblood selection.
+    const legacyAccent = /\b(?:bg|text|border|ring)-accent-(?:foreground|200|300|400)\b/;
     const offenders = listFiles(SRC_DIR)
       .filter((file) => /\.(tsx|ts|mdx)$/.test(file))
       .filter((file) => legacyAccent.test(readFileSync(file, 'utf8')))
