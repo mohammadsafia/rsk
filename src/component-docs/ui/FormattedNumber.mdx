@@ -49,3 +49,15 @@ import { FormattedNumber } from '@components/ui';
 // With suffix
 <FormattedNumber suffix="%" max={100} />
 ```
+
+## API
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `showStepButtons` | `boolean` | `false` | Shows labelled − / + buttons, disabled at `min` / `max`. |
+| `stepper` | `number` | `1` | Step for the buttons and the ↑ / ↓ keys. |
+| `min` / `max` | `number` | `0` / — | Values outside the range are rejected. |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Same heights as `Input`. |
+| `invalid` | `boolean` | `false` | Sets `aria-invalid` and the danger border. |
+
+The control stays left-to-right in Arabic, so signs and digit groups keep their order. The value is end-aligned in tabular mono digits.

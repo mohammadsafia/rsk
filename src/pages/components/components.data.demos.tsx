@@ -275,6 +275,7 @@ export function FormNumberTextareaDemo() {
     <FormContainer formContext={form} onSuccess={() => {}} className="w-96 space-y-3">
       <FormNumber name="qty" control={form.control} label="Quantity" required placeholder="Enter quantity " />
       <FormNumber
+        showStepButtons
         name="qty2"
         control={form.control}
         min={-10}

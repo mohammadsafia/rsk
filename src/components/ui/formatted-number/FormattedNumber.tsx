@@ -1,12 +1,14 @@
 import { type ComponentPropsWithoutRef, type FC, forwardRef, type KeyboardEvent, type Ref } from 'react';
 import { type NumberFormatValues, NumericFormat } from 'react-number-format';
 
-import { Button } from '@components/ui';
+import { fieldVariants, type FieldVariants, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
+
+import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
 
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { MinusIcon, PlusIcon } from 'lucide-react';
 
 const clampValue = (value: number, min?: number, max?: number) => {
   if (min !== undefined && value < min) return min;
@@ -15,20 +17,22 @@ const clampValue = (value: number, min?: number, max?: number) => {
   return value;
 };
 
-export type FormattedNumberProps = Omit<ComponentPropsWithoutRef<typeof NumericFormat>, 'value' | 'onChange' | 'onValueChange'> & {
-  ref?: Ref<HTMLInputElement>;
-  value?: number | null;
-  min?: number;
-  max?: number;
-  decimalScale?: number;
-  stepper?: number;
-  prefix?: string;
-  suffix?: string;
-  thousandSeparator?: string;
-  showStepButtons?: boolean;
-  isDecimal?: boolean;
-  onChange?: (value: number | null) => void;
-};
+export type FormattedNumberProps = Omit<ComponentPropsWithoutRef<typeof NumericFormat>, 'value' | 'onChange' | 'onValueChange' | 'size'> &
+  FieldVariants & {
+    ref?: Ref<HTMLInputElement>;
+    value?: number | null;
+    min?: number;
+    max?: number;
+    decimalScale?: number;
+    stepper?: number;
+    prefix?: string;
+    suffix?: string;
+    thousandSeparator?: string;
+    showStepButtons?: boolean;
+    isDecimal?: boolean;
+    invalid?: boolean;
+    onChange?: (value: number | null) => void;
+  };
 
 const FormattedNumber: FC<FormattedNumberProps> = ({
   ref,
@@ -43,82 +47,80 @@ const FormattedNumber: FC<FormattedNumberProps> = ({
   decimalScale,
   isDecimal = true,
   showStepButtons = false,
+  size,
+  invalid = false,
+  disabled,
   value,
   ...props
-}: FormattedNumberProps) => {
+}) => {
+  const { t } = useAppTranslation('common');
+
   const isIncrementDisabled = max !== undefined && (value ?? 0) >= max;
   const isDecrementDisabled = min !== undefined && (value ?? 0) <= min;
 
-  const onValueChange = ({ floatValue }: NumberFormatValues) => onChange?.(floatValue ?? null);
+  const handleValueChange = ({ floatValue }: NumberFormatValues) => onChange?.(floatValue ?? null);
 
-  const onIncrement = () => onChange?.(clampValue((value ?? 0) + stepper, min, max));
+  const handleIncrement = () => onChange?.(clampValue((value ?? 0) + stepper, min, max));
 
-  const onDecrement = () => onChange?.(clampValue((value ?? 0) - stepper, min, max));
+  const handleDecrement = () => onChange?.(clampValue((value ?? 0) - stepper, min, max));
 
-  const onKeyboardChange = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'ArrowUp' && !isIncrementDisabled) onIncrement();
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'ArrowUp' && !isIncrementDisabled) handleIncrement();
 
-    if (e.key === 'ArrowDown' && !isDecrementDisabled) onDecrement();
+    if (event.key === 'ArrowDown' && !isDecrementDisabled) handleDecrement();
   };
 
+  // The whole control is an LTR island: a signed or grouped number must not be reordered by the bidi algorithm (addendum §11).
   return (
-    <div className="flex flex-col">
-      <div className="flex items-center gap-0.5">
-        <div className="relative w-full">
-          <NumericFormat
-            data-slot="formatted-number-input"
-            className={cn(
-              'border-muted-200 bg-background flex w-full rounded-md border p-3 text-sm shadow-xs transition-[color,box-shadow] outline-none',
-              'placeholder:text-muted-foreground',
-              'hover:not-disabled:border-primary hover:not-disabled:ring-primary hover:not-disabled:ring',
-              'focus-visible:ring-primary focus-visible:border-primary focus-visible:ring',
-              'disabled:bg-muted-50 disabled:text-muted-300 disabled:placeholder:text-muted-300 disabled:pointer-events-none',
-              className,
-            )}
-            getInputRef={ref}
-            value={value}
-            thousandSeparator={thousandSeparator}
-            decimalScale={isDecimal ? decimalScale : 0}
-            prefix={prefix ? `${prefix} ` : undefined}
-            suffix={suffix ? `   ${suffix}` : undefined}
-            allowNegative={min < 0}
-            onValueChange={onValueChange}
-            onKeyDown={onKeyboardChange}
-            isAllowed={({ floatValue }) => {
-              if (floatValue === undefined) return true;
+    <div data-slot="formatted-number" dir="ltr" className="relative w-full">
+      <NumericFormat
+        data-slot="formatted-number-input"
+        dir="ltr"
+        aria-invalid={invalid || undefined}
+        disabled={disabled}
+        className={cn(fieldVariants({ size }), 'text-end font-mono tabular-nums', showStepButtons && 'pe-16', className)}
+        getInputRef={ref}
+        value={value}
+        thousandSeparator={thousandSeparator}
+        decimalScale={isDecimal ? decimalScale : 0}
+        prefix={prefix ? `${prefix} ` : undefined}
+        suffix={suffix ? ` ${suffix}` : undefined}
+        allowNegative={min < 0}
+        onValueChange={handleValueChange}
+        onKeyDown={handleKeyDown}
+        isAllowed={({ floatValue }) => {
+          if (floatValue === undefined) return true;
 
-              return (min === undefined || floatValue >= min) && (max === undefined || floatValue <= max);
-            }}
-            {...props}
-          />
+          return (min === undefined || floatValue >= min) && (max === undefined || floatValue <= max);
+        }}
+        {...props}
+      />
 
-          <Conditional.If condition={!showStepButtons}>
-            <div className="absolute inset-e-2 inset-bs-1/2 z-10 flex h-fit -translate-y-1/2 flex-col justify-center">
-              <Button
-                variant="ghost"
-                type="button"
+      <Conditional.If condition={showStepButtons}>
+        <div data-slot="formatted-number-steps" className="absolute inset-y-0 end-1 my-auto flex h-fit items-center gap-0.5">
+          <IconButton
+            type="button"
+            size="sm"
+            tooltip={false}
+            aria-label={t('number.decrement')}
+            disabled={disabled || isDecrementDisabled}
+            onClick={handleDecrement}
+          >
+            <MinusIcon />
+          </IconButton>
 
-                className="bg-background h-fit rounded-none rounded-t-md p-0"
-                onClick={onIncrement}
-                disabled={props.disabled || isIncrementDisabled}
-              >
-                <ChevronUp size={16} />
-              </Button>
-
-              <Button
-                variant="ghost"
-                type="button"
-
-                className="bg-background h-fit rounded-none rounded-b-md p-0"
-                onClick={onDecrement}
-                disabled={props.disabled || isDecrementDisabled}
-              >
-                <ChevronDown size={16} />
-              </Button>
-            </div>
-          </Conditional.If>
+          <IconButton
+            type="button"
+            size="sm"
+            tooltip={false}
+            aria-label={t('number.increment')}
+            disabled={disabled || isIncrementDisabled}
+            onClick={handleIncrement}
+          >
+            <PlusIcon />
+          </IconButton>
         </div>
-      </div>
+      </Conditional.If>
     </div>
   );
 };

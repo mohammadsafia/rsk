@@ -45,16 +45,7 @@ function FormNumber<TFieldValues extends FieldValues>({
             </FormLabel>
 
             <div className="relative">
-              <FormattedNumber
-                id={`${id}-${name}`}
-                className={cn(
-                  error &&
-                    'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive placeholder:text-destructive ps-8',
-                  className,
-                )}
-                {...field}
-                {...props}
-              />
+              <FormattedNumber id={`${id}-${name}`} className={cn(error && 'ps-8', className)} invalid={!!error} {...field} {...props} />
 
               <FormMessage className={errorClassName} hidden={!error} error={error!} />
             </div>

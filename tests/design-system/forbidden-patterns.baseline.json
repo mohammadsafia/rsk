@@ -156,9 +156,6 @@
   "src/components/forms/form-multi-combobox/FormMultiCombobox.tsx": {
     "legacy-color-name": 6
   },
-  "src/components/forms/form-number/FormNumber.tsx": {
-    "legacy-color-name": 6
-  },
   "src/components/forms/form-radio-group/FormRadioGroup.tsx": {
     "legacy-color-name": 11
   },
@@ -257,10 +254,6 @@
   "src/components/tables/data-table/data-table-toolbar/DataTableToolbar.tsx": {
     "legacy-color-ramp": 4,
     "legacy-color-name": 4
-  },
-  "src/components/ui/formatted-number/FormattedNumber.tsx": {
-    "legacy-color-ramp": 4,
-    "legacy-color-name": 8
   },
   "src/components/ui/layout/Layout.tsx": {
     "prime-component": 2,
