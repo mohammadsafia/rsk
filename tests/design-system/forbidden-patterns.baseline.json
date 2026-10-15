@@ -147,22 +147,6 @@
   "src/components/shared/stepper/Stepper.tsx": {
     "legacy-color-ramp": 4
   },
-  "src/components/tables/data-table-filters/async-select-filter/AsyncSelectFilter.tsx": {
-    "legacy-color-ramp": 3
-  },
-  "src/components/tables/data-table-filters/date-filter/DateFilter.tsx": {
-    "legacy-color-ramp": 3
-  },
-  "src/components/tables/data-table-filters/filter-chip-list/FilterChipList.tsx": {
-    "legacy-color-ramp": 3,
-    "legacy-color-name": 1
-  },
-  "src/components/tables/data-table-filters/select-filter/SelectFilter.tsx": {
-    "legacy-color-ramp": 3
-  },
-  "src/components/tables/data-table-filters/time-filter/TimeFilter.tsx": {
-    "legacy-color-ramp": 3
-  },
   "src/components/tables/data-table/data-table-content/DataTableContent.tsx": {
     "legacy-color-name": 1
   },

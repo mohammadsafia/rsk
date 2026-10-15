@@ -107,6 +107,11 @@ describe('clean primitives', () => {
     const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) => file.startsWith('src/components/forms/'));
     expect(offenders).toEqual([]);
   });
+
+  it('table filters contain no forbidden patterns (SP3 Plan A)', () => {
+    const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) => file.startsWith('src/components/tables/data-table-filters/'));
+    expect(offenders).toEqual([]);
+  });
 });
 
 /** Folders SP2 replaced (addendum §1, §8, §10). None may come back under src/components. */

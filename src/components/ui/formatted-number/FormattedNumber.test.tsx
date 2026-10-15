@@ -60,4 +60,14 @@ describe('FormattedNumber', () => {
     fireEvent.blur(screen.getByRole('textbox', { name: 'Quantity' }));
     expect(handleChange).toHaveBeenLastCalledWith(10);
   });
+  it('steps with the arrow keys without moving the caret, and keeps the consumer handler', () => {
+    const handleChange = vi.fn();
+    const handleKeyDown = vi.fn();
+    renderNumber({ value: 5, min: 0, max: 10, onChange: handleChange, onKeyDown: handleKeyDown });
+    const input = screen.getByRole('textbox', { name: 'Quantity' });
+    // fireEvent returns false when a handler called preventDefault.
+    expect(fireEvent.keyDown(input, { key: 'ArrowUp' })).toBe(false);
+    expect(handleChange).toHaveBeenCalledWith(6);
+    expect(handleKeyDown).toHaveBeenCalledTimes(1);
+  });
 });

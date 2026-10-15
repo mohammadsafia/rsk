@@ -52,6 +52,7 @@ const FormattedNumber: FC<FormattedNumberProps> = ({
   disabled,
   value,
   onBlur,
+  onKeyDown,
   ...props
 }) => {
   const { t } = useAppTranslation('common');
@@ -72,9 +73,18 @@ const FormattedNumber: FC<FormattedNumberProps> = ({
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'ArrowUp' && !isIncrementDisabled) handleIncrement();
+    onKeyDown?.(event);
+    if (event.defaultPrevented) return;
 
-    if (event.key === 'ArrowDown' && !isDecrementDisabled) handleDecrement();
+    if (event.key === 'ArrowUp' && !isIncrementDisabled) {
+      event.preventDefault();
+      handleIncrement();
+    }
+
+    if (event.key === 'ArrowDown' && !isDecrementDisabled) {
+      event.preventDefault();
+      handleDecrement();
+    }
   };
 
   // Plaintext bidi keeps a signed or grouped number in LTR order (addendum §11) while the control itself follows the

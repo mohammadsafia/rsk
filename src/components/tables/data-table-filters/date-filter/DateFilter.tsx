@@ -94,10 +94,10 @@ function DateFilter<TData>({ column, filterMeta }: DateFilterProps<TData>) {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <Combobox.Trigger className="hover:not-disabled:border-primary-25 hover:not-disabled:ring-primary-25 w-auto gap-1 rounded-sm px-2 py-1 text-xs">
+      <Combobox.Trigger size="sm" className="w-auto gap-1">
         {filterMeta.label}
 
-        <ChevronDown size={16} className="text-muted-400" />
+        <ChevronDown size={16} className="text-fg-muted" />
 
         <FilterChipList chips={chips} onRemoveChip={onRemoveChip} maxVisibleChips={1} />
       </Combobox.Trigger>
