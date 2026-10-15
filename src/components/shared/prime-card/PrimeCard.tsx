@@ -36,22 +36,21 @@ type CardComponent = FC<PrimeCardProps> & {
   Content: FC<PrimeCardContentProps>;
 };
 
+// Tints cover the whole card so header and body read as one surface; text stays fg on every tint.
 const primeCardVariants = cva('', {
   variants: {
     variant: {
       default: '',
-      primary: 'bg-primary-15',
-      secondary: 'bg-secondary-15',
-      success: 'bg-success-200',
-      destructive: 'bg-destructive-200',
-      warning: 'bg-warning-200',
+      primary: 'bg-accent-subtle',
+      secondary: 'bg-surface-sunken',
+      success: 'bg-success-subtle',
+      destructive: 'bg-danger-subtle',
+      warning: 'bg-warning-subtle',
       info: 'bg-info-subtle',
-      outline:
-        'border-2 border-primary bg-transparent transition-colors hover:bg-primary-600 hover:text-primary-foreground dark:hover:bg-primary-300',
-      'outline-secondary':
-        'border-2 border-secondary bg-transparent transition-colors hover:bg-secondary-600 hover:text-secondary-foreground',
-      glass: 'backdrop-blur-sm bg-background/10',
-      gradient: 'bg-linear-to-br from-primary-25 to-secondary-25',
+      outline: 'border-border-strong',
+      'outline-dashed': 'border-border-strong border-dashed',
+      glass: 'bg-surface/80 backdrop-blur-sm',
+      gradient: 'bg-linear-to-br from-surface to-accent-subtle',
     },
   },
   defaultVariants: {
@@ -60,13 +59,13 @@ const primeCardVariants = cva('', {
 });
 
 const PrimeCardHeader: FC<PrimeCardHeaderProps> = ({ className, ...props }) => (
-  <Card.Header className={cn('bg-background border-primary-25 rounded-ss-[inherit] rounded-se-[inherit] border-b', className)} {...props} />
+  <Card.Header className={cn('border-border-subtle border-b pb-3', className)} {...props} />
 );
 
 const PrimeCardHeaderLeading: FC<PrimeCardHeaderLeadingProps> = ({ className, children, ...props }) => (
   <div
     data-slot="prime-card-header-leading"
-    className={cn('grid grid-cols-[auto_1fr] items-center gap-x-2', '*:data-[slot=card-description]:col-start-2', className)}
+    className={cn('grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-0.5', '*:data-[slot=card-description]:col-start-2', className)}
     {...props}
   >
     {children}
@@ -74,7 +73,7 @@ const PrimeCardHeaderLeading: FC<PrimeCardHeaderLeadingProps> = ({ className, ch
 );
 
 const PrimeCardTitle: FC<PrimeCardHeaderProps> = ({ className, ...props }) => (
-  <Card.Title className={cn('flex items-center gap-2', className)} {...props} />
+  <Card.Title className={cn('flex items-center gap-1.5', className)} {...props} />
 );
 
 const PrimeCardTooltip: FC<PrimeCardTooltipProps> = ({ children, ...props }) => {
@@ -89,7 +88,7 @@ const PrimeCardTooltip: FC<PrimeCardTooltipProps> = ({ children, ...props }) => 
         onClick={(event) => event.preventDefault()}
         onPointerDown={(event) => event.preventDefault()}
       >
-        <Info size={20} aria-hidden="true" />
+        <Info size={16} aria-hidden="true" />
       </button>
     </Tooltip>
   );
@@ -121,7 +120,7 @@ const PrimeCard: CardComponent = ({ className, variant, title, icon, tooltip, de
           <PrimeCardHeader>
             <PrimeCardHeaderLeading className={cn(!icon && 'contents')}>
               <Conditional.If condition={!!icon}>
-                <span className="text-primary-900">{icon}</span>
+                <span className="text-fg-muted flex [&_svg]:size-4">{icon}</span>
               </Conditional.If>
 
               <PrimeCardTitle>

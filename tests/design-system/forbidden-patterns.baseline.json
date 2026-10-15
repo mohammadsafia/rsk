@@ -69,8 +69,7 @@
     "legacy-color-name": 1
   },
   "src/component-docs/shared/PrimeCard.mdx": {
-    "prime-component": 43,
-    "legacy-color-name": 1
+    "prime-component": 43
   },
   "src/component-docs/shared/PrimeLoader.mdx": {
     "prime-component": 4
@@ -197,9 +196,7 @@
     "legacy-color-ramp": 1
   },
   "src/components/shared/prime-card/PrimeCard.tsx": {
-    "prime-component": 56,
-    "legacy-color-ramp": 12,
-    "legacy-color-name": 7
+    "prime-component": 56
   },
   "src/components/shared/prime-loader/PrimeLoader.tsx": {
     "prime-component": 4,
