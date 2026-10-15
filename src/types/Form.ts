@@ -6,6 +6,7 @@ export type FieldBaseProps<TFieldValues extends FieldValues = FieldValues> = {
   name: Path<TFieldValues>;
   label?: ReactNode;
   tooltip?: ReactNode;
+  description?: ReactNode;
   required?: boolean;
   rules?: ControllerProps<TFieldValues>['rules'];
   containerClassName?: string;
