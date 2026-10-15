@@ -3,7 +3,7 @@ import { Controller, type FieldValues } from 'react-hook-form';
 
 import { Select } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
+import { FormField } from '@components/forms';
 
 import { cn } from '@utils';
 
@@ -31,11 +31,9 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
   rules,
   control,
   label,
+  description,
   tooltip,
-  containerClassName,
-  labelClassName,
   className,
-  errorClassName,
   required,
   options,
   placeholder = 'Select',
@@ -70,20 +68,10 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
         };
 
         return (
-          <FormControl className={containerClassName}>
-            <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
-              {label}
-            </FormLabel>
-
-            <div className="relative">
+          <FormField id={name} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+            {(fieldControl) => (
               <Select value={internalValue ?? ''} onValueChange={onValueChange} {...field} {...props}>
-                <Select.Trigger
-                  ref={ref}
-                  id={name}
-                  invalid={!!error}
-                  className={cn(!!error && 'ps-8', className)}
-                  disabled={field.disabled || props.disabled}
-                >
+                <Select.Trigger ref={ref} {...fieldControl} className={className} disabled={field.disabled || props.disabled}>
                   <Select.Value placeholder={placeholder} />
 
                   <Conditional.If condition={!!internalValue && !field.disabled && !props.disabled && clearable}>
@@ -118,10 +106,8 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
                   ))}
                 </Select.Content>
               </Select>
-
-              <FormMessage className={errorClassName} hidden={!error} error={error!} />
-            </div>
-          </FormControl>
+            )}
+          </FormField>
         );
       }}
     />

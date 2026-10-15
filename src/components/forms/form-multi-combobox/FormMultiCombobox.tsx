@@ -5,7 +5,7 @@ import { type FieldValues, useController } from 'react-hook-form';
 import { Badge, Button, Checkbox } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { Combobox } from '@components/shared';
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
+import { FormField } from '@components/forms';
 
 import { cn } from '@utils';
 
@@ -42,11 +42,9 @@ function FormMultiCombobox<TFieldValues extends FieldValues, TOption = FormSelec
   rules,
   control,
   label,
+  description,
   tooltip,
-  containerClassName,
-  labelClassName,
   className,
-  errorClassName,
   required,
   disabled,
   options,
@@ -137,20 +135,15 @@ function FormMultiCombobox<TFieldValues extends FieldValues, TOption = FormSelec
   };
 
   return (
-    <FormControl className={containerClassName}>
-      <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
-        {label}
-      </FormLabel>
-
-      <div className="relative">
+    <FormField id={name} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+      {(fieldControl) => (
         <Combobox open={open} onOpenChange={setOpen}>
           <Combobox.Trigger
             ref={ref}
-            id={name}
+            {...fieldControl}
             onBlur={field.onBlur}
             disabled={field.disabled || disabled}
-            invalid={!!error}
-            className={cn('h-auto min-h-control-md flex-wrap py-1', error && 'ps-8', className)}
+            className={cn('h-auto min-h-control-md flex-wrap py-1', className)}
           >
             <Combobox.Value placeholder={placeholder}>
               <Conditional>
@@ -225,10 +218,8 @@ function FormMultiCombobox<TFieldValues extends FieldValues, TOption = FormSelec
             </Combobox.List>
           </Combobox.Content>
         </Combobox>
-
-        <FormMessage className={errorClassName} hidden={!error} error={error!} />
-      </div>
-    </FormControl>
+      )}
+    </FormField>
   );
 }
 

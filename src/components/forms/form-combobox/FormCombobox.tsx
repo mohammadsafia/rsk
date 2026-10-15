@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { type FieldValues, useController } from 'react-hook-form';
 
 import { Combobox } from '@components/shared';
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
+import { FormField } from '@components/forms';
 
 import { cn } from '@utils';
 
@@ -38,11 +38,9 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
   rules,
   control,
   label,
+  description,
   tooltip,
-  containerClassName,
-  labelClassName,
   className,
-  errorClassName,
   required,
   disabled,
   options,
@@ -131,21 +129,10 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
   };
 
   return (
-    <FormControl className={containerClassName}>
-      <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
-        {label}
-      </FormLabel>
-
-      <div className="relative">
+    <FormField id={name} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+      {(fieldControl) => (
         <Combobox open={open} onOpenChange={setOpen}>
-          <Combobox.Trigger
-            ref={ref}
-            id={name}
-            invalid={!!error}
-            className={cn(error && 'ps-8', className)}
-            disabled={field.disabled || disabled}
-            onBlur={field.onBlur}
-          >
+          <Combobox.Trigger ref={ref} {...fieldControl} className={className} disabled={field.disabled || disabled} onBlur={field.onBlur}>
             <Combobox.Value className="truncate" placeholder={placeholder}>
               {selectedOption ? getOptionLabel(selectedOption) : undefined}
             </Combobox.Value>
@@ -190,10 +177,8 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
             </Combobox.List>
           </Combobox.Content>
         </Combobox>
-
-        <FormMessage className={errorClassName} hidden={!error} error={error!} />
-      </div>
-    </FormControl>
+      )}
+    </FormField>
   );
 }
 
