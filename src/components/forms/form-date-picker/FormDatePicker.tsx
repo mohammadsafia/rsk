@@ -5,7 +5,7 @@ import { Calendar, type CalendarProps, Popover, IconButton } from '@components/u
 import { Conditional } from '@components/utils';
 import { FormControl, FormLabel, FormMessage } from '@components/forms';
 
-import { DATE_INPUT_FORMATS, type DateInputFormat, useDateMask } from '@hooks/shared';
+import { DATE_INPUT_FORMATS, type DateInputFormat, useAppTranslation, useDateMask } from '@hooks/shared';
 import { cn } from '@utils';
 
 import { CalendarIcon, XIcon } from 'lucide-react';
@@ -38,6 +38,8 @@ function FormDatePicker<TFieldValues extends FieldValues>({
   formatDate,
   ...props
 }: FormDatePickerProps<TFieldValues>) {
+  const { t } = useAppTranslation('common');
+
   const [isOpen, setIsOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState<Date | undefined>(undefined);
 
@@ -234,7 +236,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
 
             <div className="flex shrink-0 items-center gap-2">
               <Conditional.If condition={!!date && !disabled}>
-                <IconButton tabIndex={-1} tone="danger" size="sm" aria-label="Clear" onClick={handleClear}>
+                <IconButton tabIndex={-1} tone="danger" size="sm" aria-label={t('clear')} onClick={handleClear}>
                   <XIcon size={16} />
                 </IconButton>
               </Conditional.If>

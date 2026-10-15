@@ -3,7 +3,7 @@ import { type ComponentPropsWithoutRef, type FC, useMemo } from 'react';
 import { Tabs, ToggleGroup, IconButton } from '@components/ui';
 import { type CalendarLegendItem, CalendarPicker, type CalendarPickerSelected, useCalendarGridContext } from '@components/calendar';
 
-import { useDate } from '@hooks/shared';
+import { useAppTranslation, useDate } from '@hooks/shared';
 
 import { cn } from '@utils';
 
@@ -33,17 +33,18 @@ const Header: FC<HeaderProps> = ({ className, children, ...props }) => (
 );
 
 const Navigation: FC = () => {
+  const { t } = useAppTranslation('common');
   const { navigationLabel, goPrev, goNext } = useCalendarGridContext();
 
   return (
     <div data-slot="calendar-grid-navigation" className="flex items-center gap-2">
-      <IconButton size="sm" type="button" aria-label="Previous" onClick={goPrev}>
+      <IconButton size="sm" type="button" aria-label={t('previous')} onClick={goPrev}>
         <ChevronLeft size={20} className="text-muted-400" />
       </IconButton>
 
       <span className="text-foreground text-sm font-bold">{navigationLabel}</span>
 
-      <IconButton size="sm" type="button" aria-label="Next" onClick={goNext}>
+      <IconButton size="sm" type="button" aria-label={t('next')} onClick={goNext}>
         <ChevronRight size={20} className="text-muted-400" />
       </IconButton>
     </div>
@@ -78,6 +79,7 @@ const ViewToggle: FC = () => {
   return (
     <ToggleGroup
       type="single"
+      variant="ghost"
       value={viewMode}
       onValueChange={(value) => {
         if (value === 'calendar' || value === 'list') setViewMode(value);

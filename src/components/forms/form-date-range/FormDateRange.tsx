@@ -7,7 +7,7 @@ import { Calendar, type CalendarProps, Popover, IconButton } from '@components/u
 import { Conditional } from '@components/utils';
 import { FormControl, FormLabel, FormMessage } from '@components/forms';
 
-import { DATE_INPUT_FORMATS, type DateInputFormat, useDateRangeMask } from '@hooks/shared';
+import { DATE_INPUT_FORMATS, type DateInputFormat, useAppTranslation, useDateRangeMask } from '@hooks/shared';
 import { cn } from '@utils';
 
 import { CalendarIcon, XIcon } from 'lucide-react';
@@ -86,6 +86,8 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
   dateFormat = DATE_INPUT_FORMATS.US_SLASH,
   ...props
 }) => {
+  const { t } = useAppTranslation('common');
+
   const [isOpen, setIsOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState<Date | undefined>(undefined);
 
@@ -251,7 +253,7 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
 
             <div className="flex shrink-0 items-center gap-2">
               <Conditional.If condition={!!hasValue && !disabled}>
-                <IconButton tabIndex={-1} tone="danger" size="sm" aria-label="Clear" onClick={handleClear}>
+                <IconButton tabIndex={-1} tone="danger" size="sm" aria-label={t('clear')} onClick={handleClear}>
                   <XIcon size={16} />
                 </IconButton>
               </Conditional.If>
