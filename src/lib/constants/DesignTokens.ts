@@ -21,6 +21,8 @@ export const SEMANTIC_COLOR_ROLES: ReadonlyArray<SemanticColorRole> = [
   { token: 'border-subtle', group: 'line', description: 'Table row lines' },
   { token: 'inverse', group: 'action', description: 'Primary action fill' },
   { token: 'inverse-fg', group: 'action', description: 'Text on primary action' },
+  { token: 'inverse-hover', group: 'action', description: 'Primary action fill on hover (solid step, not an overlay)' },
+  { token: 'inverse-pressed', group: 'action', description: 'Primary action fill while pressed' },
   { token: 'accent', group: 'accent', description: 'Oxblood: links, selection, focus' },
   { token: 'accent-fg', group: 'accent', description: 'Text on accent fill' },
   { token: 'accent-subtle', group: 'accent', description: 'Selection tint' },

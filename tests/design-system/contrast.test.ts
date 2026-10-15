@@ -23,6 +23,8 @@ const PAIRS: ReadonlyArray<readonly [string, string, number]> = [
   ['info', 'surface', TEXT],
   ['accent-fg', 'accent', TEXT],
   ['inverse-fg', 'inverse', TEXT],
+  ['inverse-fg', 'inverse-hover', TEXT],
+  ['inverse-fg', 'inverse-pressed', TEXT],
   ['fg-inverse', 'inverse', TEXT],
   ['success-fg', 'success', TEXT],
   ['warning-fg', 'warning', TEXT],

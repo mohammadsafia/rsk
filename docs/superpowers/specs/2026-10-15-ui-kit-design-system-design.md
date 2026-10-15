@@ -99,6 +99,7 @@ Consequence of rule 4: **every design value must exist as a theme token** so com
 | Control boundaries (inputs, checkboxes — WCAG 1.4.11, ≥3:1) | `border-strong` | `#63656C` | `#8F9197` |
 | Row lines | `border-subtle` | `#1D1F23` | `#EEEFF2` |
 | Primary action | `inverse` / `inverse-fg` | `#E6E7E9` / `#0F1012` | `#16171A` / `#FFFFFF` |
+| Primary action hover / pressed (solid steps, never an overlay) | `inverse-hover` / `inverse-pressed` | `oklch(0.86 …)` / `oklch(0.8 …)` | `oklch(0.29 …)` / `oklch(0.34 …)` |
 | Accent (Oxblood) | `accent` | `#E07B89` | `#8C2236` |
 | Text on accent | `accent-fg` | `#0F1012` | `#FFFFFF` |
 | Selection tint | `accent-subtle` | accent @ 11% | `#F8ECEE` |
@@ -159,7 +160,7 @@ Each status also gets `-fg` (text on its solid fill): `#0F1012` in dark, `#FFFFF
 
 | State | Treatment |
 |---|---|
-| Hover | `fg` overlay 4% (ghost/outline) or one surface step (solid) |
+| Hover | `hover` overlay (ghost/outline) or a solid step for filled controls (`inverse-hover`; never `bg-hover`/`bg-pressed` on a solid fill — it replaces the fill) |
 | Pressed | `fg` overlay 8% + `scale(0.98)` |
 | Selected | `accent-subtle` background (rows, calendar ranges, list items) |
 | Focus | `:focus-visible` only. Buttons/links: 2px solid `ring` outline + 2px offset. Inputs: `ring` border + 3px `ring-subtle` glow |

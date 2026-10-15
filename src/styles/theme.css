@@ -23,6 +23,8 @@
 
   --color-inverse: var(--inverse);
   --color-inverse-fg: var(--inverse-fg);
+  --color-inverse-hover: var(--inverse-hover);
+  --color-inverse-pressed: var(--inverse-pressed);
 
   --color-accent: var(--accent);
   --color-accent-fg: var(--accent-fg);

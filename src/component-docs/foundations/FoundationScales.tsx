@@ -76,7 +76,7 @@ const FoundationScales = () => (
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
-          className="focus-ring state-press bg-inverse text-inverse-fg hover:bg-pressed h-control-md rounded-md px-3 text-sm"
+          className="focus-ring state-press bg-inverse text-inverse-fg hover:bg-inverse-hover active:bg-inverse-pressed h-control-md rounded-md px-3 text-sm"
         >
           Press or tab to me
         </button>
