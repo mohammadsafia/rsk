@@ -3,7 +3,7 @@ id: calendar
 title: Calendar
 section: Components
 category: UI
-description: 'Date picker calendar with support for single, range, and dropdown caption layouts.'
+description: '32px day cells: today has a hairline ring, selection and range ends use the accent, the range middle a soft accent tint. Labels, locale and direction follow the app language; digits stay Western.'
 tags: [ui, calendar, date-picker]
 ---
 
@@ -44,3 +44,11 @@ import { Calendar } from '@components/ui';
 // Custom button variant
 <Calendar mode="single" buttonVariant="outline" />
 ```
+
+## Look and language
+
+- **Today** — hairline `border-strong` ring, never a fill.
+- **Selected / range ends** — `bg-accent text-accent-fg`; the **range middle** sits on `bg-accent-subtle`.
+- **Outside days** — `text-fg-subtle`; **disabled days** are struck through.
+- Previous/next buttons are ghost icon buttons with translated labels and mirror in Arabic.
+- The calendar's locale and direction follow the app language, and day numbers always use Western digits.

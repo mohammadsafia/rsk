@@ -288,11 +288,6 @@
     "legacy-color-ramp": 10,
     "legacy-color-name": 7
   },
-  "src/components/ui/calendar/Calendar.tsx": {
-    "legacy-color-ramp": 4,
-    "legacy-color-name": 15,
-    "arbitrary-length": 4
-  },
   "src/components/ui/formatted-number/FormattedNumber.tsx": {
     "legacy-color-ramp": 4,
     "legacy-color-name": 8

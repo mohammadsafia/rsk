@@ -127,6 +127,7 @@ const CLEAN_UI_FOLDERS = [
   'collapsible',
   'scroll-area',
   'avatar',
+  'calendar',
 ] as const;
 
 describe('clean primitives', () => {
