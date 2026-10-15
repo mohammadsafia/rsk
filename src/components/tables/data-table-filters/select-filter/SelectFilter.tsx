@@ -2,7 +2,7 @@ import { type MouseEvent, useCallback, useMemo, useState } from 'react';
 
 import type { Column } from '@tanstack/react-table';
 
-import { Checkbox, RadioDot } from '@components/ui';
+import { Checkbox, RadioGroup } from '@components/ui';
 import { Combobox } from '@components/shared';
 import { Conditional } from '@components/utils';
 import { type FilterChipItem, FilterChipList } from '@components/tables';
@@ -107,7 +107,7 @@ function SelectFilter<TData>({ column, filterMeta }: SelectFilterProps<TData>) {
 
                   <Conditional.Else>
                     <Combobox.Indicator>
-                      <RadioDot checked={isSelected} />
+                      <RadioGroup.Dot checked={isSelected} />
                     </Combobox.Indicator>
                   </Conditional.Else>
                 </Conditional>

@@ -364,14 +364,6 @@
     "legacy-color-name": 1,
     "legacy-shadow": 9
   },
-  "src/components/ui/checkbox-group/CheckboxGroup.tsx": {
-    "legacy-color-ramp": 12,
-    "legacy-color-name": 17
-  },
-  "src/components/ui/checkbox/Checkbox.tsx": {
-    "legacy-color-ramp": 6,
-    "legacy-color-name": 12
-  },
   "src/components/ui/command/Command.tsx": {
     "legacy-color-ramp": 5,
     "legacy-color-name": 5
@@ -400,24 +392,12 @@
     "legacy-color-ramp": 1,
     "legacy-color-name": 2
   },
-  "src/components/ui/radio-dot/RadioDot.tsx": {
-    "legacy-color-ramp": 1,
-    "legacy-color-name": 4
-  },
-  "src/components/ui/radio-group/RadioGroup.tsx": {
-    "legacy-color-ramp": 12,
-    "legacy-color-name": 17
-  },
   "src/components/ui/scroll-area/ScrollArea.tsx": {
     "legacy-color-name": 1
   },
   "src/components/ui/select/Select.tsx": {
     "legacy-color-ramp": 12,
     "legacy-color-name": 12
-  },
-  "src/components/ui/switch/Switch.tsx": {
-    "legacy-color-ramp": 1,
-    "legacy-color-name": 5
   },
   "src/components/ui/table/Table.tsx": {
     "prime-component": 2,

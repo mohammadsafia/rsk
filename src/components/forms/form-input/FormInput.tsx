@@ -8,7 +8,8 @@ import { cn } from '@utils';
 
 import type { FieldBaseProps } from '@app-types';
 
-type FormInputProps<TFieldValues extends FieldValues> = Omit<InputHTMLAttributes<HTMLInputElement>, 'name' | 'size'> & FieldBaseProps<TFieldValues>;
+type FormInputProps<TFieldValues extends FieldValues> = Omit<InputHTMLAttributes<HTMLInputElement>, 'name' | 'size'> &
+  FieldBaseProps<TFieldValues>;
 
 function FormInput<TFieldValues extends FieldValues>({
   name,

@@ -2,43 +2,39 @@ import { type ComponentProps, type FC, forwardRef } from 'react';
 
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 
-import { cva, type VariantProps } from 'class-variance-authority';
+import { Conditional } from '@components/utils';
 
 import { cn } from '@utils';
 
-import { Check } from 'lucide-react';
+import { Check, Minus } from 'lucide-react';
 
-type CheckboxProps = ComponentProps<typeof CheckboxPrimitive.Root> & VariantProps<typeof checkboxVariants>;
+type CheckboxProps = ComponentProps<typeof CheckboxPrimitive.Root>;
 
-const checkboxVariants = cva(
-  [
-    'border-muted-200 bg-background h-5 w-5 shrink-0 rounded border transition-[color,box-shadow] outline-none',
-    'hover:not-disabled:border-primary hover:not-disabled:ring-primary hover:not-disabled:ring',
-    'disabled:data-[state=checked]:bg-muted-400 disabled:data-[state=checked]:border-muted-400 disabled:pointer-events-none',
-  ],
-  {
-    variants: {
-      variant: {
-        secondary: [
-          'data-[state=checked]:border-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background',
-          'data-[state=checked]:hover:not-disabled:border-foreground data-[state=checked]:hover:not-disabled:ring-muted-400',
-        ],
-        primary: [
-          'data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:border-primary-300 dark:data-[state=checked]:bg-primary-300',
-          'data-[state=checked]:hover:not-disabled:border-primary data-[state=checked]:hover:not-disabled:ring-primary',
-        ],
-      },
-    },
-    defaultVariants: {
-      variant: 'primary',
-    },
-  },
-);
+/** The 16px checkbox square, shared with CheckboxGroup.Indicator. State comes from Radix `data-state`. */
+export const checkboxBoxClassName = [
+  'border-border-strong bg-surface text-accent-fg flex size-4 shrink-0 items-center justify-center rounded-sm border transition-colors',
+  'data-[state=checked]:border-accent data-[state=checked]:bg-accent',
+  'data-[state=indeterminate]:border-accent data-[state=indeterminate]:bg-accent',
+].join(' ');
 
-const Checkbox: FC<CheckboxProps> = ({ ref, className, variant, ...props }) => (
-  <CheckboxPrimitive.Root ref={ref} data-slot="checkbox" className={cn(checkboxVariants({ variant }), className)} {...props}>
-    <CheckboxPrimitive.Indicator data-slot="checkbox-indicator" className="flex items-center justify-center text-inherit">
-      <Check size={16} />
+const Checkbox: FC<CheckboxProps> = ({ ref, className, checked, ...props }) => (
+  <CheckboxPrimitive.Root
+    ref={ref}
+    data-slot="checkbox"
+    checked={checked}
+    className={cn(checkboxBoxClassName, 'focus-ring cursor-pointer disabled:pointer-events-none disabled:opacity-50', className)}
+    {...props}
+  >
+    <CheckboxPrimitive.Indicator data-slot="checkbox-indicator" className="flex items-center justify-center">
+      <Conditional>
+        <Conditional.If condition={checked === 'indeterminate'}>
+          <Minus className="size-3" strokeWidth={3} />
+        </Conditional.If>
+
+        <Conditional.Else>
+          <Check className="size-3" strokeWidth={3} />
+        </Conditional.Else>
+      </Conditional>
     </CheckboxPrimitive.Indicator>
   </CheckboxPrimitive.Root>
 );
