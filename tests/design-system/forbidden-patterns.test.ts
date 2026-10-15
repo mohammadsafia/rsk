@@ -117,6 +117,7 @@ const CLEAN_UI_FOLDERS = [
   'popover',
   'dialog',
   'tooltip',
+  'dropdown-menu',
 ] as const;
 
 describe('clean primitives', () => {

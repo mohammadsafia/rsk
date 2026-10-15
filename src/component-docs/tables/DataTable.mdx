@@ -273,14 +273,19 @@ DataTable supports row click navigation via `onRowClick` on the root component:
   header: '',
   meta: { disableRowClick: true },
   cell: ({ row }) => (
-    <PrimeDropdown>
-      <IconButton size="sm" aria-label="Row actions">
-        <More size={20} />
-      </IconButton>
-      <PrimeDropdown.Item icon={<Eye size={16} />} onSelect={() => navigate(`/profile/${row.original.id}`)}>
-        View Profile
-      </PrimeDropdown.Item>
-    </PrimeDropdown>
+    <DropdownMenu>
+      <DropdownMenu.Trigger asChild>
+        <IconButton size="sm" aria-label="Row actions">
+          <More size={20} />
+        </IconButton>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content align="end">
+        <DropdownMenu.Item onSelect={() => navigate(`/profile/${row.original.id}`)}>
+          <Eye />
+          View Profile
+        </DropdownMenu.Item>
+      </DropdownMenu.Content>
+    </DropdownMenu>
   ),
 }
 ```
@@ -301,7 +306,7 @@ When you use `onRowClick`, DataTable automatically detects clicks on interactive
 
 - `<button>`, `<a>`, `<input>`, `<select>`, `<textarea>`, `<label>`
 - ARIA roles: `role="button"`, `role="link"`, `role="menuitem"`, `role="checkbox"`, etc.
-- Portal-based Radix components (`PrimeDropdown`, `PrimeTooltip`, `ConfirmDialog`) — the trigger button is caught automatically
+- Portal-based Radix components (`DropdownMenu`, `Tooltip`, `ConfirmDialog`) — the trigger button is caught automatically
 
 **You don't need to call `stopPropagation()`** on interactive elements as long as they use semantic HTML.
 

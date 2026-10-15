@@ -63,7 +63,6 @@
     "legacy-color-name": 2
   },
   "src/component-docs/shared/FileCard.mdx": {
-    "prime-component": 2,
     "legacy-color-name": 3
   },
   "src/component-docs/shared/FileIcon.mdx": {
@@ -74,17 +73,11 @@
     "prime-component": 43,
     "legacy-color-name": 1
   },
-  "src/component-docs/shared/PrimeDropdown.mdx": {
-    "prime-component": 88
-  },
   "src/component-docs/shared/PrimeLoader.mdx": {
     "prime-component": 4
   },
   "src/component-docs/shared/Toaster.mdx": {
     "legacy-color-name": 1
-  },
-  "src/component-docs/tables/DataTable.mdx": {
-    "prime-component": 6
   },
   "src/component-docs/ui/Alert.mdx": {
     "legacy-color-name": 3
@@ -237,7 +230,6 @@
     "legacy-color-name": 3
   },
   "src/components/shared/file-card/FileCard.tsx": {
-    "prime-component": 12,
     "legacy-color-ramp": 11,
     "legacy-color-name": 4
   },
@@ -263,11 +255,6 @@
     "prime-component": 56,
     "legacy-color-ramp": 12,
     "legacy-color-name": 7
-  },
-  "src/components/shared/prime-dropdown/PrimeDropdown.tsx": {
-    "prime-component": 35,
-    "legacy-color-ramp": 1,
-    "legacy-color-name": 3
   },
   "src/components/shared/prime-loader/PrimeLoader.tsx": {
     "prime-component": 4,
@@ -329,11 +316,6 @@
     "legacy-color-ramp": 1,
     "legacy-color-name": 1,
     "legacy-shadow": 9
-  },
-  "src/components/ui/dropdown-menu/DropdownMenu.tsx": {
-    "legacy-color-ramp": 2,
-    "legacy-color-name": 8,
-    "legacy-shadow": 1
   },
   "src/components/ui/formatted-number/FormattedNumber.tsx": {
     "legacy-color-ramp": 4,

@@ -3,7 +3,6 @@ export * from './prime-loader';
 export * from './theme-switcher';
 export * from './language-switcher';
 export * from './toaster';
-export * from './prime-dropdown';
 export * from './prime-card';
 export * from './meta-card';
 export * from './collapsible-card';

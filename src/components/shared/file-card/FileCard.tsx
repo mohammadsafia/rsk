@@ -11,7 +11,9 @@ import {
 } from 'react';
 
 import { Avatar, Card, Badge, IconButton, Tooltip } from '@components/ui';
-import { Combobox, ComposedButton, FileIcon, type NormalizedExtension, PrimeDropdown } from '@components/shared';
+// !Direct import is required and not by mistake to avoid circular dependencies (FileCard reads DropdownMenu statics at module load)
+import DropdownMenu from '@components/ui/dropdown-menu/DropdownMenu';
+import { Combobox, ComposedButton, FileIcon, type NormalizedExtension, ComposedDropdownItem } from '@components/shared';
 import { Conditional } from '@components/utils';
 
 import { type ComboboxOptionsParams, type DateInput, useAppTranslation, useComboboxOptions, useDate } from '@hooks/shared';
@@ -36,7 +38,7 @@ type FileCardContextValue<TEntry> = {
 
 type HeaderProps = ComponentPropsWithoutRef<typeof Card.Header>;
 type TitleProps = Omit<ComponentPropsWithoutRef<'div'>, 'children'>;
-type ActionsProps<TEntry> = { children: FileCardSlotChildren<TEntry> } & Pick<ComponentProps<typeof PrimeDropdown>, 'align'>;
+type ActionsProps<TEntry> = { children: FileCardSlotChildren<TEntry> } & Pick<ComponentProps<typeof DropdownMenu.Content>, 'align'>;
 type PreviewProps<TEntry> = { children: FileCardSlotChildren<TEntry>; className?: string };
 type FileShapeProps = ComponentPropsWithoutRef<'div'>;
 type FolderShapeProps = Omit<ComponentPropsWithoutRef<'div'>, 'children'> & { count: number };
@@ -77,8 +79,8 @@ type FileCardComponents = (<TEntry>(props: FileCardProps<TEntry>) => ReactNode) 
   Header: FC<HeaderProps>;
   Title: FC<TitleProps>;
   Actions: <TEntry>(props: ActionsProps<TEntry>) => ReactNode;
-  Item: typeof PrimeDropdown.Item;
-  Separator: typeof PrimeDropdown.Separator;
+  Item: typeof ComposedDropdownItem;
+  Separator: typeof DropdownMenu.Separator;
   Preview: <TEntry>(props: PreviewProps<TEntry>) => ReactNode;
   FileShape: FC<FileShapeProps>;
   FolderShape: FC<FolderShapeProps>;
@@ -128,15 +130,15 @@ const Actions = <TEntry,>({ children, align = 'end' }: ActionsProps<TEntry>): Re
   const { t } = useAppTranslation('common');
 
   return (
-    <PrimeDropdown align={align}>
-      <PrimeDropdown.Trigger asChild>
+    <DropdownMenu>
+      <DropdownMenu.Trigger asChild>
         <IconButton size="sm" type="button" aria-label={t('actions')}>
           <MoreHorizontal size={16} />
         </IconButton>
-      </PrimeDropdown.Trigger>
+      </DropdownMenu.Trigger>
 
-      <PrimeDropdown.List>{children(entry)}</PrimeDropdown.List>
-    </PrimeDropdown>
+      <DropdownMenu.Content align={align}>{children(entry)}</DropdownMenu.Content>
+    </DropdownMenu>
   );
 };
 
@@ -424,8 +426,8 @@ const FileCard = FileCardRoot as FileCardComponents;
 FileCard.Header = Header;
 FileCard.Title = Title;
 FileCard.Actions = Actions;
-FileCard.Item = PrimeDropdown.Item;
-FileCard.Separator = PrimeDropdown.Separator;
+FileCard.Item = ComposedDropdownItem;
+FileCard.Separator = DropdownMenu.Separator;
 FileCard.Preview = Preview;
 FileCard.FileShape = FileShape;
 FileCard.FolderShape = FolderShape;

@@ -51,11 +51,11 @@ export const NeutralDemo = () => {
         <FileCard.Actions>
           {(entry) => (
             <>
-              <FileCard.Item icon={<Mail size={16} />}>Send by Email</FileCard.Item>
+              <FileCard.Item><Mail />Send by Email</FileCard.Item>
 
               <FileCard.Separator />
 
-              <FileCard.Item icon={<Trash size={16} />} variant="destructive">
+              <FileCard.Item tone="danger"><Trash />
                 Delete
               </FileCard.Item>
             </>
@@ -84,7 +84,7 @@ export const ApprovedDemo = () => {
       <FileCard.Header>
         <FileCard.Title />
 
-        <FileCard.Actions>{(entry) => <FileCard.Item icon={<Download size={16} />}>Download</FileCard.Item>}</FileCard.Actions>
+        <FileCard.Actions>{(entry) => <FileCard.Item><Download />Download</FileCard.Item>}</FileCard.Actions>
       </FileCard.Header>
 
       <FileCard.Preview>
@@ -114,7 +114,7 @@ export const RejectedDemo = () => {
       <FileCard.Header>
         <FileCard.Title />
 
-        <FileCard.Actions>{(entry) => <FileCard.Item icon={<Download size={16} />}>Download</FileCard.Item>}</FileCard.Actions>
+        <FileCard.Actions>{(entry) => <FileCard.Item><Download />Download</FileCard.Item>}</FileCard.Actions>
       </FileCard.Header>
 
       <FileCard.Preview>
@@ -147,11 +147,11 @@ export const ApprovalRequiredDemo = () => {
         <FileCard.Actions>
           {(entry) => (
             <>
-              <FileCard.Item icon={<Mail size={16} />}>Send by Email</FileCard.Item>
+              <FileCard.Item><Mail />Send by Email</FileCard.Item>
 
               <FileCard.Separator />
 
-              <FileCard.Item icon={<Trash size={16} />} variant="destructive">
+              <FileCard.Item tone="danger"><Trash />
                 Delete
               </FileCard.Item>
             </>
@@ -201,7 +201,7 @@ export const FolderDemo = () => {
 
         <FileCard.Actions>
           {(entry) => (
-            <FileCard.Item icon={<Trash size={16} />} variant="destructive">
+            <FileCard.Item tone="danger"><Trash />
               Delete
             </FileCard.Item>
           )}
@@ -265,13 +265,13 @@ import { FileCard, type FileCardAccessors } from '@components/shared';
     <FileCard.Actions>
       {(entry) => (
         <>
-          <FileCard.Item condition={entry.canSendByEmail} permissions={[Permissions.SendByEmail]} icon={<Mail size={16} />} onClick={...}>
+          <FileCard.Item condition={entry.canSendByEmail} permissions={[Permissions.SendByEmail]} onClick={...}><Mail />
             Send by Email
           </FileCard.Item>
 
           <FileCard.Separator />
 
-          <FileCard.Item condition={entry.canDelete} permissions={[Permissions.Delete]} icon={<Trash size={16} />} variant="destructive" onClick={...}>
+          <FileCard.Item condition={entry.canDelete} permissions={[Permissions.Delete]} tone="danger" onClick={...}><Trash />
             Delete
           </FileCard.Item>
         </>
@@ -336,8 +336,8 @@ import { FileCard, type FileCardAccessors } from '@components/shared';
 | `<FileCard.Header>` | container | — |
 | `<FileCard.Title>` | reads context | file-icon chip + title text |
 | `<FileCard.Actions>` | reads context, render-prop children | dropdown trigger + list |
-| `<FileCard.Item>` | alias of `PrimeDropdown.Item` | already `withConditional(withAuth(…))` |
-| `<FileCard.Separator>` | alias of `PrimeDropdown.Separator` | — |
+| `<FileCard.Item>` | alias of `DropdownMenu.Item` (composed) | already `withConditional(withAuth(…))` |
+| `<FileCard.Separator>` | alias of `DropdownMenu.Separator` | — |
 | `<FileCard.Preview>` | reads context, render-prop children | preview region container |
 | `<FileCard.FileShape>` | visual primitive | document watermark icon with content overlay |
 | `<FileCard.FolderShape>` | visual primitive | folder shape with `count` |
