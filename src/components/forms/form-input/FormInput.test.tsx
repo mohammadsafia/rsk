@@ -5,6 +5,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { FormInput, FormSelect } from '@components/forms';
+import { Tooltip } from '@components/ui';
 
 import '../../../i18n';
 
@@ -16,7 +17,11 @@ const WithError = ({ children }: { children: ReactNode }) => {
     methods.setError('email', { message: 'Required' });
     methods.setError('role', { message: 'Required' });
   }, [methods]);
-  return <FormProvider {...methods}>{children}</FormProvider>;
+  return (
+    <Tooltip.Provider>
+      <FormProvider {...methods}>{children}</FormProvider>
+    </Tooltip.Provider>
+  );
 };
 
 describe('form field invalid state', () => {

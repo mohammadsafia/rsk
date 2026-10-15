@@ -1,10 +1,9 @@
 import { type ComponentPropsWithoutRef, type FC } from 'react';
 
-import { Card } from '@components/ui';
+import { Card, Tooltip } from '@components/ui';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
-import { PrimeTooltip } from '@components/shared';
 
 type GridCardListProps = ComponentPropsWithoutRef<'ul'> & VariantProps<typeof gridCardListVariants>;
 type GridCardItemProps = ComponentPropsWithoutRef<typeof Card>;
@@ -109,11 +108,11 @@ const Content: FC<GridCardContentProps> = ({ className, children, ...props }) =>
 
 const TruncatedText: FC<GridCardTruncatedTextProps> = ({ className, children, ...props }) => {
   return (
-    <PrimeTooltip content={children}>
+    <Tooltip content={children}>
       <div data-slot="grid-card-truncated-text" className={cn('w-full truncate', className)} {...props}>
         {children ?? '-'}
       </div>
-    </PrimeTooltip>
+    </Tooltip>
   );
 };
 

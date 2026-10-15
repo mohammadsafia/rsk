@@ -1,7 +1,8 @@
-import { type ComponentPropsWithoutRef, createContext, type FC, type SVGProps, useContext } from 'react';
+import { type ComponentPropsWithoutRef, createContext, type FC, type ReactNode, type SVGProps, useContext } from 'react';
 
-import { Card, Collapsible } from '@components/ui';
-import { PrimeTooltip, type PrimeTooltipProps } from '@components/shared';
+import { Card, Collapsible, Tooltip, type TooltipProps } from '@components/ui';
+
+import { useAppTranslation } from '@hooks/shared';
 
 import { cva, VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
@@ -15,7 +16,7 @@ type CollapsibleCardHeaderLeadingProps = ComponentPropsWithoutRef<'div'>;
 type CollapsibleCardTitleProps = ComponentPropsWithoutRef<typeof Card.Title>;
 type CollapsibleCardTriggerProps = ComponentPropsWithoutRef<typeof Collapsible.Trigger>;
 type CollapsibleCardTriggerIconProps = SVGProps<SVGSVGElement>;
-type CollapsibleCardTooltipProps = PrimeTooltipProps;
+type CollapsibleCardTooltipProps = Omit<TooltipProps, 'content' | 'children'> & { children: ReactNode };
 type CollapsibleCardDescriptionProps = ComponentPropsWithoutRef<typeof Card.Description>;
 type CollapsibleCardContentProps = ComponentPropsWithoutRef<typeof Card.Content> & VariantProps<typeof collapsibleCardVariants>;
 type CollapsibleCardFooterProps = ComponentPropsWithoutRef<typeof Card.Footer>;
@@ -144,15 +145,23 @@ const CollapsibleCardTriggerIcon: FC<CollapsibleCardTriggerIconProps> = ({ class
   );
 };
 
-const CollapsibleCardTooltip: FC<CollapsibleCardTooltipProps> = ({ children, ...props }) => (
-  <PrimeTooltip align="start" {...props}>
-    <PrimeTooltip.Trigger type="button">
-      <Info size={20} className="text-muted-400 inline-block cursor-help" />
-    </PrimeTooltip.Trigger>
+const CollapsibleCardTooltip: FC<CollapsibleCardTooltipProps> = ({ children, ...props }) => {
+  const { t } = useAppTranslation('common');
 
-    <PrimeTooltip.Item>{children}</PrimeTooltip.Item>
-  </PrimeTooltip>
-);
+  return (
+    <Tooltip content={children} align="start" {...props}>
+      <button
+        type="button"
+        aria-label={t('moreInfo')}
+        className="focus-ring text-fg-muted inline-flex cursor-help rounded-sm"
+        onClick={(event) => event.preventDefault()}
+        onPointerDown={(event) => event.preventDefault()}
+      >
+        <Info size={20} aria-hidden="true" />
+      </button>
+    </Tooltip>
+  );
+};
 
 const CollapsibleCardDescription: FC<CollapsibleCardDescriptionProps> = ({ className, children, ...props }) => (
   <Card.Description className={cn(className)} {...props}>

@@ -1,7 +1,6 @@
 import { type FC, forwardRef } from 'react';
 
 import { Button, type ButtonProps, Tooltip } from '@components/ui';
-import { Conditional } from '@components/utils';
 
 import { cn } from '@utils';
 
@@ -29,17 +28,9 @@ const IconButton: FC<IconButtonProps> = ({ ref, variant = 'ghost', size, tooltip
   );
 
   return (
-    <Conditional>
-      <Conditional.If condition={tooltip}>
-        <Tooltip>
-          <Tooltip.Trigger asChild>{button}</Tooltip.Trigger>
-
-          <Tooltip.Content>{props['aria-label']}</Tooltip.Content>
-        </Tooltip>
-      </Conditional.If>
-
-      <Conditional.Else>{button}</Conditional.Else>
-    </Conditional>
+    <Tooltip content={props['aria-label']} disabled={!tooltip}>
+      {button}
+    </Tooltip>
   );
 };
 

@@ -1,8 +1,9 @@
 import { Children, type ComponentPropsWithoutRef, type FC, isValidElement, type ReactNode } from 'react';
 
-import { Card } from '@components/ui';
-import { PrimeTooltip, type PrimeTooltipProps } from '@components/shared';
+import { Card, Tooltip, type TooltipProps } from '@components/ui';
 import { Conditional } from '@components/utils';
+
+import { useAppTranslation } from '@hooks/shared';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
@@ -12,7 +13,7 @@ import { Info } from 'lucide-react';
 type PrimeCardHeaderProps = ComponentPropsWithoutRef<typeof Card.Header>;
 type PrimeCardHeaderLeadingProps = ComponentPropsWithoutRef<'div'>;
 type PrimeCardTitleProps = ComponentPropsWithoutRef<typeof Card.Title>;
-type PrimeCardTooltipProps = PrimeTooltipProps;
+type PrimeCardTooltipProps = Omit<TooltipProps, 'content' | 'children'> & { children: ReactNode };
 type PrimeCardDescriptionProps = ComponentPropsWithoutRef<typeof Card.Description>;
 
 type PrimeCardContentProps = ComponentPropsWithoutRef<typeof Card.Content>;
@@ -76,15 +77,21 @@ const PrimeCardTitle: FC<PrimeCardHeaderProps> = ({ className, ...props }) => (
   <Card.Title className={cn('flex items-center gap-2', className)} {...props} />
 );
 
-const PrimeCardTooltip: FC<PrimeCardTooltipProps> = ({ className, children, ...props }) => {
-  return (
-    <PrimeTooltip align="start" {...props}>
-      <PrimeTooltip.Trigger type="button">
-        <Info size={20} className="text-muted-400 inline-block cursor-help" />
-      </PrimeTooltip.Trigger>
+const PrimeCardTooltip: FC<PrimeCardTooltipProps> = ({ children, ...props }) => {
+  const { t } = useAppTranslation('common');
 
-      <PrimeTooltip.Item>{children}</PrimeTooltip.Item>
-    </PrimeTooltip>
+  return (
+    <Tooltip content={children} align="start" {...props}>
+      <button
+        type="button"
+        aria-label={t('moreInfo')}
+        className="focus-ring text-fg-muted inline-flex cursor-help rounded-sm"
+        onClick={(event) => event.preventDefault()}
+        onPointerDown={(event) => event.preventDefault()}
+      >
+        <Info size={20} aria-hidden="true" />
+      </button>
+    </Tooltip>
   );
 };
 

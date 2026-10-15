@@ -80,11 +80,6 @@
   "src/component-docs/shared/PrimeLoader.mdx": {
     "prime-component": 4
   },
-  "src/component-docs/shared/PrimeTooltip.mdx": {
-    "prime-component": 61,
-    "legacy-color-ramp": 1,
-    "legacy-color-name": 1
-  },
   "src/component-docs/shared/Toaster.mdx": {
     "legacy-color-name": 1
   },
@@ -191,8 +186,6 @@
     "legacy-color-name": 3
   },
   "src/components/forms/form-label/FormLabel.tsx": {
-    "prime-component": 7,
-    "legacy-color-ramp": 1,
     "legacy-color-name": 2
   },
   "src/components/forms/form-message/FormMessage.tsx": {
@@ -225,8 +218,7 @@
     "legacy-color-name": 1
   },
   "src/components/shared/collapsible-card/CollapsibleCard.tsx": {
-    "prime-component": 9,
-    "legacy-color-ramp": 22,
+    "legacy-color-ramp": 21,
     "legacy-color-name": 18
   },
   "src/components/shared/combobox/Combobox.tsx": {
@@ -235,13 +227,6 @@
   },
   "src/components/shared/confirm-dialog/ConfirmDialog.tsx": {
     "legacy-color-name": 2
-  },
-  "src/components/shared/count-tooltip/CountTooltip.tsx": {
-    "prime-component": 12,
-    "legacy-color-ramp": 1
-  },
-  "src/components/shared/error-tooltip/ErrorTooltip.tsx": {
-    "legacy-color-name": 4
   },
   "src/components/shared/faceted-filter/FacetedFilter.tsx": {
     "legacy-color-name": 3,
@@ -252,7 +237,7 @@
     "legacy-color-name": 3
   },
   "src/components/shared/file-card/FileCard.tsx": {
-    "prime-component": 17,
+    "prime-component": 12,
     "legacy-color-ramp": 11,
     "legacy-color-name": 4
   },
@@ -269,16 +254,14 @@
     "legacy-shadow": 1
   },
   "src/components/shared/grid-card/GridCard.tsx": {
-    "prime-component": 3,
     "legacy-color-ramp": 4
   },
   "src/components/shared/meta-card/MetaCard.tsx": {
-    "prime-component": 3,
     "legacy-color-ramp": 1
   },
   "src/components/shared/prime-card/PrimeCard.tsx": {
-    "prime-component": 65,
-    "legacy-color-ramp": 13,
+    "prime-component": 56,
+    "legacy-color-ramp": 12,
     "legacy-color-name": 7
   },
   "src/components/shared/prime-dropdown/PrimeDropdown.tsx": {
@@ -291,10 +274,6 @@
     "legacy-color-ramp": 1,
     "legacy-color-name": 3,
     "arbitrary-length": 1
-  },
-  "src/components/shared/prime-tooltip/PrimeTooltip.tsx": {
-    "prime-component": 20,
-    "legacy-color-ramp": 1
   },
   "src/components/shared/stepper/Stepper.tsx": {
     "legacy-color-ramp": 4
@@ -389,10 +368,6 @@
     "legacy-color-ramp": 4,
     "legacy-color-name": 8,
     "legacy-shadow": 1
-  },
-  "src/components/ui/tooltip/Tooltip.tsx": {
-    "legacy-color-ramp": 1,
-    "legacy-color-name": 2
   },
   "src/layouts/auth-guard/AuthGuard.tsx": {
     "prime-component": 1

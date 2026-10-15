@@ -3,38 +3,54 @@ id: tooltip
 title: Tooltip
 section: Components
 category: UI
-description: 'Contextual hints on hover or focus.'
+description: 'Short inverse hint on hover or keyboard focus. Pass the text as content; the trigger is the child.'
 tags: [ui, tooltip, feedback]
 ---
 
-import { Tooltip, Button } from '@components/ui';
+import { Tooltip, Button, IconButton } from '@components/ui';
+import { ArchiveIcon } from 'lucide-react';
 
 ## Demo
 
-<Tooltip.Provider>
-  <Tooltip>
-    <Tooltip.Trigger asChild>
-      <Button variant="outline">Hover me</Button>
-    </Tooltip.Trigger>
-    <Tooltip.Content>Helpful hint</Tooltip.Content>
+<div className="flex gap-3">
+  <Tooltip content="Helpful hint">
+    <Button variant="outline">Hover me</Button>
   </Tooltip>
-</Tooltip.Provider>
+  <Tooltip content="Shown below, aligned to the start" side="bottom" align="start">
+    <Button variant="outline">Bottom start</Button>
+  </Tooltip>
+  <IconButton aria-label="Archive record">
+    <ArchiveIcon />
+  </IconButton>
+</div>
 
 ## Imports
 
 ```tsx
-import { Tooltip, Button } from '@components/ui';
+import { Tooltip } from '@components/ui';
 ```
 
 ## Code
 
 ```tsx
-<Tooltip.Provider>
-  <Tooltip>
-    <Tooltip.Trigger asChild>
-      <Button>Hover me</Button>
-    </Tooltip.Trigger>
-    <Tooltip.Content>Helpful hint</Tooltip.Content>
-  </Tooltip>
-</Tooltip.Provider>
+<Tooltip content="Helpful hint">
+  <Button variant="outline">Hover me</Button>
+</Tooltip>
+
+<Tooltip content="Shown below" side="bottom" align="start">
+  <Button variant="outline">Bottom start</Button>
+</Tooltip>
 ```
+
+`IconButton` shows its `aria-label` as a tooltip automatically. A single `Tooltip.Provider` is mounted at the app root, so you never add one yourself.
+
+## API
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `content` | `ReactNode` | — | Tooltip text. Empty content renders only the trigger. |
+| `side` | `'top' \| 'right' \| 'bottom' \| 'left'` | `'top'` | Preferred side. |
+| `align` | `'start' \| 'center' \| 'end'` | `'center'` | Alignment against the trigger. |
+| `delayDuration` | `number` | provider (300ms) | Hover delay before opening. |
+| `disabled` | `boolean` | `false` | Render the trigger with no tooltip. |
+| `className` | `string` | — | Applied to the bubble. |

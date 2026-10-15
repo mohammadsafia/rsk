@@ -5,7 +5,6 @@ export * from './language-switcher';
 export * from './toaster';
 export * from './prime-dropdown';
 export * from './prime-card';
-export * from './prime-tooltip';
 export * from './meta-card';
 export * from './collapsible-card';
 export * from './count-tooltip';

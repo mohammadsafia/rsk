@@ -2,7 +2,9 @@ import { type ComponentPropsWithoutRef, type FC, type ReactNode } from 'react';
 import { type FieldError } from 'react-hook-form';
 import * as LabelPrimitive from '@radix-ui/react-label';
 
-import { PrimeTooltip } from '@components/shared';
+import { Tooltip } from '@components/ui';
+
+import { useAppTranslation } from '@hooks/shared';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
@@ -22,6 +24,8 @@ const labelVariants = cva(
 );
 
 const FormLabel: FC<FormLabelProps> = ({ className, error, children, tooltip, required, hidden, ...props }) => {
+  const { t } = useAppTranslation('common');
+
   if (hidden) return null;
 
   return (
@@ -31,13 +35,17 @@ const FormLabel: FC<FormLabelProps> = ({ className, error, children, tooltip, re
       {required && <Asterisk className="ms-0.5 inline-block align-text-top text-inherit" size={10} />}
 
       {tooltip && (
-        <PrimeTooltip align="start">
-          <PrimeTooltip.Trigger type="button">
-            <Info size={16} className="text-muted-400 ms-1 inline-block cursor-help" />
-          </PrimeTooltip.Trigger>
-
-          <PrimeTooltip.Item onClick={(e) => e.preventDefault()}>{tooltip}</PrimeTooltip.Item>
-        </PrimeTooltip>
+        <Tooltip content={tooltip} align="start">
+          <button
+            type="button"
+            aria-label={t('moreInfo')}
+            className="focus-ring text-fg-muted ms-1 inline-flex cursor-help rounded-sm align-text-top"
+            onClick={(event) => event.preventDefault()}
+            onPointerDown={(event) => event.preventDefault()}
+          >
+            <Info size={16} aria-hidden="true" />
+          </button>
+        </Tooltip>
       )}
     </LabelPrimitive.Root>
   );

@@ -1,7 +1,6 @@
 import { type ComponentProps, type FC, type ReactNode } from 'react';
 
-import { Card, Skeleton } from '@components/ui';
-import { PrimeTooltip } from '@components/shared';
+import { Card, Skeleton, Tooltip } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -76,9 +75,9 @@ const MetaCard: CardComponent = ({
 
       <Conditional>
         <Conditional.If condition={!!truncate}>
-          <PrimeTooltip content={description}>
+          <Tooltip content={description}>
             <div className="truncate p-0 text-sm font-medium">{description ?? '-'}</div>
-          </PrimeTooltip>
+          </Tooltip>
         </Conditional.If>
 
         <Conditional.Else>

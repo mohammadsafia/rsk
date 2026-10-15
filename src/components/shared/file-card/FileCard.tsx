@@ -10,8 +10,8 @@ import {
   useState,
 } from 'react';
 
-import { Avatar, Card, Badge, IconButton } from '@components/ui';
-import { Combobox, ComposedButton, FileIcon, type NormalizedExtension, PrimeDropdown, PrimeTooltip } from '@components/shared';
+import { Avatar, Card, Badge, IconButton, Tooltip } from '@components/ui';
+import { Combobox, ComposedButton, FileIcon, type NormalizedExtension, PrimeDropdown } from '@components/shared';
 import { Conditional } from '@components/utils';
 
 import { type ComboboxOptionsParams, type DateInput, useAppTranslation, useComboboxOptions, useDate } from '@hooks/shared';
@@ -115,9 +115,9 @@ const Title: FC<TitleProps> = ({ className, ...props }) => {
     <div data-slot="file-card-title" className={cn('flex min-w-0 items-center gap-2', className)} {...props}>
       <FileIcon extension={accessors.getFileType(entry)} variant="chip" size={20} />
 
-      <PrimeTooltip content={accessors.getTitle(entry)}>
+      <Tooltip content={accessors.getTitle(entry)}>
         <span className="truncate text-sm font-bold">{accessors.getTitle(entry)}</span>
-      </PrimeTooltip>
+      </Tooltip>
     </div>
   );
 };
@@ -339,9 +339,9 @@ const Assignee = <TOption,>({
           <Avatar.Fallback className="bg-primary text-primary-foreground">{selectedInitials}</Avatar.Fallback>
         </Avatar>
 
-        <PrimeTooltip content={selectedLabel}>
+        <Tooltip content={selectedLabel}>
           <span className="truncate text-sm font-medium">{selectedLabel}</span>
-        </PrimeTooltip>
+        </Tooltip>
 
         <Combobox.Clear when={!!value && !disabled} title={clearTitle} onClear={onClear} />
 

@@ -6,10 +6,12 @@ import {
   type FC,
   forwardRef,
   isValidElement,
+  type ReactElement,
+  type ReactNode,
   useContext,
 } from 'react';
 
-import PrimeTooltip, { type PrimeTooltipProps } from '@components/shared/prime-tooltip/PrimeTooltip';
+import { Tooltip, type TooltipProps } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { cn } from '@utils';
@@ -20,11 +22,12 @@ type CountTooltipContextType = {
 
 type CountTooltipTriggerProps = ComponentProps<'span'>;
 
-type CountTooltipItemProps = ComponentPropsWithoutRef<typeof PrimeTooltip.Item>;
+type CountTooltipItemProps = ComponentPropsWithoutRef<'div'> & { icon?: ReactNode };
 
-type CountTooltipProps = PrimeTooltipProps & {
+type CountTooltipProps = Omit<TooltipProps, 'content' | 'children'> & {
   count: number;
   condition?: boolean;
+  children: ReactNode;
 };
 
 type CountTooltipComponent = FC<CountTooltipProps> & {
@@ -49,7 +52,8 @@ const Trigger: FC<CountTooltipTriggerProps> = ({ ref, className, children, ...pr
     <span
       ref={ref}
       data-slot="count-tooltip-trigger"
-      className={cn('bg-muted-100 inline-flex items-center justify-center rounded-full px-1.5 text-xs', className)}
+      tabIndex={0}
+      className={cn('bg-hover text-fg-muted inline-flex items-center justify-center rounded-full px-1.5 text-xs', className)}
       {...props}
     >
       {children ?? `+${count}`}
@@ -57,33 +61,32 @@ const Trigger: FC<CountTooltipTriggerProps> = ({ ref, className, children, ...pr
   );
 };
 
-const Item: FC<CountTooltipItemProps> = (props) => <PrimeTooltip.Item {...props} />;
+const Item: FC<CountTooltipItemProps> = ({ className, icon, children, ...props }) => (
+  <div data-slot="count-tooltip-item" className={cn('flex items-center gap-2', className)} {...props}>
+    <Conditional.If condition={!!icon}>
+      <span className="flex items-center">{icon}</span>
+    </Conditional.If>
+
+    <span className="flex-1">{children}</span>
+  </div>
+);
 
 const CountTooltip: CountTooltipComponent = ({ count, condition = true, children, ...props }) => {
   const childArray = Children.toArray(children);
 
   const triggerChild = childArray.find((child) => isValidElement(child) && child.type === CountTooltip.Trigger);
 
-  const otherChildren = childArray.filter((child) => !(isValidElement(child) && child.type === CountTooltip.Trigger));
+  // Without an explicit Trigger, the first child is the trigger and the rest is content (unchanged behaviour).
+  const trigger = (triggerChild ?? childArray[0]) as ReactElement;
+  const items = triggerChild ? childArray.filter((child) => child !== triggerChild) : childArray.slice(1);
 
   if (!condition) return null;
 
   return (
     <CountTooltipContext.Provider value={{ count }}>
-      <Conditional>
-        <Conditional.If condition={!!triggerChild}>
-          <PrimeTooltip {...props}>
-            <PrimeTooltip.Trigger>{triggerChild}</PrimeTooltip.Trigger>
-            {otherChildren}
-          </PrimeTooltip>
-        </Conditional.If>
-
-        <Conditional.Else>
-          <PrimeTooltip content={childArray.length > 1 ? childArray.slice(1) : undefined} {...props}>
-            {childArray[0]}
-          </PrimeTooltip>
-        </Conditional.Else>
-      </Conditional>
+      <Tooltip content={items.length > 0 ? <div className="grid gap-1">{items}</div> : null} {...props}>
+        {trigger}
+      </Tooltip>
     </CountTooltipContext.Provider>
   );
 };
