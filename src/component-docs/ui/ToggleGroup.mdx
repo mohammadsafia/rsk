@@ -3,7 +3,7 @@ id: toggle-group
 title: ToggleGroup
 section: Components
 category: UI
-description: 'Group of toggle buttons with multiple variants and sizes.'
+description: 'Group of pressable toggles (outline or ghost, three sizes); active items take the accent tint.'
 tags: [ui, toggle, input]
 ---
 
@@ -15,7 +15,7 @@ import { ToggleGroup } from '@components/ui';
     <div>
         <p className="text-muted-foreground mb-2 text-xs font-medium">Variants</p>
         <div className="space-y-3">
-            <ToggleGroup type="single" defaultValue="center" variant="default">
+            <ToggleGroup variant="ghost" type="single" defaultValue="center">
                 <ToggleGroup.Item value="left" aria-label="Align left">
                     Left
                 </ToggleGroup.Item>
@@ -27,7 +27,7 @@ import { ToggleGroup } from '@components/ui';
                 </ToggleGroup.Item>
             </ToggleGroup>
 
-            <ToggleGroup type="single" defaultValue="center" variant="outline">
+            <ToggleGroup type="single" defaultValue="center">
                 <ToggleGroup.Item value="left" aria-label="Align left">
                     Left
                 </ToggleGroup.Item>
@@ -44,19 +44,19 @@ import { ToggleGroup } from '@components/ui';
     <div>
         <p className="text-muted-foreground mb-2 text-xs font-medium">Sizes</p>
         <div className="space-y-3">
-            <ToggleGroup type="single" defaultValue="center" size="sm">
+            <ToggleGroup size="sm" type="single" defaultValue="center">
                 <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
                 <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
                 <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
             </ToggleGroup>
 
-            <ToggleGroup type="single" defaultValue="center" size="default">
+            <ToggleGroup type="single" defaultValue="center">
                 <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
                 <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
                 <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
             </ToggleGroup>
 
-            <ToggleGroup type="single" defaultValue="center" size="lg">
+            <ToggleGroup size="lg" type="single" defaultValue="center">
                 <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
                 <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
                 <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
@@ -92,20 +92,20 @@ import { ToggleGroup } from '@components/ui/ToggleGroup';
 ```tsx
 
 // Variants
-<ToggleGroup type="single" variant="default" defaultValue="center">
+<ToggleGroup variant="ghost" type="single" defaultValue="center">
   <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
   <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
   <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
 </ToggleGroup>
 
-<ToggleGroup type="single" variant="outline" defaultValue="center">
+<ToggleGroup type="single" defaultValue="center">
   <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
 </ToggleGroup>
 
 // Sizes
-<ToggleGroup type="single" size="sm" defaultValue="center">...</ToggleGroup>
-<ToggleGroup type="single" size="default" defaultValue="center">...</ToggleGroup>
-<ToggleGroup type="single" size="lg" defaultValue="center">...</ToggleGroup>
+<ToggleGroup size="sm" type="single" defaultValue="center">...</ToggleGroup>
+<ToggleGroup type="single" defaultValue="center">...</ToggleGroup>
+<ToggleGroup size="lg" type="single" defaultValue="center">...</ToggleGroup>
 
 // Multiple Selection
 <ToggleGroup type="multiple" defaultValue={['bold']}>

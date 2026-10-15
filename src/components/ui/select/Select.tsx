@@ -2,11 +2,13 @@ import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef
 
 import * as SelectPrimitive from '@radix-ui/react-select';
 
+import { fieldVariants, type FieldVariants } from '@components/ui';
+
 import { cn } from '@utils';
 
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 
-type SelectTriggerProps = ComponentProps<typeof SelectPrimitive.Trigger>;
+type SelectTriggerProps = ComponentProps<typeof SelectPrimitive.Trigger> & FieldVariants & { invalid?: boolean };
 type SelectValueProps = ComponentPropsWithoutRef<typeof SelectPrimitive.Value>;
 type SelectIconProps = ComponentPropsWithoutRef<typeof SelectPrimitive.Icon>;
 type SelectScrollUpButtonProps = ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>;
@@ -35,17 +37,14 @@ type SelectComponent = SelectProps & {
   ScrollDownButton: FC<SelectScrollDownButtonProps>;
 };
 
-const SelectTrigger: FC<SelectTriggerProps> = ({ ref, className, children, ...props }) => (
+const SelectTrigger: FC<SelectTriggerProps> = ({ ref, className, size, invalid, children, ...props }) => (
   <SelectPrimitive.Trigger
     ref={ref}
     data-slot="select-trigger"
+    aria-invalid={invalid || undefined}
     className={cn(
-      'group/select-trigger bg-background relative flex w-full cursor-pointer items-center gap-2 rounded-md border p-3 text-sm shadow-xs',
-      'border-muted-200 transition-[color,box-shadow] outline-none',
-      'data-[state=open]:border-primary data-[state=open]:ring-primary data-[state=open]:ring',
-      'hover:not-disabled:border-primary hover:not-disabled:ring-primary hover:not-disabled:ring',
-      'focus-visible:ring-primary focus-visible:border-primary focus-visible:ring',
-      'disabled:bg-muted-50 disabled:text-muted-300 disabled:pointer-events-none',
+      fieldVariants({ size }),
+      'group/select-trigger relative cursor-pointer gap-2 text-start data-[placeholder]:text-fg-muted data-[state=open]:border-ring',
       className,
     )}
     {...props}
@@ -64,11 +63,8 @@ const SelectIcon: FC<SelectIconProps> = ({ className, children, ...props }) => (
   <SelectPrimitive.Icon data-slot="select-icon" asChild {...props}>
     {children ?? (
       <ChevronDownIcon
-        size={20}
         className={cn(
-          'text-muted-400 shrink-0 transition-colors',
-          'group-data-[state=open]/select-trigger:text-primary',
-          'group-disabled/select-trigger:text-muted-300',
+          'text-fg-muted size-4 shrink-0 transition-transform group-data-[state=open]/select-trigger:rotate-180 group-disabled/select-trigger:text-fg-subtle',
           className,
         )}
       />
@@ -79,7 +75,7 @@ const SelectIcon: FC<SelectIconProps> = ({ className, children, ...props }) => (
 const SelectScrollUpButton: FC<SelectScrollUpButtonProps> = ({ className, ...props }) => (
   <SelectPrimitive.ScrollUpButton
     data-slot="select-scroll-up"
-    className={cn('flex cursor-default items-center justify-center py-1', className)}
+    className={cn('text-fg-muted flex cursor-default items-center justify-center py-1', className)}
     {...props}
   >
     <ChevronUpIcon />
@@ -89,7 +85,7 @@ const SelectScrollUpButton: FC<SelectScrollUpButtonProps> = ({ className, ...pro
 const SelectScrollDownButton: FC<SelectScrollDownButtonProps> = ({ className, ...props }) => (
   <SelectPrimitive.ScrollDownButton
     data-slot="select-scroll-down"
-    className={cn('flex cursor-default items-center justify-center py-1', className)}
+    className={cn('text-fg-muted flex cursor-default items-center justify-center py-1', className)}
     {...props}
   >
     <ChevronDownIcon />
@@ -101,7 +97,7 @@ const SelectContent: FC<SelectContentProps> = ({ className, children, position =
     <SelectPrimitive.Content
       data-slot="select-content"
       className={cn(
-        'bg-popover text-popover-foreground border-muted-200 relative z-50 max-h-96 overflow-hidden rounded-md border shadow-xs',
+        'bg-surface-raised text-fg shadow-raised relative z-50 max-h-96 overflow-hidden rounded-lg p-1',
         'data-[side=bottom]:slide-in-from-top-2 data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
         'data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
@@ -130,18 +126,16 @@ const SelectContent: FC<SelectContentProps> = ({ className, children, position =
 const SelectGroup: FC<SelectGroupProps> = (props) => <SelectPrimitive.Group data-slot="select-group" {...props} />;
 
 const SelectLabel: FC<SelectLabelProps> = ({ className, ...props }) => (
-  <SelectPrimitive.Label data-slot="select-label" className={cn('px-2 py-1.5 text-sm font-semibold', className)} {...props} />
+  <SelectPrimitive.Label data-slot="select-label" className={cn('text-fg-muted px-2 py-1.5 text-xs font-medium', className)} {...props} />
 );
 
 const SelectItem: FC<SelectItemProps> = ({ className, children, ...props }) => (
   <SelectPrimitive.Item
     data-slot="select-item"
     className={cn(
-      'bg-background border-muted-200 relative flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors outline-none select-none not-last:border-b',
-      'data-[state=checked]:bg-primary-25 data-[state=checked]:text-primary-900 data-[state=checked]:border-b-muted-50',
-      'data-highlighted:bg-primary-15',
-      'focus:bg-muted-100 focus:text-foreground',
-      'data-disabled:pointer-events-none data-disabled:opacity-50',
+      'relative flex h-control-sm w-full cursor-pointer items-center gap-2 rounded-md px-2 text-sm outline-none select-none',
+      'data-highlighted:bg-hover data-[state=checked]:font-medium',
+      'data-disabled:pointer-events-none data-disabled:text-fg-subtle',
       className,
     )}
     {...props}
@@ -156,12 +150,12 @@ const SelectItemText: FC<SelectItemTextProps> = ({ className, ...props }) => (
 
 const SelectIndicator: FC<SelectIndicatorProps> = ({ className, children, ...props }) => (
   <SelectPrimitive.ItemIndicator data-slot="select-item-indicator" {...props}>
-    {children ?? <CheckIcon size={16} className={cn(className)} />}
+    {children ?? <CheckIcon className={cn('text-accent ms-auto size-4', className)} />}
   </SelectPrimitive.ItemIndicator>
 );
 
 const SelectSeparator: FC<SelectSeparatorProps> = ({ className, ...props }) => (
-  <SelectPrimitive.Separator data-slot="select-item-separator" className={cn('bg-muted-200 h-px w-full', className)} {...props} />
+  <SelectPrimitive.Separator data-slot="select-item-separator" className={cn('bg-border-subtle -mx-1 my-1 h-px', className)} {...props} />
 );
 
 const Select = SelectPrimitive.Root as SelectComponent;

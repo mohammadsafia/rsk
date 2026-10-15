@@ -134,3 +134,13 @@ describe('feedback rules', () => {
     expect(migrateSource(input, RULE_SETS.feedback).output.replace(/\s+/g, ' ')).toBe(expected);
   });
 });
+
+describe('menus rules', () => {
+  it.each([
+    ['<ToggleGroup type="single" variant="default" size="default">', '<ToggleGroup variant="ghost" type="single">'],
+    ['<ToggleGroup type="single" variant="outline" size="lg">', '<ToggleGroup size="lg" type="single">'],
+    ['<ToggleGroup.Item value="a" size="sm">', '<ToggleGroup.Item size="sm" value="a">'],
+  ])('%s → %s', (input, expected) => {
+    expect(migrateSource(input, RULE_SETS.menus).output.replace(/\s+/g, ' ')).toBe(expected);
+  });
+});

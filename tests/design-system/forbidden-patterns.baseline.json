@@ -364,10 +364,6 @@
     "legacy-color-name": 1,
     "legacy-shadow": 9
   },
-  "src/components/ui/command/Command.tsx": {
-    "legacy-color-ramp": 5,
-    "legacy-color-name": 5
-  },
   "src/components/ui/dialog/Dialog.tsx": {
     "legacy-color-name": 4
   },
@@ -395,10 +391,6 @@
   "src/components/ui/scroll-area/ScrollArea.tsx": {
     "legacy-color-name": 1
   },
-  "src/components/ui/select/Select.tsx": {
-    "legacy-color-ramp": 12,
-    "legacy-color-name": 12
-  },
   "src/components/ui/table/Table.tsx": {
     "prime-component": 2,
     "legacy-color-ramp": 12,
@@ -417,10 +409,6 @@
     "legacy-color-ramp": 4,
     "legacy-color-name": 8,
     "legacy-shadow": 1
-  },
-  "src/components/ui/toggle-group/ToggleGroup.tsx": {
-    "legacy-color-ramp": 3,
-    "legacy-color-name": 5
   },
   "src/components/ui/tooltip/Tooltip.tsx": {
     "legacy-color-ramp": 1,

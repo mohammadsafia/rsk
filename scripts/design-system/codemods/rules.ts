@@ -209,6 +209,27 @@ const checkboxRule: TagRule = {
   transform: () => ({}),
 };
 
+const TOGGLE_VARIANTS: Readonly<Record<string, 'ghost' | null>> = { default: 'ghost', outline: null };
+
+const TOGGLE_SIZES: Readonly<Record<string, 'sm' | 'lg' | null>> = { default: null, sm: 'sm', lg: 'lg' };
+
+const toggleRule = (tag: string): TagRule => ({
+  tag,
+  keys: ['variant', 'size'],
+  transform: (attrs) => {
+    const out: Record<string, AttrValue> = {};
+    if (attrs.variant !== undefined) {
+      const variant = lookup(TOGGLE_VARIANTS, attrs.variant, 'ToggleGroup variant');
+      if (variant) out.variant = variant;
+    }
+    if (attrs.size !== undefined) {
+      const size = lookup(TOGGLE_SIZES, attrs.size, 'ToggleGroup size');
+      if (size) out.size = size;
+    }
+    return out;
+  },
+});
+
 /** Rule sets applied with `pnpm ds:migrate <set>`. Each Plan A task adds its set. */
 export const RULE_SETS: Record<string, ReadonlyArray<TagRule>> = {
   button: [buttonRule('Button'), buttonRule('LoadingButton', 'Button')],
@@ -216,4 +237,5 @@ export const RULE_SETS: Record<string, ReadonlyArray<TagRule>> = {
   tag: [chipRule],
   alert: [alertRule],
   feedback: [progressRule, skeletonRule, switchRule, checkboxRule],
+  menus: [toggleRule('ToggleGroup'), toggleRule('ToggleGroup.Item')],
 };

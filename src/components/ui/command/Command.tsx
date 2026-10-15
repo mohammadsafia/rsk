@@ -40,12 +40,15 @@ type CommandComponent = FC<CommandProps> & {
 };
 
 const CommandInput: FC<CommandInputProps> = ({ className, children, ...props }) => (
-  <div className="border-b-muted-200 flex items-center gap-2 border-b px-3" cmdk-input-wrapper="">
-    <Search size={16} className="text-muted-foreground shrink-0" />
+  <div className="border-border-subtle flex items-center gap-2 border-b px-3" cmdk-input-wrapper="">
+    <Search size={16} className="text-fg-muted shrink-0" />
 
     <CommandPrimitive.Input
       data-slot="command-input"
-      className={cn('flex w-full rounded-md bg-transparent py-3 text-sm outline-none disabled:pointer-events-none', className)}
+      className={cn(
+        'placeholder:text-fg-muted flex h-control-lg w-full bg-transparent text-sm outline-none disabled:pointer-events-none',
+        className,
+      )}
       {...props}
     />
 
@@ -64,15 +67,15 @@ const CommandList: FC<CommandListProps> = ({ className, ...props }) => (
 const CommandEmpty: FC<CommandEmptyProps> = ({ when, ...props }) => {
   if (!when) return null;
 
-  return <CommandPrimitive.Empty data-slot="command-empty" className="py-6 text-center text-sm" {...props} />;
+  return <CommandPrimitive.Empty data-slot="command-empty" className="text-fg-muted py-6 text-center text-sm" {...props} />;
 };
 
 const CommandGroup: FC<CommandGroupProps> = ({ className, ...props }) => (
   <CommandPrimitive.Group
     data-slot="command-group"
     className={cn(
-      'text-foreground **:[[cmdk-group-heading]]:overflow-hidden',
-      '**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-medium',
+      'text-fg p-1 **:[[cmdk-group-heading]]:overflow-hidden',
+      '**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-medium **:[[cmdk-group-heading]]:text-fg-muted',
       className,
     )}
     {...props}
@@ -83,11 +86,9 @@ const CommandItem: FC<CommandItemProps> = ({ className, ...props }) => (
   <CommandPrimitive.Item
     data-slot="command-item"
     className={cn(
-      'group/command-item bg-background border-muted-200 flex w-full items-center gap-2 px-3 py-2 text-sm',
-      'relative cursor-pointer leading-none transition-colors outline-none select-none not-last:border-b',
-      'hover:bg-primary-15',
-      'data-[checked=true]:bg-primary-25 data-[checked=true]:text-primary-900 data-[checked=true]:border-b-muted-50',
-      'data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
+      'group/command-item relative flex h-control-sm w-full cursor-pointer items-center gap-2 rounded-md px-2 text-sm outline-none select-none',
+      'data-[selected=true]:bg-hover data-[checked=true]:font-medium',
+      'data-[disabled=true]:pointer-events-none data-[disabled=true]:text-fg-subtle',
       className,
     )}
     {...props}
@@ -104,16 +105,16 @@ const CommandItemIndicator: FC<CommandIndicatorProps> = ({ className, children, 
     )}
     {...props}
   >
-    {children ?? <CheckIcon size={16} />}
+    {children ?? <CheckIcon className="text-accent size-4" />}
   </span>
 );
 
 const CommandShortcut: FC<CommandShortcutProps> = ({ className, ...props }) => (
-  <span className={cn('ms-auto text-xs tracking-widest', className)} {...props} />
+  <span className={cn('text-fg-muted ms-auto font-mono text-2xs', className)} {...props} />
 );
 
 const CommandItemSeparator: FC<CommandSeparatorProps> = ({ className, ...props }) => (
-  <CommandPrimitive.Separator data-slot="command-separator" className={cn('bg-muted-200 h-px w-full', className)} {...props} />
+  <CommandPrimitive.Separator data-slot="command-separator" className={cn('bg-border-subtle -mx-1 my-1 h-px', className)} {...props} />
 );
 
 const CommandDialog: FC<CommandDialogProps> = ({ children, ...props }) => (
@@ -136,7 +137,7 @@ const CommandDialog: FC<CommandDialogProps> = ({ children, ...props }) => (
 const Command: CommandComponent = ({ className, ...props }) => (
   <CommandPrimitive
     data-slot="command"
-    className={cn('bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-md shadow-xs', className)}
+    className={cn('bg-surface-raised text-fg flex h-full w-full flex-col overflow-hidden rounded-lg', className)}
     {...props}
   />
 );
