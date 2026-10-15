@@ -24,3 +24,17 @@ import { TimePicker } from '@components/ui';
 ```tsx
 <TimePicker />
 ```
+
+## API
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `use24hFormat` | `boolean` | `false` | Emits `"HH:MM"`; otherwise `"hh:MM AM\|PM"`. |
+| `min` / `max` | `string` (`"HH:MM"`) | `"00:00"` / `"23:59"` | Inclusive range. |
+| `step` | `number` | `1` | Minutes between options, counted from `min`. |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Same heights as `Input`. |
+| `invalid` | `boolean` | `false` | Sets `aria-invalid` and the danger border. |
+| `clearButton` | `boolean` | `true` | Clear control outside the trigger. |
+| `startAt` | `string` | `08:00` | Seed shown when there is no value. |
+
+The hour, minute and AM/PM columns are keyboard-reachable listboxes. Use `TimePicker.Content` inside your own `Popover` when you need a custom trigger (as the table `TimeFilter` does).

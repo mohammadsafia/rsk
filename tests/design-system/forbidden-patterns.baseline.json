@@ -166,9 +166,6 @@
     "legacy-color-ramp": 4,
     "legacy-color-name": 12
   },
-  "src/components/forms/form-time-picker/FormTimePicker.tsx": {
-    "legacy-color-name": 4
-  },
   "src/components/shared/action-panel/ActionPanel.tsx": {
     "legacy-color-name": 1
   },
@@ -268,11 +265,6 @@
   "src/components/ui/layout/Layout.tsx": {
     "prime-component": 2,
     "legacy-color-name": 2
-  },
-  "src/components/ui/time-picker/TimePicker.tsx": {
-    "legacy-color-ramp": 7,
-    "legacy-color-name": 11,
-    "arbitrary-length": 2
   },
   "src/layouts/auth-guard/AuthGuard.tsx": {
     "prime-component": 1

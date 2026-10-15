@@ -30,7 +30,6 @@ export * from './skeleton';
 export * from './switch';
 export * from './toggle-group';
 export * from './time-picker';
-export * from './scroll-selector';
 export * from './radio-group';
 export * from './calendar-time-grid';
 export * from './calendar-month-grid';

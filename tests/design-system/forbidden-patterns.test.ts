@@ -131,6 +131,7 @@ const CLEAN_UI_FOLDERS = [
   'calendar-month-grid',
   'calendar-time-grid',
   'calendar-event',
+  'time-picker',
 ] as const;
 
 describe('clean primitives', () => {

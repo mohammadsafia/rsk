@@ -64,12 +64,8 @@ function FormTimePicker<TFieldValues extends FieldValues>({
                 value={timeValue}
                 onChange={handleChange}
                 use24hFormat={use24hFormat}
-                className={cn(
-                  error &&
-                    'border-destructive hover:ring-destructive focus-visible:ring-destructive focus-visible:border-destructive ps-8 focus-visible:ring-1',
-                  className,
-                )}
-                error={!!error}
+                className={cn(error && 'ps-8', className)}
+                invalid={!!error}
                 {...props}
               />
 
