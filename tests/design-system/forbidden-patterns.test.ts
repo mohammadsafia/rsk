@@ -128,6 +128,9 @@ const CLEAN_UI_FOLDERS = [
   'scroll-area',
   'avatar',
   'calendar',
+  'calendar-month-grid',
+  'calendar-time-grid',
+  'calendar-event',
 ] as const;
 
 describe('clean primitives', () => {
@@ -135,6 +138,11 @@ describe('clean primitives', () => {
     const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) =>
       CLEAN_UI_FOLDERS.some((folder) => file.startsWith(`src/components/ui/${folder}/`)),
     );
+    expect(offenders).toEqual([]);
+  });
+
+  it('calendar views (user direction, Plan B) contain no forbidden patterns', () => {
+    const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) => file.startsWith('src/components/calendar/'));
     expect(offenders).toEqual([]);
   });
 });

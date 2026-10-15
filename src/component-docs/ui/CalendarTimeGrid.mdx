@@ -7,13 +7,13 @@ description: 'Pure rendering primitives for time-axis calendar grids — Spacer,
 tags: [ui, calendar, calendar-time-grid, calendar-grid, time-axis, schedule, primitive, compound]
 ---
 
-import { CalendarTimeGrid } from '@components/ui';
+import { CalendarEvent, CalendarTimeGrid } from '@components/ui';
 
 ## Demo
 
 A single-day view assembled from the primitives — chrome row (spacer + header), then a body row (time axis on the left, a column of cells, with an event card and a now-line layered on top).
 
-<div className="flex h-[480px] flex-col rounded-2xl border border-muted-200 overflow-clip">
+<div className="flex h-[480px] flex-col rounded-lg border border-border overflow-clip">
   <CalendarTimeGrid>
     <div className="flex shrink-0">
       <CalendarTimeGrid.Spacer />
@@ -49,15 +49,11 @@ A single-day view assembled from the primitives — chrome row (spacer + header)
         <CalendarTimeGrid.Cell available />
 
         <CalendarTimeGrid.EventCard top={20} height={20} left={5} width={90}>
-          <div className="bg-secondary-100 text-secondary text-2xs flex h-full w-full items-center px-1.5 py-0.5 truncate">
-            9:00 AM - Patient A
-          </div>
+          <CalendarEvent tone="info">9:00 AM · Patient A</CalendarEvent>
         </CalendarTimeGrid.EventCard>
 
         <CalendarTimeGrid.EventCard top={70} height={15} left={5} width={90}>
-          <div className="bg-primary-100 text-primary text-2xs flex h-full w-full items-center px-1.5 py-0.5 truncate">
-            11:30 AM - Patient B
-          </div>
+          <CalendarEvent tone="accent">11:30 AM · Patient B</CalendarEvent>
         </CalendarTimeGrid.EventCard>
 
         <CalendarTimeGrid.NowLine percent={45} />
@@ -81,7 +77,7 @@ CalendarTimeGrid.Header       — Day header chip (dayName + dayNumber + isToday
 CalendarTimeGrid.Axis         — Time axis with hour marks, takes a rows array. Optional showStepLabels.
 CalendarTimeGrid.Cell         — One row inside a column, with available={true|false} for availability tint.
 CalendarTimeGrid.EventCard    — Absolutely positioned button (top/height/left/width as percentages). Children render the event content.
-CalendarTimeGrid.NowLine      — A 1px destructive line + dot, positioned via percent. Decorative.
+CalendarTimeGrid.NowLine      — A 1px accent line + dot, positioned via percent. Decorative.
 CalendarTimeGrid.Column       — Grid container for one day's cells + events + nowline. Requires rowCount.
 ```
 
@@ -191,3 +187,23 @@ For overlapping events on the same day, split the column into vertical lanes and
 - **`Spacer` and `NowLine` are decorative** (`aria-hidden`). Day headers and event cards carry the meaningful semantics.
 - **`EventCard` is a `<button>`** — accepts the same props as a native button (`onClick`, `disabled`, `aria-label`, etc.). Use it as the trigger for popover details when paired with Radix `Popover.Trigger asChild`.
 - **No internal state** — sub-parts are pure. The `Provider` was removed; pass `rowCount` directly to `Column`.
+
+## CalendarEvent
+
+Render event content with `CalendarEvent` inside `EventCard` or `EventChip`. It is a soft tone tint with a status dot, and its text stays `text-fg` on every tone. Tone is never shown as a colored side stripe. Pass `past` to mute an event that has ended.
+
+<div className="grid max-w-sm gap-2">
+  <CalendarEvent tone="neutral">09:00 · Available block</CalendarEvent>
+  <CalendarEvent tone="accent">09:30 · Surgery consult</CalendarEvent>
+  <CalendarEvent tone="info">10:00 · Check-up</CalendarEvent>
+  <CalendarEvent tone="success">10:30 · Lab review</CalendarEvent>
+  <CalendarEvent tone="warning">11:00 · Insurance call</CalendarEvent>
+  <CalendarEvent tone="danger">11:30 · Deposition</CalendarEvent>
+  <CalendarEvent tone="info" past>08:00 · Finished visit</CalendarEvent>
+</div>
+
+```tsx
+<CalendarTimeGrid.EventCard top={20} height={20} left={5} width={90}>
+  <CalendarEvent tone="info">9:00 AM · Patient A</CalendarEvent>
+</CalendarTimeGrid.EventCard>
+```

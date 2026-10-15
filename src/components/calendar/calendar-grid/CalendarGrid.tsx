@@ -325,7 +325,7 @@ function CalendarGridRoot<TEvent>({
         data-slot="calendar-grid-skeleton"
         aria-busy="true"
         aria-live="polite"
-        className={cn('border-muted-200 bg-background flex min-h-180 flex-col gap-3 overflow-clip rounded-2xl border p-4', className)}
+        className={cn('border-border bg-surface flex min-h-180 flex-col gap-3 overflow-clip rounded-2xl border p-4', className)}
       >
         <Skeleton />
 
@@ -342,7 +342,7 @@ function CalendarGridRoot<TEvent>({
         data-slot="calendar-grid"
         role="application"
         aria-roledescription="calendar"
-        className={cn('border-muted-200 bg-background flex max-h-[80dvh] min-h-180 flex-col overflow-clip rounded-2xl border', className)}
+        className={cn('border-border bg-surface flex max-h-[80dvh] min-h-180 flex-col overflow-clip rounded-2xl border', className)}
         {...divProps}
       >
         {otherChildren}

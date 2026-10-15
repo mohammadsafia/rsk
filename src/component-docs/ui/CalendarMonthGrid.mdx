@@ -7,13 +7,13 @@ description: 'Pure rendering primitives for month-grid calendars — Weekdays, W
 tags: [ui, calendar, calendar-month-grid, calendar-grid, month-view, schedule, primitive, compound]
 ---
 
-import { CalendarMonthGrid } from '@components/ui';
+import { CalendarEvent, CalendarMonthGrid } from '@components/ui';
 
 ## Demo
 
 A compact month grid — weekday header strip, then a days area with a few day cells (one current-month available day, one current-month unavailable day, one with events including the today highlight, and one out-of-month day).
 
-<div className="flex h-[400px] flex-col rounded-2xl border border-muted-200 overflow-clip">
+<div className="flex h-[400px] flex-col rounded-lg border border-border overflow-clip">
   <CalendarMonthGrid>
     <CalendarMonthGrid.Weekdays>
       <CalendarMonthGrid.Weekday>SUN</CalendarMonthGrid.Weekday>
@@ -35,11 +35,11 @@ A compact month grid — weekday header strip, then a days area with a few day c
       <CalendarMonthGrid.DayCell dayNumber={4} isCurrentMonth available />
 
       <CalendarMonthGrid.DayCell dayNumber={5} isCurrentMonth available isToday>
-        <CalendarMonthGrid.EventChip className="bg-secondary-100 text-secondary text-2xs px-1.5 py-0.5 truncate text-start">
-          9 AM Patient A
+        <CalendarMonthGrid.EventChip>
+          <CalendarEvent tone="info">9 AM Patient A</CalendarEvent>
         </CalendarMonthGrid.EventChip>
-        <CalendarMonthGrid.EventChip className="bg-primary-100 text-primary text-2xs px-1.5 py-0.5 truncate text-start">
-          11 AM Patient B
+        <CalendarMonthGrid.EventChip>
+          <CalendarEvent tone="accent">11 AM Patient B</CalendarEvent>
         </CalendarMonthGrid.EventChip>
       </CalendarMonthGrid.DayCell>
 
@@ -48,8 +48,8 @@ A compact month grid — weekday header strip, then a days area with a few day c
       <CalendarMonthGrid.DayCell dayNumber={8} isCurrentMonth available={false} />
 
       <CalendarMonthGrid.DayCell dayNumber={9} isCurrentMonth available>
-        <CalendarMonthGrid.EventChip className="bg-destructive-200 text-destructive text-2xs px-1.5 py-0.5 truncate text-start">
-          2 PM Deposition
+        <CalendarMonthGrid.EventChip>
+          <CalendarEvent tone="danger">2 PM Deposition</CalendarEvent>
         </CalendarMonthGrid.EventChip>
       </CalendarMonthGrid.DayCell>
 
@@ -74,7 +74,7 @@ CalendarMonthGrid.Weekdays     — 7-column header strip for weekday labels. One
 CalendarMonthGrid.Weekday      — One weekday header cell (e.g., "MON"). Just text.
 CalendarMonthGrid.Days         — Grid container for all day cells. 7 columns, auto-rows.
 CalendarMonthGrid.DayCell      — One day in the grid. Renders the day-number chip + a flex-column area for children (events).
-CalendarMonthGrid.EventChip    — A button-shaped event preview inside a DayCell. Pass styling via className for type tones.
+CalendarMonthGrid.EventChip    — A button-shaped event preview inside a DayCell. Render a CalendarEvent inside for the tone tint and dot.
 ```
 
 ## Code
@@ -99,12 +99,8 @@ CalendarMonthGrid.EventChip    — A button-shaped event preview inside a DayCel
         isToday={day.isToday}
       >
         {day.events.map((event) => (
-          <CalendarMonthGrid.EventChip
-            key={event.id}
-            className={cn(eventTone(event).bg, eventTone(event).text, 'text-2xs truncate px-1.5 py-0.5 text-start')}
-            onClick={() => openPopover(event)}
-          >
-            {formatEventLabel(event)}
+          <CalendarMonthGrid.EventChip key={event.id} onClick={() => openPopover(event)}>
+            <CalendarEvent tone={eventTone(event)}>{formatEventLabel(event)}</CalendarEvent>
           </CalendarMonthGrid.EventChip>
         ))}
       </CalendarMonthGrid.DayCell>
@@ -118,7 +114,7 @@ CalendarMonthGrid.EventChip    — A button-shaped event preview inside a DayCel
 The cell automatically renders the day-number chip with appropriate styling based on three flags:
 
 ```tsx
-{/* Today — primary-filled chip */}
+{/* Today — accent day number */}
 <CalendarMonthGrid.DayCell dayNumber={5} isToday isCurrentMonth available />
 
 {/* Current month, has availability — normal foreground */}

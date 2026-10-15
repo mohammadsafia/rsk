@@ -34,3 +34,4 @@ export * from './scroll-selector';
 export * from './radio-group';
 export * from './calendar-time-grid';
 export * from './calendar-month-grid';
+export * from './calendar-event';

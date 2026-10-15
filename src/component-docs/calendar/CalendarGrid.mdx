@@ -9,7 +9,7 @@ tags: [calendar, calendar-grid, schedule, compound, day-view, week-view, month-v
 
 import { useMemo, useState } from 'react';
 
-import { Tag, Divider, Table, IconButton } from '@components/ui';
+import { CalendarEvent, Tag, Divider, Table, IconButton } from '@components/ui';
 import { MetaCard } from '@components/shared';
 import { CalendarGrid } from '@components/calendar';
 import { Conditional } from '@components/utils';
@@ -22,11 +22,7 @@ import { CalendarClock, Clock, MapPin, Stethoscope, X } from 'lucide-react';
 
 The demo wires the same calendar to BOTH a calendar mode and a list mode. Use the view toggle (top-right, calendar/list icons) to switch — the calendar views self-guard out, and the consumer-rendered `<Table>` takes over the body.
 
-export const TONES = {
-  initial: { bg: 'bg-secondary-100', text: 'text-secondary', dotClass: 'bg-secondary' },
-  're-eval': { bg: 'bg-primary-100', text: 'text-primary', dotClass: 'bg-primary-400' },
-  deposition: { bg: 'bg-destructive-200', text: 'text-destructive', dotClass: 'bg-destructive' },
-};
+export const TONES = { initial: 'info', 're-eval': 'accent', deposition: 'danger' };
 
 export const TYPE_LABELS = { initial: 'Initial Evaluation', 're-eval': 'Re Evaluation', deposition: 'Deposition' };
 
@@ -150,31 +146,26 @@ export const CalendarGridDemo = () => {
 
         <CalendarGrid.Legend
           items={[
-            { label: 'Available', colorClass: 'bg-background' },
-            { label: 'Not Available', colorClass: 'bg-muted-100' },
-            { label: 'Initial Evaluation', colorClass: 'bg-secondary-100' },
-            { label: 'Re Evaluation', colorClass: 'bg-primary-100' },
-            { label: 'Deposition', colorClass: 'bg-destructive-200' },
+            { label: 'Available', colorClass: 'bg-surface' },
+            { label: 'Not Available', colorClass: 'bg-surface-sunken' },
+            { label: 'Initial Evaluation', colorClass: 'bg-info-subtle' },
+            { label: 'Re Evaluation', colorClass: 'bg-accent-subtle' },
+            { label: 'Deposition', colorClass: 'bg-danger-subtle' },
           ]}
         />
 
         <CalendarGrid.EventTemplate>
-          {(event, status) => {
-            const tone = TONES[event.type];
-            const pastDecoration = status === 'past' ? 'line-through' : '';
-            return (
-              <div className={`text-2xs h-full w-full truncate px-1.5 py-0.5 ${tone.bg} ${tone.text} ${pastDecoration}`}>
-                <span className={`me-1 inline-block size-1.5 rounded-full ${tone.dotClass}`} />
-                {formatTime(event.start)} - {event.patient}
-              </div>
-            );
-          }}
+          {(event, status) => (
+            <CalendarEvent tone={TONES[event.type]} past={status === 'past'}>
+              {formatTime(event.start)} · {event.patient}
+            </CalendarEvent>
+          )}
         </CalendarGrid.EventTemplate>
 
         <CalendarGrid.PopoverTemplate>
           {(event, onClose) => (
             <div className="flex w-80 flex-col gap-3 p-4">
-              <div className="border-muted-200 flex items-start justify-between border-b pb-3">
+              <div className="border-border-subtle flex items-start justify-between border-b pb-3">
                 <div className="flex flex-col gap-2">
                   <span className="text-sm font-bold">{event.patient}</span>
 
@@ -192,7 +183,7 @@ export const CalendarGridDemo = () => {
                 </div>
               </div>
 
-              <div className="border-muted-200 flex flex-col gap-2 border-b pb-3">
+              <div className="border-border-subtle flex flex-col gap-2 border-b pb-3">
                 <MetaCard
                   direction="horizontal"
                   title={<span className="flex items-center gap-2"><Stethoscope size={14} /> Doctor</span>}
@@ -221,7 +212,7 @@ export const CalendarGridDemo = () => {
         <CalendarGrid.MonthView />
 
         <Conditional.If condition={viewMode === 'list'}>
-          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto [scrollbar-color:var(--color-muted-200)_transparent] [scrollbar-width:thin]">
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto [scrollbar-color:var(--color-border-strong)_transparent] [scrollbar-width:thin]">
             <Table className={cn(!hasSlots && !hasEvents && 'flex-1')}>
               <Table.Header>
                 <Table.Row>
@@ -260,15 +251,13 @@ export const CalendarGridDemo = () => {
                   }
 
                   return dayEvents.map((event, idx) => {
-                    const tone = TONES[event.type];
                     return (
                       <Table.Row key={`${dayKey}-${event.id}`}>
                         <Table.Cell className="font-semibold">{idx === 0 ? dayLabel : ''}</Table.Cell>
                         <Table.Cell>
-                          <span className={`text-2xs inline-flex items-center gap-1 rounded-md px-2 py-0.5 ${tone.bg} ${tone.text}`}>
-                            <span className={`size-1.5 rounded-full ${tone.dotClass}`} />
+                          <CalendarEvent tone={TONES[event.type]} className="h-auto w-fit">
                             {TYPE_LABELS[event.type]}
-                          </span>
+                          </CalendarEvent>
                         </Table.Cell>
                         <Table.Cell>{formatTime(event.start)}</Table.Cell>
                         <Table.Cell>{formatTime(event.end)}</Table.Cell>
@@ -374,7 +363,7 @@ type CalendarLegendItem = { label: string; colorClass: string }; // colorClass i
   eventAccessors={{ getId: (e) => e.id, getStartTime: (e) => e.start, getEndTime: (e) => e.end }}
 >
   <CalendarGrid.EventTemplate>
-    {(event) => <div className="bg-secondary-100 text-secondary text-2xs h-full w-full truncate px-1.5 py-0.5">{event.title}</div>}
+    {(event) => <CalendarEvent tone="info">{event.title}</CalendarEvent>}
   </CalendarGrid.EventTemplate>
 
   <CalendarGrid.Header>
@@ -393,7 +382,7 @@ type CalendarLegendItem = { label: string; colorClass: string }; // colorClass i
 
 ### With availability slots
 
-Slots are passed as an object keyed by ISO date (`YYYY-MM-DD`), with each value an array of `{ startTime, endTime }` (`HH:mm`). Cells outside any slot render as "Not Available" (`bg-muted-100`); cells inside a slot render as "Available" (`bg-background`).
+Slots are passed as an object keyed by ISO date (`YYYY-MM-DD`), with each value an array of `{ startTime, endTime }` (`HH:mm`). Cells outside any slot render as "Not Available" (`bg-surface-sunken`); cells inside a slot render as "Available" (`bg-surface`).
 
 ```tsx
 const slots = {
@@ -432,8 +421,8 @@ When the calendar visualizes availability only (no appointments), pass `events={
 
   <CalendarGrid.Legend
     items={[
-      { label: 'Available', colorClass: 'bg-background' },
-      { label: 'Not Available', colorClass: 'bg-muted-100' },
+      { label: 'Available', colorClass: 'bg-surface' },
+      { label: 'Not Available', colorClass: 'bg-surface-sunken' },
     ]}
   />
 
@@ -455,12 +444,12 @@ The header row's right-side group uses a `<Divider orientation="vertical">` to s
 
 ```tsx
 const LEGEND_ITEMS: CalendarLegendItem[] = [
-  { label: 'Available', colorClass: 'bg-background' },
-  { label: 'Not Available', colorClass: 'bg-muted-100' },
-  { label: 'Initial Evaluation', colorClass: 'bg-secondary-100' },
-  { label: 'Re Evaluation', colorClass: 'bg-primary-100' },
+  { label: 'Available', colorClass: 'bg-surface' },
+  { label: 'Not Available', colorClass: 'bg-surface-sunken' },
+  { label: 'Initial Evaluation', colorClass: 'bg-info-subtle' },
+  { label: 'Re Evaluation', colorClass: 'bg-accent-subtle' },
   { label: 'Supplemental', colorClass: 'bg-info-subtle' },
-  { label: 'Deposition', colorClass: 'bg-destructive-200' },
+  { label: 'Deposition', colorClass: 'bg-danger-subtle' },
 ];
 
 <CalendarGrid {...props}>
@@ -523,12 +512,10 @@ const LEGEND_ITEMS: CalendarLegendItem[] = [
 ```tsx
 <CalendarGrid.EventTemplate>
   {(event, status) => {
-    const tone = APPOINTMENT_TYPE_TONES[event.appointmentType];
     return (
-      <div className={cn('text-2xs h-full w-full truncate px-1.5 py-0.5', tone.bg, tone.text, status === 'past' && 'line-through')}>
-        <span className={cn('me-1 inline-block size-1.5 rounded-full', tone.dotClass)} />
+      <CalendarEvent tone={APPOINTMENT_TYPE_TONES[event.appointmentType]} past={status === 'past'}>
         {event.title}
-      </div>
+      </CalendarEvent>
     );
   }}
 </CalendarGrid.EventTemplate>
@@ -656,7 +643,7 @@ events  — booked appointments (each one becomes an event card / row).
 
 slots   — availability windows (the "open" hours per day).
           Just startTime/endTime per day. Affects the calendar BACKDROP only:
-            - Calendar mode: bg-muted-100 on cells outside any slot's window
+            - Calendar mode: bg-surface-sunken on cells outside any slot's window
             - Calendar mode: legend "Available" / "Not Available" tints
             - List mode (consumer): together with events drives the empty state
               ("No schedule data" — only when BOTH are absent) AND optionally
@@ -758,7 +745,7 @@ The `<CalendarGrid.Header>` container is `flex items-center justify-between`. Pa
 - **Pure Composable API**: `EventTemplate` (required when events are provided; omit for slot-only calendars) and `PopoverTemplate` (optional) are slot sub-components. No render-prop on the root, no IoC stacking — every slot is a child.
 - **Accessor strings only**: `getStartTime` / `getEndTime` return ISO 8601 strings. The internal helpers parse them via `useDate().toLocalDate()`. If your DTO uses `Date` objects, convert at the accessor.
 - **Slots shape is BE-driven**: `slots: Record<string, TimeRange[]>` lets you pass the API response directly with no transformation. The grid computes per-cell availability via interval overlap (no negative-space derivation needed).
-- **Now indicator**: a 1px destructive line shows the current time on today's column in day / week views. No setInterval — it refreshes on natural re-renders.
+- **Now indicator**: a 1px accent line shows the current time on today's column in day / week views. No setInterval — it refreshes on natural re-renders.
 - **Month overflow**: in month view, events past the third per day collapse into a "+N more" popover.
 - **Scrollbar gutter**: header row reserves an invisible scrollbar gutter to match the body's scrollbar width — keeps day-column dividers aligned with day-header dividers across the week.
 - **Range callback fires on window shifts**: use `onRangeChange` to drive query refetching. The callback dedupes via the start/end date keys (does not fire when the range object is recomputed but the window is the same).

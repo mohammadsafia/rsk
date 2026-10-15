@@ -25,7 +25,7 @@ type CalendarGridChromeComponents = FC & {
 const Header: FC<HeaderProps> = ({ className, children, ...props }) => (
   <div
     data-slot="calendar-grid-header"
-    className={cn('border-muted-200 flex items-center justify-between gap-4 border-b px-4 py-3', className)}
+    className={cn('border-border-subtle flex items-center justify-between gap-4 border-b px-4 py-3', className)}
     {...props}
   >
     {children}
@@ -39,13 +39,13 @@ const Navigation: FC = () => {
   return (
     <div data-slot="calendar-grid-navigation" className="flex items-center gap-2">
       <IconButton size="sm" type="button" aria-label={t('previous')} onClick={goPrev}>
-        <ChevronLeft size={20} className="text-muted-400" />
+        <ChevronLeft size={20} className="text-fg-muted rtl:rotate-180" />
       </IconButton>
 
-      <span className="text-foreground text-sm font-bold">{navigationLabel}</span>
+      <span className="text-fg text-sm font-bold">{navigationLabel}</span>
 
       <IconButton size="sm" type="button" aria-label={t('next')} onClick={goNext}>
-        <ChevronRight size={20} className="text-muted-400" />
+        <ChevronRight size={20} className="text-fg-muted rtl:rotate-180" />
       </IconButton>
     </div>
   );
@@ -123,9 +123,9 @@ const Legend: FC<LegendProps> = ({ items, className, ...props }) => (
   <div data-slot="calendar-grid-legend" className={cn('flex flex-wrap items-center gap-3 px-3 py-2', className)} {...props}>
     {items.map((item) => (
       <div key={item.label} data-slot="calendar-grid-legend-item" className="flex items-center gap-2">
-        <span aria-hidden="true" className={cn('border-muted-200 size-3 shrink-0 rounded-full border', item.colorClass)} />
+        <span aria-hidden="true" className={cn('border-border-subtle size-3 shrink-0 rounded-full border', item.colorClass)} />
 
-        <span className="text-muted-foreground text-xs">{item.label}</span>
+        <span className="text-fg-muted text-xs">{item.label}</span>
       </div>
     ))}
   </div>

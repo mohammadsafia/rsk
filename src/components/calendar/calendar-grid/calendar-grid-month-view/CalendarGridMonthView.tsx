@@ -110,7 +110,7 @@ const MonthView: FC = () => {
                     </Button>
                   </Popover.Trigger>
 
-                  <Popover.Content className="border-muted-200 bg-background w-60 rounded-xl border p-2" side="bottom" align="start">
+                  <Popover.Content className="w-60 p-2" side="bottom" align="start">
                     <div className="flex flex-col gap-1">
                       {overflowEvents.map(({ event, status }, idx) => (
                         <MonthEventItem key={`${eventAccessors.getId(event)}-overflow-${idx}`} event={event} status={status} />
