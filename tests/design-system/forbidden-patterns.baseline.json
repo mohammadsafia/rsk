@@ -388,10 +388,6 @@
     "legacy-color-ramp": 4,
     "legacy-color-name": 8
   },
-  "src/components/ui/input/Input.tsx": {
-    "legacy-color-ramp": 4,
-    "legacy-color-name": 6
-  },
   "src/components/ui/layout/Layout.tsx": {
     "prime-component": 2,
     "legacy-color-name": 2

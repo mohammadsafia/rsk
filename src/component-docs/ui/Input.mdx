@@ -3,13 +3,21 @@ id: inputs
 title: Input
 section: Components
 category: UI
-description: 'Text input for forms.'
+description: 'Text field in three sizes with invalid and disabled states; shares its shape with Select, TimePicker and FormattedNumber.'
 tags: [ui, forms, input]
 ---
 
 import { Input } from '@components/ui';
 
 ## Demo
+
+<div className="grid max-w-sm gap-3">
+  <Input placeholder="Patient name" />
+  <Input size="sm" placeholder="Search" />
+  <Input size="lg" placeholder="Search" />
+  <Input invalid defaultValue="2981-44" />
+  <Input disabled value="Locked" />
+</div>
 
 <div className="flex w-80 flex-col gap-3">
   <Input placeholder="Email" />
