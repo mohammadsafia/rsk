@@ -1,0 +1,73 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+import { describe, expect, it } from 'vite-plus/test';
+
+import { compareToBaseline, countPatterns, scanRepo, type Baseline } from './forbidden-patterns';
+
+const REPO_ROOT = fileURLToPath(new URL('../../', import.meta.url));
+const BASELINE_PATH = fileURLToPath(new URL('./forbidden-patterns.baseline.json', import.meta.url));
+
+describe('countPatterns', () => {
+  it('counts each banned pattern', () => {
+    const source = [
+      '<PrimeCard />',
+      '<div className="bg-primary-15 text-muted-400 border-destructive-200" />',
+      '<p className="bg-background text-foreground text-primary-foreground" />',
+      '<span className="shadow-boundary shadow-deep" />',
+      '<Button variant="ghost-muted-primary" />',
+      "const c = '#E07B89';",
+      "const d = 'rgb(0 0 0)';",
+      '<i className="text-[12px] p-[1.5rem]" />',
+    ].join('\n');
+
+    expect(countPatterns(source)).toEqual({
+      'prime-component': 1,
+      'legacy-color-ramp': 3,
+      'legacy-color-name': 3,
+      'legacy-shadow': 2,
+      'removed-button-variant': 1,
+      'hex-color': 1,
+      'raw-color-function': 1,
+      'arbitrary-length': 2,
+    });
+  });
+
+  it('does not count legitimate code', () => {
+    const source = [
+      '<div className="grid-cols-[auto_1fr] rounded-[inherit] max-w-[100dvw] bg-[var(--canvas)]" />',
+      '<div className="bg-canvas text-fg border-border-strong bg-accent-subtle text-danger" />',
+      '<a href="#top">Top</a>',
+      '<Button variant="ghost" tone="danger" />',
+      '<div className="shadow-raised shadow-overlay" />',
+    ].join('\n');
+
+    expect(countPatterns(source)).toEqual({});
+  });
+});
+
+describe('compareToBaseline', () => {
+  const baseline: Baseline = { 'src/a.tsx': { 'hex-color': 2 } };
+
+  it('reports increases and new files as regressions', () => {
+    const result = compareToBaseline({ 'src/a.tsx': { 'hex-color': 3 }, 'src/b.tsx': { 'prime-component': 1 } }, baseline);
+    expect(result.regressions).toEqual(['src/a.tsx: hex-color 2 → 3', 'src/b.tsx: prime-component 0 → 1']);
+  });
+
+  it('reports decreases as improvements so the baseline gets lowered', () => {
+    expect(compareToBaseline({}, baseline).improvements).toEqual(['src/a.tsx: hex-color 2 → 0']);
+  });
+});
+
+describe('repository ratchet', () => {
+  const baseline = JSON.parse(readFileSync(BASELINE_PATH, 'utf8')) as Baseline;
+  const result = compareToBaseline(scanRepo(REPO_ROOT), baseline);
+
+  it('introduces no new forbidden patterns', () => {
+    expect(result.regressions).toEqual([]);
+  });
+
+  it('has an up-to-date baseline (after removing violations run: corepack pnpm@10.34.7 ds:baseline)', () => {
+    expect(result.improvements).toEqual([]);
+  });
+});

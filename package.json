@@ -81,7 +81,8 @@
     "dto:clean": "tsx scripts/cli/bin-cli/dto-gen.ts clean",
     "generate-dtos": "node scripts/generate-dtos.js",
     "docs:new": "tsx src/component-docs/scripts/new.ts",
-    "docs:lint": "tsx src/component-docs/scripts/lint.ts"
+    "docs:lint": "tsx src/component-docs/scripts/lint.ts",
+    "ds:baseline": "tsx scripts/design-system/update-forbidden-baseline.ts"
   },
   "devDependencies": {
     "@clack/prompts": "^0.11.0",

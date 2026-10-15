@@ -1,0 +1,585 @@
+{
+  "src/App.tsx": {
+    "prime-component": 2
+  },
+  "src/assets/icons/CertificationIcon.tsx": {
+    "hex-color": 2
+  },
+  "src/assets/icons/QuraAILoader.tsx": {
+    "hex-color": 6
+  },
+  "src/assets/icons/QuraAILogo.tsx": {
+    "hex-color": 15
+  },
+  "src/assets/icons/SortIcon.tsx": {
+    "legacy-color-ramp": 6
+  },
+  "src/component-docs/calendar/CalendarGrid.mdx": {
+    "legacy-color-ramp": 18,
+    "legacy-color-name": 11,
+    "arbitrary-length": 1
+  },
+  "src/component-docs/calendar/CalendarPicker.mdx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 15
+  },
+  "src/component-docs/code-block/CodeBlock.tsx": {
+    "legacy-color-name": 9
+  },
+  "src/component-docs/forms/FormControl.mdx": {
+    "legacy-color-name": 2
+  },
+  "src/component-docs/forms/FormMessage.mdx": {
+    "legacy-color-name": 2
+  },
+  "src/component-docs/forms/FormSelect.mdx": {
+    "legacy-color-name": 1
+  },
+  "src/component-docs/gallery/doc-panel/DocPanel.tsx": {
+    "legacy-color-ramp": 5,
+    "legacy-color-name": 1
+  },
+  "src/component-docs/gallery/sidebar-panel/SidebarPanel.tsx": {
+    "legacy-color-ramp": 8,
+    "legacy-color-name": 5
+  },
+  "src/component-docs/hooks/UseRowEditing.mdx": {
+    "legacy-color-name": 4
+  },
+  "src/component-docs/shared/BlankSlate.mdx": {
+    "legacy-color-ramp": 11
+  },
+  "src/component-docs/shared/CollapsibleCard.mdx": {
+    "legacy-color-name": 6
+  },
+  "src/component-docs/shared/Conditional.mdx": {
+    "legacy-color-name": 1
+  },
+  "src/component-docs/shared/CountTooltip.mdx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 1
+  },
+  "src/component-docs/shared/FieldSection.mdx": {
+    "legacy-color-name": 2
+  },
+  "src/component-docs/shared/FileCard.mdx": {
+    "prime-component": 2,
+    "legacy-color-name": 3
+  },
+  "src/component-docs/shared/FileIcon.mdx": {
+    "legacy-color-ramp": 4,
+    "legacy-color-name": 1
+  },
+  "src/component-docs/shared/LoadingButton.mdx": {
+    "legacy-color-name": 3
+  },
+  "src/component-docs/shared/PrimeCard.mdx": {
+    "prime-component": 43,
+    "legacy-color-name": 1
+  },
+  "src/component-docs/shared/PrimeDialog.mdx": {
+    "prime-component": 17
+  },
+  "src/component-docs/shared/PrimeDropdown.mdx": {
+    "prime-component": 88
+  },
+  "src/component-docs/shared/PrimeLoader.mdx": {
+    "prime-component": 4
+  },
+  "src/component-docs/shared/PrimeTooltip.mdx": {
+    "prime-component": 61,
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 1
+  },
+  "src/component-docs/shared/Toaster.mdx": {
+    "legacy-color-name": 1
+  },
+  "src/component-docs/tables/DataTable.mdx": {
+    "prime-component": 6,
+    "removed-button-variant": 1
+  },
+  "src/component-docs/ui/Alert.mdx": {
+    "legacy-color-name": 7,
+    "removed-button-variant": 3
+  },
+  "src/component-docs/ui/Avatar.mdx": {
+    "legacy-color-name": 2
+  },
+  "src/component-docs/ui/Badge.mdx": {
+    "legacy-color-name": 2
+  },
+  "src/component-docs/ui/Button.mdx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 20,
+    "removed-button-variant": 24
+  },
+  "src/component-docs/ui/Calendar.mdx": {
+    "legacy-color-name": 2
+  },
+  "src/component-docs/ui/CalendarMonthGrid.mdx": {
+    "legacy-color-ramp": 4,
+    "legacy-color-name": 4,
+    "arbitrary-length": 1
+  },
+  "src/component-docs/ui/CalendarTimeGrid.mdx": {
+    "legacy-color-ramp": 3,
+    "legacy-color-name": 2,
+    "arbitrary-length": 1
+  },
+  "src/component-docs/ui/CheckboxGroup.mdx": {
+    "legacy-color-ramp": 2,
+    "legacy-color-name": 1
+  },
+  "src/component-docs/ui/Chip.mdx": {
+    "legacy-color-name": 2
+  },
+  "src/component-docs/ui/Command.mdx": {
+    "arbitrary-length": 1
+  },
+  "src/component-docs/ui/Divider.mdx": {
+    "legacy-color-name": 2
+  },
+  "src/component-docs/ui/FormattedNumber.mdx": {
+    "legacy-color-name": 3
+  },
+  "src/component-docs/ui/Layout.mdx": {
+    "legacy-color-name": 3
+  },
+  "src/component-docs/ui/Pagination.mdx": {
+    "legacy-color-name": 3
+  },
+  "src/component-docs/ui/Progress.mdx": {
+    "legacy-color-name": 2
+  },
+  "src/component-docs/ui/RadioGroup.mdx": {
+    "legacy-color-ramp": 2,
+    "legacy-color-name": 1
+  },
+  "src/component-docs/ui/Skeleton.mdx": {
+    "legacy-color-name": 11
+  },
+  "src/component-docs/ui/Switch.mdx": {
+    "legacy-color-name": 3
+  },
+  "src/component-docs/ui/Table.mdx": {
+    "legacy-color-ramp": 2
+  },
+  "src/component-docs/ui/Tabs.mdx": {
+    "legacy-color-name": 2
+  },
+  "src/component-docs/ui/ToggleGroup.mdx": {
+    "legacy-color-name": 3
+  },
+  "src/component-docs/ui/TooltipButton.mdx": {
+    "legacy-color-name": 3
+  },
+  "src/components/calendar/calendar-grid/CalendarGrid.tsx": {
+    "legacy-color-ramp": 2,
+    "legacy-color-name": 2
+  },
+  "src/components/calendar/calendar-grid/calendar-grid-chrome/CalendarGridChrome.tsx": {
+    "legacy-color-ramp": 4,
+    "legacy-color-name": 2
+  },
+  "src/components/calendar/calendar-grid/calendar-grid-month-view/CalendarGridMonthView.tsx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 1
+  },
+  "src/components/calendar/calendar-grid/calendar-grid-time-view/CalendarGridTimeView.tsx": {
+    "legacy-color-ramp": 1
+  },
+  "src/components/forms/form-checkbox-group/FormCheckboxGroup.tsx": {
+    "legacy-color-name": 11
+  },
+  "src/components/forms/form-checkbox/FormCheckbox.tsx": {
+    "legacy-color-ramp": 10,
+    "legacy-color-name": 13
+  },
+  "src/components/forms/form-combobox/FormCombobox.tsx": {
+    "legacy-color-name": 6
+  },
+  "src/components/forms/form-date-picker/FormDatePicker.tsx": {
+    "legacy-color-ramp": 6,
+    "legacy-color-name": 10,
+    "removed-button-variant": 1
+  },
+  "src/components/forms/form-date-range/FormDateRange.tsx": {
+    "legacy-color-ramp": 6,
+    "legacy-color-name": 10,
+    "removed-button-variant": 1
+  },
+  "src/components/forms/form-file-uploader/FormFileUploader.tsx": {
+    "legacy-color-name": 3
+  },
+  "src/components/forms/form-input/FormInput.tsx": {
+    "legacy-color-name": 6
+  },
+  "src/components/forms/form-label/FormLabel.tsx": {
+    "prime-component": 7,
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 2
+  },
+  "src/components/forms/form-message/FormMessage.tsx": {
+    "legacy-color-name": 1
+  },
+  "src/components/forms/form-multi-combobox/FormMultiCombobox.tsx": {
+    "legacy-color-name": 6,
+    "removed-button-variant": 1
+  },
+  "src/components/forms/form-number/FormNumber.tsx": {
+    "legacy-color-name": 6
+  },
+  "src/components/forms/form-radio-group/FormRadioGroup.tsx": {
+    "legacy-color-name": 11
+  },
+  "src/components/forms/form-select/FormSelect.tsx": {
+    "legacy-color-name": 6,
+    "removed-button-variant": 1
+  },
+  "src/components/forms/form-textarea/FormTextarea.tsx": {
+    "legacy-color-ramp": 4,
+    "legacy-color-name": 12
+  },
+  "src/components/forms/form-time-picker/FormTimePicker.tsx": {
+    "legacy-color-name": 4
+  },
+  "src/components/shared/action-panel/ActionPanel.tsx": {
+    "legacy-color-name": 1,
+    "removed-button-variant": 1
+  },
+  "src/components/shared/blank-slate/BlankSlate.tsx": {
+    "legacy-color-ramp": 3
+  },
+  "src/components/shared/breadcrumb/Breadcrumb.tsx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 1
+  },
+  "src/components/shared/collapsible-card/CollapsibleCard.tsx": {
+    "prime-component": 9,
+    "legacy-color-ramp": 22,
+    "legacy-color-name": 18
+  },
+  "src/components/shared/combobox/Combobox.tsx": {
+    "legacy-color-ramp": 7,
+    "legacy-color-name": 9,
+    "removed-button-variant": 1
+  },
+  "src/components/shared/confirm-dialog/ConfirmDialog.tsx": {
+    "legacy-color-name": 2
+  },
+  "src/components/shared/count-tooltip/CountTooltip.tsx": {
+    "prime-component": 12,
+    "legacy-color-ramp": 1
+  },
+  "src/components/shared/error-tooltip/ErrorTooltip.tsx": {
+    "legacy-color-name": 4
+  },
+  "src/components/shared/faceted-filter/FacetedFilter.tsx": {
+    "legacy-color-name": 3,
+    "arbitrary-length": 4
+  },
+  "src/components/shared/field-section/FieldSection.tsx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 3
+  },
+  "src/components/shared/file-card/FileCard.tsx": {
+    "prime-component": 17,
+    "legacy-color-ramp": 11,
+    "legacy-color-name": 5,
+    "removed-button-variant": 2
+  },
+  "src/components/shared/file-icon/FileIcon.tsx": {
+    "legacy-color-ramp": 2,
+    "legacy-color-name": 1
+  },
+  "src/components/shared/file-uploader/FileUploader.tsx": {
+    "legacy-color-ramp": 7,
+    "legacy-color-name": 6,
+    "removed-button-variant": 4
+  },
+  "src/components/shared/form-submit-buttons/FormSubmitButtons.tsx": {
+    "legacy-color-name": 1,
+    "legacy-shadow": 1
+  },
+  "src/components/shared/grid-card/GridCard.tsx": {
+    "prime-component": 3,
+    "legacy-color-ramp": 4
+  },
+  "src/components/shared/language-switcher/LanguageSwitcher.tsx": {
+    "legacy-color-name": 2
+  },
+  "src/components/shared/link-button/LinkButton.tsx": {
+    "legacy-color-name": 1
+  },
+  "src/components/shared/meta-card/MetaCard.tsx": {
+    "prime-component": 3,
+    "legacy-color-ramp": 1
+  },
+  "src/components/shared/prime-card/PrimeCard.tsx": {
+    "prime-component": 65,
+    "legacy-color-ramp": 13,
+    "legacy-color-name": 7
+  },
+  "src/components/shared/prime-dialog/PrimeDialog.tsx": {
+    "prime-component": 20,
+    "legacy-color-name": 2
+  },
+  "src/components/shared/prime-dropdown/PrimeDropdown.tsx": {
+    "prime-component": 35,
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 3
+  },
+  "src/components/shared/prime-loader/PrimeLoader.tsx": {
+    "prime-component": 4,
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 3,
+    "arbitrary-length": 1
+  },
+  "src/components/shared/prime-tooltip/PrimeTooltip.tsx": {
+    "prime-component": 20,
+    "legacy-color-ramp": 1
+  },
+  "src/components/shared/stepper/Stepper.tsx": {
+    "legacy-color-ramp": 4
+  },
+  "src/components/shared/theme-switcher/ThemeSwitcher.tsx": {
+    "legacy-color-name": 2
+  },
+  "src/components/tables/data-table-filters/async-select-filter/AsyncSelectFilter.tsx": {
+    "legacy-color-ramp": 3
+  },
+  "src/components/tables/data-table-filters/date-filter/DateFilter.tsx": {
+    "legacy-color-ramp": 3
+  },
+  "src/components/tables/data-table-filters/filter-chip-list/FilterChipList.tsx": {
+    "legacy-color-ramp": 3,
+    "legacy-color-name": 1
+  },
+  "src/components/tables/data-table-filters/select-filter/SelectFilter.tsx": {
+    "legacy-color-ramp": 3
+  },
+  "src/components/tables/data-table-filters/time-filter/TimeFilter.tsx": {
+    "legacy-color-ramp": 3
+  },
+  "src/components/tables/data-table/data-table-content/DataTableContent.tsx": {
+    "legacy-color-name": 1
+  },
+  "src/components/tables/data-table/data-table-pagination/DataTablePagination.tsx": {
+    "legacy-color-ramp": 2,
+    "legacy-color-name": 1
+  },
+  "src/components/tables/data-table/data-table-toolbar/DataTableToolbar.tsx": {
+    "legacy-color-ramp": 4,
+    "legacy-color-name": 4,
+    "removed-button-variant": 1
+  },
+  "src/components/ui/accordion/Accordion.tsx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 2
+  },
+  "src/components/ui/alert/Alert.tsx": {
+    "legacy-color-ramp": 14,
+    "legacy-color-name": 16
+  },
+  "src/components/ui/avatar/Avatar.tsx": {
+    "legacy-color-name": 1
+  },
+  "src/components/ui/badge/Badge.tsx": {
+    "legacy-color-ramp": 3,
+    "legacy-color-name": 4
+  },
+  "src/components/ui/button/Button.tsx": {
+    "legacy-color-ramp": 29,
+    "legacy-color-name": 37
+  },
+  "src/components/ui/calendar-month-grid/CalendarMonthGrid.tsx": {
+    "legacy-color-ramp": 7,
+    "legacy-color-name": 3
+  },
+  "src/components/ui/calendar-time-grid/CalendarTimeGrid.tsx": {
+    "legacy-color-ramp": 10,
+    "legacy-color-name": 7
+  },
+  "src/components/ui/calendar/Calendar.tsx": {
+    "legacy-color-ramp": 4,
+    "legacy-color-name": 15,
+    "arbitrary-length": 4
+  },
+  "src/components/ui/card/Card.tsx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 1,
+    "legacy-shadow": 9
+  },
+  "src/components/ui/checkbox-group/CheckboxGroup.tsx": {
+    "legacy-color-ramp": 12,
+    "legacy-color-name": 17
+  },
+  "src/components/ui/checkbox/Checkbox.tsx": {
+    "legacy-color-ramp": 6,
+    "legacy-color-name": 12
+  },
+  "src/components/ui/chip/Chip.tsx": {
+    "legacy-color-ramp": 11,
+    "legacy-color-name": 10
+  },
+  "src/components/ui/command/Command.tsx": {
+    "legacy-color-ramp": 5,
+    "legacy-color-name": 5
+  },
+  "src/components/ui/dialog/Dialog.tsx": {
+    "legacy-color-name": 4
+  },
+  "src/components/ui/divider/Divider.tsx": {
+    "legacy-color-ramp": 3
+  },
+  "src/components/ui/dropdown-menu/DropdownMenu.tsx": {
+    "legacy-color-ramp": 2,
+    "legacy-color-name": 8,
+    "legacy-shadow": 1
+  },
+  "src/components/ui/formatted-number/FormattedNumber.tsx": {
+    "legacy-color-ramp": 4,
+    "legacy-color-name": 8,
+    "removed-button-variant": 2
+  },
+  "src/components/ui/input/Input.tsx": {
+    "legacy-color-ramp": 4,
+    "legacy-color-name": 6
+  },
+  "src/components/ui/layout/Layout.tsx": {
+    "prime-component": 2,
+    "legacy-color-name": 2
+  },
+  "src/components/ui/pagination/Pagination.tsx": {
+    "legacy-color-ramp": 5,
+    "legacy-color-name": 4
+  },
+  "src/components/ui/popover/Popover.tsx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 2
+  },
+  "src/components/ui/progress/Progress.tsx": {
+    "legacy-color-name": 5
+  },
+  "src/components/ui/radio-dot/RadioDot.tsx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 4
+  },
+  "src/components/ui/radio-group/RadioGroup.tsx": {
+    "legacy-color-ramp": 12,
+    "legacy-color-name": 17
+  },
+  "src/components/ui/scroll-area/ScrollArea.tsx": {
+    "legacy-color-name": 1
+  },
+  "src/components/ui/select/Select.tsx": {
+    "legacy-color-ramp": 12,
+    "legacy-color-name": 12
+  },
+  "src/components/ui/skeleton/Skeleton.tsx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 2
+  },
+  "src/components/ui/switch/Switch.tsx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 5
+  },
+  "src/components/ui/table/Table.tsx": {
+    "prime-component": 2,
+    "legacy-color-ramp": 12,
+    "legacy-color-name": 3
+  },
+  "src/components/ui/tabs/Tabs.tsx": {
+    "legacy-color-ramp": 4,
+    "legacy-color-name": 8
+  },
+  "src/components/ui/time-picker/TimePicker.tsx": {
+    "legacy-color-ramp": 7,
+    "legacy-color-name": 11,
+    "removed-button-variant": 1,
+    "arbitrary-length": 2
+  },
+  "src/components/ui/toast/Toast.tsx": {
+    "legacy-color-ramp": 4,
+    "legacy-color-name": 8,
+    "legacy-shadow": 1
+  },
+  "src/components/ui/toggle-group/ToggleGroup.tsx": {
+    "legacy-color-ramp": 3,
+    "legacy-color-name": 5
+  },
+  "src/components/ui/tooltip/Tooltip.tsx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 2
+  },
+  "src/layouts/auth-guard/AuthGuard.tsx": {
+    "prime-component": 1
+  },
+  "src/layouts/auth-layout/AuthLayout.tsx": {
+    "legacy-color-name": 1
+  },
+  "src/layouts/dashboard-header/DashboardHeader.tsx": {
+    "legacy-color-ramp": 1,
+    "legacy-color-name": 13,
+    "arbitrary-length": 1
+  },
+  "src/layouts/dashboard-layout/DashboardLayout.tsx": {
+    "prime-component": 2,
+    "legacy-shadow": 1
+  },
+  "src/layouts/dashboard-sidebar-drawer/DashboardSidebarDrawer.tsx": {
+    "legacy-color-name": 3
+  },
+  "src/layouts/dashboard-sidebar-link/DashboardSidebarLink.tsx": {
+    "legacy-color-name": 2,
+    "arbitrary-length": 1
+  },
+  "src/layouts/dashboard-sidebar/DashboardSidebar.tsx": {
+    "legacy-color-name": 12,
+    "legacy-shadow": 1,
+    "arbitrary-length": 1
+  },
+  "src/layouts/error-boundary/ErrorBoundary.tsx": {
+    "legacy-color-name": 5,
+    "removed-button-variant": 2,
+    "arbitrary-length": 1
+  },
+  "src/pages/components/ComponentDetailPage.tsx": {
+    "legacy-color-ramp": 6,
+    "legacy-color-name": 8
+  },
+  "src/pages/components/ComponentsGalleryPage.tsx": {
+    "legacy-color-ramp": 3,
+    "legacy-color-name": 1,
+    "removed-button-variant": 1
+  },
+  "src/pages/components/components.data.demos.tsx": {
+    "prime-component": 68,
+    "legacy-color-ramp": 43,
+    "legacy-color-name": 44,
+    "removed-button-variant": 3,
+    "arbitrary-length": 5
+  },
+  "src/pages/dashboard/DashboardPage.tsx": {
+    "legacy-color-name": 11
+  },
+  "src/pages/home/HomePage.tsx": {
+    "legacy-color-ramp": 8,
+    "legacy-color-name": 60,
+    "legacy-shadow": 3,
+    "hex-color": 2,
+    "arbitrary-length": 29
+  },
+  "src/pages/members/MembersPage.tsx": {
+    "legacy-color-name": 5
+  },
+  "src/routes/RoutePlaceholders.tsx": {
+    "legacy-color-name": 5
+  },
+  "src/views/home/component-showcase/ComponentShowcase.tsx": {
+    "legacy-color-ramp": 4,
+    "legacy-color-name": 18,
+    "legacy-shadow": 1,
+    "arbitrary-length": 11
+  }
+}
