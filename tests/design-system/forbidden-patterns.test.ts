@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { compareToBaseline, countPatterns, scanRepo, type Baseline } from './forbidden-patterns';
+import { compareToBaseline, countPatterns, nextBaseline, scanRepo, type Baseline } from './forbidden-patterns';
 
 const REPO_ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const BASELINE_PATH = fileURLToPath(new URL('./forbidden-patterns.baseline.json', import.meta.url));
@@ -69,5 +69,29 @@ describe('repository ratchet', () => {
 
   it('has an up-to-date baseline (after removing violations run: corepack pnpm@10.34.7 ds:baseline)', () => {
     expect(result.improvements).toEqual([]);
+  });
+});
+
+describe('nextBaseline', () => {
+  const committed: Baseline = { 'src/a.tsx': { 'hex-color': 2, 'prime-component': 1 } };
+
+  it('lowers counts when violations are removed', () => {
+    expect(nextBaseline({ 'src/a.tsx': { 'hex-color': 1 } }, committed, { allowIncrease: false })).toEqual({
+      baseline: { 'src/a.tsx': { 'hex-color': 1 } },
+      regressions: [],
+    });
+  });
+
+  it('refuses to launder a regression into the baseline', () => {
+    const result = nextBaseline({ 'src/a.tsx': { 'hex-color': 1 }, 'src/b.tsx': { 'arbitrary-length': 1 } }, committed, {
+      allowIncrease: false,
+    });
+    expect(result.baseline).toBeNull();
+    expect(result.regressions).toEqual(['src/b.tsx: arbitrary-length 0 → 1']);
+  });
+
+  it('accepts increases only when explicitly allowed', () => {
+    const current: Baseline = { 'src/b.tsx': { 'arbitrary-length': 1 } };
+    expect(nextBaseline(current, committed, { allowIncrease: true }).baseline).toEqual(current);
   });
 });

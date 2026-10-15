@@ -102,3 +102,17 @@ export function compareToBaseline(current: Baseline, baseline: Baseline): { regr
 
   return { regressions, improvements };
 }
+
+/**
+ * Computes the baseline to commit. Refuses (baseline: null) when any count would rise,
+ * so `ds:baseline` can only ratchet down unless increases are explicitly allowed.
+ */
+export function nextBaseline(
+  current: Baseline,
+  committed: Baseline,
+  { allowIncrease }: { allowIncrease: boolean },
+): { baseline: Baseline | null; regressions: string[] } {
+  const { regressions } = compareToBaseline(current, committed);
+  if (regressions.length > 0 && !allowIncrease) return { baseline: null, regressions };
+  return { baseline: current, regressions };
+}
