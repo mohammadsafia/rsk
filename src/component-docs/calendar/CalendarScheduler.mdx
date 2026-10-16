@@ -1,0 +1,232 @@
+---
+id: calendar-scheduler
+title: Scheduler
+section: Components
+category: Calendar
+description: 'CalendarGrid as a scheduler: resource columns, click-or-drag to create, drag to move and resize with optimistic save, full keyboard control, an all-day row and an agenda view.'
+tags: [calendar, scheduler, resources, drag, resize, agenda, all-day, appointments]
+---
+
+import { useState } from 'react';
+import { demoSource } from '@component-docs/blocks';
+import { CalendarGrid } from '@components/calendar';
+import { DescriptionList } from '@components/shared';
+import { Divider } from '@components/ui';
+import pageSource from './CalendarScheduler.mdx?raw';
+
+export const DOCTORS = [
+  { id: 'haddad', label: 'Dr. Haddad' },
+  { id: 'khalil', label: 'Dr. Khalil' },
+  { id: 'nasser', label: 'Dr. Nasser' },
+];
+
+export const atToday = (hour, minute = 0, dayOffset = 0) => {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate() + dayOffset, hour, minute).toISOString();
+};
+
+export const todayKey = (dayOffset = 0) => {
+  const now = new Date();
+  const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + dayOffset);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
+
+export const initialVisits = () => [
+  { id: 'v1', patient: 'Sara Haddad', doctor: 'haddad', start: atToday(8, 30), end: atToday(9, 15) },
+  { id: 'v2', patient: 'Omar Khalil', doctor: 'haddad', start: atToday(10), end: atToday(11) },
+  { id: 'v3', patient: 'Lina Nasser', doctor: 'khalil', start: atToday(9), end: atToday(9, 30) },
+  { id: 'v4', patient: 'Fail Demo', doctor: 'khalil', start: atToday(11), end: atToday(12) },
+  { id: 'v5', patient: 'Yousef Amin', doctor: 'nasser', start: atToday(13, 30), end: atToday(14, 30) },
+  { id: 'v6', patient: 'Maya Saleh', doctor: 'nasser', start: atToday(15), end: atToday(15, 30) },
+  { id: 'v7', patient: 'Rami Odeh', doctor: 'haddad', start: atToday(14), end: atToday(15) },
+  { id: 'v8', patient: 'Hala Fares', doctor: 'khalil', start: atToday(10, 0, 1), end: atToday(10, 30, 1) },
+  { id: 'audit', patient: 'Clinic audit', doctor: 'nasser', start: atToday(0), end: atToday(0, 0, 1), allDay: true },
+];
+
+export const clinicSlots = () =>
+  Object.fromEntries(
+    DOCTORS.map((doctor) => [
+      doctor.id,
+      Object.fromEntries(
+        [0, 1, 2, 3, 4, 5, 6].map((offset) => [
+          todayKey(offset),
+          [
+            { startTime: '08:00', endTime: '12:00' },
+            { startTime: '13:00', endTime: '17:00' },
+          ],
+        ]),
+      ),
+    ]),
+  );
+
+export const accessors = {
+  getId: (visit) => visit.id,
+  getStartTime: (visit) => visit.start,
+  getEndTime: (visit) => visit.end,
+  getResourceId: (visit) => visit.doctor,
+  isAllDay: (visit) => !!visit.allDay,
+};
+
+export const formatTime = (iso) => new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+export const VisitDetails = ({ visit }) => (
+  <div className="flex flex-col gap-3 p-4">
+    <p className="text-fg text-sm font-semibold">{visit.patient}</p>
+    <Divider />
+    <DescriptionList
+      layout="inline"
+      items={[
+        { term: 'Time', value: visit.allDay ? 'All day' : `${formatTime(visit.start)} – ${formatTime(visit.end)}` },
+        { term: 'Doctor', value: DOCTORS.find((doctor) => doctor.id === visit.doctor)?.label },
+      ]}
+    />
+  </div>
+);
+
+export const SchedulerDemo = ({ initialView = 'day' }) => {
+  const [visits, setVisits] = useState(initialVisits);
+  const [slots] = useState(clinicSlots);
+
+  const createVisit = (slot) =>
+    setVisits((current) => [
+      ...current,
+      { id: `new-${current.length}`, patient: 'New visit', doctor: slot.resourceId ?? 'haddad', start: slot.start, end: slot.end },
+    ]);
+
+  const saveChange = ({ event, start, end, resourceId }) =>
+    new Promise((resolve, reject) =>
+      setTimeout(() => {
+        if (event.patient === 'Fail Demo') return reject(new Error('Slot taken'));
+        setVisits((current) => current.map((visit) => (visit.id === event.id ? { ...visit, start, end, doctor: resourceId ?? visit.doctor } : visit)));
+        resolve();
+      }, 500),
+    );
+
+  return (
+    <div className="flex h-190 w-full min-w-0 flex-col">
+      <CalendarGrid
+        initialView={initialView}
+        events={visits}
+        eventAccessors={accessors}
+        resources={DOCTORS}
+        slots={slots}
+        startHour={8}
+        endHour={18}
+        stepMinutes={15}
+        onSlotSelect={createVisit}
+        onEventChange={saveChange}
+        canEdit={(visit) => new Date(visit.end) > new Date()}
+      >
+        <CalendarGrid.Header>
+          <CalendarGrid.Navigation />
+          <div className="flex flex-1 items-center justify-end gap-3">
+            <CalendarGrid.ResourceFilter />
+            <CalendarGrid.ViewTabs views={['day', 'week', 'month', 'agenda']} />
+          </div>
+        </CalendarGrid.Header>
+        <CalendarGrid.EventTemplate>
+          {(visit, status) => (
+            <span className={`bg-accent-subtle text-fg flex size-full flex-col rounded-md px-1.5 py-1 text-xs ${status === 'past' ? 'opacity-60' : ''}`}>
+              <span className="truncate font-medium">{visit.patient}</span>
+            </span>
+          )}
+        </CalendarGrid.EventTemplate>
+        <CalendarGrid.PopoverTemplate>{(visit) => <VisitDetails visit={visit} />}</CalendarGrid.PopoverTemplate>
+        <CalendarGrid.DayView />
+        <CalendarGrid.WeekView />
+        <CalendarGrid.MonthView />
+        <CalendarGrid.AgendaView />
+      </CalendarGrid>
+    </div>
+  );
+};
+
+export const AgendaDemo = () => <SchedulerDemo initialView="agenda" />;
+
+## Clinic day
+
+Three doctors side by side, each with their own availability. Try all of these:
+
+- Click or drag on an empty slot to create a visit.
+- Drag a visit to another time or doctor.
+- Drag a visit's bottom edge to resize it.
+- Drag "Fail Demo" to see the change reverted with a toast.
+- Past visits are locked.
+
+<Example title="Clinic day" code={demoSource('SchedulerDemo', pageSource)}>
+  <SchedulerDemo />
+</Example>
+
+## Resources
+
+Pass `resources` and `eventAccessors.getResourceId`.
+- **Day view:** one column per resource, with a sticky header. Many resources scroll horizontally while the time axis stays pinned.
+- **Week view:** `CalendarGrid.ResourceFilter` shows all resources or one.
+- **Availability:** `slots` can be keyed by resource and then by date: `{ haddad: { '2026-10-16': [{ startTime: '08:00', endTime: '12:00' }] } }`.
+- **No resource id:** in resource columns, events without a resource id are not shown.
+
+## Creating events
+
+With `onSlotSelect`, a click selects one step and a drag selects a range, snapped to `stepMinutes`. You get `{ start, end, resourceId }` as local wall times with an offset.
+- **Unavailable cells:** these are refused unless `allowOutsideAvailability` is set. The ghost turns red over them.
+- **Cancel and clicks:** Escape cancels, and a press that moves less than 4px counts as a click.
+- **Touch:** a tap selects one step, while a vertical swipe still scrolls the grid.
+
+## Moving and resizing
+
+With `onEventChange`, you can drag an event's body to move it (to another time, day or resource, keeping its duration) or drag its bottom edge to resize it.
+- **Saving:** the grid shows the new position at once and calls `onEventChange({ event, start, end, resourceId })`. If the promise rejects, the event goes back and a danger toast explains why.
+- **Locking:** `canEdit(event)` locks events, for example past visits.
+- **Clicks:** a short press is still a click, so popovers keep working.
+
+```tsx
+const saveChange = async ({ event, start, end, resourceId }) => {
+  await api.visits.update(event.id, { start, end, doctorId: resourceId }); // throw to revert
+  await refetch();
+};
+```
+
+## Agenda
+
+`view="agenda"` lists the next `agendaDays` (default 7) grouped by day, skipping empty days. Navigation pages by the same number of days. Add the tab with `ViewTabs views={['day', 'week', 'month', 'agenda']}`.
+
+<Example title="Agenda" code={demoSource('AgendaDemo', pageSource)}>
+  <AgendaDemo />
+</Example>
+
+## All-day events
+
+Events with `eventAccessors.isAllDay(event)` true, or that span midnight, sit in a strip above the time grid, packed into lanes. Past three lanes, the extra events collapse into "+N more".
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'resources', type: '{ id; label; avatar? }[]', description: 'One day-view column per resource; enables the week filter.' },
+    { prop: 'resourceFilter · onResourceFilterChange', type: 'string | null', description: 'Week view resource (controlled); null shows all.' },
+    { prop: 'slots', type: 'Record<date, TimeRange[]> | Record<resourceId, Record<date, TimeRange[]>>', description: 'Availability, by date or by resource then date.' },
+    { prop: 'onSlotSelect', type: '(slot: { start; end; resourceId? }) => void', description: 'Click, drag or Enter on empty cells.' },
+    { prop: 'allowOutsideAvailability', type: 'boolean', default: 'false', description: 'Allow selecting cells outside slots.' },
+    { prop: 'onEventChange', type: '({ event, start, end, resourceId }) => Promise<void>', description: 'Makes events movable and resizable; reject to revert.' },
+    { prop: 'canEdit', type: '(event) => boolean', description: 'Locks individual events.' },
+    { prop: 'agendaDays', type: 'number', default: '7', description: 'Days listed (and paged) by the agenda view.' },
+    { prop: 'eventAccessors.getResourceId · isAllDay', type: '(event) => string | boolean', description: 'Resource of an event; puts it in the all-day row.' },
+    { prop: 'ViewTabs views', type: "CalendarView[]", default: "['day', 'week', 'month']", description: 'Tabs to show; add agenda to opt in.' },
+  ]}
+/>
+
+## Accessibility
+
+- With `onEventChange`, event cards are buttons with `aria-keyshortcuts="M R"`.
+  - **M** starts a move and **R** a resize.
+  - The arrow keys change the time by one step and the day or resource by one column.
+  - **Enter** saves, while **Escape** or tabbing away cancels.
+  - Every step is announced politely, for example "Fri, Oct 16, 9:30 AM to 10:30 AM, Dr. Khalil".
+- With `onSlotSelect`, empty cells form a single tab stop. The arrow keys move between cells, each named "Fri, Oct 16, 8:30 AM, Dr. Haddad", and Enter selects one step. Unavailable cells say so and are `aria-disabled`.
+- A failed save shows a danger toast. A successful one is announced: "Moved to …".
+
+## RTL notes
+
+- Resource columns, the all-day lanes, drag directions and the arrow keys all mirror in Arabic: ArrowLeft moves to the next column.
+- **M** and **R** also work on an Arabic keyboard layout, because the physical key is used.
+- Times stay left-to-right isolated and use Western digits.
