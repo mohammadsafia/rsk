@@ -52,7 +52,37 @@ export type TimeFilterMeta = FilterMetaBase & {
   step?: number;
 };
 
-export type DataTableFilterMeta = SelectFilterMeta | DateFilterMeta | TimeFilterMeta;
+/** Yes / No filter; clearing it means "Any". */
+export type BooleanFilterMeta = FilterMetaBase & {
+  variant: 'boolean';
+  /** @default t('common:yes') */
+  trueLabel?: string;
+  /** @default t('common:no') */
+  falseLabel?: string;
+};
+
+/** Case- and diacritic-insensitive "contains" text filter. */
+export type TextFilterMeta = FilterMetaBase & { variant: 'text' };
+
+/** Inclusive numeric range; either end may be open. */
+export type NumberRangeFilterMeta = FilterMetaBase & {
+  variant: 'numberRange';
+  /** Formats the pill summary. @default 'decimal' */
+  format?: 'decimal' | 'currency' | 'percent';
+  min?: number;
+  max?: number;
+};
+
+export type DataTableFilterMeta =
+  | SelectFilterMeta
+  | DateFilterMeta
+  | TimeFilterMeta
+  | BooleanFilterMeta
+  | TextFilterMeta
+  | NumberRangeFilterMeta;
+
+/** Column filter value for the `numberRange` variant. */
+export type NumberRangeFilterValue = { min?: number; max?: number };
 
 /** Column filter value for the `dateRange` variant (ISO `yyyy-MM-dd` strings). */
 export type DateRangeFilterValue = { from?: string; to?: string };

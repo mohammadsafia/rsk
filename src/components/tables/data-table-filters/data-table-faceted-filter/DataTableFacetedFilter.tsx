@@ -21,10 +21,14 @@ function DataTableFacetedFilter<TData>({ column }: DataTableFacetedFilterProps<T
     case 'time':
       return <TimeFilter column={column} filterMeta={filterMeta} />;
 
-    default:
+    case 'select':
+    case 'multiSelect':
       if (isAsyncFilterMeta(filterMeta)) return <AsyncSelectFilter column={column} filterMeta={filterMeta} />;
 
       return <SelectFilter column={column} filterMeta={filterMeta} />;
+
+    default:
+      return null;
   }
 }
 

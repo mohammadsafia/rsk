@@ -147,6 +147,20 @@ export function createFilterMeta(config: {
   max?: string;
   step?: number;
 }): DataTableFilterMeta;
+export function createFilterMeta(config: {
+  variant: 'boolean';
+  label: string;
+  trueLabel?: string;
+  falseLabel?: string;
+}): DataTableFilterMeta;
+export function createFilterMeta(config: { variant: 'text'; label: string; placeholder?: string }): DataTableFilterMeta;
+export function createFilterMeta(config: {
+  variant: 'numberRange';
+  label: string;
+  format?: 'decimal' | 'currency' | 'percent';
+  min?: number;
+  max?: number;
+}): DataTableFilterMeta;
 export function createFilterMeta(config: unknown): DataTableFilterMeta {
   return config as DataTableFilterMeta;
 }
