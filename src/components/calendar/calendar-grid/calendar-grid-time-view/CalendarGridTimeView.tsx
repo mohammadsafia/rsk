@@ -1,5 +1,6 @@
 import { type FC, useMemo, useState } from 'react';
 
+import { Conditional } from '@components/utils';
 import { CalendarTimeGrid, type CalendarTimeGridAxisRow, Popover } from '@components/ui';
 import { type CalendarAccessors, type EventTimeStatus, useCalendarGridContext } from '@components/calendar';
 
@@ -214,8 +215,9 @@ const TimeAxis: FC = () => {
 
 const EventSlot: FC<EventSlotProps> = ({ placement }) => {
   const { renderEvent, popoverContent, eventAccessors } = useCalendarGridContext();
-  const { formatDate, constants } = useDate();
+  const { formatNullableDate, constants } = useDate();
   const [open, setOpen] = useState(false);
+  const day = formatNullableDate(eventAccessors.getStartTime(placement.event), constants.DateFormats.FULL_MONTH_DAY_YEAR, '');
 
   const trigger = (
     <CalendarTimeGrid.EventCard
@@ -225,7 +227,10 @@ const EventSlot: FC<EventSlotProps> = ({ placement }) => {
       width={placement.width}
       onClick={popoverContent ? () => setOpen(true) : undefined}
     >
-      <span className="sr-only">{`${formatDate(eventAccessors.getStartTime(placement.event), constants.DateFormats.FULL_MONTH_DAY_YEAR)}, `}</span>
+      <Conditional.If condition={!!day}>
+        <span className="sr-only">{`${day}, `}</span>
+      </Conditional.If>
+
       {renderEvent(placement.event, placement.status)}
     </CalendarTimeGrid.EventCard>
   );

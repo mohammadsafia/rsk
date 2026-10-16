@@ -84,7 +84,7 @@ const Content: FC<ComponentPropsWithoutRef<'main'>> = ({ className, children, ..
       className={cn('relative min-h-0 flex-1 overflow-y-auto p-4 focus:outline-none md:p-6', className)}
       {...props}
     >
-      <div ref={sentinelRef} aria-hidden="true" className="h-px" />
+      <div ref={sentinelRef} aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px" />
 
       {children}
     </main>
@@ -117,6 +117,7 @@ const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY
   const contentId = `main-content-${shellId}`;
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const asideRef = useRef<HTMLElement>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
 
   const [collapsed, setCollapsedState] = useState(() => readStored(storageKey));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -132,8 +133,15 @@ const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY
 
   const closeMobile = useCallback((restoreFocus = false) => {
     setMobileOpen(false);
+    // Lift `inert` now so the menu button (inside the main region) can take focus before React re-renders.
+    mainRef.current?.removeAttribute('inert');
     if (restoreFocus) menuButtonRef.current?.focus();
   }, []);
+
+  // The open drawer is modal: the page behind it leaves the tab order and the accessibility tree.
+  useEffect(() => {
+    mainRef.current?.toggleAttribute('inert', mobileOpen);
+  }, [mobileOpen]);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -186,6 +194,7 @@ const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY
         <aside
           ref={asideRef}
           id={sidebarId}
+          aria-label={t('navigation')}
           tabIndex={-1}
           data-slot="app-shell-sidebar"
           data-collapsed={collapsed}
@@ -201,7 +210,7 @@ const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY
           {sidebar}
         </aside>
 
-        <div data-slot="app-shell-main" className="flex min-w-0 flex-1 flex-col">
+        <div ref={mainRef} data-slot="app-shell-main" className="flex min-w-0 flex-1 flex-col">
           {children}
         </div>
       </div>

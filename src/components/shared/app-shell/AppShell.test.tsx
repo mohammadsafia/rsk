@@ -103,6 +103,25 @@ describe('AppShell', () => {
     expect(classes.filter((name) => /translate-x-full|^invisible$/.test(name) && !name.startsWith('max-md:'))).toEqual([]);
   });
 
+  it('makes the content behind the open drawer inert and names the drawer', () => {
+    renderShell();
+    const behind = document.querySelector('[data-slot="app-shell-main"]') as HTMLElement;
+    expect(behind.hasAttribute('inert')).toBe(false);
+    fireEvent.click(menuButton());
+    expect(behind.hasAttribute('inert')).toBe(true);
+    expect(aside().getAttribute('aria-label')).toBe('Navigation');
+    act(() => {
+      fireEvent.keyDown(document, { key: 'Escape' });
+    });
+    expect(behind.hasAttribute('inert')).toBe(false);
+  });
+
+  it('keeps the scroll sentinel out of flow so full-height pages do not overflow', () => {
+    renderShell();
+    const sentinel = screen.getByRole('main').firstElementChild as HTMLElement;
+    expect(sentinel.className).toMatch(/(^|\s)absolute(\s|$)/);
+  });
+
   it('offers a skip link to the main content', () => {
     renderShell();
     const skip = screen.getByRole('link', { name: 'Skip to content' });

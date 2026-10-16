@@ -19,12 +19,16 @@ const MAX_VISIBLE_MONTH_EVENTS = 3;
 
 const MonthEventItem: FC<MonthEventItemProps> = ({ event, status }) => {
   const { renderEvent, popoverContent, eventAccessors } = useCalendarGridContext();
-  const { formatDate, constants } = useDate();
+  const { formatNullableDate, constants } = useDate();
   const [open, setOpen] = useState(false);
+  const day = formatNullableDate(eventAccessors.getStartTime(event), constants.DateFormats.FULL_MONTH_DAY_YEAR, '');
 
   const trigger = (
     <CalendarMonthGrid.EventChip onClick={popoverContent ? () => setOpen(true) : undefined}>
-      <span className="sr-only">{`${formatDate(eventAccessors.getStartTime(event), constants.DateFormats.FULL_MONTH_DAY_YEAR)}, `}</span>
+      <Conditional.If condition={!!day}>
+        <span className="sr-only">{`${day}, `}</span>
+      </Conditional.If>
+
       {renderEvent(event, status)}
     </CalendarMonthGrid.EventChip>
   );
