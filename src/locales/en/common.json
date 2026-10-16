@@ -166,5 +166,20 @@
     "viewChart": "View as chart",
     "empty": "No data for this period",
     "legend": "Series"
+  },
+  "wizard": {
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip",
+    "submit": "Submit",
+    "edit": "Edit",
+    "review": "Review",
+    "stepOf": "Step {{current}} of {{total}}",
+    "stepAnnounce": "Step {{current}} of {{total}}, {{title}}",
+    "optional": "Optional",
+    "draftRestored": "Draft restored from your last visit.",
+    "discardDraft": "Discard",
+    "submitFailed": "Some details need attention before you can submit.",
+    "steps": "Steps"
   }
 }

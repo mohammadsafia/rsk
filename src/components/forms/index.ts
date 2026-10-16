@@ -14,3 +14,4 @@ export * from './form-time-picker';
 export * from './form-checkbox-group';
 export * from './form-radio-group';
 export * from './form-section';
+export * from './form-wizard';

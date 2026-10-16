@@ -186,5 +186,20 @@
     "viewChart": "عرض كرسم بياني",
     "empty": "لا توجد بيانات لهذه الفترة",
     "legend": "السلاسل"
+  },
+  "wizard": {
+    "next": "التالي",
+    "back": "رجوع",
+    "skip": "تخطي",
+    "submit": "إرسال",
+    "edit": "تعديل",
+    "review": "المراجعة",
+    "stepOf": "الخطوة {{current}} من {{total}}",
+    "stepAnnounce": "الخطوة {{current}} من {{total}}، {{title}}",
+    "optional": "اختياري",
+    "draftRestored": "تمت استعادة المسودة من زيارتك الأخيرة.",
+    "discardDraft": "تجاهل",
+    "submitFailed": "بعض التفاصيل تحتاج إلى مراجعة قبل الإرسال.",
+    "steps": "الخطوات"
   }
 }
