@@ -72,5 +72,112 @@
       "title": "تعذّر تحميل لوحة التحكم",
       "description": "حدث خطأ ما. حاول مرة أخرى بعد قليل."
     }
+  },
+  "billing": {
+    "title": "الفواتير",
+    "description": "الفواتير والمدفوعات والمبالغ المستحقة.",
+    "summary": {
+      "outstanding": "المستحق",
+      "overdue": "المتأخر",
+      "overdueCaption_one": "فاتورة واحدة",
+      "overdueCaption_other": "{{count}} فواتير",
+      "collected": "المحصّل هذا الشهر"
+    },
+    "tabs": {
+      "label": "حالة الفاتورة",
+      "all": "الكل"
+    },
+    "status": {
+      "draft": "مسودة",
+      "sent": "مُرسلة",
+      "overdue": "متأخرة",
+      "paid": "مدفوعة",
+      "void": "ملغاة"
+    },
+    "columns": {
+      "number": "الرقم",
+      "patient": "المريض",
+      "issued": "تاريخ الإصدار",
+      "due": "تاريخ الاستحقاق",
+      "status": "الحالة",
+      "total": "الإجمالي",
+      "balance": "الرصيد"
+    },
+    "searchPlaceholder": "ابحث بالرقم أو اسم المريض",
+    "totalLabel": "فاتورة",
+    "bulk": {
+      "remind": "إرسال تذكيرات",
+      "markPaid": "تعليم كمدفوعة",
+      "export": "تصدير CSV",
+      "confirmTitle_one": "تعليم فاتورة واحدة كمدفوعة؟",
+      "confirmTitle_other": "تعليم {{count}} فواتير كمدفوعة؟",
+      "confirmDescription": "يُسجَّل رصيدها المستحق كدفعة بالبطاقة اليوم.",
+      "reminded": "أُرسلت التذكيرات إلى {{done}}",
+      "markedPaid": "عُلّمت {{done}} كمدفوعة",
+      "skipped": "، وتُخطّيت {{skipped}} (غير مفتوحة)",
+      "failed": "تعذّر إكمال الإجراء"
+    },
+    "empty": {
+      "title": "لا توجد فواتير بعد",
+      "description": "تظهر الفواتير هنا بعد اكتمال الزيارات."
+    },
+    "noResults": {
+      "title": "لا توجد فواتير مطابقة",
+      "description": "جرّب حالة أو بحثًا آخر."
+    },
+    "error": {
+      "title": "تعذّر تحميل الفواتير",
+      "description": "حدث خطأ ما. حاول مرة أخرى بعد قليل."
+    },
+    "sheet": {
+      "issuedDue": "صدرت {{issued}} · تستحق {{due}}",
+      "lines": "الخدمات",
+      "service": "الخدمة",
+      "quantity": "الكمية",
+      "unitPrice": "سعر الوحدة",
+      "amount": "المبلغ",
+      "total": "الإجمالي",
+      "payments": "المدفوعات",
+      "noPayments": "لا توجد مدفوعات بعد",
+      "balance": "الرصيد",
+      "record": {
+        "title": "تسجيل دفعة",
+        "amount": "المبلغ",
+        "method": "طريقة الدفع",
+        "date": "التاريخ",
+        "submit": "تسجيل الدفعة",
+        "success": "سُجّلت الدفعة",
+        "amountRequired": "أدخل مبلغًا أكبر من 0",
+        "amountTooHigh": "لا يمكن أن يتجاوز الرصيد ({{balance}})"
+      },
+      "send": "إرسال الفاتورة",
+      "sent": "أُرسلت الفاتورة",
+      "void": "إلغاء الفاتورة",
+      "voidTitle": "إلغاء {{number}}؟",
+      "voidDescription": "لا يمكن دفع الفاتورة الملغاة أو إرسالها.",
+      "voided": "أُلغيت الفاتورة",
+      "notFound": "الفاتورة غير موجودة",
+      "notFoundDescription": "ربما حُذفت. اختر فاتورة أخرى من القائمة.",
+      "close": "إغلاق"
+    }
+  },
+  "errors": {
+    "conflict": "لم يعد هذا الوقت متاحًا",
+    "not-found": "لم يعد موجودًا",
+    "invalid-transition": "هذا غير ممكن في حالته الحالية",
+    "duplicate-phone": "رقم الهاتف هذا مسجّل مسبقًا",
+    "forced": "حدث خطأ ما. حاول مرة أخرى.",
+    "invalid": "بعض القيم غير صالحة"
+  },
+  "services": {
+    "consultation": "استشارة",
+    "follow-up": "مراجعة",
+    "procedure": "إجراء",
+    "check-up": "فحص دوري"
+  },
+  "methods": {
+    "cash": "نقدًا",
+    "card": "بطاقة",
+    "insurance": "تأمين"
   }
 }

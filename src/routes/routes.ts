@@ -1,6 +1,6 @@
 import type { ElementType } from 'react';
 
-import { Component, Contact, LayoutDashboard, Settings, Users } from 'lucide-react';
+import { Component, Contact, LayoutDashboard, Receipt, Settings, Users } from 'lucide-react';
 
 export type AppMenu = {
   id: string;
@@ -44,6 +44,9 @@ export const FULL_ROUTES_PATH = {
     NEW: '/patients/new',
     DETAIL: '/patients/:id',
   },
+  BILLING: {
+    INDEX: '/billing',
+  },
   ROOT: {
     INDEX: '..',
   },
@@ -69,6 +72,13 @@ export const APP_MENU: AppMenu[] = [
     name: 'Patients',
     group: 'main',
     icon: Contact,
+  },
+  {
+    id: 'billing',
+    path: FULL_ROUTES_PATH.BILLING.INDEX,
+    name: 'Billing',
+    group: 'main',
+    icon: Receipt,
   },
   // The docs site is dev-only (see docs-routes.tsx).
   ...(import.meta.env.DEV

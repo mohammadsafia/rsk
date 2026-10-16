@@ -72,5 +72,112 @@
       "title": "The dashboard couldn't be loaded",
       "description": "Something went wrong. Try again in a moment."
     }
+  },
+  "billing": {
+    "title": "Billing",
+    "description": "Invoices, payments and what is still owed.",
+    "summary": {
+      "outstanding": "Outstanding",
+      "overdue": "Overdue",
+      "overdueCaption_one": "{{count}} invoice",
+      "overdueCaption_other": "{{count}} invoices",
+      "collected": "Collected this month"
+    },
+    "tabs": {
+      "label": "Invoice status",
+      "all": "All"
+    },
+    "status": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "overdue": "Overdue",
+      "paid": "Paid",
+      "void": "Void"
+    },
+    "columns": {
+      "number": "Number",
+      "patient": "Patient",
+      "issued": "Issued",
+      "due": "Due",
+      "status": "Status",
+      "total": "Total",
+      "balance": "Balance"
+    },
+    "searchPlaceholder": "Search by number or patient",
+    "totalLabel": "invoices",
+    "bulk": {
+      "remind": "Send reminders",
+      "markPaid": "Mark paid",
+      "export": "Export CSV",
+      "confirmTitle_one": "Mark {{count}} invoice paid?",
+      "confirmTitle_other": "Mark {{count}} invoices paid?",
+      "confirmDescription": "Their outstanding balance is recorded as a card payment today.",
+      "reminded": "Reminders sent to {{done}}",
+      "markedPaid": "{{done}} marked paid",
+      "skipped": ", {{skipped}} skipped (not open)",
+      "failed": "The action couldn't be completed"
+    },
+    "empty": {
+      "title": "No invoices yet",
+      "description": "Invoices appear here after completed visits."
+    },
+    "noResults": {
+      "title": "No matching invoices",
+      "description": "Try another status or search."
+    },
+    "error": {
+      "title": "Invoices couldn't be loaded",
+      "description": "Something went wrong. Try again in a moment."
+    },
+    "sheet": {
+      "issuedDue": "Issued {{issued}} · Due {{due}}",
+      "lines": "Services",
+      "service": "Service",
+      "quantity": "Qty",
+      "unitPrice": "Unit price",
+      "amount": "Amount",
+      "total": "Total",
+      "payments": "Payments",
+      "noPayments": "No payments yet",
+      "balance": "Balance",
+      "record": {
+        "title": "Record payment",
+        "amount": "Amount",
+        "method": "Method",
+        "date": "Date",
+        "submit": "Record payment",
+        "success": "Payment recorded",
+        "amountRequired": "Enter an amount above 0",
+        "amountTooHigh": "Can't be more than the balance ({{balance}})"
+      },
+      "send": "Send invoice",
+      "sent": "Invoice sent",
+      "void": "Void invoice",
+      "voidTitle": "Void {{number}}?",
+      "voidDescription": "A voided invoice can't be paid or sent.",
+      "voided": "Invoice voided",
+      "notFound": "Invoice not found",
+      "notFoundDescription": "It may have been removed. Pick another invoice from the list.",
+      "close": "Close"
+    }
+  },
+  "errors": {
+    "conflict": "That time is no longer free",
+    "not-found": "It no longer exists",
+    "invalid-transition": "That isn't possible in its current state",
+    "duplicate-phone": "That phone number is already registered",
+    "forced": "Something went wrong. Try again.",
+    "invalid": "Some values aren't valid"
+  },
+  "services": {
+    "consultation": "Consultation",
+    "follow-up": "Follow-up",
+    "procedure": "Procedure",
+    "check-up": "Check-up"
+  },
+  "methods": {
+    "cash": "Cash",
+    "card": "Card",
+    "insurance": "Insurance"
   }
 }
