@@ -14,9 +14,9 @@ function AuthLayout() {
     <>
       <Toaster />
 
-      <div className="bg-background flex h-screen w-screen items-center justify-center">
+      <main className="bg-canvas text-fg flex min-h-dvh items-center justify-center p-6">
         <Outlet />
-      </div>
+      </main>
     </>
   );
 }

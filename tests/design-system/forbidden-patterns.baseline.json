@@ -124,13 +124,6 @@
     "legacy-color-ramp": 4,
     "legacy-color-name": 4
   },
-  "src/layouts/auth-layout/AuthLayout.tsx": {
-    "legacy-color-name": 1
-  },
-  "src/layouts/error-boundary/ErrorBoundary.tsx": {
-    "legacy-color-name": 5,
-    "arbitrary-length": 1
-  },
   "src/pages/components/ComponentDetailPage.tsx": {
     "legacy-color-ramp": 6,
     "legacy-color-name": 8
@@ -155,9 +148,6 @@
     "arbitrary-length": 29
   },
   "src/pages/members/MembersPage.tsx": {
-    "legacy-color-name": 5
-  },
-  "src/routes/RoutePlaceholders.tsx": {
     "legacy-color-name": 5
   },
   "src/views/home/component-showcase/ComponentShowcase.tsx": {
