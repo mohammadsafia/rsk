@@ -32,7 +32,7 @@ type CalendarGridChromeComponents = FC & {
 const Header: FC<HeaderProps> = ({ className, children, ...props }) => (
   <div
     data-slot="calendar-grid-header"
-    className={cn('border-border-subtle flex items-center justify-between gap-4 border-b px-4 py-3', className)}
+    className={cn('border-border-subtle flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b px-4 py-3', className)}
     {...props}
   >
     {children}

@@ -297,7 +297,8 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
 
   const onColumnPointerDown = (event: ReactPointerEvent<HTMLElement>, columnIndex: number) => {
     if (!onSlotSelect || event.button !== 0) return;
-    if ((event.target as HTMLElement).closest('[data-slot="calendar-time-grid-event-card"]')) return;
+    // Presses on an event belong to the event (its data-slot can be replaced by a Popover trigger, so use data-event-id).
+    if ((event.target as HTMLElement).closest('[data-event-id]')) return;
     const hit = hitTest(event.clientX, event.clientY, columnIndex);
     startSession(event, { kind: 'create', columnIndex, anchor: hit.minute });
   };

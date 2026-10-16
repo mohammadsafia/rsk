@@ -35,7 +35,11 @@ const resources = [
 
 type Change = (change: CalendarEventChange<Visit>) => Promise<void>;
 
-const renderDay = ({ onEventChange, canEdit }: { onEventChange?: Change; canEdit?: (v: Visit) => boolean } = {}) =>
+const renderDay = ({
+  onEventChange,
+  canEdit,
+  onSlotSelect,
+}: { onEventChange?: Change; canEdit?: (v: Visit) => boolean; onSlotSelect?: () => void } = {}) =>
   render(
     <Tooltip.Provider>
       <CalendarGrid
@@ -49,6 +53,7 @@ const renderDay = ({ onEventChange, canEdit }: { onEventChange?: Change; canEdit
         stepMinutes={30}
         onEventChange={onEventChange}
         canEdit={canEdit}
+        onSlotSelect={onSlotSelect}
       >
         <CalendarGrid.EventTemplate<Visit>>{(v) => v.patient}</CalendarGrid.EventTemplate>
         <CalendarGrid.PopoverTemplate<Visit>>{() => <p>Details</p>}</CalendarGrid.PopoverTemplate>
@@ -152,6 +157,25 @@ describe('CalendarGrid move and resize', () => {
     expect(draft()).toBeNull();
     fireEvent.pointerUp(window, { pointerId: 1, ...at(1, 726) });
     expect(onEventChange).not.toHaveBeenCalled();
+  });
+
+  it('moves (not selects a slot) when a popover event is dragged in a selectable grid', () => {
+    const onEventChange = vi.fn<Change>(async () => {});
+    const onSlotSelect = vi.fn();
+    renderDay({ onEventChange, onSlotSelect });
+    drag(card(), at(0, 546), at(1, 726));
+    expect(onSlotSelect).not.toHaveBeenCalled();
+    expect(onEventChange).toHaveBeenCalledWith(expect.objectContaining({ resourceId: 'khalil' }));
+  });
+
+  it('a locked event in a selectable grid starts nothing', () => {
+    const onSlotSelect = vi.fn();
+    renderDay({ onEventChange: vi.fn<Change>(async () => {}), canEdit: () => false, onSlotSelect });
+    fireEvent.pointerDown(card(), { button: 0, pointerId: 1, ...at(0, 546) });
+    fireEvent.pointerMove(window, { pointerId: 1, ...at(0, 700) });
+    expect(draft()).toBeNull();
+    fireEvent.pointerUp(window, { pointerId: 1, ...at(0, 700) });
+    expect(onSlotSelect).not.toHaveBeenCalled();
   });
 
   it('is read-only without onEventChange', () => {

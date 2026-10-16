@@ -44,6 +44,11 @@ describe('CalendarGrid localisation', () => {
     expect(screen.getByRole('radio', { name: 'عرض القائمة' })).toBeTruthy();
   });
 
+  it('lets the header wrap on narrow screens', () => {
+    renderGrid('month');
+    expect(document.querySelector('[data-slot="calendar-grid-header"]')?.classList.contains('flex-wrap')).toBe(true);
+  });
+
   it('keeps the default tabs without Agenda', () => {
     renderGrid('month');
     expect(screen.getAllByRole('tab')).toHaveLength(3);

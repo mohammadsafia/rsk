@@ -32,7 +32,7 @@ export const todayKey = (dayOffset = 0) => {
 };
 
 export const initialVisits = () => [
-  { id: 'v1', patient: 'Sara Haddad', doctor: 'haddad', start: atToday(8, 30), end: atToday(9, 15) },
+  { id: 'v1', patient: 'Sara Haddad', doctor: 'haddad', start: atToday(8, 30), end: atToday(9, 15), checkedIn: true },
   { id: 'v2', patient: 'Omar Khalil', doctor: 'haddad', start: atToday(10), end: atToday(11) },
   { id: 'v3', patient: 'Lina Nasser', doctor: 'khalil', start: atToday(9), end: atToday(9, 30) },
   { id: 'v4', patient: 'Fail Demo', doctor: 'khalil', start: atToday(11), end: atToday(12) },
@@ -115,7 +115,7 @@ export const SchedulerDemo = ({ initialView = 'day' }) => {
         stepMinutes={15}
         onSlotSelect={createVisit}
         onEventChange={saveChange}
-        canEdit={(visit) => new Date(visit.end) > new Date()}
+        canEdit={(visit) => !visit.checkedIn}
       >
         <CalendarGrid.Header>
           <CalendarGrid.Navigation />
@@ -128,6 +128,7 @@ export const SchedulerDemo = ({ initialView = 'day' }) => {
           {(visit, status) => (
             <span className={`bg-accent-subtle text-fg flex size-full flex-col rounded-md px-1.5 py-1 text-xs ${status === 'past' ? 'opacity-60' : ''}`}>
               <span className="truncate font-medium">{visit.patient}</span>
+              {visit.checkedIn ? <span className="text-fg-muted text-2xs">Checked in</span> : null}
             </span>
           )}
         </CalendarGrid.EventTemplate>
@@ -151,7 +152,7 @@ Three doctors side by side, each with their own availability. Try all of these:
 - Drag a visit to another time or doctor.
 - Drag a visit's bottom edge to resize it.
 - Drag "Fail Demo" to see the change reverted with a toast.
-- Past visits are locked.
+- Checked-in visits (Sara Haddad) are locked.
 
 <Example title="Clinic day" code={demoSource('SchedulerDemo', pageSource)}>
   <SchedulerDemo />
@@ -176,7 +177,7 @@ With `onSlotSelect`, a click selects one step and a drag selects a range, snappe
 
 With `onEventChange`, you can drag an event's body to move it (to another time, day or resource, keeping its duration) or drag its bottom edge to resize it.
 - **Saving:** the grid shows the new position at once and calls `onEventChange({ event, start, end, resourceId })`. If the promise rejects, the event goes back and a danger toast explains why.
-- **Locking:** `canEdit(event)` locks events, for example past visits.
+- **Locking:** `canEdit(event)` locks events, for example visits already checked in or in the past.
 - **Clicks:** a short press is still a click, so popovers keep working.
 
 ```tsx
