@@ -1,0 +1,77 @@
+---
+id: card-grid
+title: CardGrid
+section: Components
+category: Shared
+description: 'Responsive grid for cards — a column count or per-breakpoint columns and a gap; layout only, no surface of its own.'
+tags: [shared, card-grid, layout, grid, kpi]
+---
+
+import { Card } from '@components/ui';
+import { CardGrid } from '@components/shared';
+
+## Demo
+
+<div className="flex w-full flex-col gap-6">
+  <CardGrid>
+    <Card>
+      <Card.Content className="flex flex-col gap-1">
+        <span className="text-fg-muted text-sm">Visits today</span>
+        <span dir="ltr" className="text-fg font-mono text-2xl font-semibold tabular-nums">48</span>
+        <span className="text-fg-muted text-xs">6 walk-ins</span>
+      </Card.Content>
+    </Card>
+    <Card>
+      <Card.Content className="flex flex-col gap-1">
+        <span className="text-fg-muted text-sm">No-shows</span>
+        <span dir="ltr" className="text-fg font-mono text-2xl font-semibold tabular-nums">3</span>
+        <span className="text-fg-muted text-xs">6% of bookings</span>
+      </Card.Content>
+    </Card>
+    <Card>
+      <Card.Content className="flex flex-col gap-1">
+        <span className="text-fg-muted text-sm">Average wait</span>
+        <span dir="ltr" className="text-fg font-mono text-2xl font-semibold tabular-nums">14 min</span>
+        <span className="text-fg-muted text-xs">2 min faster than last week</span>
+      </Card.Content>
+    </Card>
+    <Card>
+      <Card.Content className="flex flex-col gap-1">
+        <span className="text-fg-muted text-sm">Collected</span>
+        <span dir="ltr" className="text-fg font-mono text-2xl font-semibold tabular-nums">JOD 2,940</span>
+        <span className="text-fg-muted text-xs">Card and cash</span>
+      </Card.Content>
+    </Card>
+  </CardGrid>
+
+  <CardGrid columns={2} gap="lg">
+    <Card title="Morning shift" description="08:00 – 14:00" />
+    <Card title="Evening shift" description="14:00 – 20:00" />
+  </CardGrid>
+</div>
+
+## Imports
+
+```tsx
+import { CardGrid } from '@components/shared';
+```
+
+## Code
+
+```tsx
+// Default: 1 column, 2 from sm, 4 from lg
+<CardGrid>
+  <Card>…</Card>
+</CardGrid>
+
+<CardGrid columns={2} gap="lg">…</CardGrid>
+
+<CardGrid columns={{ base: 1, md: 2, xl: 3 }}>…</CardGrid>
+```
+
+## API
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `columns` | `1–6 \| { base?, sm?, md?, lg?, xl? }` | `{ base: 1, sm: 2, lg: 4 }` | A number fixes the count; an object sets it per breakpoint. |
+| `gap` | `'sm' \| 'md' \| 'lg'` | `'md'` | 8, 16 or 24 px. |

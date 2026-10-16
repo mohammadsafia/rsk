@@ -113,9 +113,6 @@
     "legacy-color-ramp": 7,
     "legacy-color-name": 4
   },
-  "src/components/shared/grid-card/GridCard.tsx": {
-    "legacy-color-ramp": 4
-  },
   "src/components/shared/stepper/Stepper.tsx": {
     "legacy-color-ramp": 4
   },
