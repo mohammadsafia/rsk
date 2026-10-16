@@ -1,8 +1,10 @@
-import { type FC, useCallback, useMemo } from 'react';
+import { type FC, useCallback, useId, useMemo } from 'react';
 
 import { Pagination, Select } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { useDataTableContext } from '@components/tables';
+
+import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
 
@@ -33,7 +35,9 @@ function getPageNumbers(currentPage: number, totalPages: number): (number | 'ell
 }
 
 const DataTablePagination: FC<PaginationProps> = ({ pageSizeOptions = [30, 50, 100, 200], className }) => {
+  const { t } = useAppTranslation('common');
   const { table } = useDataTableContext();
+  const rowsLabelId = useId();
 
   const currentPage = table.getState().pagination.pageIndex + 1;
   const totalPages = table.getPageCount();
@@ -48,66 +52,62 @@ const DataTablePagination: FC<PaginationProps> = ({ pageSizeOptions = [30, 50, 1
   );
 
   return (
-    <div
-      data-slot="data-table-pagination"
-      className={cn('bg-background flex w-full items-center justify-end gap-4 overflow-hidden rounded-2xl px-7 py-2 shadow', className)}
-    >
-      <div className="bg-muted-50 flex items-center gap-2 rounded-full px-3 py-2">
-        <span className="text-muted-400 text-xs font-normal whitespace-nowrap">Rows per page</span>
+    <div data-slot="data-table-pagination" className={cn('flex w-full flex-wrap items-center justify-between gap-4', className)}>
+      <span className="text-fg-muted text-xs">{t('pagination.pageOf', { current: currentPage, total: Math.max(totalPages, 1) })}</span>
 
-        <Select value={`${table.getState().pagination.pageSize}`} onValueChange={handlePageSizeChange}>
-          <Select.Trigger
-            className={cn(
-              'border-0 bg-transparent px-1 py-0 text-xs font-normal shadow-none',
-              'data-[state=open]:border-none data-[state=open]:ring-0',
-              'hover:not-disabled:border-none hover:not-disabled:ring-0',
-              'focus-visible:border-none focus-visible:ring-0',
-            )}
-          >
-            <Select.Value placeholder={table.getState().pagination.pageSize} />
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex items-center gap-2">
+          <span id={rowsLabelId} className="text-fg-muted text-xs whitespace-nowrap">
+            {t('pagination.rowsPerPage')}
+          </span>
 
-            <Select.Icon />
-          </Select.Trigger>
+          <Select value={`${table.getState().pagination.pageSize}`} onValueChange={handlePageSizeChange}>
+            <Select.Trigger size="sm" aria-labelledby={rowsLabelId} className="w-20">
+              <Select.Value placeholder={table.getState().pagination.pageSize} />
 
-          <Select.Content side="top">
-            {pageSizeOptions.map((pageSize) => (
-              <Select.Item key={pageSize} value={`${pageSize}`}>
-                <Select.Text>{pageSize}</Select.Text>
-              </Select.Item>
+              <Select.Icon />
+            </Select.Trigger>
+
+            <Select.Content side="top">
+              {pageSizeOptions.map((pageSize) => (
+                <Select.Item key={pageSize} value={`${pageSize}`}>
+                  <Select.Text>{pageSize}</Select.Text>
+                </Select.Item>
+              ))}
+            </Select.Content>
+          </Select>
+        </div>
+
+        <Pagination className="w-fit p-0">
+          <Pagination.List>
+            <Pagination.Item>
+              <Pagination.Previous onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()} />
+            </Pagination.Item>
+
+            {pageNumbers.map((page, index) => (
+              <Conditional key={typeof page === 'number' ? page : `ellipsis-${index}`}>
+                <Conditional.If condition={page === 'ellipsis'}>
+                  <Pagination.Item>
+                    <Pagination.Ellipsis />
+                  </Pagination.Item>
+                </Conditional.If>
+
+                <Conditional.Else>
+                  <Pagination.Item>
+                    <Pagination.NavButton onClick={() => table.setPageIndex((page as number) - 1)} isActive={page === currentPage}>
+                      {page}
+                    </Pagination.NavButton>
+                  </Pagination.Item>
+                </Conditional.Else>
+              </Conditional>
             ))}
-          </Select.Content>
-        </Select>
+
+            <Pagination.Item>
+              <Pagination.Next onClick={() => table.nextPage()} disabled={!table.getCanNextPage()} />
+            </Pagination.Item>
+          </Pagination.List>
+        </Pagination>
       </div>
-
-      <Pagination className="w-fit p-0">
-        <Pagination.List>
-          <Pagination.Item>
-            <Pagination.Previous onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()} />
-          </Pagination.Item>
-
-          {pageNumbers.map((page, index) => (
-            <Conditional key={typeof page === 'number' ? page : `ellipsis-${index}`}>
-              <Conditional.If condition={page === 'ellipsis'}>
-                <Pagination.Item>
-                  <Pagination.Ellipsis />
-                </Pagination.Item>
-              </Conditional.If>
-
-              <Conditional.Else>
-                <Pagination.Item>
-                  <Pagination.NavButton onClick={() => table.setPageIndex((page as number) - 1)} isActive={page === currentPage}>
-                    {page.toString().padStart(2, '0')}
-                  </Pagination.NavButton>
-                </Pagination.Item>
-              </Conditional.Else>
-            </Conditional>
-          ))}
-
-          <Pagination.Item>
-            <Pagination.Next onClick={() => table.nextPage()} disabled={!table.getCanNextPage()} />
-          </Pagination.Item>
-        </Pagination.List>
-      </Pagination>
     </div>
   );
 };

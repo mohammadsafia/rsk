@@ -8,9 +8,6 @@
   "src/assets/icons/QuraAILogo.tsx": {
     "hex-color": 15
   },
-  "src/assets/icons/SortIcon.tsx": {
-    "legacy-color-ramp": 6
-  },
   "src/component-docs/calendar/CalendarGrid.mdx": {
     "legacy-color-name": 1,
     "arbitrary-length": 1
@@ -112,17 +109,6 @@
   },
   "src/components/shared/stepper/Stepper.tsx": {
     "legacy-color-ramp": 4
-  },
-  "src/components/tables/data-table/data-table-content/DataTableContent.tsx": {
-    "legacy-color-name": 1
-  },
-  "src/components/tables/data-table/data-table-pagination/DataTablePagination.tsx": {
-    "legacy-color-ramp": 2,
-    "legacy-color-name": 1
-  },
-  "src/components/tables/data-table/data-table-toolbar/DataTableToolbar.tsx": {
-    "legacy-color-ramp": 4,
-    "legacy-color-name": 4
   },
   "src/pages/components/ComponentDetailPage.tsx": {
     "legacy-color-ramp": 6,

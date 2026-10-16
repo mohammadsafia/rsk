@@ -16,7 +16,8 @@
   "clearFilters": "Clear filters",
   "clearAll": "Clear All",
   "filter": "Filter",
-  "selectedCount": "{{count}} selected",
+  "selectedCount_one": "{{count}} selected",
+  "selectedCount_other": "{{count}} selected",
   "yes": "Yes",
   "no": "No",
   "actions": "Actions",
@@ -38,7 +39,9 @@
     "root": "Dashboard"
   },
   "table": {
-    "total": "Total: {{count}} {{label}}",
+    "total_one": "{{count}} result",
+    "total_other": "{{count}} results",
+    "totalWithLabel": "{{label}}: {{count}}",
     "rowsPerPage": "Rows per page",
     "emptyTitle": "No Results Found",
     "emptyDescription": "No results found for your search. Please try again with different keywords."
@@ -103,5 +106,7 @@
   },
   "pageHeader": {
     "back": "Back"
-  }
+  },
+  "loadingMore": "Loading more…",
+  "filters": "Filters"
 }

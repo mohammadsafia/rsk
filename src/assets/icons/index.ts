@@ -15,7 +15,6 @@ export { default as DoctorIcon } from './DoctorIcon';
 export { default as BillIcon } from './BillIcon';
 export { default as SmsIcon } from './SmsIcon';
 export { default as GenderIcon } from './GenderIcon';
-export { default as SortIcon } from './SortIcon';
 export { default as CertificateIcon } from './CertificateIcon';
 export { default as StepCircleCheckedIcon } from './StepCircleCheckedIcon';
 export { default as StepCircleFilledIcon } from './StepCircleFilledIcon';

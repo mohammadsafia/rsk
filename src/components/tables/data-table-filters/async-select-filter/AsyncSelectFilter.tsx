@@ -7,7 +7,7 @@ import { Combobox } from '@components/shared';
 import { Conditional } from '@components/utils';
 import { type FilterChipItem, FilterChipList } from '@components/tables';
 
-import { type AsyncOptionsFn, useAsyncOptionsInfiniteQuery, useDebounce, useInfiniteScroll } from '@hooks/shared';
+import { type AsyncOptionsFn, useAppTranslation, useAsyncOptionsInfiniteQuery, useDebounce, useInfiniteScroll } from '@hooks/shared';
 
 import { ChevronDown } from 'lucide-react';
 
@@ -19,6 +19,7 @@ type AsyncSelectFilterProps<TData> = {
 };
 
 function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps<TData>) {
+  const { t } = useAppTranslation('common');
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -104,7 +105,7 @@ function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps
         </Combobox.Input>
 
         <Combobox.List onScroll={handleScroll}>
-          <Combobox.Empty when={!infiniteQuery.isFetching && allOptions.length === 0}>No results</Combobox.Empty>
+          <Combobox.Empty when={!infiniteQuery.isFetching && allOptions.length === 0}>{t('noResults')}</Combobox.Empty>
 
           {allOptions.map((opt) => {
             const optValue = filterMeta.getOptionValue(opt);
@@ -136,7 +137,7 @@ function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps
             );
           })}
 
-          <Combobox.Loader when={infiniteQuery.isFetchingNextPage} message="Loading more..." />
+          <Combobox.Loader when={infiniteQuery.isFetchingNextPage} message={t('loadingMore')} />
         </Combobox.List>
       </Combobox.Content>
     </Combobox>

@@ -61,6 +61,8 @@ declare module '@tanstack/table-core' {
   // oxlint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
     label?: string;
+    /** Right-align (end-align) and use tabular figures for this column. */
+    numeric?: boolean;
     filterMeta?: DataTableFilterMeta;
     disableRowClick?: boolean;
     // TODO: this will be removed after the migration to the new component

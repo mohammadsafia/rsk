@@ -7,7 +7,7 @@ import { useDataTableContext } from '@components/tables';
 
 import { cn, getCommonPinningStyles, isInteractiveClick } from '@utils';
 
-import { SortIcon } from '@assets/icons';
+import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react';
 
 const ARIA_SORT: Record<SortDirection, 'ascending' | 'descending'> = {
   asc: 'ascending',
@@ -32,7 +32,7 @@ function DataTableContent<TData>({ className, emptyState }: ContentProps) {
   };
 
   return (
-    <ScrollArea className={cn('bg-background min-h-0 flex-1 rounded-2xl shadow', className)} viewportClassName="[&>div]:h-full">
+    <ScrollArea className={cn('bg-surface border-border min-h-0 flex-1 rounded-lg border', className)} viewportClassName="[&>div]:h-full">
       <Table className={cn('w-max min-w-full', isEmpty && 'min-h-full')}>
         <Table.Header className="sticky inset-bs-0 z-10">
           {table.getHeaderGroups().map((headerGroup) => (
@@ -46,6 +46,7 @@ function DataTableContent<TData>({ className, emptyState }: ContentProps) {
                 return (
                   <Table.Head
                     key={header.id}
+                    numeric={header.column.columnDef.meta?.numeric}
                     colSpan={header.colSpan}
                     aria-sort={sortDirection ? ARIA_SORT[sortDirection] : undefined}
                     onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
@@ -59,12 +60,27 @@ function DataTableContent<TData>({ className, emptyState }: ContentProps) {
                     }
                   >
                     <Conditional.If condition={!header.isPlaceholder}>
-                      <div className="flex items-center gap-1">
+                      <div className={cn('flex items-center gap-1', header.column.columnDef.meta?.numeric && 'justify-end')}>
                         {flexRender(header.column.columnDef.header, header.getContext())}
 
                         <Conditional.If condition={canSort}>
-                          <span className="inline-flex shrink-0">
-                            <SortIcon direction={sortDirection} />
+                          <span
+                            aria-hidden="true"
+                            className={cn('inline-flex shrink-0 [&_svg]:size-3.5', sortDirection ? 'text-fg' : 'text-fg-subtle')}
+                          >
+                            <Conditional>
+                              <Conditional.If condition={sortDirection === 'asc'}>
+                                <ArrowUp />
+                              </Conditional.If>
+
+                              <Conditional.If condition={sortDirection === 'desc'}>
+                                <ArrowDown />
+                              </Conditional.If>
+
+                              <Conditional.Else>
+                                <ChevronsUpDown />
+                              </Conditional.Else>
+                            </Conditional>
                           </span>
                         </Conditional.If>
                       </div>
@@ -95,6 +111,7 @@ function DataTableContent<TData>({ className, emptyState }: ContentProps) {
                   return (
                     <Table.Cell
                       key={cell.id}
+                      numeric={cell.column.columnDef.meta?.numeric}
                       title={typeof value === 'string' ? String(value) : undefined}
                       data-disable-row-click={isDisabled || undefined}
                       style={isPinned ? getCommonPinningStyles({ column: cell.column, withBorder: true }) : undefined}

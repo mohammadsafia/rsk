@@ -2,7 +2,9 @@ import { createContext, type PropsWithChildren, type ReactNode, useContext, useM
 
 import type { Row, Table as TanstackTable } from '@tanstack/react-table';
 
-import { DataTableContent, DataTablePagination, DataTableToolbar } from '@components/tables';
+import DataTableContent from './data-table-content/DataTableContent';
+import DataTablePagination from './data-table-pagination/DataTablePagination';
+import DataTableToolbar from './data-table-toolbar/DataTableToolbar';
 
 import { cn } from '@utils';
 

@@ -7,6 +7,8 @@ import { Combobox } from '@components/shared';
 import { Conditional } from '@components/utils';
 import { type FilterChipItem, FilterChipList } from '@components/tables';
 
+import { useAppTranslation } from '@hooks/shared';
+
 import { ChevronDown } from 'lucide-react';
 
 import type { SelectFilterMeta } from '@app-types';
@@ -17,6 +19,7 @@ type SelectFilterProps<TData> = {
 };
 
 function SelectFilter<TData>({ column, filterMeta }: SelectFilterProps<TData>) {
+  const { t } = useAppTranslation('common');
   const isMulti = filterMeta.variant === 'multiSelect';
   const options = filterMeta.options as Record<string, unknown>[];
   const columnFilterValue = column.getFilterValue();
@@ -84,7 +87,7 @@ function SelectFilter<TData>({ column, filterMeta }: SelectFilterProps<TData>) {
         <Combobox.Input placeholder={filterMeta.placeholder ?? filterMeta.label} />
 
         <Combobox.List>
-          <Combobox.Empty when={options.length === 0}>No results</Combobox.Empty>
+          <Combobox.Empty when={options.length === 0}>{t('noResults')}</Combobox.Empty>
 
           {options.map((option) => {
             const value = getOptionValue(option);

@@ -16,7 +16,12 @@
   "clearFilters": "مسح عوامل التصفية",
   "clearAll": "مسح الكل",
   "filter": "تصفية",
-  "selectedCount": "{{count}} محدد",
+  "selectedCount_zero": "لم يُحدَّد شيء",
+  "selectedCount_one": "عنصر واحد محدد",
+  "selectedCount_two": "عنصران محددان",
+  "selectedCount_few": "{{count}} عناصر محددة",
+  "selectedCount_many": "{{count}} عنصرًا محددًا",
+  "selectedCount_other": "{{count}} عنصر محدد",
   "yes": "نعم",
   "no": "لا",
   "actions": "إجراءات",
@@ -38,7 +43,13 @@
     "root": "لوحة التحكم"
   },
   "table": {
-    "total": "الإجمالي: {{count}} {{label}}",
+    "total_zero": "لا توجد نتائج",
+    "total_one": "نتيجة واحدة",
+    "total_two": "نتيجتان",
+    "total_few": "{{count}} نتائج",
+    "total_many": "{{count}} نتيجةً",
+    "total_other": "{{count}} نتيجة",
+    "totalWithLabel": "{{label}}: {{count}}",
     "rowsPerPage": "صفوف لكل صفحة",
     "emptyTitle": "لا توجد نتائج",
     "emptyDescription": "لا توجد نتائج لبحثك. يرجى المحاولة مرة أخرى بكلمات مختلفة."
@@ -103,5 +114,7 @@
   },
   "pageHeader": {
     "back": "رجوع"
-  }
+  },
+  "loadingMore": "جارٍ تحميل المزيد…",
+  "filters": "عوامل التصفية"
 }
