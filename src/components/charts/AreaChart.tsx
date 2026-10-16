@@ -40,7 +40,7 @@ export function AreaChart<T>({
         <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 640, height }}>
           <RechartsAreaChart data={data} accessibilityLayer margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
             <CartesianGrid vertical={false} {...GRID} />
-            <XAxis dataKey={x.key} reversed={isRTL} tickFormatter={formatX} {...AXIS} />
+            <XAxis dataKey={x.key as string} reversed={isRTL} tickFormatter={formatX} {...AXIS} />
             <YAxis orientation={isRTL ? 'right' : 'left'} width={64} tickFormatter={(value: number) => formatValue(value)} {...AXIS} />
             <Tooltip content={<ChartTooltip formatValue={formatValue} formatX={formatX} />} cursor={{ stroke: 'var(--border-strong)' }} />
             {visible.map((item) => (
