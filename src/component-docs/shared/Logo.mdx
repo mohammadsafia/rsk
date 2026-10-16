@@ -1,0 +1,54 @@
+---
+id: logo
+title: Logo
+section: Components
+category: Shared
+description: 'The RSK building-block mark and lockup, drawn from tokens so it inverts with the theme.'
+tags: [shared, logo, brand, mark]
+---
+
+import { Logo } from '@components/shared';
+
+## Demo
+
+<div className="flex w-full flex-col gap-6">
+  <div className="flex items-center gap-6">
+    <Logo size="sm" />
+    <Logo size="md" />
+    <Logo size="lg" />
+  </div>
+
+  <div className="flex flex-wrap items-center gap-8">
+    <Logo variant="lockup" size="md" />
+    <Logo variant="lockup" size="lg" tagline />
+  </div>
+
+  <div className="bg-surface-sunken border-border flex w-fit items-center gap-4 rounded-lg border p-4">
+    <Logo size="lg" />
+    <span className="text-fg-muted text-sm">Reads on sunken and raised surfaces alike.</span>
+  </div>
+</div>
+
+## Imports
+
+```tsx
+import { Logo } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<Logo />                               // mark, 24px
+<Logo size="sm" />                     // 16px geometry
+<Logo variant="lockup" size="lg" tagline />
+```
+
+## API
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `variant` | `'mark' \| 'lockup'` | `'mark'` | The mark is `role="img"` named "RSK"; the lockup shows the wordmark as text. |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | 16, 24 or 32 px. `sm` uses larger squares so they survive rasterising. |
+| `tagline` | `boolean` | `false` | Lockup only: adds "React Starter Kit". |
+
+The accent square is the only accent on a surface that shows the logo — never place it on an accent background.

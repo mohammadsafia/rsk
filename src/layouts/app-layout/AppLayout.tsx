@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 
 import { Avatar, Spinner } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { AppShell, CommandPalette, Sidebar, Toaster, useAppShell } from '@components/shared';
+import { AppShell, CommandPalette, Logo, Sidebar, Toaster, useAppShell } from '@components/shared';
 
 import { CommandPaletteProvider } from '@contexts';
 import { AppHeader } from '../app-header';
@@ -12,7 +12,6 @@ import { useRouteUtils } from '@hooks/utils';
 
 import { cn } from '@utils';
 import { APP_MENU, type AppMenu } from '@routes';
-import { APP_CONFIGURATIONS } from '@app-config';
 
 const DEFAULT_GROUP = 'main';
 
@@ -40,15 +39,8 @@ function AppSidebar() {
   return (
     <Sidebar>
       <Sidebar.Header>
-        <div className={cn('flex min-w-0 items-center gap-2.5', collapsed && 'md:hidden')}>
-          <span
-            aria-hidden="true"
-            className="bg-fg text-canvas flex size-8 shrink-0 items-center justify-center rounded-md text-sm font-semibold"
-          >
-            {APP_CONFIGURATIONS.APP_NAME.charAt(0)}
-          </span>
-
-          <span className="text-fg truncate text-sm font-semibold">{APP_CONFIGURATIONS.APP_NAME}</span>
+        <div className={cn('flex min-w-0 items-center', collapsed && 'md:hidden')}>
+          <Logo variant="lockup" size="md" />
         </div>
 
         <Sidebar.CollapseButton />

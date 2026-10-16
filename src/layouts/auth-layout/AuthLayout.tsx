@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 
-import { Toaster } from '@components/shared';
+import { Logo, Toaster } from '@components/shared';
 import { useAuth } from '@hooks/shared';
 
 import { FULL_ROUTES_PATH } from '@routes';
@@ -14,7 +14,9 @@ function AuthLayout() {
     <>
       <Toaster />
 
-      <main className="bg-canvas text-fg flex min-h-dvh items-center justify-center p-6">
+      <main className="bg-canvas text-fg flex min-h-dvh flex-col items-center justify-center gap-8 p-6">
+        <Logo variant="lockup" size="lg" tagline />
+
         <Outlet />
       </main>
     </>

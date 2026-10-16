@@ -19,3 +19,4 @@ export * from './file-card';
 export * from './command-palette';
 export * from './app-shell';
 export * from './sidebar';
+export * from './logo';
