@@ -53,5 +53,10 @@
     "guides": "Guides",
     "components": "Components",
     "sections": "Sections"
+  },
+  "overview": {
+    "title": "Components",
+    "description": "{{count}} documented components, built on one token system.",
+    "all": "All"
   }
 }
