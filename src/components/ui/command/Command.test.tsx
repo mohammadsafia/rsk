@@ -20,4 +20,21 @@ describe('Command', () => {
     expect((container.firstElementChild as HTMLElement).className).toContain('bg-surface-raised');
     expect(screen.getByText('⌘D').className).toContain('font-mono');
   });
+
+  it('lets an item grow for two-line content while keeping the control height as a minimum', () => {
+    render(
+      <Command>
+        <Command.List>
+          <Command.Item value="lina">
+            <span>Dr. Lina Khoury</span>
+            <span>Cardiology</span>
+          </Command.Item>
+        </Command.List>
+      </Command>,
+    );
+    const item = document.querySelector('[data-slot="command-item"]') as HTMLElement;
+    expect(item.className).toContain('min-h-control-sm');
+    expect(item.className).not.toMatch(/(^|\s)h-control-sm(\s|$)/);
+    expect(item.className).toContain('py-1.5');
+  });
 });

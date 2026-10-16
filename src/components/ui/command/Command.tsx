@@ -93,7 +93,7 @@ const CommandItem: FC<CommandItemProps> = ({ className, ...props }) => (
   <CommandPrimitive.Item
     data-slot="command-item"
     className={cn(
-      'group/command-item relative flex h-control-sm w-full cursor-pointer items-center gap-2 rounded-md px-2 text-sm outline-none select-none',
+      'group/command-item relative flex min-h-control-sm w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-none select-none',
       'data-[selected=true]:bg-hover data-[checked=true]:font-medium',
       'data-[disabled=true]:pointer-events-none data-[disabled=true]:text-fg-subtle',
       className,

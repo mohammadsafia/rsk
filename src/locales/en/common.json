@@ -44,7 +44,9 @@
     "totalWithLabel": "{{label}}: {{count}}",
     "rowsPerPage": "Rows per page",
     "emptyTitle": "No Results Found",
-    "emptyDescription": "No results found for your search. Please try again with different keywords."
+    "emptyDescription": "No results found for your search. Please try again with different keywords.",
+    "filteredWithLabel": "{{label}}: {{count}} of {{total}}",
+    "filtered": "{{count}} of {{total}} results"
   },
   "pagination": {
     "label": "Pagination",
@@ -128,5 +130,8 @@
     "noAssignees": "No assignees",
     "documents_one": "document",
     "documents_other": "documents"
+  },
+  "filterBar": {
+    "remove": "Remove {{label}} filter"
   }
 }

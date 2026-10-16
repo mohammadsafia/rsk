@@ -1,4 +1,4 @@
-import { type MouseEvent, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import type { Column } from '@tanstack/react-table';
 import type { DateRange } from 'react-day-picker';
@@ -6,13 +6,13 @@ import type { DateRange } from 'react-day-picker';
 import { Calendar, Popover } from '@components/ui';
 import { Combobox } from '@components/shared';
 import { Conditional } from '@components/utils';
-import { type FilterChipItem, FilterChipList } from '@components/tables';
+import { FilterPill } from '@components/tables/data-table-filters/filter-pill';
 
 import { DateFormats, useDate } from '@hooks/shared';
 
-import { ChevronDown } from 'lucide-react';
-
 import type { DateFilterMeta, DateRangeFilterValue } from '@app-types';
+
+type FilterChip = { value: string; label: string };
 
 type DateFilterProps<TData> = {
   column: Column<TData>;
@@ -44,7 +44,7 @@ function DateFilter<TData>({ column, filterMeta }: DateFilterProps<TData>) {
     };
   }, [range, toBoundaryDate]);
 
-  const chips = useMemo<FilterChipItem[]>(() => {
+  const chips = useMemo<FilterChip[]>(() => {
     if (isRange) {
       if (!range?.from && !range?.to) return [];
 
@@ -83,24 +83,9 @@ function DateFilter<TData>({ column, filterMeta }: DateFilterProps<TData>) {
     [column, toDate],
   );
 
-  const onRemoveChip = useCallback(
-    (_value: string, event: MouseEvent) => {
-      event.stopPropagation();
-
-      column.setFilterValue(undefined);
-    },
-    [column],
-  );
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <Combobox.Trigger size="sm" className="w-auto gap-1">
-        {filterMeta.label}
-
-        <ChevronDown size={16} className="text-fg-muted" />
-
-        <FilterChipList chips={chips} onRemoveChip={onRemoveChip} maxVisibleChips={1} />
-      </Combobox.Trigger>
+      <FilterPill label={filterMeta.label} values={chips.map((chip) => chip.label)} onClear={() => column.setFilterValue(undefined)} />
 
       <Popover.Content align="start" className="w-auto p-0">
         <Conditional>

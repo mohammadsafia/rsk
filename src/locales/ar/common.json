@@ -52,7 +52,9 @@
     "totalWithLabel": "{{label}}: {{count}}",
     "rowsPerPage": "صفوف لكل صفحة",
     "emptyTitle": "لا توجد نتائج",
-    "emptyDescription": "لا توجد نتائج لبحثك. يرجى المحاولة مرة أخرى بكلمات مختلفة."
+    "emptyDescription": "لا توجد نتائج لبحثك. يرجى المحاولة مرة أخرى بكلمات مختلفة.",
+    "filteredWithLabel": "{{label}}: {{count}} من {{total}}",
+    "filtered": "{{count}} من {{total}} نتيجة"
   },
   "pagination": {
     "label": "التنقل بين الصفحات",
@@ -140,5 +142,8 @@
     "documents_few": "مستندات",
     "documents_many": "مستندًا",
     "documents_other": "مستند"
+  },
+  "filterBar": {
+    "remove": "إزالة عامل التصفية {{label}}"
   }
 }

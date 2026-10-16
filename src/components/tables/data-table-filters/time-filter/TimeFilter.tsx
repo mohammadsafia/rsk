@@ -1,14 +1,14 @@
-import { type MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { Column } from '@tanstack/react-table';
 
 import { Popover, TimePicker } from '@components/ui';
 import { Combobox } from '@components/shared';
-import { type FilterChipItem, FilterChipList } from '@components/tables';
-
-import { ChevronDown } from 'lucide-react';
+import { FilterPill } from '@components/tables/data-table-filters/filter-pill';
 
 import type { TimeFilterMeta } from '@app-types';
+
+type FilterChip = { value: string; label: string };
 
 type TimeFilterProps<TData> = {
   column: Column<TData>;
@@ -30,31 +30,16 @@ function TimeFilter<TData>({ column, filterMeta }: TimeFilterProps<TData>) {
     setTempValue(open ? value || startAt : '');
   }, [open, value, startAt]);
 
-  const chips = useMemo<FilterChipItem[]>(() => (value ? [{ value, label: value }] : []), [value]);
+  const chips = useMemo<FilterChip[]>(() => (value ? [{ value, label: value }] : []), [value]);
 
   const onConfirm = useCallback(() => {
     column.setFilterValue(tempValue || undefined);
     setOpen(false);
   }, [column, tempValue]);
 
-  const onRemoveChip = useCallback(
-    (_value: string, event: MouseEvent) => {
-      event.stopPropagation();
-
-      column.setFilterValue(undefined);
-    },
-    [column],
-  );
-
   return (
     <Popover open={open} onOpenChange={setOpen} modal>
-      <Combobox.Trigger size="sm" className="w-auto gap-1">
-        {filterMeta.label}
-
-        <ChevronDown size={16} className="text-fg-muted" />
-
-        <FilterChipList chips={chips} onRemoveChip={onRemoveChip} maxVisibleChips={1} />
-      </Combobox.Trigger>
+      <FilterPill label={filterMeta.label} values={chips.map((chip) => chip.label)} onClear={() => column.setFilterValue(undefined)} />
 
       <TimePicker.Content
         value={value}

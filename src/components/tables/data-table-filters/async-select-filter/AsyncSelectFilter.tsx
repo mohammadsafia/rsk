@@ -1,17 +1,17 @@
-import { type MouseEvent, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import type { Column } from '@tanstack/react-table';
 
 import { Checkbox, RadioGroup } from '@components/ui';
 import { Combobox } from '@components/shared';
 import { Conditional } from '@components/utils';
-import { type FilterChipItem, FilterChipList } from '@components/tables';
+import { FilterPill } from '@components/tables/data-table-filters/filter-pill';
 
 import { type AsyncOptionsFn, useAppTranslation, useAsyncOptionsInfiniteQuery, useDebounce, useInfiniteScroll } from '@hooks/shared';
 
-import { ChevronDown } from 'lucide-react';
-
 import type { SelectFilterMeta } from '@app-types';
+
+type FilterChip = { value: string; label: string };
 
 type AsyncSelectFilterProps<TData> = {
   column: Column<TData>;
@@ -47,7 +47,7 @@ function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps
 
   const allOptions = useMemo(() => infiniteQuery.data?.pages.flatMap((p) => p.data) ?? [], [infiniteQuery.data]);
 
-  const chips = useMemo<FilterChipItem[]>(
+  const chips = useMemo<FilterChip[]>(
     () =>
       selectedValues.map((val) => {
         const option = allOptions.find((o) => filterMeta.getOptionValue(o) === val);
@@ -74,30 +74,9 @@ function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps
     [column, isMulti, selectedSet, selectedValues],
   );
 
-  const onRemoveChip = useCallback(
-    (chipValue: string, e: MouseEvent) => {
-      e.stopPropagation();
-      e.preventDefault();
-
-      if (isMulti) {
-        const next = selectedValues.filter((v) => v !== chipValue);
-        column.setFilterValue(next.length > 0 ? next : undefined);
-      } else {
-        column.setFilterValue(undefined);
-      }
-    },
-    [column, isMulti, selectedValues],
-  );
-
   return (
     <Combobox open={open} onOpenChange={setOpen}>
-      <Combobox.Trigger size="sm" className="w-auto gap-1">
-        {filterMeta.label}
-
-        <ChevronDown size={16} className="text-fg-muted" />
-
-        <FilterChipList chips={chips} onRemoveChip={onRemoveChip} maxVisibleChips={isMulti ? undefined : 1} />
-      </Combobox.Trigger>
+      <FilterPill label={filterMeta.label} values={chips.map((chip) => chip.label)} onClear={() => column.setFilterValue(undefined)} />
 
       <Combobox.Content className="min-w-60" shouldFilter={false}>
         <Combobox.Input placeholder={filterMeta.placeholder ?? filterMeta.label} value={search} onValueChange={setSearch}>

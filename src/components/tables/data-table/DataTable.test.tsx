@@ -82,9 +82,10 @@ describe('DataTable', () => {
     expect(html).not.toMatch(/bg-background|text-muted-400|bg-primary-25|muted-200|bg-muted-50|fill-primary|(^|\s)shadow(\s|")/);
   });
 
-  it('labels the filter row as a group, not an arrow-key toolbar', () => {
+  it('labels the filter bar as a group, not an arrow-key toolbar', () => {
     render(<Harness total={2} />);
-    expect(document.querySelector('[aria-label="Filters"]')?.getAttribute('role')).toBe('group');
+    expect(document.querySelector('[data-slot="data-table-toolbar"]')?.getAttribute('role')).toBe('group');
+    expect(document.querySelector('[data-slot="data-table-toolbar"]')?.getAttribute('aria-label')).toBe('Filters');
   });
 
   it('pins the search input to the document direction so the start icon and padding stay aligned', async () => {

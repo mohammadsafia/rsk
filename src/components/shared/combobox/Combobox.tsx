@@ -115,11 +115,21 @@ const ComboboxIcon: FC<ComboboxIconProps> = ({ className, children, ...props }) 
   </span>
 );
 
-const ComboboxContent: FC<ComboboxContentProps> = ({ children, className, shouldFilter, align = 'start', ...props }) => (
+const ComboboxContent: FC<ComboboxContentProps> = ({ children, className, shouldFilter, align = 'start', onOpenAutoFocus, ...props }) => (
   <Popover.Content
     align={align}
     className={cn('w-(--radix-popover-trigger-width) p-0', className)}
-    onOpenAutoFocus={(e) => e.preventDefault()}
+    onOpenAutoFocus={(event) => {
+      onOpenAutoFocus?.(event);
+      if (event.defaultPrevented) return;
+
+      // Land in the search field so typing filters straight away; without one, keep Radix's default focus.
+      const search = (event.currentTarget as HTMLElement | null)?.querySelector<HTMLInputElement>('[cmdk-input]');
+      if (!search) return;
+
+      event.preventDefault();
+      search.focus();
+    }}
     {...props}
   >
     <Command shouldFilter={shouldFilter}>{children}</Command>

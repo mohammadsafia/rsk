@@ -1,17 +1,17 @@
-import { type MouseEvent, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import type { Column } from '@tanstack/react-table';
 
 import { Checkbox, RadioGroup } from '@components/ui';
 import { Combobox } from '@components/shared';
 import { Conditional } from '@components/utils';
-import { type FilterChipItem, FilterChipList } from '@components/tables';
+import { FilterPill } from '@components/tables/data-table-filters/filter-pill';
 
 import { useAppTranslation } from '@hooks/shared';
 
-import { ChevronDown } from 'lucide-react';
-
 import type { SelectFilterMeta } from '@app-types';
+
+type FilterChip = { value: string; label: string };
 
 type SelectFilterProps<TData> = {
   column: Column<TData>;
@@ -33,7 +33,7 @@ function SelectFilter<TData>({ column, filterMeta }: SelectFilterProps<TData>) {
     [columnFilterValue],
   );
 
-  const chips = useMemo<FilterChipItem[]>(
+  const chips = useMemo<FilterChip[]>(
     () =>
       options
         .filter((option) => selectedValues.has(getOptionValue(option)))
@@ -60,28 +60,9 @@ function SelectFilter<TData>({ column, filterMeta }: SelectFilterProps<TData>) {
     [column, getOptionValue, isMulti, selectedValues],
   );
 
-  const onRemoveChip = useCallback(
-    (value: string, event: MouseEvent) => {
-      event.stopPropagation();
-
-      const next = new Set(selectedValues);
-      next.delete(value);
-
-      const values = Array.from(next);
-      column.setFilterValue(values.length > 0 ? values : undefined);
-    },
-    [column, selectedValues],
-  );
-
   return (
     <Combobox open={open} onOpenChange={setOpen}>
-      <Combobox.Trigger size="sm" className="w-auto gap-1">
-        {filterMeta.label}
-
-        <ChevronDown size={16} className="text-fg-muted" />
-
-        <FilterChipList chips={chips} onRemoveChip={onRemoveChip} maxVisibleChips={isMulti ? undefined : 1} />
-      </Combobox.Trigger>
+      <FilterPill label={filterMeta.label} values={chips.map((chip) => chip.label)} onClear={() => column.setFilterValue(undefined)} />
 
       <Combobox.Content className="min-w-60" shouldFilter={true}>
         <Combobox.Input placeholder={filterMeta.placeholder ?? filterMeta.label} />

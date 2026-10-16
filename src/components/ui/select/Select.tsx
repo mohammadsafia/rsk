@@ -4,6 +4,8 @@ import * as SelectPrimitive from '@radix-ui/react-select';
 
 import { fieldVariants, type FieldVariants, floatingMotionClassName, floatingSurfaceClassName } from '@components/ui';
 
+import { Conditional } from '@components/utils';
+
 import { cn } from '@utils';
 
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
@@ -139,7 +141,18 @@ const SelectItem: FC<SelectItemProps> = ({ className, children, ...props }) => (
     )}
     {...props}
   >
-    {children}
+    <Conditional>
+      {/* Plain text must sit in ItemText, or Radix cannot show it in the trigger's Select.Value. */}
+      <Conditional.If condition={typeof children === 'string' || typeof children === 'number'}>
+        <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+
+        <SelectPrimitive.ItemIndicator className="ms-auto">
+          <CheckIcon aria-hidden="true" className="text-accent size-4" />
+        </SelectPrimitive.ItemIndicator>
+      </Conditional.If>
+
+      <Conditional.Else>{children}</Conditional.Else>
+    </Conditional>
   </SelectPrimitive.Item>
 );
 

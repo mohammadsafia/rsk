@@ -7,32 +7,66 @@ description: 'Searchable dropdown with command input and loading state.'
 tags: [shared, combobox, select, search]
 ---
 
+import { useState } from 'react';
 import { Combobox } from '@components/shared';
+import { Conditional } from '@components/utils';
+import { CheckIcon } from 'lucide-react';
+
+export const DOCTORS = [
+  { id: 'lina', name: 'Dr. Lina Khoury', specialty: 'Cardiology' },
+  { id: 'omar', name: 'Dr. Omar Nasser', specialty: 'Dermatology' },
+  { id: 'sara', name: 'Dr. Sara Haddad', specialty: 'Paediatrics' },
+  { id: 'yousef', name: 'Dr. Yousef Saleh', specialty: 'Orthopaedics' },
+];
+
+export const DoctorPicker = () => {
+  const [open, setOpen] = useState(false);
+  const [doctorId, setDoctorId] = useState();
+  const selected = DOCTORS.find((doctor) => doctor.id === doctorId);
+
+  return (
+    <Combobox open={open} onOpenChange={setOpen}>
+      <Combobox.Trigger className="w-72">
+        <Combobox.Value placeholder="Choose a doctor">{selected?.name}</Combobox.Value>
+      </Combobox.Trigger>
+
+      <Combobox.Content>
+        <Combobox.Input placeholder="Search doctors…" />
+
+        <Combobox.List>
+          <Combobox.Empty>No doctors match.</Combobox.Empty>
+
+          {DOCTORS.map((doctor) => (
+            <Combobox.Item
+              key={doctor.id}
+              value={`${doctor.name} ${doctor.specialty}`}
+              data-checked={doctor.id === doctorId || undefined}
+              onSelect={() => {
+                setDoctorId(doctor.id);
+                setOpen(false);
+              }}
+            >
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="text-fg">{doctor.name}</span>
+                <span className="text-fg-muted text-xs">{doctor.specialty}</span>
+              </span>
+
+              <Conditional.If condition={doctor.id === doctorId}>
+                <CheckIcon aria-hidden="true" className="text-accent size-4" />
+              </Conditional.If>
+            </Combobox.Item>
+          ))}
+        </Combobox.List>
+      </Combobox.Content>
+    </Combobox>
+  );
+};
 
 ## Demo
 
-<div className="w-64">
-  <Combobox>
-    <Combobox.Trigger>
-      <Combobox.Value placeholder="Select an option..." />
-    </Combobox.Trigger>
+Click or focus the trigger, type to filter, use the arrow keys to move and Enter to choose; Escape closes without choosing.
 
-    <Combobox.Content>
-      <Combobox.Input placeholder="Search..." />
-
-      <Combobox.List>
-        <Combobox.Empty>No results found.</Combobox.Empty>
-
-        <Combobox.Item value="option-1">Option 1</Combobox.Item>
-
-        <Combobox.Item value="option-2">Option 2</Combobox.Item>
-
-        <Combobox.Item value="option-3">Option 3</Combobox.Item>
-      </Combobox.List>
-    </Combobox.Content>
-
-  </Combobox>
-</div>
+<DoctorPicker />
 
 ## Imports
 
@@ -43,10 +77,13 @@ import { Combobox } from '@components/shared';
 ## Code
 
 ```tsx
+const [open, setOpen] = useState(false);
+const [doctorId, setDoctorId] = useState<string>();
+const selected = DOCTORS.find((doctor) => doctor.id === doctorId);
+
 <Combobox open={open} onOpenChange={setOpen}>
   <Combobox.Trigger>
-    <Combobox.Value placeholder="Select..." />
-    <Combobox.Clear onClick={handleClear} />
+    <Combobox.Value placeholder="Choose a doctor">{selected?.name}</Combobox.Value>
   </Combobox.Trigger>
 
   <Combobox.Content>
@@ -54,7 +91,18 @@ import { Combobox } from '@components/shared';
 
     <Combobox.List>
       <Combobox.Empty>No results.</Combobox.Empty>
-      <Combobox.Item value="item-1">Item 1</Combobox.Item>
+      {DOCTORS.map((doctor) => (
+        <Combobox.Item
+          key={doctor.id}
+          value={doctor.name}
+          onSelect={() => {
+            setDoctorId(doctor.id);
+            setOpen(false);
+          }}
+        >
+          {doctor.name}
+        </Combobox.Item>
+      ))}
     </Combobox.List>
   </Combobox.Content>
 </Combobox>
