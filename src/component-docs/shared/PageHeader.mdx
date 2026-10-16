@@ -7,7 +7,7 @@ description: 'The top of a page: title, description, back link, breadcrumb and a
 tags: [shared, layout, header, title]
 ---
 
-import { Button } from '@components/ui';
+import { Avatar, Badge, Button } from '@components/ui';
 import { PageHeader } from '@components/shared';
 import { Download, Plus } from 'lucide-react';
 
@@ -44,6 +44,34 @@ import { Download, Plus } from 'lucide-react';
   />
 </Example>
 
+## Media and meta
+
+`media` puts an avatar or icon before the title; `meta` adds badges and key/value items under the description.
+
+<Example title="Patient profile">
+  <PageHeader
+    className="w-full"
+    title="Sara Haddad"
+    media={
+      <Avatar size="lg">
+        <Avatar.Fallback>SH</Avatar.Fallback>
+      </Avatar>
+    }
+    meta={
+      <>
+        <Badge tone="success">Active</Badge>
+        <span dir="ltr" className="font-mono">MRN-20391</span>
+        <span>Last visit 12 Oct 2026</span>
+      </>
+    }
+  >
+    <PageHeader.Actions>
+      <Button variant="outline">Message</Button>
+      <Button>Book visit</Button>
+    </PageHeader.Actions>
+  </PageHeader>
+</Example>
+
 ## API
 
 <PropsTable
@@ -51,6 +79,8 @@ import { Download, Plus } from 'lucide-react';
     { prop: 'title', type: 'ReactNode', required: true, description: 'Rendered as the page’s h1.' },
     { prop: 'description', type: 'ReactNode', description: 'Muted line under the title.' },
     { prop: 'back', type: 'string | () => void', description: 'A path renders a link; a function renders a button. Labelled "Back".' },
+    { prop: 'media', type: 'ReactNode', description: 'Avatar or icon before the title.' },
+    { prop: 'meta', type: 'ReactNode', description: 'Badges and key/value items under the description.' },
     { prop: 'breadcrumb', type: 'BreadcrumbLink[]', description: 'Rendered with Breadcrumb above the title.' },
   ]}
 />

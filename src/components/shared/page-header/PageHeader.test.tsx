@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { PageHeader } from '@components/shared';
-import { Tooltip } from '@components/ui';
+import { Badge, Tooltip } from '@components/ui';
 
 import '../../../i18n';
 
@@ -47,5 +47,25 @@ describe('PageHeader', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
     expect(onBack).toHaveBeenCalledOnce();
+  });
+});
+
+describe('PageHeader media and meta', () => {
+  it('renders media before the title and meta under it, keeping the h1', () => {
+    render(
+      <MemoryRouter>
+        <PageHeader title="Sara Haddad" media={<span data-testid="avatar" />} meta={<Badge tone="success">Active</Badge>} />
+      </MemoryRouter>,
+    );
+    const heading = screen.getByRole('heading', { level: 1, name: 'Sara Haddad' });
+    const media = screen.getByTestId('avatar');
+    expect(media.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(document.querySelector('[data-slot="page-header-meta"]')?.textContent).toBe('Active');
+  });
+
+  it('renders neither slot when not given', () => {
+    render(<PageHeader title="Patients" />);
+    expect(document.querySelector('[data-slot="page-header-media"]')).toBeNull();
+    expect(document.querySelector('[data-slot="page-header-meta"]')).toBeNull();
   });
 });
