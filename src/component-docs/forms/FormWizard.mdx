@@ -78,7 +78,7 @@ export const IntakeDemo = () => {
 
 ## Steps and validation
 
-Next validates only the current step: with its `schema`, or by triggering the listed `fields`. Back never validates. Completed steps can be revisited from the stepper; later ones stay locked. Tick "has insurance" to see a conditional step appear.
+Next validates only the current step: with its `schema`, or by triggering the listed `fields`. Back never blocks, but a passed step left invalid loses its tick and locks the steps after it. Submit re-checks every step schema, the last step included. Completed steps can be revisited from the stepper; later ones stay locked. Tick "has insurance" to see a conditional step appear.
 
 <Example title="Patient intake" code={demoSource('IntakeDemo', pageSource)}>
   <IntakeDemo />
@@ -105,7 +105,7 @@ const save = async (values: Intake) => {
 
 ## URL sync
 
-`urlSync` keeps `?step=<id>` in the URL so refresh and the browser Back button move between steps. A step that isn't reachable yet opens the first incomplete step instead.
+`urlSync` keeps `?step=<id>` in the URL, adding a history entry per step, so the browser Back and Forward buttons move between steps. A step that isn't reachable yet opens the first incomplete step instead; after a refresh that means step 1 unless a `draftKey` draft restores the progress.
 
 ## API
 

@@ -11,6 +11,7 @@ export function useWizardSteps(ids: string[], initialIndex = 0) {
     (target: number) => target <= safeIndex || ids.slice(0, target).every((id) => completed.has(id)),
     [ids, completed, safeIndex],
   );
+  const goTo = useCallback((target: number) => setIndex(Math.max(0, Math.min(ids.length - 1, target))), [ids.length]);
 
   return {
     index: safeIndex,
@@ -18,7 +19,7 @@ export function useWizardSteps(ids: string[], initialIndex = 0) {
     completed,
     errored,
     canJumpTo,
-    goTo: (target: number) => setIndex(Math.max(0, Math.min(ids.length - 1, target))),
+    goTo,
     markCompleted: (id: string) => {
       setCompleted((current) => new Set(current).add(id));
       setErrored((current) => {
@@ -28,5 +29,15 @@ export function useWizardSteps(ids: string[], initialIndex = 0) {
       });
     },
     markErrored: (stepIds: string[]) => setErrored((current) => new Set([...current, ...stepIds])),
+    /** A passed step that no longer validates: shows the error status and locks the steps after it. */
+    markInvalid: (stepIds: string[]) => {
+      setCompleted((current) => new Set([...current].filter((id) => !stepIds.includes(id))));
+      setErrored((current) => new Set([...current, ...stepIds]));
+    },
+    /** Restores a saved position (from a draft): the step and the steps already passed. */
+    restore: (target: number, completedIds: string[]) => {
+      setCompleted(new Set(completedIds.filter((id) => ids.includes(id))));
+      setIndex(Math.max(0, Math.min(ids.length - 1, target)));
+    },
   };
 }

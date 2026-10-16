@@ -1,4 +1,4 @@
-import { Children, Fragment, isValidElement, type ReactElement, type ReactNode, useEffect, useRef, useState } from 'react';
+import { Children, type FormEvent, Fragment, isValidElement, type ReactElement, type ReactNode, useEffect, useRef, useState } from 'react';
 import { type FieldErrors, type FieldValues, FormProvider, type Path, type UseFormReturn } from 'react-hook-form';
 
 import { Alert, Badge, Button, Divider } from '@components/ui';
@@ -46,11 +46,39 @@ const readSteps = (children: ReactNode, reviewTitle: string): WizardStep[] =>
     return [];
   });
 
+type SchemaLike = { shape?: Record<string, unknown>; _def?: { schema?: SchemaLike } };
+
+/** The object shape of a step schema, looking through wrappers such as `.refine()` (ZodEffects). */
+const schemaShape = (schema: unknown): Record<string, unknown> | undefined => {
+  let current = schema as SchemaLike | undefined;
+  for (let depth = 0; current && depth < 5; depth += 1) {
+    if (current.shape) return current.shape;
+    current = current._def?.schema;
+  }
+  return undefined;
+};
+
 /** Field paths a step owns, for validation and error routing. */
 export const stepFields = (step: WizardStep): string[] => {
   if (step.kind !== 'step') return [];
-  const shape = (step.schema as { shape?: Record<string, unknown> } | undefined)?.shape;
+  const shape = schemaShape(step.schema);
   return shape ? Object.keys(shape) : (step.fields ?? []);
+};
+
+/** A step owns an error path when one is the other or contains it (`address` ↔ `address.city`). */
+const ownsPath = (field: string, path: string) => field === path || path.startsWith(`${field}.`) || field.startsWith(`${path}.`);
+
+const stepOwns = (step: WizardStep, path: string) => stepFields(step).some((field) => ownsPath(field, path));
+
+/** react-hook-form errors as dotted paths with their messages (nested objects and arrays flattened). */
+const flattenErrors = (errors: unknown, prefix = ''): Record<string, string> => {
+  if (!errors || typeof errors !== 'object') return {};
+  const entry = errors as { message?: unknown; type?: unknown };
+  if (typeof entry.message === 'string' && entry.message && prefix) return { [prefix]: entry.message };
+  return Object.entries(errors).reduce<Record<string, string>>((all, [key, value]) => {
+    if (key === 'ref' || key === 'type' || key === 'message' || key === 'types') return all;
+    return { ...all, ...flattenErrors(value, prefix ? `${prefix}.${key}` : key) };
+  }, {});
 };
 
 /**
@@ -72,23 +100,34 @@ function WizardUrlSync({
 }) {
   const [step, setStep] = useQueryState('step', parseAsString);
   const started = useRef(false);
+  const wrote = useRef(false);
 
+  // Reads the URL: on mount, then whenever it changes (browser Back / Forward). Unreachable steps are refused.
   useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-    const target = step ? ids.indexOf(step) : -1;
+    if (!started.current) {
+      started.current = true;
+      const target = step ? ids.indexOf(step) : -1;
+      if (target >= 0 && canJumpTo(target)) goTo(target);
+      else
+        goTo(
+          Math.max(
+            0,
+            ids.findIndex((id) => !completed.has(id)),
+          ),
+        );
+      return;
+    }
+    if (!step || step === ids[index]) return;
+    const target = ids.indexOf(step);
     if (target >= 0 && canJumpTo(target)) goTo(target);
-    else
-      goTo(
-        Math.max(
-          0,
-          ids.findIndex((id) => !completed.has(id)),
-        ),
-      );
-  }, [step, ids, canJumpTo, completed, goTo]);
+    else void setStep(ids[index] ?? null, { history: 'replace' });
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- follow the URL only when it changes
+  }, [step]);
 
+  // Writes the URL when the wizard moves: the first write corrects the entry, later ones add history.
   useEffect(() => {
-    if (ids[index] && ids[index] !== step) void setStep(ids[index]);
+    if (ids[index] && ids[index] !== step) void setStep(ids[index], { history: wrote.current ? 'push' : 'replace' });
+    wrote.current = true;
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- write only when the wizard moves
   }, [index]);
 
@@ -149,53 +188,81 @@ function FormWizard<TValues extends FieldValues>({
   const ids = steps.map((step) => step.id);
   const wizard = useWizardSteps(ids);
   const current = steps[wizard.index];
-  const draft = useWizardDraft(draftKey, form, wizard.index, wizard.goTo);
+  const draft = useWizardDraft(draftKey, form, { stepId: wizard.currentId, completed: wizard.completed }, (stepId, completedIds) =>
+    wizard.restore(stepId ? Math.max(0, ids.indexOf(stepId)) : 0, completedIds),
+  );
   const [formError, setFormError] = useState<string[] | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
   // Read during render so react-hook-form tracks dirtiness (formState is a subscription proxy).
   const isDirty = form.formState.isDirty;
 
-  /** Sends field errors to the first visible step that owns one; otherwise shows them as a form-level alert. */
-  const routeErrors = (messages: Record<string, string>) => {
-    const fields = Object.keys(messages);
-    const owners = steps
-      .map((step, index) => ({ step, index }))
-      .filter(({ step }) => stepFields(step).some((name) => fields.includes(name)));
-    if (owners.length === 0) {
-      setFormError(Object.values(messages));
-      return;
-    }
+  /**
+   * Sends field errors to the first visible step that owns one. Messages no visible step owns show as a form-level
+   * alert, and are never set on the form: an error on an unregistered name would block every later submit.
+   */
+  const routeErrors = (messages: Record<string, string>, { setOnFields }: { setOnFields: boolean }) => {
+    const owned = Object.entries(messages).filter(([path]) => steps.some((step) => stepOwns(step, path)));
+    const unowned = Object.entries(messages).filter(([path]) => !steps.some((step) => stepOwns(step, path)));
+    if (setOnFields) for (const [path, message] of owned) form.setError(path as Path<TValues>, { type: 'server', message });
+    setFormError(unowned.length ? unowned.map(([, message]) => message) : null);
+    const owners = steps.map((step, index) => ({ step, index })).filter(({ step }) => owned.some(([path]) => stepOwns(step, path)));
+    if (owners.length === 0) return;
     wizard.markErrored(owners.map(({ step }) => step.id));
     wizard.goTo(owners[0].index);
   };
   const isLast = wizard.index === steps.length - 1;
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const moved = useRef(false);
+  const shownIndex = useRef(wizard.index);
+  const [announcement, setAnnouncement] = useState('');
 
+  // Only a real move focuses the heading and announces it (not the mount, nor StrictMode's repeated mount effect).
   useEffect(() => {
-    if (moved.current) headingRef.current?.focus();
-    moved.current = true;
+    if (shownIndex.current === wizard.index) return;
+    shownIndex.current = wizard.index;
+    headingRef.current?.focus();
+    if (current) setAnnouncement(t('wizard.stepAnnounce', { current: wizard.index + 1, total: steps.length, title: current.title }));
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- announce on moves only
   }, [wizard.index]);
 
-  const validateCurrent = async (): Promise<boolean> => {
-    if (!current || current.kind !== 'step') return true;
-    if (current.schema) {
-      const result = current.schema.safeParse(form.getValues());
-      if (result.success) return true;
-      for (const issue of result.error.issues)
-        form.setError(issue.path.join('.') as Path<TValues>, { type: 'wizard', message: issue.message });
-      const first = result.error.issues[0]?.path.join('.');
-      if (first) form.setFocus(first as Path<TValues>);
-      return false;
+  /** Validates one step. Messages without a field path (object-level refine) come back as `general`. */
+  const validateStep = async (step: WizardStep | undefined, { focus }: { focus: boolean }) => {
+    if (!step || step.kind !== 'step') return { ok: true, general: [] as string[] };
+    const owned = stepFields(step);
+    if (owned.length) form.clearErrors(owned as Path<TValues>[]);
+    if (step.schema) {
+      const result = step.schema.safeParse(form.getValues());
+      if (result.success) return { ok: true, general: [] };
+      const general: string[] = [];
+      for (const issue of result.error.issues) {
+        const path = issue.path.join('.');
+        if (path) form.setError(path as Path<TValues>, { type: 'wizard', message: issue.message });
+        else general.push(issue.message);
+      }
+      const first = result.error.issues.find((issue) => issue.path.length)?.path.join('.');
+      if (focus && first) form.setFocus(first as Path<TValues>);
+      return { ok: false, general };
     }
-    if (current.fields?.length) return form.trigger(current.fields as Path<TValues>[], { shouldFocus: true });
-    return true;
+    if (step.fields?.length) return { ok: await form.trigger(step.fields as Path<TValues>[], { shouldFocus: focus }), general: [] };
+    return { ok: true, general: [] };
   };
 
-  const goNext = async () => {
-    if (!(await validateCurrent())) return;
+  /**
+   * Moves to another step. Forward moves (Next, the stepper) validate the current step first. Back never blocks, but a
+   * passed step left invalid loses its "done" status, so the steps after it lock until it passes again.
+   */
+  const moveTo = async (target: number) => {
+    if (target === wizard.index || !current) return;
+    if (target < wizard.index) {
+      if (current.kind === 'step' && wizard.completed.has(current.id) && !(await validateStep(current, { focus: false })).ok)
+        wizard.markInvalid([current.id]);
+      wizard.goTo(target);
+      return;
+    }
+    const result = await validateStep(current, { focus: true });
+    setFormError(result.general.length ? result.general : null);
+    if (!result.ok) return;
     wizard.markCompleted(current.id);
-    wizard.goTo(wizard.index + 1);
+    wizard.goTo(target);
   };
 
   const submit = form.handleSubmit(
@@ -206,16 +273,29 @@ function FormWizard<TValues extends FieldValues>({
         draft.clear();
       } catch (error) {
         if (!(error instanceof FormWizardError)) throw error;
-        for (const [name, message] of Object.entries(error.fieldErrors)) form.setError(name as Path<TValues>, { type: 'server', message });
-        routeErrors(error.fieldErrors);
+        routeErrors(error.fieldErrors, { setOnFields: true });
       }
     },
-    (errors: FieldErrors<TValues>) => {
-      routeErrors(
-        Object.fromEntries(Object.entries(errors).map(([name, error]) => [name, String((error as { message?: unknown })?.message ?? '')])),
-      );
-    },
+    (errors: FieldErrors<TValues>) => routeErrors(flattenErrors(errors), { setOnFields: false }),
   );
+
+  /** Re-checks every visible step (the last one included) before handing the values to react-hook-form's submit. */
+  const submitAll = async (event: FormEvent<HTMLFormElement>) => {
+    for (const [index, step] of steps.entries()) {
+      if (step.kind !== 'step' || (index !== wizard.index && !step.schema)) continue;
+      const result = await validateStep(step, { focus: index === wizard.index });
+      if (result.ok) continue;
+      setFormError(result.general.length ? result.general : null);
+      if (index !== wizard.index) {
+        wizard.markInvalid([step.id]);
+        wizard.goTo(index);
+      }
+      return;
+    }
+    // Every step passed: drop stale errors (e.g. from a rejected submit) so the resolver or rules decide afresh.
+    form.clearErrors();
+    await submit(event);
+  };
 
   return (
     <FormProvider {...form}>
@@ -226,8 +306,8 @@ function FormWizard<TValues extends FieldValues>({
         className={cn('flex flex-col gap-6', className)}
         onSubmit={(event) => {
           event.preventDefault();
-          if (isLast) void submit(event);
-          else void goNext();
+          if (isLast) void submitAll(event);
+          else void moveTo(wizard.index + 1);
         }}
       >
         <nav aria-label={t('wizard.steps')}>
@@ -252,7 +332,7 @@ function FormWizard<TValues extends FieldValues>({
                       type="button"
                       disabled={!wizard.canJumpTo(index)}
                       aria-current={index === wizard.index ? 'step' : undefined}
-                      onClick={() => wizard.goTo(index)}
+                      onClick={() => void moveTo(index)}
                       className="focus-ring flex flex-col items-center gap-1 rounded-sm disabled:cursor-not-allowed"
                     >
                       <Stepper.Icon status={status} />
@@ -288,9 +368,7 @@ function FormWizard<TValues extends FieldValues>({
         </Conditional.If>
 
         <span aria-live="polite" className="sr-only">
-          {moved.current && current
-            ? t('wizard.stepAnnounce', { current: wizard.index + 1, total: steps.length, title: current.title })
-            : ''}
+          {announcement}
         </span>
 
         <section data-slot="form-wizard-step" className="flex flex-col gap-4">
@@ -313,7 +391,11 @@ function FormWizard<TValues extends FieldValues>({
             {current?.kind === 'step' ? (
               current.children
             ) : (
-              <ReviewPanel steps={steps.slice(0, wizard.index)} values={form.getValues() as Record<string, unknown>} onEdit={wizard.goTo} />
+              <ReviewPanel
+                steps={steps.slice(0, wizard.index)}
+                values={form.getValues() as Record<string, unknown>}
+                onEdit={(index) => void moveTo(index)}
+              />
             )}
           </Fragment>
         </section>
@@ -333,7 +415,7 @@ function FormWizard<TValues extends FieldValues>({
           </Conditional.If>
 
           <Conditional.If condition={wizard.index > 0}>
-            <Button type="button" variant="outline" onClick={() => wizard.goTo(wizard.index - 1)}>
+            <Button type="button" variant="outline" onClick={() => void moveTo(wizard.index - 1)}>
               <ArrowLeft aria-hidden="true" className="size-4 rtl:-scale-x-100" />
               {t('wizard.back')}
             </Button>
