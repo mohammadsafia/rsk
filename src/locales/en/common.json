@@ -85,7 +85,8 @@
     "today": "Today",
     "more": "+{{count}} more",
     "allResources": "All resources",
-    "resource": "Resource"
+    "resource": "Resource",
+    "allDay": "All day"
   },
   "timePicker": {
     "placeholder": "Select time",

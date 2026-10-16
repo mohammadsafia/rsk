@@ -101,7 +101,8 @@
     "today": "اليوم",
     "more": "+{{count}} أخرى",
     "allResources": "كل الموارد",
-    "resource": "المورد"
+    "resource": "المورد",
+    "allDay": "طوال اليوم"
   },
   "timePicker": {
     "placeholder": "اختر الوقت",

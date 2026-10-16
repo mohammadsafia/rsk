@@ -9,6 +9,7 @@ import { type DateInput, useDate } from '@hooks/shared';
 import { cn } from '@utils';
 
 import { dayKeyOf, slotRangesFor } from '../scheduling';
+import AllDayRow from './AllDayRow';
 import { isAllDayEvent, type PlacedEvent, placeEvents } from './placement';
 
 export type GridColumn = { key: string; dayKey: string; resourceId?: string };
@@ -130,7 +131,7 @@ const ResourceHeader: FC<{ resource: CalendarResource }> = ({ resource }) => (
   </div>
 );
 
-const DayColumn: FC<{ column: GridColumn; index: number; className?: string }> = ({ column, index, className }) => {
+const DayColumn: FC<{ column: GridColumn; index: number; wide: boolean }> = ({ column, index, wide }) => {
   const { events, eventAccessors, slots, startHour, endHour, stepMinutes } = useCalendarGridContext();
   const { toDate, toDateUnits, isBefore, isAfter } = useDate();
 
@@ -177,7 +178,7 @@ const DayColumn: FC<{ column: GridColumn; index: number; className?: string }> =
       data-column-index={index}
       data-day={dayKey}
       data-resource={resourceId}
-      className={cn('border-border-subtle border-e last:border-e-0', resourceId !== undefined ? 'min-w-44' : 'min-w-0', className)}
+      className={cn('border-border-subtle border-e last:border-e-0', wide ? 'min-w-44' : 'min-w-0')}
     >
       <NowIndicator day={dayKey} />
 
@@ -193,7 +194,13 @@ const DayColumn: FC<{ column: GridColumn; index: number; className?: string }> =
 };
 
 /** Shared layout of the day and week views: one scroller with a sticky header row and a sticky time axis. */
-const TimeGrid: FC<{ slot: string; columns: GridColumn[]; headers: ReactNode }> = ({ slot, columns, headers }) => (
+/** `wide`: resource columns keep a readable width and scroll horizontally instead of squeezing. */
+const TimeGrid: FC<{ slot: string; columns: GridColumn[]; headers: ReactNode; wide?: boolean }> = ({
+  slot,
+  columns,
+  headers,
+  wide = false,
+}) => (
   <div data-slot={slot} className="flex min-h-0 flex-1 flex-col">
     <div
       data-slot="calendar-grid-body"
@@ -208,13 +215,15 @@ const TimeGrid: FC<{ slot: string; columns: GridColumn[]; headers: ReactNode }> 
               {headers}
             </div>
           </div>
+
+          <AllDayRow columns={columns} resourceMode={wide} />
         </div>
 
         <div data-slot="calendar-grid-body-row" className="flex flex-1">
           <TimeAxis className="sticky start-0 z-30" />
 
           {columns.map((column, index) => (
-            <DayColumn key={column.key} column={column} index={index} />
+            <DayColumn key={column.key} column={column} index={index} wide={wide} />
           ))}
         </div>
       </div>
@@ -238,7 +247,7 @@ const DayView: FC = () => {
   const headers =
     resources.length > 0 ? resources.map((resource) => <ResourceHeader key={resource.id} resource={resource} />) : <DayHeader day={date} />;
 
-  return <TimeGrid slot="calendar-grid-day-view" columns={columns} headers={headers} />;
+  return <TimeGrid slot="calendar-grid-day-view" columns={columns} headers={headers} wide={resources.length > 0} />;
 };
 
 const WeekView: FC = () => {

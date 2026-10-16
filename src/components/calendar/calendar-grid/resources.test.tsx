@@ -98,3 +98,12 @@ describe('CalendarGrid resources', () => {
     expect(screen.queryByRole('combobox', { name: 'Resource' })).toBeNull();
   });
 });
+
+describe('CalendarGrid resource widths', () => {
+  it('keeps week columns flexible even when a resource filter is set', () => {
+    renderGrid('week', { resourceFilter: 'haddad' });
+    const columns = [...document.querySelectorAll('[data-calendar-column]')];
+    expect(columns).toHaveLength(7);
+    expect(columns.every((column) => column.classList.contains('min-w-0'))).toBe(true);
+  });
+});
