@@ -1,8 +1,8 @@
 // @vitest-environment happy-dom
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vite-plus/test';
 
-import { AreaChart, BarChart, LineChart } from '@components/charts';
+import { AreaChart, BarChart, DonutChart, LineChart, Sparkline } from '@components/charts';
 
 import i18n from '../../i18n';
 
@@ -96,5 +96,41 @@ describe('BarChart', () => {
 
     rerender(<BarChart aria-label="Revenue by clinic" data={data} series={series} x={{ key: 'day' }} orientation="horizontal" stacked />);
     expect(document.querySelector('.recharts-bar-rectangle path')?.getAttribute('fill')).toBe('var(--chart-1)');
+  });
+});
+
+const visitTypes = [
+  { type: 'In person', count: 62 },
+  { type: 'Video', count: 23 },
+  { type: 'Phone', count: 15 },
+];
+
+describe('DonutChart', () => {
+  it('draws a slice per item with palette colours, a centre value and a slice table', () => {
+    render(
+      <DonutChart aria-label="Visits by type" data={visitTypes} nameKey="type" valueKey="count" centerLabel="Visits" centerValue="100" />,
+    );
+    const slices = [...document.querySelectorAll('.recharts-pie-sector path')];
+    expect(slices).toHaveLength(3);
+    expect(slices[1].getAttribute('fill')).toBe('var(--chart-2)');
+    expect(screen.getByText('100')).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: 'View as table' }));
+    expect(screen.getByRole('cell', { name: 'In person' })).toBeTruthy();
+    expect(screen.getByText('62').closest('td')).not.toBeNull();
+  });
+});
+
+describe('Sparkline', () => {
+  it('is a labelled image with a single accent line', () => {
+    render(<Sparkline aria-label="Visits, last 7 days" data={data} valueKey="visits" />);
+    const image = screen.getByRole('img', { name: 'Visits, last 7 days' });
+    expect(image.querySelector('.recharts-line-curve')?.getAttribute('stroke')).toBe('var(--accent)');
+  });
+
+  it('renders an empty labelled box with fewer than two points', () => {
+    render(<Sparkline aria-label="Visits, last 7 days" data={[{ visits: 4 }]} valueKey="visits" />);
+    const image = screen.getByRole('img', { name: 'Visits, last 7 days' });
+    expect(image.querySelector('.recharts-line-curve')).toBeNull();
   });
 });

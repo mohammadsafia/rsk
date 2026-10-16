@@ -9,13 +9,23 @@ tags: [shared, kpi, stat, dashboard, metric]
 
 import { CardGrid, StatCard } from '@components/shared';
 import { Money } from '@components/ui';
+import { Sparkline } from '@components/charts';
 import { CalendarCheck, Clock, UserX, Wallet } from 'lucide-react';
+
+export const TREND = [{ v: 30 }, { v: 34 }, { v: 31 }, { v: 40 }, { v: 38 }, { v: 45 }, { v: 48 }];
 
 ## Dashboard row
 
 <Example title="Four KPIs">
   <CardGrid className="w-full">
-    <StatCard label="Visits today" value="48" icon={<CalendarCheck />} trend={{ value: 12.4 }} caption="vs last week" />
+    <StatCard
+      label="Visits today"
+      value="48"
+      icon={<CalendarCheck />}
+      trend={{ value: 12.4 }}
+      caption="vs last week"
+      sparkline={<Sparkline aria-label="Visits, last 7 days" data={TREND} valueKey="v" />}
+    />
     <StatCard label="Collected" value={<Money value={2940} />} icon={<Wallet />} trend={{ value: -3.1 }} caption="vs last week" />
     <StatCard label="No-shows" value="3" icon={<UserX />} trend={{ value: 8, positive: 'down' }} caption="vs last week" />
     <StatCard label="Average wait" value="14 min" icon={<Clock />} trend={{ value: 0 }} />
