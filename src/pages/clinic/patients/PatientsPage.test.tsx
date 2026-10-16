@@ -34,11 +34,41 @@ describe('PatientsPage', () => {
     expect(screen.getByTestId('location').textContent).toBe(`/patients/${firstPatient().id}`);
   });
 
-  it('searches by name', async () => {
+  it('searches by MRN', async () => {
     renderPage();
     await screen.findByText(firstPatient().name.en);
     fireEvent.change(screen.getByPlaceholderText('Search by name, MRN or phone'), { target: { value: firstPatient().mrn } });
     await waitFor(() => expect(screen.getAllByRole('row').length).toBeLessThanOrEqual(3));
+  });
+
+  it('searches names, MRNs and phones only — not doctor ids — and matches phones by digits', async () => {
+    renderPage();
+    await screen.findByText(firstPatient().name.en);
+    const search = screen.getByPlaceholderText('Search by name, MRN or phone');
+    fireEvent.change(search, { target: { value: 'Haddad' } });
+    const named = clinicStore.read().patients.filter((p) => p.name.en.includes('Haddad'));
+    await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(named.length + 1));
+
+    const target = clinicStore.read().patients[5];
+    const local = `0${target.phone.replace(/\D/g, '').slice(3)}`;
+    fireEvent.change(search, { target: { value: local } });
+    await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
+    expect(screen.getAllByRole('row')[1].textContent).toContain(target.name.en);
+  });
+
+  it('gives every row a link to the profile for keyboard users', async () => {
+    renderPage();
+    const link = await screen.findByRole('link', { name: firstPatient().name.en });
+    expect(link.getAttribute('href')).toBe(`/patients/${firstPatient().id}`);
+  });
+
+  it('shows the error state when doctors or insurers fail to load, and Retry recovers', async () => {
+    clinicStore.failNext('listDoctors');
+    renderPage();
+    const alert = await screen.findByRole('alert');
+    fireEvent.click(within(alert).getByRole('button', { name: 'Retry' }));
+    expect(await screen.findByText(firstPatient().name.en)).toBeTruthy();
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 
   it('shows an error with Retry, and Retry recovers', async () => {
@@ -68,5 +98,17 @@ describe('PatientsPage', () => {
     expect(screen.getAllByRole('row')[1].textContent).toContain(arabicFirst.name.ar);
     expect(screen.getByRole('heading', { level: 1, name: 'المرضى' })).toBeTruthy();
     expect(document.body.textContent).not.toMatch(/[٠-٩]/);
+    const row = screen.getAllByRole('row')[1];
+    expect(row.querySelector('bdi[dir="ltr"]')?.textContent).toBe(arabicFirst.phone);
+    // Dates with Arabic month names are isolated without being forced left-to-right.
+    expect(row.querySelector('[data-slot="last-visit"]')?.getAttribute('dir')).toBeNull();
+  });
+
+  it('sorts the doctor column by the doctor name shown, in Arabic too', async () => {
+    await act(() => i18n.changeLanguage('ar'));
+    renderPage();
+    await screen.findAllByText('د. لينا حداد');
+    fireEvent.click(within(screen.getByRole('columnheader', { name: /الطبيب المعالج/ })).getByText('الطبيب المعالج'));
+    await waitFor(() => expect(screen.getAllByRole('row')[1].textContent).toContain('د. رانيا ناصر'));
   });
 });

@@ -139,3 +139,28 @@ describe('clinicService failures and metrics', () => {
     expect(await clinicService.listMetrics(90)).toHaveLength(90);
   });
 });
+
+describe('clinicService ids across page loads', () => {
+  /** A page load: fresh service and store modules over the same sessionStorage. */
+  const pageLoad = async () => {
+    const { vi } = await import('vite-plus/test');
+    vi.resetModules();
+    const { clinicService: service } = await import('./service');
+    const { clinicStore: store } = await import('./store');
+    store.setClock(() => NOW);
+    store.setLatency([0, 0]);
+    return { service, store };
+  };
+
+  it('never reuses an id after a reload', async () => {
+    const template = clinicStore.read().patients[0];
+    const firstLoad = await pageLoad();
+    const first = await firstLoad.service.registerPatient({ ...template, phone: '+962 79 000 0001' });
+    const secondLoad = await pageLoad();
+    const second = await secondLoad.service.registerPatient({ ...template, phone: '+962 79 000 0002' });
+
+    expect(second.id).not.toBe(first.id);
+    expect((await secondLoad.service.getPatient(first.id)).phone).toBe('+962 79 000 0001');
+    expect((await secondLoad.service.getPatient(second.id)).phone).toBe('+962 79 000 0002');
+  });
+});

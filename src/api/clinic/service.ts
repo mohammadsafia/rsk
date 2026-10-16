@@ -92,7 +92,17 @@ const inRange = (key: string, range: DayRange) => key >= range.from && key <= ra
 
 const payable = (invoice: Invoice) => invoice.status === 'sent' || invoice.status === 'overdue';
 
-let sequence = 0;
+/**
+ * Next id for records created in this session, derived from the stored data so it survives a page reload
+ * (a module-level counter would restart at 1 and reuse ids).
+ */
+const nextId = (prefix: string, ids: string[]) => {
+  const pattern = new RegExp(`^${prefix}-new-(\\d+)$`);
+  const max = ids.reduce((highest, id) => Math.max(highest, Number(pattern.exec(id)?.[1] ?? 0)), 0);
+  return `${prefix}-new-${max + 1}`;
+};
+
+const paymentIds = (data: ClinicData) => data.invoices.flatMap((invoice) => invoice.payments.map((payment) => payment.id));
 
 export const clinicService = {
   listDoctors: () => request('listDoctors', (data) => data.doctors),
@@ -111,7 +121,15 @@ export const clinicService = {
         throw new ClinicError('duplicate-phone', 'A patient with this phone already exists', { phone: 'duplicate-phone' });
       }
       const nextMrn = Math.max(...data.patients.map((patient) => Number(patient.mrn.replace('MRN-', '')))) + 1;
-      const patient: Patient = { ...input, id: `pt-new-${(sequence += 1)}`, mrn: `MRN-${nextMrn}`, createdAt: nowIso() };
+      const patient: Patient = {
+        ...input,
+        id: nextId(
+          'pt',
+          data.patients.map((p) => p.id),
+        ),
+        mrn: `MRN-${nextMrn}`,
+        createdAt: nowIso(),
+      };
       data.patients.push(patient);
       return patient;
     }),
@@ -123,7 +141,15 @@ export const clinicService = {
     mutation('createVisit', (data) => {
       find(data.patients, input.patientId, 'Patient');
       assertFree(data, input.doctorId, input.start, input.end);
-      const visit: Visit = { ...input, notes: input.notes ?? null, id: `vs-new-${(sequence += 1)}`, status: 'scheduled' };
+      const visit: Visit = {
+        ...input,
+        notes: input.notes ?? null,
+        id: nextId(
+          'vs',
+          data.visits.map((v) => v.id),
+        ),
+        status: 'scheduled',
+      };
       data.visits.push(visit);
       return visit;
     }),
@@ -152,7 +178,7 @@ export const clinicService = {
       if (!payable(invoice)) throw new ClinicError('invalid-transition', `Cannot record a payment on a ${invoice.status} invoice`);
       if (!(payment.amount > 0) || payment.amount > invoiceBalance(invoice))
         throw new ClinicError('invalid', 'The amount must be above 0 and at most the balance');
-      invoice.payments.push({ id: `pay-new-${(sequence += 1)}`, ...payment });
+      invoice.payments.push({ id: nextId('pay', paymentIds(data)), ...payment });
       if (invoiceBalance(invoice) === 0) invoice.status = 'paid';
       return invoice;
     }),
@@ -184,7 +210,7 @@ export const clinicService = {
         }
         if (action === 'mark-paid') {
           invoice.payments.push({
-            id: `pay-new-${(sequence += 1)}`,
+            id: nextId('pay', paymentIds(data)),
             amount: invoiceBalance(invoice),
             method: 'card',
             date: dayKey(clinicStore.now()),

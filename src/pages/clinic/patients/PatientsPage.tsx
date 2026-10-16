@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import {
   type ColumnDef,
+  type FilterFn,
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
@@ -28,6 +29,23 @@ import { useDoctors, useInsurers, usePatients } from '../queries';
 import { useLocalized } from '../shared/useLocalized';
 
 const SELF_PAY = 'self-pay';
+
+/** Search covers what people type: names, MRNs and phones (not doctor or insurer ids, dates or balances). */
+const SEARCHABLE = new Set(['name', 'mrn', 'phone']);
+
+const digits = (value: string) => value.replace(/\D/g, '').replace(/^(962|0)/, '');
+
+const searchPatients: FilterFn<PatientSummary> = (row, columnId, filterValue) => {
+  const query = String(filterValue ?? '')
+    .trim()
+    .toLowerCase();
+  if (!query) return true;
+  const value = String(row.getValue(columnId) ?? '').toLowerCase();
+  if (value.includes(query)) return true;
+  // "0791012345" finds "+962 79 101 2345".
+  const queryDigits = digits(query);
+  return columnId === 'phone' && queryDigits.length >= 3 && digits(value).includes(queryDigits);
+};
 
 type Option = { id: string; name: string };
 
@@ -70,7 +88,10 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }:
       filterFn: containsFilterFn,
       cell: ({ row }) => (
         <div className="flex flex-col">
-          <span className="text-fg font-medium">{localize(row.original.name)}</span>
+          {/* A real link, so keyboard and screen-reader users can open the profile (the row click is a mouse shortcut). */}
+          <Link to={patientPath(row.original.id)} className="text-fg focus-ring w-fit rounded-sm font-medium hover:underline">
+            {localize(row.original.name)}
+          </Link>
           <span dir="ltr" className="text-fg-muted text-xs tabular-nums">
             {row.original.mrn}
           </span>
@@ -81,13 +102,14 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }:
     {
       accessorKey: 'mrn',
       header: t('patients.columns.mrn'),
-      enableHiding: true,
       cell: () => null,
       meta: { label: t('patients.columns.mrn') },
+      enableSorting: false,
     },
     {
       accessorKey: 'phone',
       header: t('patients.columns.phone'),
+      enableSorting: false,
       cell: ({ row }) => (
         <bdi dir="ltr" className="text-fg-muted tabular-nums">
           {row.original.phone}
@@ -98,6 +120,7 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }:
     {
       accessorKey: 'primaryDoctorId',
       header: t('patients.columns.doctor'),
+      sortingFn: (a, b) => doctorName(a.original.primaryDoctorId).localeCompare(doctorName(b.original.primaryDoctorId), language),
       filterFn: inListFilterFn,
       cell: ({ row }) => <span className="text-fg">{doctorName(row.original.primaryDoctorId)}</span>,
       meta: { label: t('patients.columns.doctor'), filterMeta: optionFilter(t('patients.columns.doctor'), doctorOptions) },
@@ -106,6 +129,7 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }:
       id: 'insurer',
       accessorFn: (patient) => patient.insurerId ?? SELF_PAY,
       header: t('patients.columns.insurer'),
+      sortingFn: (a, b) => insurerName(a.original.insurerId).localeCompare(insurerName(b.original.insurerId), language),
       filterFn: inListFilterFn,
       cell: ({ row }) => <span className="text-fg-muted">{insurerName(row.original.insurerId)}</span>,
       meta: { label: t('patients.columns.insurer'), filterMeta: optionFilter(t('patients.columns.insurer'), insurerOptions) },
@@ -118,9 +142,10 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }:
       sortDescFirst: true,
       filterFn: dateRangeFilterFn,
       cell: ({ row }) => (
-        <span dir="ltr" className="text-fg-muted tabular-nums">
+        // Isolated, not forced LTR: Arabic dates carry Arabic month names.
+        <bdi data-slot="last-visit" className="text-fg-muted tabular-nums">
           {formatVisit(row.original.lastVisit)}
-        </span>
+        </bdi>
       ),
       meta: {
         label: t('patients.columns.lastVisit'),
@@ -164,8 +189,8 @@ function PatientsPage() {
     onColumnFiltersChange: filters.onColumnFiltersChange,
     onGlobalFilterChange: filters.onGlobalFilterChange,
     enableGlobalFilter: true,
-    globalFilterFn: 'includesString',
-    getColumnCanGlobalFilter: () => true,
+    globalFilterFn: searchPatients,
+    getColumnCanGlobalFilter: (column) => SEARCHABLE.has(column.id),
     enableSortingRemoval: true,
     initialState: { pagination: { pageSize: 10 }, sorting: [{ id: 'name', desc: false }] },
     getCoreRowModel: getCoreRowModel(),
@@ -186,13 +211,19 @@ function PatientsPage() {
   );
 
   const body = () => {
-    if (patients.isError) {
+    if (patients.isError || doctors.isError || insurers.isError) {
       return (
         <Alert tone="danger">
           <Alert.Title>{t('patients.error.title')}</Alert.Title>
           <Alert.Description className="flex flex-wrap items-center gap-3">
             {t('patients.error.description')}
-            <Button size="sm" variant="outline" onClick={() => void patients.refetch()}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                for (const query of [patients, doctors, insurers]) if (query.isError) void query.refetch();
+              }}
+            >
               {t('retry')}
             </Button>
           </Alert.Description>
@@ -211,10 +242,9 @@ function PatientsPage() {
     return (
       <DataTable
         table={table}
-        isLoading={patients.isLoading}
+        isLoading={patients.isLoading || doctors.isLoading || insurers.isLoading}
         onResetFilters={filters.reset}
         onRowClick={(row) => navigate(patientPath(row.original.id))}
-        getRowClassName={() => 'cursor-pointer'}
         className="min-h-0 flex-1"
       >
         <DataTable.Toolbar
