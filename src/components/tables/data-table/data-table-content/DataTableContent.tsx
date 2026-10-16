@@ -32,7 +32,13 @@ function DataTableContent<TData>({ className, emptyState }: ContentProps) {
   };
 
   return (
-    <ScrollArea className={cn('bg-surface border-border min-h-0 flex-1 rounded-lg border', className)} viewportClassName="[&>div]:h-full">
+    <ScrollArea
+      className={cn('bg-surface border-border min-h-0 flex-1 rounded-lg border', className)}
+      viewportClassName="[&>div]:h-full"
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && Object.keys(table.getState().rowSelection).length > 0) table.resetRowSelection();
+      }}
+    >
       <Table className={cn('w-max min-w-full', isEmpty && 'min-h-full')}>
         <Table.Header className="sticky inset-bs-0 z-10">
           {table.getHeaderGroups().map((headerGroup) => (

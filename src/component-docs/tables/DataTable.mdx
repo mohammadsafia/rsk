@@ -17,8 +17,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { Badge } from '@components/ui';
-import { DataTable } from '@components/tables';
+import { Badge, Button } from '@components/ui';
+import { createSelectionColumn, DataTable } from '@components/tables';
 import { useDataTableFilters } from '@hooks/shared';
 import { containsFilterFn, createFilterMeta, inListFilterFn, numberRangeFilterFn } from '@utils';
 import { demoSource } from '@component-docs/blocks';
@@ -42,6 +42,7 @@ export const INVOICES = Array.from({ length: 24 }, (_, index) => ({
 export const InvoicesDemo = () => {
   const columns = useMemo(
     () => [
+      createSelectionColumn({ getRowLabel: (row) => row.id }),
       { accessorKey: 'id', header: 'Invoice', meta: { label: 'Invoice' } },
       {
         accessorKey: 'patient',
@@ -83,6 +84,7 @@ export const InvoicesDemo = () => {
   const table = useReactTable({
     data: INVOICES,
     columns,
+    getRowId: (row) => row.id,
     state: filters.state,
     onColumnFiltersChange: filters.onColumnFiltersChange,
     onGlobalFilterChange: filters.onGlobalFilterChange,
@@ -101,6 +103,13 @@ export const InvoicesDemo = () => {
     <div className="flex h-120 w-full min-w-0 flex-col">
       <DataTable table={table} onResetFilters={filters.reset} className="min-h-0 flex-1">
         <DataTable.Toolbar totalCount={table.getFilteredRowModel().rows.length} totalLabel="Invoices" placeholder="Search invoices…" />
+        <DataTable.BulkActions>
+          {(selected) => (
+            <Button size="sm" variant="outline">
+              Export {selected.length}
+            </Button>
+          )}
+        </DataTable.BulkActions>
         <DataTable.Content />
         <DataTable.Pagination pageSizeOptions={[6, 12, 24]} />
       </DataTable>
@@ -110,11 +119,27 @@ export const InvoicesDemo = () => {
 
 ## Example
 
-Search, filter by patient, status or amount, sort by clicking a header, and page through 24 invoices.
+Search, filter by patient, status or amount, sort by clicking a header, select rows for bulk actions, and page through 24 invoices.
 
 <Example title="Invoices" code={demoSource('InvoicesDemo', pageSource)}>
   <InvoicesDemo />
 </Example>
+
+## Bulk selection
+
+Add `createSelectionColumn()` as the first column and `getRowId` on the table, then render `DataTable.BulkActions`. While rows are selected it replaces the toolbar with the count, a "Select all N results" link (client-side pagination only) and your actions, which receive the selected rows. Escape inside the table clears the selection.
+
+```tsx
+const columns = [createSelectionColumn<Invoice>({ getRowLabel: (row) => row.id }), ...rest];
+const table = useReactTable({ data, columns, getRowId: (row) => row.id, ... });
+
+<DataTable table={table}>
+  <DataTable.Toolbar totalCount={total} />
+  <DataTable.BulkActions>{(selected) => <Button onClick={() => exportRows(selected)}>Export</Button>}</DataTable.BulkActions>
+  <DataTable.Content />
+  <DataTable.Pagination />
+</DataTable>
+```
 
 ## Overview
 
@@ -486,6 +511,8 @@ For all the above, prefer the action-icon pattern.
     { prop: 'onResetFilters', type: '() => void', description: 'Called by "Clear filters"; pass useDataTableFilters().reset.' },
     { prop: 'Toolbar · totalCount · totalLabel · placeholder', type: 'number · string · string', description: 'Search box, filter pills and the result count.' },
     { prop: 'Content · emptyState', type: '{ title, description }', description: 'Scrollable body with a pinned header; message when no rows match.' },
+    { prop: 'BulkActions · children', type: '(rows: Row<TData>[]) => ReactNode', description: 'Action buttons shown while rows are selected.' },
+    { prop: 'createSelectionColumn · getRowLabel', type: '(row: TData) => string', description: 'Names each row checkbox ("Select INV-0142").' },
     { prop: 'Pagination · pageSizeOptions', type: 'number[]', default: '[30, 50, 100, 200]', description: 'Page navigation and rows-per-page selector.' },
   ]}
 />
@@ -515,6 +542,7 @@ The key rule: **every ancestor between the page container and DataTable must hav
 
 ## Accessibility
 
+- Selection checkboxes are labelled per row; the selected count is announced in a polite live region, and Escape clears the selection.
 - Native table semantics with a sticky header; a sorted column's header carries `aria-sort`.
 - Sorting is triggered by clicking the header cell, which is not keyboard-focusable today; if keyboard sorting matters, offer a sort control in the toolbar.
 - Row click is mouse-only, so always offer an explicit action button for keyboard users (see Row Click Navigation).

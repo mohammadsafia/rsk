@@ -23,7 +23,9 @@ type ToolbarProps = PropsWithChildren<{
  */
 const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholder, children, className }) => {
   const { t, direction } = useAppTranslation('common');
-  const { table, onResetFilters } = useDataTableContext();
+  const { table, onResetFilters, bulkActionsMounted } = useDataTableContext();
+  // While bulk actions show, the toolbar stays mounted (typed search survives) but hidden.
+  const hasSelection = bulkActionsMounted && table.getSelectedRowModel().rows.length > 0;
 
   const [search, setSearch] = useState(table.getState().globalFilter ?? '');
   const debouncedSearch = useDebounce(search, 500);
@@ -44,6 +46,7 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
   return (
     <div
       data-slot="data-table-toolbar"
+      hidden={hasSelection || undefined}
       role="group"
       aria-label={t('filters')}
       className={cn('bg-surface border-border flex w-full flex-wrap items-center gap-2 rounded-lg border px-3 py-2', className)}

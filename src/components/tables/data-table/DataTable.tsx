@@ -1,10 +1,12 @@
-import { createContext, type PropsWithChildren, type ReactNode, useContext, useMemo } from 'react';
+import { type PropsWithChildren, type ReactNode, useMemo, useState } from 'react';
 
 import type { Row, Table as TanstackTable } from '@tanstack/react-table';
 
 import DataTableContent from './data-table-content/DataTableContent';
 import DataTablePagination from './data-table-pagination/DataTablePagination';
 import DataTableToolbar from './data-table-toolbar/DataTableToolbar';
+import DataTableBulkActions from './data-table-selection/DataTableBulkActions';
+import { DataTableContext, type DataTableContextValue } from './DataTableContext';
 
 import { cn } from '@utils';
 
@@ -22,25 +24,10 @@ type DataTableComponents = (<TData>(props: DataTableRootProps<TData>) => ReactNo
   Toolbar: typeof DataTableToolbar;
   Content: typeof DataTableContent;
   Pagination: typeof DataTablePagination;
+  BulkActions: typeof DataTableBulkActions;
 };
 
-type DataTableContextValue<TData> = {
-  table: TanstackTable<TData>;
-  isLoading: boolean;
-  onRowClick?: (row: Row<TData>) => void;
-  getRowClassName?: (row: Row<TData>) => string;
-  onResetFilters?: () => void;
-};
-
-const DataTableContext = createContext<DataTableContextValue<unknown> | null>(null);
-
-export const useDataTableContext = <TData = unknown,>() => {
-  const context = useContext(DataTableContext) as DataTableContextValue<TData> | null;
-
-  if (!context) throw new Error('useDataTableContext must be used within a <DataTable /> provider');
-
-  return context;
-};
+export { useDataTableContext } from './DataTableContext';
 
 function DataTableRoot<TData>({
   table,
@@ -51,6 +38,8 @@ function DataTableRoot<TData>({
   children,
   className,
 }: DataTableRootProps<TData>) {
+  const [bulkActionsMounted, setBulkActionsMounted] = useState(false);
+
   const contextValue = useMemo<DataTableContextValue<unknown>>(
     () => ({
       table: table as TanstackTable<unknown>,
@@ -58,8 +47,10 @@ function DataTableRoot<TData>({
       onRowClick: onRowClick as DataTableContextValue<unknown>['onRowClick'],
       getRowClassName: getRowClassName as DataTableContextValue<unknown>['getRowClassName'],
       onResetFilters,
+      bulkActionsMounted,
+      setBulkActionsMounted,
     }),
-    [table, isLoading, onRowClick, getRowClassName, onResetFilters],
+    [table, isLoading, onRowClick, getRowClassName, onResetFilters, bulkActionsMounted],
   );
 
   return (
@@ -76,5 +67,6 @@ const DataTable = DataTableRoot as DataTableComponents;
 DataTable.Toolbar = DataTableToolbar;
 DataTable.Content = DataTableContent;
 DataTable.Pagination = DataTablePagination;
+DataTable.BulkActions = DataTableBulkActions;
 
 export default DataTable;

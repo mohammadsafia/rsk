@@ -46,7 +46,16 @@
     "emptyTitle": "No Results Found",
     "emptyDescription": "No results found for your search. Please try again with different keywords.",
     "filteredWithLabel": "{{label}}: {{count}} of {{total}}",
-    "filtered": "{{count}} of {{total}} results"
+    "filtered": "{{count}} of {{total}} results",
+    "selectPage": "Select all rows on this page",
+    "selectRow": "Select row",
+    "selectRowNamed": "Select {{name}}",
+    "selected_one": "{{count}} selected",
+    "selected_other": "{{count}} selected",
+    "selectAllResults_one": "Select {{count}} result",
+    "selectAllResults_other": "Select all {{count}} results",
+    "clearSelection": "Clear selection",
+    "bulkActions": "Actions for selected rows"
   },
   "pagination": {
     "label": "Pagination",
