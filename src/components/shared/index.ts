@@ -2,7 +2,7 @@ export { EmptyState, type EmptyStateProps } from '@components/ui/empty-state';
 export * from './theme-switcher';
 export * from './language-switcher';
 export * from './toaster';
-export * from './meta-card';
+export * from './description-list';
 export * from './count-tooltip';
 export * from './confirm-dialog';
 export * from './faceted-filter';

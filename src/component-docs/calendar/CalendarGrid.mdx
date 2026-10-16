@@ -10,7 +10,7 @@ tags: [calendar, calendar-grid, schedule, compound, day-view, week-view, month-v
 import { useMemo, useState } from 'react';
 
 import { CalendarEvent, Tag, Divider, Table, IconButton } from '@components/ui';
-import { MetaCard } from '@components/shared';
+import { DescriptionList } from '@components/shared';
 import { CalendarGrid } from '@components/calendar';
 import { Conditional } from '@components/utils';
 
@@ -183,23 +183,23 @@ export const CalendarGridDemo = () => {
                 </div>
               </div>
 
-              <div className="border-border-subtle flex flex-col gap-2 border-b pb-3">
-                <MetaCard
-                  direction="horizontal"
-                  title={<span className="flex items-center gap-2"><Stethoscope size={14} /> Doctor</span>}
-                  description={event.doctor}
-                />
+              <DescriptionList
+                layout="inline"
+                className="border-border-subtle border-b pb-3"
+                items={[
+                  { term: <><Stethoscope aria-hidden /> Doctor</>, value: event.doctor },
+                  { term: <><MapPin aria-hidden /> Location</>, value: event.location },
+                ]}
+              />
 
-                <MetaCard
-                  direction="horizontal"
-                  title={<span className="flex items-center gap-2"><MapPin size={14} /> Location</span>}
-                  description={event.location}
-                />
-              </div>
-
-              <MetaCard
-                title={<span className="flex items-center gap-2"><Clock size={14} /> Date & Time</span>}
-                description={`${new Date(event.start).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })} ${formatTime(event.start)} - ${formatTime(event.end)}`}
+              <DescriptionList
+                items={[
+                  {
+                    term: <><Clock aria-hidden /> Date & Time</>,
+                    numeric: true,
+                    value: `${new Date(event.start).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })} ${formatTime(event.start)} - ${formatTime(event.end)}`,
+                  },
+                ]}
               />
             </div>
           )}
@@ -494,9 +494,7 @@ const LEGEND_ITEMS: CalendarLegendItem[] = [
           </IconButton>
         </div>
 
-        <MetaCard direction="horizontal" title="Doctor" description={event.doctor} />
-
-        <MetaCard direction="horizontal" title="Location" description={event.location} />
+        <DescriptionList layout="inline" items={[{ term: 'Doctor', value: event.doctor }, { term: 'Location', value: event.location }]} />
       </div>
     )}
   </CalendarGrid.PopoverTemplate>

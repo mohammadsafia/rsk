@@ -1,0 +1,76 @@
+---
+id: description-list
+title: DescriptionList
+section: Components
+category: Shared
+description: 'Term–value pairs for record details, stacked or inline, in one to three columns; numeric values are isolated left-to-right.'
+tags: [shared, description-list, details, key-value]
+---
+
+import { Card } from '@components/ui';
+import { DescriptionList } from '@components/shared';
+
+## Demo
+
+<div className="flex w-full flex-col gap-6">
+  <Card title="Patient summary" description="Registered 3 March 2024">
+    <Card.Content>
+      <DescriptionList
+        columns={2}
+        items={[
+          { term: 'Full name', value: 'Sara Haddad' },
+          { term: 'File number', value: 'MRN-20391', numeric: true },
+          { term: 'Date of birth', value: '1991-07-14', numeric: true },
+          { term: 'Insurer', value: 'Jordan Health Mutual' },
+          { term: 'Mobile', value: null },
+        ]}
+      />
+    </Card.Content>
+  </Card>
+
+  <div className="border-border max-w-sm rounded-lg border p-4">
+    <DescriptionList
+      layout="inline"
+      items={[
+        { term: 'Doctor', value: 'Dr. Lina Khoury' },
+        { term: 'Room', value: 'B-204', numeric: true },
+        { term: 'Duration', value: '30 min', numeric: true },
+      ]}
+    />
+  </div>
+</div>
+
+## Imports
+
+```tsx
+import { DescriptionList } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<DescriptionList
+  columns={2}
+  items={[
+    { term: 'Full name', value: 'Sara Haddad' },
+    { term: 'File number', value: 'MRN-20391', numeric: true },
+    { term: 'Mobile', value: null }, // renders "—"
+  ]}
+/>
+
+<DescriptionList layout="inline">
+  <DescriptionList.Item term="Doctor" value="Dr. Lina Khoury" />
+  <DescriptionList.Item term="Room" value="B-204" numeric />
+</DescriptionList>
+```
+
+## API
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `items` | `{ term, value?, numeric? }[]` | — | Or pass `DescriptionList.Item` children. |
+| `columns` | `1 \| 2 \| 3` | `1` | Responsive: one column on phones, two from `sm`, three from `lg`. |
+| `layout` | `'stacked' \| 'inline'` | `'stacked'` | Inline puts the value at the end of the term's row. |
+| `numeric` (item) | `boolean` | `false` | Wraps the value in `dir="ltr"` tabular mono, for IDs, amounts and dates. |
+
+An empty value (`null`, `undefined`, `''`) renders an em dash.

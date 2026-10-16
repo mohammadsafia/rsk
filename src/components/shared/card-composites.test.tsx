@@ -2,8 +2,7 @@
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
-import { GridCard, MetaCard } from '@components/shared';
-import { Tooltip } from '@components/ui';
+import { GridCard } from '@components/shared';
 
 import '../../i18n';
 
@@ -20,16 +19,6 @@ describe('shared cards keep their own header look', () => {
         </GridCard.Header>
         <GridCard.Content>12</GridCard.Content>
       </GridCard.Item>,
-    );
-    expect(header().className).toContain('not-last:border-b-0');
-    expect(header().className).toContain('not-last:pb-0');
-  });
-
-  it('MetaCard header opts out of the Card header hairline and padding', () => {
-    render(
-      <Tooltip.Provider>
-        <MetaCard title="Insurance" subtitle="Primary" description="Gold plan" />
-      </Tooltip.Provider>,
     );
     expect(header().className).toContain('not-last:border-b-0');
     expect(header().className).toContain('not-last:pb-0');
