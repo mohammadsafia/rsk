@@ -152,7 +152,7 @@ describe('clean primitives', () => {
       'src/layouts/',
       'src/routes/',
       'src/App.tsx',
-      'src/pages/dashboard/',
+      'src/pages/clinic/',
       'src/pages/members/',
     ];
     const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) => scopes.some((scope) => file.startsWith(scope)));

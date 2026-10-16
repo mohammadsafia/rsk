@@ -15,9 +15,61 @@
       "lastVisit": "Last visit",
       "balance": "Balance"
     },
-    "empty": { "title": "No patients yet", "description": "Register the first patient to start booking visits." },
-    "noResults": { "title": "No matching patients", "description": "Try another search or clear the filters." },
-    "error": { "title": "Patients couldn't be loaded", "description": "Something went wrong. Try again in a moment." }
+    "empty": {
+      "title": "No patients yet",
+      "description": "Register the first patient to start booking visits."
+    },
+    "noResults": {
+      "title": "No matching patients",
+      "description": "Try another search or clear the filters."
+    },
+    "error": {
+      "title": "Patients couldn't be loaded",
+      "description": "Something went wrong. Try again in a moment."
+    }
   },
-  "retry": "Retry"
+  "retry": "Retry",
+  "dashboard": {
+    "title": "Operations",
+    "description": "How the clinic is doing",
+    "range": "Range",
+    "ranges": {
+      "7": "Last 7 days",
+      "30": "Last 30 days",
+      "90": "Last 90 days"
+    },
+    "stats": {
+      "visits": "Visits",
+      "newPatients": "New patients",
+      "noShowRate": "No-show rate",
+      "revenue": "Revenue"
+    },
+    "sparkline": {
+      "visits": "Visits per day",
+      "newPatients": "New patients per day",
+      "noShowRate": "No-show rate per day",
+      "revenue": "Revenue per day"
+    },
+    "charts": {
+      "visits": "Visits per day",
+      "completed": "Completed",
+      "noShows": "No-shows",
+      "payerMix": "Payer mix",
+      "insured": "Insured",
+      "selfPay": "Self-pay",
+      "payerCenter": "Visits",
+      "revenueByDoctor": "Revenue by doctor",
+      "revenue": "Revenue"
+    },
+    "today": {
+      "title": "Today's visits",
+      "empty": "No more visits today",
+      "viewSchedule": "View schedule",
+      "error": "Today's visits couldn't be loaded"
+    },
+    "error": {
+      "title": "The dashboard couldn't be loaded",
+      "description": "Something went wrong. Try again in a moment."
+    }
+  }
 }

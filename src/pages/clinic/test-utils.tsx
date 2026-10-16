@@ -25,7 +25,8 @@ function LocationProbe() {
 /** Renders a clinic page with the app's providers; any navigation away lands on a location probe. */
 export const renderClinic = (ui: ReactElement, { route = '/', path = '*' }: { route?: string; path?: string } = {}) =>
   render(
-    <NuqsTestingAdapter>
+    // nuqs reads its own copy of the query string; give it the route's so ?range=… etc. reach the page.
+    <NuqsTestingAdapter searchParams={new URL(route, 'http://clinic.test').search}>
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false, cacheTime: 0 } } })}>
         <Tooltip.Provider>
           <MemoryRouter initialEntries={[route]}>

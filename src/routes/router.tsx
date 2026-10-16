@@ -8,7 +8,7 @@ import { FULL_ROUTES_PATH } from './routes';
 import { LoginPlaceholder, NotFound, SettingsPlaceholder } from './RoutePlaceholders';
 
 const HomePage = lazy(() => import('@pages/home/HomePage'));
-const DashboardPage = lazy(() => import('@pages/dashboard/DashboardPage'));
+const OperationsDashboard = lazy(() => import('@pages/clinic/dashboard/OperationsDashboard'));
 const MembersPage = lazy(() => import('@pages/members/MembersPage'));
 const PatientsPage = lazy(() => import('@pages/clinic/patients/PatientsPage'));
 
@@ -55,7 +55,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: FULL_ROUTES_PATH.HOME.DASHBOARD,
-            element: <DashboardPage />,
+            element: <OperationsDashboard />,
           },
           {
             path: FULL_ROUTES_PATH.PATIENTS.INDEX,
