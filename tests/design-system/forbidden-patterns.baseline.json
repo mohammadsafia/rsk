@@ -1,13 +1,4 @@
 {
-  "src/assets/icons/CertificationIcon.tsx": {
-    "hex-color": 2
-  },
-  "src/assets/icons/QuraAILoader.tsx": {
-    "hex-color": 6
-  },
-  "src/assets/icons/QuraAILogo.tsx": {
-    "hex-color": 15
-  },
   "src/component-docs/calendar/CalendarGrid.mdx": {
     "legacy-color-name": 1,
     "arbitrary-length": 1

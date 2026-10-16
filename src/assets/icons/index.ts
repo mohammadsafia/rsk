@@ -5,8 +5,6 @@ export { default as CertificationIcon } from './CertificationIcon';
 export { default as FlagIcon } from './FlagIcon';
 export { default as ExcelSheetIcon } from './ExcelSheetIcon';
 export { default as RescheduleIcon } from './RescheduleIcon';
-export { default as QuraAILogo } from './QuraAILogo';
-export { default as QuraAILoader } from './QuraAILoader';
 export { default as SignatureIcon } from './SignatureIcon';
 export { default as AppointmentIcon } from './AppointmentIcon';
 export { default as LocationIcon } from './LocationIcon';
