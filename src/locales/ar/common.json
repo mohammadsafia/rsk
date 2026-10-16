@@ -144,6 +144,10 @@
     "documents_other": "مستند"
   },
   "filterBar": {
-    "remove": "إزالة عامل التصفية {{label}}"
+    "remove": "إزالة عامل التصفية {{label}}",
+    "min": "الحد الأدنى",
+    "max": "الحد الأقصى",
+    "apply": "تطبيق",
+    "textPlaceholder": "يحتوي على…"
   }
 }

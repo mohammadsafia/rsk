@@ -4,3 +4,6 @@ export * from './select-filter';
 export * from './async-select-filter';
 export * from './date-filter';
 export * from './time-filter';
+export * from './boolean-filter';
+export * from './text-filter';
+export * from './number-range-filter';

@@ -132,6 +132,10 @@
     "documents_other": "documents"
   },
   "filterBar": {
-    "remove": "Remove {{label}} filter"
+    "remove": "Remove {{label}} filter",
+    "min": "Minimum",
+    "max": "Maximum",
+    "apply": "Apply",
+    "textPlaceholder": "Contains…"
   }
 }

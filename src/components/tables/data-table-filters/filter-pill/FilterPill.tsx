@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { type FC, type ReactNode } from 'react';
 
 import { Combobox } from '@components/shared';
 import { Conditional } from '@components/utils';
@@ -15,6 +15,8 @@ export type FilterPillProps = {
   /** Display labels of the applied values; empty means the filter is inactive. */
   values: string[];
   onClear: () => void;
+  /** Wraps the summary text, e.g. to LTR-isolate numbers. @default the text itself */
+  renderValues?: (text: string) => ReactNode;
 };
 
 const summarise = (values: string[]) => (values.length > 2 ? `${values[0]} +${values.length - 1}` : values.join(', '));
@@ -23,7 +25,7 @@ const summarise = (values: string[]) => (values.length > 2 ? `${values[0]} +${va
  * The trigger of one table filter. Must sit inside the filter's Popover/Combobox root.
  * Inactive: a quiet dashed "+ Label" pill. Active: an accent-tinted "Label · values" pill with its own remove button.
  */
-const FilterPill: FC<FilterPillProps> = ({ label, values, onClear }) => {
+const FilterPill: FC<FilterPillProps> = ({ label, values, onClear, renderValues }) => {
   const { t } = useAppTranslation('common');
   const active = values.length > 0;
 
@@ -47,7 +49,7 @@ const FilterPill: FC<FilterPillProps> = ({ label, values, onClear }) => {
             </span>
 
             <span data-slot="filter-pill-values" className="text-fg max-w-48 truncate">
-              {summarise(values)}
+              {renderValues ? renderValues(summarise(values)) : summarise(values)}
             </span>
           </Conditional.If>
 
