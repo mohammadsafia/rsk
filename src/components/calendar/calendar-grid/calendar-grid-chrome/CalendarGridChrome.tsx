@@ -1,7 +1,13 @@
 import { type ComponentPropsWithoutRef, type FC, useMemo } from 'react';
 
 import { IconButton, Select, Tabs, ToggleGroup } from '@components/ui';
-import { type CalendarLegendItem, CalendarPicker, type CalendarPickerSelected, useCalendarGridContext } from '@components/calendar';
+import {
+  type CalendarLegendItem,
+  CalendarPicker,
+  type CalendarView,
+  type CalendarPickerSelected,
+  useCalendarGridContext,
+} from '@components/calendar';
 
 import { useAppTranslation, useDate } from '@hooks/shared';
 
@@ -16,7 +22,7 @@ type LegendProps = ComponentPropsWithoutRef<'div'> & { items: CalendarLegendItem
 type CalendarGridChromeComponents = FC & {
   Header: FC<HeaderProps>;
   Navigation: FC;
-  ViewTabs: FC;
+  ViewTabs: FC<{ views?: CalendarView[] }>;
   ViewToggle: FC;
   Picker: FC;
   Legend: FC<LegendProps>;
@@ -52,7 +58,10 @@ const Navigation: FC = () => {
   );
 };
 
-const ViewTabs: FC = () => {
+const DEFAULT_VIEWS: CalendarView[] = ['day', 'week', 'month'];
+
+/** View tabs. Agenda is opt-in: `views={['day', 'week', 'month', 'agenda']}`. */
+const ViewTabs: FC<{ views?: CalendarView[] }> = ({ views = DEFAULT_VIEWS }) => {
   const { t } = useAppTranslation('common');
   const { view, setView } = useCalendarGridContext();
 
@@ -61,15 +70,16 @@ const ViewTabs: FC = () => {
       className="min-w-1/3"
       value={view}
       onValueChange={(value) => {
-        if (value === 'day' || value === 'week' || value === 'month') setView(value);
+        const next = views.find((candidate) => candidate === value);
+        if (next) setView(next);
       }}
     >
       <Tabs.List variant="contained" fullWidth aria-label={t('calendar.views')}>
-        <Tabs.Trigger value="day">{t('calendar.day')}</Tabs.Trigger>
-
-        <Tabs.Trigger value="week">{t('calendar.week')}</Tabs.Trigger>
-
-        <Tabs.Trigger value="month">{t('calendar.month')}</Tabs.Trigger>
+        {views.map((candidate) => (
+          <Tabs.Trigger key={candidate} value={candidate}>
+            {t(`calendar.${candidate}`)}
+          </Tabs.Trigger>
+        ))}
       </Tabs.List>
     </Tabs>
   );
@@ -105,7 +115,7 @@ const Picker: FC = () => {
   const { toStartAndEndOf, toBoundaryDate, addDuration, toDate, constants } = useDate();
 
   const selected = useMemo<CalendarPickerSelected>(() => {
-    if (view === 'day') return date;
+    if (view === 'day' || view === 'agenda') return date;
 
     const { startOf, endOf } = toStartAndEndOf(date, view === 'week' ? constants.UnitOfTime.WEEK : constants.UnitOfTime.MONTH);
 

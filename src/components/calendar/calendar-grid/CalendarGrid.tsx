@@ -13,6 +13,7 @@ import {
 } from 'react';
 
 import { type NowLineMode, Skeleton } from '@components/ui';
+import { CalendarGridAgendaView } from './calendar-grid-agenda-view';
 import { CalendarGridChrome } from './calendar-grid-chrome';
 import { CalendarGridMonthView } from './calendar-grid-month-view';
 import { CalendarGridTimeView } from './calendar-grid-time-view';
@@ -23,7 +24,7 @@ import { cn } from '@utils';
 
 import { type CalendarSlots, slotDates } from './scheduling';
 
-export type CalendarView = 'day' | 'week' | 'month';
+export type CalendarView = 'day' | 'week' | 'month' | 'agenda';
 
 export type CalendarViewMode = 'calendar' | 'list';
 
@@ -88,6 +89,8 @@ export type CalendarGridProps<TEvent> = {
   resources?: CalendarResource[];
   resourceFilter?: string | null;
   onResourceFilterChange?: (resourceId: string | null) => void;
+  /** Days the agenda view lists and pages by. @default 7 */
+  agendaDays?: number;
   children: ReactNode;
 } & Omit<ComponentPropsWithoutRef<'div'>, 'children'>;
 
@@ -118,6 +121,7 @@ type CalendarGridContextValue<T> = {
   resources: CalendarResource[];
   resourceFilter: string | null;
   setResourceFilter: (resourceId: string | null) => void;
+  agendaDays: number;
 };
 
 type CalendarGridComponents = (<TEvent>(props: CalendarGridProps<TEvent>) => ReactNode) & {
@@ -133,16 +137,20 @@ type CalendarGridComponents = (<TEvent>(props: CalendarGridProps<TEvent>) => Rea
   DayView: typeof CalendarGridTimeView.DayView;
   WeekView: typeof CalendarGridTimeView.WeekView;
   MonthView: typeof CalendarGridMonthView.MonthView;
+  AgendaView: typeof CalendarGridAgendaView.AgendaView;
 };
 
 const DEFAULT_START_HOUR = 8;
 const DEFAULT_END_HOUR = 24;
 const DEFAULT_STEP_MINUTES = 30;
 
+const DEFAULT_AGENDA_DAYS = 7;
+
 const VIEW_TO_UNIT: Record<CalendarView, UnitOfTime> = {
   day: UnitOfTime.DAY,
   week: UnitOfTime.WEEK,
   month: UnitOfTime.MONTH,
+  agenda: UnitOfTime.DAY,
 };
 
 const CalendarGridContext = createContext<CalendarGridContextValue<unknown> | null>(null);
@@ -182,6 +190,7 @@ function CalendarGridRoot<TEvent>({
   resources,
   resourceFilter: controlledResourceFilter,
   onResourceFilterChange,
+  agendaDays = DEFAULT_AGENDA_DAYS,
   className,
   children,
   ...divProps
@@ -223,6 +232,8 @@ function CalendarGridRoot<TEvent>({
   const range = useMemo<CalendarRange>(() => {
     if (view === 'day') return { startDate: date, endDate: date };
 
+    if (view === 'agenda') return { startDate: date, endDate: toDate(addDuration(date, agendaDays - 1, constants.UnitOfTime.DAY)) };
+
     if (view === 'week') {
       const { startOf, endOf } = toStartAndEndOf(date, constants.UnitOfTime.WEEK);
 
@@ -234,10 +245,15 @@ function CalendarGridRoot<TEvent>({
     const gridEnd = toStartAndEndOf(month.endOf, constants.UnitOfTime.WEEK).endOf;
 
     return { startDate: gridStart, endDate: gridEnd };
-  }, [view, date, toStartAndEndOf, constants.UnitOfTime.MONTH, constants.UnitOfTime.WEEK]);
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- addDuration/toDate are recreated per render (useDate); the inputs are listed
+  }, [view, date, agendaDays, toStartAndEndOf, constants.UnitOfTime.MONTH, constants.UnitOfTime.WEEK, constants.UnitOfTime.DAY]);
 
   const navigationLabel = useMemo(() => {
     if (view === 'day') return formatDate(date, constants.DateFormats.FULL_DAY_MONTH_DATE);
+
+    if (view === 'agenda') {
+      return `${formatDate(range.startDate, constants.DateFormats.DAY_SHORT_MONTH)} – ${formatDate(range.endDate, constants.DateFormats.DAY_SHORT_MONTH)}`;
+    }
 
     if (view === 'week') {
       const startMonth = formatDate(range.startDate, constants.DateFormats.SHORT_MONTH);
@@ -291,12 +307,12 @@ function CalendarGridRoot<TEvent>({
   );
 
   const goNext = useCallback(() => {
-    setDate(addDuration(date, 1, VIEW_TO_UNIT[view]));
-  }, [setDate, addDuration, date, view]);
+    setDate(addDuration(date, view === 'agenda' ? agendaDays : 1, VIEW_TO_UNIT[view]));
+  }, [setDate, addDuration, date, view, agendaDays]);
 
   const goPrev = useCallback(() => {
-    setDate(subtractDuration(date, 1, VIEW_TO_UNIT[view]));
-  }, [setDate, subtractDuration, date, view]);
+    setDate(subtractDuration(date, view === 'agenda' ? agendaDays : 1, VIEW_TO_UNIT[view]));
+  }, [setDate, subtractDuration, date, view, agendaDays]);
 
   const goToday = useCallback(() => {
     setDate(toDate());
@@ -330,6 +346,7 @@ function CalendarGridRoot<TEvent>({
       resources: resourceList,
       resourceFilter,
       setResourceFilter,
+      agendaDays,
     }),
     [
       view,
@@ -358,6 +375,7 @@ function CalendarGridRoot<TEvent>({
       resourceList,
       resourceFilter,
       setResourceFilter,
+      agendaDays,
     ],
   );
 
@@ -412,5 +430,6 @@ CalendarGrid.PopoverTemplate = PopoverTemplate;
 CalendarGrid.DayView = CalendarGridTimeView.DayView;
 CalendarGrid.WeekView = CalendarGridTimeView.WeekView;
 CalendarGrid.MonthView = CalendarGridMonthView.MonthView;
+CalendarGrid.AgendaView = CalendarGridAgendaView.AgendaView;
 
 export default CalendarGrid;

@@ -86,7 +86,10 @@
     "more": "+{{count}} more",
     "allResources": "All resources",
     "resource": "Resource",
-    "allDay": "All day"
+    "allDay": "All day",
+    "agenda": "Agenda",
+    "agendaEmpty": "Nothing scheduled",
+    "agendaEmptyHint": "There are no events in these days."
   },
   "timePicker": {
     "placeholder": "Select time",

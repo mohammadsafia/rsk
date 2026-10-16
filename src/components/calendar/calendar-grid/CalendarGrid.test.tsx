@@ -44,6 +44,11 @@ describe('CalendarGrid localisation', () => {
     expect(screen.getByRole('radio', { name: 'عرض القائمة' })).toBeTruthy();
   });
 
+  it('keeps the default tabs without Agenda', () => {
+    renderGrid('month');
+    expect(screen.getAllByRole('tab')).toHaveLength(3);
+  });
+
   it('renders weekday headers in the active language', async () => {
     renderGrid('month');
     expect(screen.getByText('Sun')).toBeTruthy();

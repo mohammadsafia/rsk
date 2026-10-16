@@ -102,7 +102,10 @@
     "more": "+{{count}} أخرى",
     "allResources": "كل الموارد",
     "resource": "المورد",
-    "allDay": "طوال اليوم"
+    "allDay": "طوال اليوم",
+    "agenda": "جدول الأعمال",
+    "agendaEmpty": "لا توجد مواعيد",
+    "agendaEmptyHint": "لا توجد أحداث في هذه الأيام."
   },
   "timePicker": {
     "placeholder": "اختر الوقت",
