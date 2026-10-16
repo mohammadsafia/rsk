@@ -1,0 +1,93 @@
+---
+id: app-shell
+title: AppShell
+section: Components
+category: Shared
+description: 'Application frame: a collapsible sidebar with a remembered preference, a header, scrolling content, a mobile drawer and a skip link.'
+tags: [shared, app-shell, layout, sidebar, navigation, drawer]
+---
+
+import { Card } from '@components/ui';
+import { AppShell, Sidebar } from '@components/shared';
+import { CalendarDays, ClipboardList, Settings, Users } from 'lucide-react';
+
+## Demo
+
+<div className="border-border h-112 w-full transform-gpu overflow-hidden rounded-lg border">
+  <AppShell
+    storageKey={null}
+    className="h-full"
+    sidebar={
+      <Sidebar>
+        <Sidebar.Header>
+          <span className="text-fg truncate text-sm font-semibold">Al-Noor Clinic</span>
+          <Sidebar.CollapseButton />
+        </Sidebar.Header>
+        <Sidebar.Content>
+          <Sidebar.Group label="Clinic">
+            <Sidebar.Item href="/components/app-shell" icon={CalendarDays} active>Schedule</Sidebar.Item>
+            <Sidebar.Item href="/components/app-shell" icon={Users} badge={4}>Patients</Sidebar.Item>
+            <Sidebar.Item href="/components/app-shell" icon={ClipboardList}>Visits</Sidebar.Item>
+          </Sidebar.Group>
+          <Sidebar.Group label="Admin">
+            <Sidebar.Item href="/components/app-shell" icon={Settings}>Settings</Sidebar.Item>
+          </Sidebar.Group>
+        </Sidebar.Content>
+        <Sidebar.Footer>
+          <p className="text-fg truncate text-sm font-medium">Dr. Lina Khoury</p>
+          <p className="text-fg-muted truncate text-xs">Reception desk</p>
+        </Sidebar.Footer>
+      </Sidebar>
+    }
+  >
+    <AppShell.Header>
+      <AppShell.MenuButton />
+      <span className="text-fg text-sm font-semibold">Schedule</span>
+    </AppShell.Header>
+    <AppShell.Content>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card title="Next patient" description="Sara Haddad · 10:30" />
+        <Card title="Waiting room" description="3 patients checked in" />
+      </div>
+    </AppShell.Content>
+  </AppShell>
+</div>
+
+## Imports
+
+```tsx
+import { AppShell, Sidebar, useAppShell } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<AppShell sidebar={<AppSidebar />}>
+  <AppShell.Header>
+    <AppShell.MenuButton />
+    {/* search, theme, language, user menu */}
+  </AppShell.Header>
+
+  <AppShell.Content>
+    <Outlet />
+  </AppShell.Content>
+</AppShell>
+```
+
+## API
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `sidebar` | `ReactNode` | — | Usually a `Sidebar`. Rendered in the desktop rail and the mobile drawer. |
+| `storageKey` | `string \| null` | `'rsk:sidebar-collapsed'` | Where the collapsed preference is remembered; `null` turns it off. A blocked storage is ignored. |
+| `AppShell.Header` | `header` | — | 56 px bar; gains a raised shadow once the content scrolls. |
+| `AppShell.Content` | `main` | — | The scrolling region; the skip link targets it. |
+| `AppShell.MenuButton` | — | — | Opens and closes the drawer below `md`. |
+
+`useAppShell()` returns `collapsed`, `setCollapsed`, `toggleCollapsed`, `mobileOpen`, `openMobile` and `closeMobile`.
+
+## Accessibility
+
+- A skip link is the first focusable element and jumps to the content.
+- The drawer closes on Escape, on the scrim and when an item is chosen; Escape and the scrim return focus to the menu button.
+- The current page carries `aria-current="page"`; collapsed items keep their names and show a tooltip.

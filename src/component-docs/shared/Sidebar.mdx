@@ -1,0 +1,77 @@
+---
+id: sidebar
+title: Sidebar
+section: Components
+category: Shared
+description: 'Presentational navigation: header, labelled groups, items with icon, badge and active state, sub-menus, a footer and a collapse button.'
+tags: [shared, sidebar, navigation, menu]
+---
+
+import { Sidebar } from '@components/shared';
+import { CalendarDays, ClipboardList, Receipt, Users } from 'lucide-react';
+
+## Demo
+
+<div className="flex w-full flex-wrap gap-6">
+  <div className="bg-sidebar border-border h-96 w-64 overflow-hidden rounded-lg border">
+    <Sidebar>
+      <Sidebar.Header>
+        <span className="text-fg text-sm font-semibold">Al-Noor Clinic</span>
+      </Sidebar.Header>
+      <Sidebar.Content>
+        <Sidebar.Group label="Clinic">
+          <Sidebar.Item href="/components/sidebar" icon={CalendarDays} active>Schedule</Sidebar.Item>
+          <Sidebar.Item href="/components/sidebar" icon={Users} badge={4}>Patients</Sidebar.Item>
+          <Sidebar.SubMenu icon={Receipt} label="Billing">
+            <Sidebar.Item href="/components/sidebar" icon={ClipboardList}>Invoices</Sidebar.Item>
+          </Sidebar.SubMenu>
+        </Sidebar.Group>
+      </Sidebar.Content>
+    </Sidebar>
+  </div>
+
+  <div className="bg-sidebar border-border h-96 w-16 overflow-hidden rounded-lg border">
+    <Sidebar collapsed>
+      <Sidebar.Content>
+        <Sidebar.Group label="Clinic">
+          <Sidebar.Item href="/components/sidebar" icon={CalendarDays} active>Schedule</Sidebar.Item>
+          <Sidebar.Item href="/components/sidebar" icon={Users} badge={4}>Patients</Sidebar.Item>
+        </Sidebar.Group>
+      </Sidebar.Content>
+    </Sidebar>
+  </div>
+</div>
+
+## Imports
+
+```tsx
+import { Sidebar } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<Sidebar>
+  <Sidebar.Header>
+    <Logo />
+    <Sidebar.CollapseButton />
+  </Sidebar.Header>
+  <Sidebar.Content>
+    <Sidebar.Group label="Clinic">
+      <Sidebar.Item href="/schedule" icon={CalendarDays} active>Schedule</Sidebar.Item>
+      <Sidebar.Item href="/patients" icon={Users} badge={4}>Patients</Sidebar.Item>
+    </Sidebar.Group>
+  </Sidebar.Content>
+  <Sidebar.Footer>…</Sidebar.Footer>
+</Sidebar>
+```
+
+## API
+
+| Part | Props | Notes |
+|---|---|---|
+| `Sidebar` | `collapsed?` | Defaults to the surrounding `AppShell`'s state. Collapsed styles apply from `md` up. |
+| `Sidebar.Group` | `label` | Labels the group (`role="group"`); hidden visually when collapsed. |
+| `Sidebar.Item` | `href`, `icon`, `active?`, `badge?` | Active items get `aria-current="page"` and the hover tint — never a side stripe. Collapsed items show a tooltip. |
+| `Sidebar.SubMenu` | `icon`, `label`, `active?` | Clicking it while collapsed expands the sidebar first. |
+| `Sidebar.CollapseButton` | — | Desktop only; toggles and remembers the collapsed state. |

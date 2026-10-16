@@ -17,3 +17,5 @@ export * from './stepper';
 export * from './composed-components';
 export * from './file-card';
 export * from './command-palette';
+export * from './app-shell';
+export * from './sidebar';

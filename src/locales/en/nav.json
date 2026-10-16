@@ -14,5 +14,6 @@
   "groups": {
     "main": "Main",
     "account": "Account"
-  }
+  },
+  "skipToContent": "Skip to content"
 }

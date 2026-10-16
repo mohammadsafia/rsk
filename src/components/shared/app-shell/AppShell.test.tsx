@@ -1,0 +1,104 @@
+// @vitest-environment happy-dom
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
+
+import { AppShell, Sidebar } from '@components/shared';
+import { Tooltip } from '@components/ui';
+
+import { Users } from 'lucide-react';
+
+import '../../../i18n';
+
+beforeEach(() => localStorage.clear());
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
+
+const renderShell = () =>
+  render(
+    <MemoryRouter>
+      <Tooltip.Provider>
+        <AppShell
+          sidebar={
+            <Sidebar>
+              <Sidebar.Header>
+                <Sidebar.CollapseButton />
+              </Sidebar.Header>
+              <Sidebar.Content>
+                <Sidebar.Item href="/members" icon={Users}>
+                  Members
+                </Sidebar.Item>
+              </Sidebar.Content>
+            </Sidebar>
+          }
+        >
+          <AppShell.Header>
+            <AppShell.MenuButton />
+          </AppShell.Header>
+          <AppShell.Content>Page</AppShell.Content>
+        </AppShell>
+      </Tooltip.Provider>
+    </MemoryRouter>,
+  );
+
+const aside = () => document.querySelector('[data-slot="app-shell-sidebar"]') as HTMLElement;
+const menuButton = () => screen.getByRole('button', { name: /^(Open|Close) menu$/ });
+
+describe('AppShell', () => {
+  it('persists the collapsed sidebar across mounts', () => {
+    renderShell();
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
+    expect(aside().getAttribute('data-collapsed')).toBe('true');
+    expect(localStorage.getItem('rsk:sidebar-collapsed')).toBe('true');
+
+    cleanup();
+    renderShell();
+    expect(aside().getAttribute('data-collapsed')).toBe('true');
+    expect(screen.getByRole('button', { name: 'Expand sidebar' })).toBeTruthy();
+  });
+
+  it('survives a storage that throws', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    renderShell();
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
+    expect(aside().getAttribute('data-collapsed')).toBe('true');
+  });
+
+  it('opens the mobile drawer and closes it on Escape, returning focus to the menu button', () => {
+    renderShell();
+    fireEvent.click(menuButton());
+    expect(aside().getAttribute('data-open')).toBe('true');
+    expect(menuButton().getAttribute('aria-expanded')).toBe('true');
+    expect(menuButton().getAttribute('aria-controls')).toBe(aside().id);
+
+    act(() => {
+      fireEvent.keyDown(document, { key: 'Escape' });
+    });
+    expect(aside().getAttribute('data-open')).toBe('false');
+    expect(document.activeElement).toBe(menuButton());
+  });
+
+  it('closes the drawer on the scrim and when an item is chosen', () => {
+    renderShell();
+    fireEvent.click(menuButton());
+    fireEvent.click(document.querySelector('[data-slot="app-shell-scrim"]') as HTMLElement);
+    expect(aside().getAttribute('data-open')).toBe('false');
+
+    fireEvent.click(menuButton());
+    fireEvent.click(screen.getByRole('link', { name: 'Members' }));
+    expect(aside().getAttribute('data-open')).toBe('false');
+  });
+
+  it('offers a skip link to the main content', () => {
+    renderShell();
+    const skip = screen.getByRole('link', { name: 'Skip to content' });
+    expect(skip.getAttribute('href')).toBe(`#${screen.getByRole('main').id}`);
+  });
+});
