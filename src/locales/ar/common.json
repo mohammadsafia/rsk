@@ -149,5 +149,12 @@
     "max": "الحد الأقصى",
     "apply": "تطبيق",
     "textPlaceholder": "يحتوي على…"
+  },
+  "statCard": {
+    "up": "ارتفاع",
+    "down": "انخفاض",
+    "flat": "دون تغيير",
+    "trend": "{{direction}} {{value}}",
+    "trendWithCaption": "{{direction}} {{value}} {{caption}}"
   }
 }

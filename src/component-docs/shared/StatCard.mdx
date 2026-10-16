@@ -1,0 +1,55 @@
+---
+id: stat-card
+title: StatCard
+section: Components
+category: Shared
+description: 'A KPI tile: label, value, a trend whose colour knows whether up is good, and an optional sparkline.'
+tags: [shared, kpi, stat, dashboard, metric]
+---
+
+import { CardGrid, StatCard } from '@components/shared';
+import { Money } from '@components/ui';
+import { CalendarCheck, Clock, UserX, Wallet } from 'lucide-react';
+
+## Dashboard row
+
+<Example title="Four KPIs">
+  <CardGrid className="w-full">
+    <StatCard label="Visits today" value="48" icon={<CalendarCheck />} trend={{ value: 12.4 }} caption="vs last week" />
+    <StatCard label="Collected" value={<Money value={2940} />} icon={<Wallet />} trend={{ value: -3.1 }} caption="vs last week" />
+    <StatCard label="No-shows" value="3" icon={<UserX />} trend={{ value: 8, positive: 'down' }} caption="vs last week" />
+    <StatCard label="Average wait" value="14 min" icon={<Clock />} trend={{ value: 0 }} />
+  </CardGrid>
+</Example>
+
+`positive="down"` flips the colours for metrics where less is better (no-shows, wait time).
+
+## Loading
+
+<Example title="Skeleton">
+  <div className="w-64">
+    <StatCard label="Visits today" value="48" loading />
+  </div>
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'label · value', type: 'ReactNode', required: true, description: 'value is mono and LTR-isolated; pass Money for amounts.' },
+    { prop: 'trend', type: '{ value: number; direction?; positive?: "up" | "down" }', description: 'Percent change; tone is success when it moves the positive way.' },
+    { prop: 'caption', type: 'string', description: 'e.g. "vs last week"; part of the trend label.' },
+    { prop: 'sparkline · icon', type: 'ReactNode', description: 'A Sparkline chart and a decorative icon.' },
+    { prop: 'loading', type: 'boolean', default: 'false', description: 'Skeleton value, aria-busy.' },
+    { prop: 'href', type: 'string', description: 'Makes the whole card a router link.' },
+  ]}
+/>
+
+## Accessibility
+
+- The trend has an `aria-label` such as "Up 12.4% vs last week"; its arrow and colour are decorative, so the meaning never relies on colour.
+- With `href`, the card is one link named by its contents.
+
+## RTL notes
+
+- The value and percentage are LTR-isolated; the trend arrow mirrors in Arabic.

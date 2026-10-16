@@ -137,5 +137,12 @@
     "max": "Maximum",
     "apply": "Apply",
     "textPlaceholder": "Contains…"
+  },
+  "statCard": {
+    "up": "Up",
+    "down": "Down",
+    "flat": "No change",
+    "trend": "{{direction}} {{value}}",
+    "trendWithCaption": "{{direction}} {{value}} {{caption}}"
   }
 }

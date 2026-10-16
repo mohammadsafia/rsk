@@ -12,6 +12,7 @@ export * from './breadcrumb';
 export * from './page-header';
 export * from './combobox';
 export * from './card-grid';
+export * from './stat-card';
 export * from './stepper';
 export * from './composed-components';
 export * from './file-card';
