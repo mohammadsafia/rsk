@@ -1,5 +1,4 @@
 export * from './blank-slate';
-export * from './prime-loader';
 export * from './theme-switcher';
 export * from './language-switcher';
 export * from './toaster';

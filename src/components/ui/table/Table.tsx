@@ -2,12 +2,13 @@ import { type ComponentPropsWithoutRef, type FC, type ReactNode } from 'react';
 
 import { Skeleton } from '@components/ui';
 import { Conditional } from '@components/utils';
+import Spinner from '@components/ui/spinner/Spinner';
 
 import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
 
-import { Loader2Icon, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 type TableProps = ComponentPropsWithoutRef<'table'> & {
   isLoading?: boolean;
@@ -138,14 +139,14 @@ const Loader: FC<TableLoaderProps> = ({ colSpan, loaderType = 'skeleton', isLoad
       <Conditional.If condition={loaderType === 'spinner'}>
         <tr data-slot="table-loader">
           <td colSpan={colSpan} className="py-12 text-center">
-            <Loader2Icon aria-label={t('loading')} className="text-fg-muted inline size-6 animate-spin motion-reduce:animate-none" />
+            <Spinner />
           </td>
         </tr>
       </Conditional.If>
 
       <Conditional.Else>
         {Array.from({ length: rows }, (_, rowIndex) => (
-          <Row key={`skeleton-row-${rowIndex}`} data-slot="table-loader">
+          <Row key={`skeleton-row-${rowIndex}`} data-slot="table-loader" aria-hidden="true">
             {Array.from({ length: colSpan }, (_, colIndex) => (
               <Cell key={`skeleton-cell-${rowIndex}-${colIndex}`}>
                 <Skeleton />
@@ -153,6 +154,11 @@ const Loader: FC<TableLoaderProps> = ({ colSpan, loaderType = 'skeleton', isLoad
             ))}
           </Row>
         ))}
+        <tr className="sr-only">
+          <td colSpan={colSpan} role="status">
+            {t('loading')}
+          </td>
+        </tr>
       </Conditional.Else>
     </Conditional>
   );

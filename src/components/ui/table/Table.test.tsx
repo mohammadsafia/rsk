@@ -50,6 +50,29 @@ describe('Table', () => {
     expect(screen.getByText('No Results Found')).toBeTruthy();
   });
 
+  it('announces skeleton loading once through a status cell and hides the skeleton rows', () => {
+    render(
+      <table>
+        <tbody>
+          <Table.Loader isLoading colSpan={2} rows={3} />
+        </tbody>
+      </table>,
+    );
+    expect(screen.getByRole('status').textContent).toBe('Loading…');
+    document.querySelectorAll('[data-slot="table-loader"]').forEach((row) => expect(row.getAttribute('aria-hidden')).toBe('true'));
+  });
+
+  it('uses the Spinner for the spinner loader', () => {
+    render(
+      <table>
+        <tbody>
+          <Table.Loader isLoading loaderType="spinner" colSpan={2} />
+        </tbody>
+      </table>,
+    );
+    expect(document.querySelector('[data-slot="spinner"]')).not.toBeNull();
+  });
+
   it('reports loading through aria-busy, not a stray DOM attribute', () => {
     render(<Table isLoading data-testid="table" />);
     const table = screen.getByTestId('table');

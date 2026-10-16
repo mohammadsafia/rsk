@@ -1,7 +1,8 @@
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 
-import { CommandPalette, PrimeLoader, Toaster } from '@components/shared';
+import { CommandPalette, Toaster } from '@components/shared';
+import { Spinner } from '@components/ui';
 
 import { CommandPaletteProvider } from '@contexts';
 
@@ -17,7 +18,7 @@ function DashboardLayout() {
           <DashboardHeader />
 
           <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
-            <Suspense fallback={<PrimeLoader />}>
+            <Suspense fallback={<Spinner overlay size="lg" />}>
               <Outlet />
             </Suspense>
           </main>
