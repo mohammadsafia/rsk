@@ -4,14 +4,18 @@
     "logoAlt": "RSK logo",
     "features": "Features",
     "components": "Components",
-    "github": "GitHub"
+    "github": "GitHub",
+    "primary": "Primary",
+    "docs": "Docs",
+    "cli": "CLI",
+    "getStarted": "Get Started"
   },
   "hero": {
     "eyebrow": "React · TypeScript · Vite",
     "titleLead": "The foundation for what's ",
     "titleEmphasis": "next",
     "titleTrail": ".",
-    "subtitle": "A considered starter for developers who value craft. 76 components, enterprise patterns, and zero compromise — wired together so you can ship on day one.",
+    "subtitle": "A considered starter for developers who value craft. {{count}} components, enterprise patterns, and zero compromise — wired together so you can ship on day one.",
     "ctaPrimary": "Get Started",
     "ctaSecondary": "Browse Components"
   },

@@ -79,6 +79,11 @@
   --text-xl--line-height: calc(1.75rem + var(--leading-rtl-boost));
   --text-2xl: 1.75rem;
   --text-2xl--line-height: calc(2.125rem + var(--leading-rtl-boost));
+  /* display steps — landing hero only */
+  --text-3xl: 2.25rem;
+  --text-3xl--line-height: calc(2.625rem + var(--leading-rtl-boost));
+  --text-4xl: 2.75rem;
+  --text-4xl--line-height: calc(3rem + var(--leading-rtl-boost));
 
   /* shape + density */
   --radius-sm: 0.25rem;
