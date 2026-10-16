@@ -19,7 +19,7 @@ function Toaster() {
           </div>
 
           {action && (
-            <Toast.Action asChild altText={typeof title === 'string' ? title : 'Toast action'}>
+            <Toast.Action asChild altText={typeof title === 'string' ? title : t('toast.action')}>
               {action}
             </Toast.Action>
           )}

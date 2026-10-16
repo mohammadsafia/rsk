@@ -85,7 +85,8 @@
   },
   "toast": {
     "label": "Notification",
-    "region": "Notifications ({hotkey})"
+    "region": "Notifications ({hotkey})",
+    "action": "Notification action"
   },
   "command": {
     "suggestions": "Suggestions"
@@ -117,5 +118,15 @@
     "back": "Back"
   },
   "loadingMore": "Loading more…",
-  "filters": "Filters"
+  "filters": "Filters",
+  "fileCard": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "selectStatus": "Select status",
+    "noOptions": "No options",
+    "unassigned": "Unassigned",
+    "noAssignees": "No assignees",
+    "documents_one": "document",
+    "documents_other": "documents"
+  }
 }

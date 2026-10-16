@@ -69,8 +69,8 @@ const EXTENSION_ICON_MAP: Record<NormalizedExtension, LucideIcon> = {
 const fileIconVariants = cva('inline-flex shrink-0 items-center justify-center', {
   variants: {
     variant: {
-      plain: 'text-muted-400',
-      chip: 'bg-primary-15 text-primary gap-1 rounded-md p-1.5',
+      plain: 'text-fg-muted',
+      chip: 'bg-surface-sunken text-fg gap-1 rounded-md p-1.5',
     },
   },
   defaultVariants: {

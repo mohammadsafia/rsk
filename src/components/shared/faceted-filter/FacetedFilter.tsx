@@ -51,16 +51,16 @@ function FacetedFilter({ title, name, control, filterVariant = 'text', filterOpt
       <Popover>
         <Popover.Trigger asChild>
           <Button variant="outline" size="sm" className="border-dashed">
-            <PlusIcon className="me-2 h-4 w-4" />
+            <PlusIcon aria-hidden="true" />
 
             {title}
 
             <Conditional.If condition={selectedCount > 0}>
-              <Divider orientation="vertical" className="mx-2 h-4" />
+              <Divider orientation="vertical" className="mx-1 h-4" />
 
               <Badge className="rounded-sm px-1 font-normal lg:hidden">{selectedCount}</Badge>
 
-              <div className="hidden space-x-1 lg:flex">
+              <div className="hidden gap-1 lg:flex">
                 <Conditional>
                   <Conditional.If condition={selectedCount < 3}>
                     {filterOptions
@@ -73,7 +73,7 @@ function FacetedFilter({ title, name, control, filterVariant = 'text', filterOpt
                   </Conditional.If>
 
                   <Conditional.Else>
-                    <Badge className="rounded-sm px-1 font-normal">{selectedCount} selected</Badge>
+                    <Badge className="rounded-sm px-1 font-normal">{t('selectedCount', { count: selectedCount })}</Badge>
                   </Conditional.Else>
                 </Conditional>
               </div>
@@ -81,12 +81,12 @@ function FacetedFilter({ title, name, control, filterVariant = 'text', filterOpt
           </Button>
         </Popover.Trigger>
 
-        <Popover.Content className="w-[200px] p-0" align="start">
+        <Popover.Content className="w-56 p-0" align="start">
           <Command>
             <Command.Input placeholder={title} />
 
             <Command.List>
-              <Command.Empty>No results found.</Command.Empty>
+              <Command.Empty>{t('noResults')}</Command.Empty>
 
               <Command.Group>
                 {filterOptions.map((opt) => {
@@ -95,14 +95,14 @@ function FacetedFilter({ title, name, control, filterVariant = 'text', filterOpt
                   return (
                     <Command.Item key={opt.value} onSelect={() => onSelect(opt.value)}>
                       <div
-                        className={cn('border-primary me-2 flex h-4 w-4 items-center justify-center border', {
-                          'bg-primary text-primary-foreground': isSelected,
+                        className={cn('border-border-strong me-2 flex size-4 items-center justify-center border', {
+                          'bg-accent border-accent text-accent-fg': isSelected,
                           'opacity-50 [&_svg]:invisible': !isSelected,
                           'rounded-sm': multiSelect,
                           'rounded-full': !multiSelect,
                         })}
                       >
-                        <CheckIcon size={16} />
+                        <CheckIcon aria-hidden="true" className="size-3" />
                       </div>
 
                       <span>{opt.label}</span>
@@ -116,7 +116,7 @@ function FacetedFilter({ title, name, control, filterVariant = 'text', filterOpt
 
                 <Command.Group>
                   <Command.Item onSelect={() => onChange(undefined)} className="justify-center text-center">
-                    Clear filters
+                    {t('clearFilters')}
                   </Command.Item>
                 </Command.Group>
               </Conditional.If>
@@ -127,7 +127,7 @@ function FacetedFilter({ title, name, control, filterVariant = 'text', filterOpt
     );
   }
 
-  return <FormInput name={name} placeholder={title ?? 'Search'} className="m-0 me-0 h-[36px] w-[150px] lg:w-[250px]" />;
+  return <FormInput name={name} placeholder={title ?? t('search')} className="w-40 lg:w-64" />;
 }
 
 export default FacetedFilter;

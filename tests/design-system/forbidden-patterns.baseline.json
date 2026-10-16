@@ -91,25 +91,6 @@
   "src/component-docs/ui/ToggleGroup.mdx": {
     "legacy-color-name": 3
   },
-  "src/components/shared/faceted-filter/FacetedFilter.tsx": {
-    "legacy-color-name": 3,
-    "arbitrary-length": 4
-  },
-  "src/components/shared/file-card/FileCard.tsx": {
-    "legacy-color-ramp": 11,
-    "legacy-color-name": 4
-  },
-  "src/components/shared/file-icon/FileIcon.tsx": {
-    "legacy-color-ramp": 2,
-    "legacy-color-name": 1
-  },
-  "src/components/shared/file-uploader/FileUploader.tsx": {
-    "legacy-color-ramp": 7,
-    "legacy-color-name": 4
-  },
-  "src/components/shared/stepper/Stepper.tsx": {
-    "legacy-color-ramp": 4
-  },
   "src/pages/components/ComponentDetailPage.tsx": {
     "legacy-color-ramp": 6,
     "legacy-color-name": 8

@@ -14,14 +14,14 @@ import {
   useState,
 } from 'react';
 
-import { Button, Tag, ScrollArea, IconButton } from '@components/ui';
+import { Button, Tag, ScrollArea, IconButton, Spinner } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
 
-import { DownloadIcon, Loader2Icon, PaperclipIcon, XCircleIcon, XIcon } from 'lucide-react';
+import { DownloadIcon, PaperclipIcon, XCircleIcon, XIcon } from 'lucide-react';
 
 type FileUploaderDropzoneGroupProps = ComponentPropsWithoutRef<'div'>;
 
@@ -100,9 +100,10 @@ const FileUploaderDropzoneGroup: FC<FileUploaderDropzoneGroupProps> = ({ classNa
     <div
       data-slot="file-uploader-dropzone-group"
       className={cn(
-        'border-muted-200 bg-background text-muted-400 relative flex items-center gap-2 rounded-lg border border-dashed p-3 text-sm transition-[color,box-shadow] outline-none',
-        !disabled && 'hover:border-primary',
-        disabled && 'bg-muted-50 text-muted-300',
+        'border-border bg-surface text-fg-muted relative flex items-center gap-2 rounded-lg border border-dashed p-3 text-sm transition-colors outline-none',
+        'has-[input:focus-visible]:ring-ring has-[input:focus-visible]:ring-2',
+        !disabled && 'hover:border-border-strong',
+        disabled && 'bg-surface-sunken text-fg-subtle cursor-not-allowed',
         isUploading && 'pointer-events-none',
         className,
       )}
@@ -136,7 +137,7 @@ const FileUploaderDropzone: FC<FileUploaderDropzoneProps> = ({ ref, placeholder,
         type="file"
         id={inputId}
         name={name}
-        className="hidden"
+        className="peer sr-only"
         disabled={disabled || isUploading}
         onChange={handleChange}
         multiple={multiple}
@@ -154,15 +155,17 @@ const FileUploaderDropzone: FC<FileUploaderDropzoneProps> = ({ ref, placeholder,
       >
         <Conditional>
           <Conditional.If condition={isUploading}>
-            <Loader2Icon size={20} className="animate-spin" />
+            <Spinner size="sm" />
           </Conditional.If>
 
           <Conditional.If condition={!!singleFile}>
             <PaperclipIcon size={16} className="shrink-0" />
 
-            <span className="text-foreground truncate">{singleFile?.name}</span>
+            <span className="text-fg truncate">{singleFile?.name}</span>
 
-            <span className="shrink-0 text-xs">{formatFileSize(singleFile?.size ?? 0)}</span>
+            <span dir="ltr" className="shrink-0 text-xs tabular-nums">
+              {formatFileSize(singleFile?.size ?? 0)}
+            </span>
           </Conditional.If>
 
           <Conditional.Else>
@@ -189,23 +192,15 @@ const FileUploaderActions: FC<FileUploaderActionsProps> = ({ onDownload, clearab
   return (
     <div data-slot="file-uploader-actions" className={cn('relative z-10 flex shrink-0 items-center gap-2', className)} {...props}>
       <Conditional.If condition={showDownload}>
-        <DownloadIcon
-          size={16}
-          role="button"
-          aria-label={t('download')}
-          className="text-accent shrink-0 cursor-pointer"
-          onClick={onDownload}
-        />
+        <IconButton size="sm" tooltip={false} aria-label={t('download')} className="text-accent" onClick={onDownload}>
+          <DownloadIcon aria-hidden="true" />
+        </IconButton>
       </Conditional.If>
 
       <Conditional.If condition={showClear}>
-        <XCircleIcon
-          size={16}
-          role="button"
-          aria-label={t('clear')}
-          className="text-fg-muted hover:text-danger shrink-0 cursor-pointer"
-          onClick={() => onRemove(0)}
-        />
+        <IconButton size="sm" tooltip={false} aria-label={t('clear')} className="hover:text-danger" onClick={() => onRemove(0)}>
+          <XCircleIcon aria-hidden="true" />
+        </IconButton>
       </Conditional.If>
     </div>
   );
@@ -248,14 +243,16 @@ const FileUploaderFileList: FC<FileUploaderFileListProps> = ({ variant = 'list',
     <ScrollArea>
       <ul data-slot="file-uploader-file-list" className={cn('grid max-h-16 grid-cols-[minmax(0,1fr)] gap-1', className)}>
         {files.map((file, index) => (
-          <li key={`${file.name}-${index}`} className="border-muted-200 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm">
-            <PaperclipIcon size={14} className="text-primary shrink-0" />
+          <li key={`${file.name}-${index}`} className="border-border flex items-center gap-2 rounded-lg border px-3 py-2 text-sm">
+            <PaperclipIcon size={14} aria-hidden="true" className="text-fg-muted shrink-0" />
 
             <span className="flex-1 truncate" title={file.name}>
               {file.name}
             </span>
 
-            <span className="text-muted-400 shrink-0 text-xs">{formatFileSize(file.size)}</span>
+            <span dir="ltr" className="text-fg-muted shrink-0 text-xs tabular-nums">
+              {formatFileSize(file.size)}
+            </span>
 
             <Conditional.If condition={!disabled && !isUploading}>
               <IconButton tone="danger" size="sm" tooltip={false} type="button" aria-label={t('clear')} onClick={() => onRemove(index)}>
@@ -313,7 +310,7 @@ const FileUploaderImagePreview: FC<FileUploaderImagePreviewProps> = ({ className
               <img
                 src={url}
                 alt={file.name}
-                className={cn('border-muted-200 shrink-0 rounded-lg border object-fill', isCompact ? 'h-28 w-full' : 'size-16')}
+                className={cn('border-border shrink-0 rounded-lg border object-fill', isCompact ? 'h-28 w-full' : 'size-16')}
               />
 
               <Conditional.If condition={multiple && !disabled && !isUploading}>

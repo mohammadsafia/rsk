@@ -158,46 +158,58 @@ const FileShape: FC<FileShapeProps> = ({ className, children, ...props }) => (
     className={cn('relative isolate flex min-h-40 w-full flex-col items-center justify-center gap-3 px-6 py-4', className)}
     {...props}
   >
-    <FileText size={160} strokeWidth={1.25} className="text-primary-15 absolute inset-0 -z-10 m-auto" />
+    <FileText size={160} strokeWidth={1.25} className="text-border absolute inset-0 -z-10 m-auto" />
 
     <div className="flex flex-col items-center gap-3">{children}</div>
   </div>
 );
 
-const FolderShape: FC<FolderShapeProps> = ({ className, count, ...props }) => (
-  <div
-    data-slot="file-card-folder-shape"
-    className={cn(
-      'bg-primary-15 relative flex min-h-40 w-full max-w-44 flex-col items-center justify-center gap-2 rounded-md px-4 py-6',
-      className,
-    )}
-    {...props}
-  >
-    <FolderOpen size={36} className="text-primary-200" />
+const FolderShape: FC<FolderShapeProps> = ({ className, count, ...props }) => {
+  const { t } = useAppTranslation('common');
 
-    <span className="text-2xl font-bold">{count}</span>
+  return (
+    <div
+      data-slot="file-card-folder-shape"
+      className={cn(
+        'bg-surface-sunken relative flex min-h-40 w-full max-w-44 flex-col items-center justify-center gap-2 rounded-md px-4 py-6',
+        className,
+      )}
+      {...props}
+    >
+      <FolderOpen size={36} aria-hidden="true" className="text-fg-subtle" />
 
-    <span className="text-2xs text-muted-400 font-medium uppercase">{count === 1 ? 'document' : 'documents'}</span>
-  </div>
-);
+      <span className="text-2xl font-bold tabular-nums">{count}</span>
+
+      <span className="text-2xs text-fg-muted font-medium uppercase">{t('fileCard.documents', { count })}</span>
+    </div>
+  );
+};
 
 const ApprovalPrompt: FC<ApprovalPromptProps> = ({ className, children, ...props }) => (
-  <p data-slot="file-card-approval-prompt" className={cn('text-muted-400 text-xs font-medium', className)} {...props}>
+  <p data-slot="file-card-approval-prompt" className={cn('text-fg-muted text-xs font-medium', className)} {...props}>
     {children}
   </p>
 );
 
-const Approve: FC<ApproveProps> = ({ children = 'Approve', ...props }) => (
-  <ComposedButton variant="outline" size="lg" {...props}>
-    {children}
-  </ComposedButton>
-);
+const Approve: FC<ApproveProps> = ({ children, ...props }) => {
+  const { t } = useAppTranslation('common');
 
-const Reject: FC<RejectProps> = ({ children = 'Reject', ...props }) => (
-  <ComposedButton variant="outline" tone="danger" size="lg" {...props}>
-    {children}
-  </ComposedButton>
-);
+  return (
+    <ComposedButton variant="outline" size="lg" {...props}>
+      {children ?? t('fileCard.approve')}
+    </ComposedButton>
+  );
+};
+
+const Reject: FC<RejectProps> = ({ children, ...props }) => {
+  const { t } = useAppTranslation('common');
+
+  return (
+    <ComposedButton variant="outline" tone="danger" size="lg" {...props}>
+      {children ?? t('fileCard.reject')}
+    </ComposedButton>
+  );
+};
 
 const Status = <TOption,>({
   options,
@@ -208,7 +220,7 @@ const Status = <TOption,>({
   getOptionDisabled,
   queryKey = 'file-card-status-options',
   urlSearchParams,
-  placeholder = 'Select status',
+  placeholder,
   disabled,
   onChange,
 }: StatusProps<TOption>): ReactNode => {
@@ -233,12 +245,14 @@ const Status = <TOption,>({
   return (
     <div data-slot="file-card-status" className="px-4 py-3">
       <Combobox open={open} onOpenChange={setOpen}>
-        <Combobox.Trigger className="bg-primary-15 rounded-full border-none px-4 py-2 shadow-none" disabled={disabled}>
+        <Combobox.Trigger size="sm" className="bg-surface-sunken rounded-full border-none px-4 shadow-none" disabled={disabled}>
           <Conditional.If condition={!!value && !!getOptionDot}>
             <span className={cn('size-3 rounded-full', value && getOptionDot?.(value))} />
           </Conditional.If>
 
-          <Combobox.Value className="text-sm font-bold">{value ? getOptionLabel(value) : placeholder}</Combobox.Value>
+          <Combobox.Value className="text-sm font-bold">
+            {value ? getOptionLabel(value) : (placeholder ?? t('fileCard.selectStatus'))}
+          </Combobox.Value>
 
           <Combobox.Icon />
         </Combobox.Trigger>
@@ -249,7 +263,7 @@ const Status = <TOption,>({
           </Combobox.Input>
 
           <Combobox.List onScroll={onScroll}>
-            <Combobox.Empty when={!isLoading && allOptions.length === 0}>No options</Combobox.Empty>
+            <Combobox.Empty when={!isLoading && allOptions.length === 0}>{t('fileCard.noOptions')}</Combobox.Empty>
 
             {allOptions.map((option) => {
               const optValue = getOptionValue(option);
@@ -273,7 +287,7 @@ const Status = <TOption,>({
               );
             })}
 
-            <Combobox.Loader when={isFetchingNextPage} message="Loading more..." />
+            <Combobox.Loader when={isFetchingNextPage} message={t('loadingMore')} />
           </Combobox.List>
         </Combobox.Content>
       </Combobox>
@@ -295,7 +309,7 @@ const Assignee = <TOption,>({
   getOptionAvatar,
   queryKey = 'file-card-assignee-options',
   urlSearchParams,
-  placeholder = 'Unassigned',
+  placeholder,
   clearTitle,
   disabled,
   onChange,
@@ -313,7 +327,7 @@ const Assignee = <TOption,>({
   });
 
   const selectedValue = value ? getOptionValue(value) : null;
-  const selectedLabel = value ? getOptionLabel(value) : placeholder;
+  const selectedLabel = value ? getOptionLabel(value) : (placeholder ?? t('fileCard.unassigned'));
   const selectedAvatarUrl = value ? getOptionAvatar?.(value) : undefined;
   const selectedInitials = value ? getOptionLabel(value).slice(0, 2).toUpperCase() : '?';
 
@@ -335,10 +349,10 @@ const Assignee = <TOption,>({
         )}
         disabled={disabled}
       >
-        <Avatar size="sm" className="text-2xs ring-primary-25 shrink-0 font-bold ring-2">
+        <Avatar size="sm" className="text-2xs ring-surface shrink-0 font-bold ring-2">
           <Avatar.Image src={selectedAvatarUrl} alt={selectedLabel} />
 
-          <Avatar.Fallback className="bg-primary text-primary-foreground">{selectedInitials}</Avatar.Fallback>
+          <Avatar.Fallback className="bg-fg text-fg-inverse">{selectedInitials}</Avatar.Fallback>
         </Avatar>
 
         <Tooltip content={selectedLabel}>
@@ -347,7 +361,7 @@ const Assignee = <TOption,>({
 
         <Combobox.Clear when={!!value && !disabled} title={clearTitle} onClear={onClear} />
 
-        <ChevronDown size={14} className="text-muted-400 shrink-0" />
+        <ChevronDown size={14} aria-hidden="true" className="text-fg-muted shrink-0" />
       </Combobox.Trigger>
 
       <Combobox.Content className="w-(--radix-popover-content-available-width) min-w-64" shouldFilter={!isAsync}>
@@ -356,7 +370,7 @@ const Assignee = <TOption,>({
         </Combobox.Input>
 
         <Combobox.List onScroll={onScroll}>
-          <Combobox.Empty when={!isLoading && allOptions.length === 0}>No assignees</Combobox.Empty>
+          <Combobox.Empty when={!isLoading && allOptions.length === 0}>{t('fileCard.noAssignees')}</Combobox.Empty>
 
           {allOptions.map((option) => {
             const optValue = getOptionValue(option);
@@ -370,12 +384,10 @@ const Assignee = <TOption,>({
               >
                 <Combobox.Indicator />
 
-                <Avatar size="sm" className="text-2xs ring-primary-25 font-bold ring-2">
+                <Avatar size="sm" className="text-2xs ring-surface font-bold ring-2">
                   <Avatar.Image src={getOptionAvatar?.(option)} alt={getOptionLabel(option)} />
 
-                  <Avatar.Fallback className="bg-primary text-primary-foreground">
-                    {getOptionLabel(option).slice(0, 2).toUpperCase()}
-                  </Avatar.Fallback>
+                  <Avatar.Fallback className="bg-fg text-fg-inverse">{getOptionLabel(option).slice(0, 2).toUpperCase()}</Avatar.Fallback>
                 </Avatar>
 
                 {getOptionLabel(option)}
@@ -383,7 +395,7 @@ const Assignee = <TOption,>({
             );
           })}
 
-          <Combobox.Loader when={isFetchingNextPage} message="Loading more..." />
+          <Combobox.Loader when={isFetchingNextPage} message={t('loadingMore')} />
         </Combobox.List>
       </Combobox.Content>
     </Combobox>
@@ -395,7 +407,7 @@ const Date: FC<DateProps> = ({ className, ...props }) => {
   const { formatNullableDate, constants } = useDate();
 
   return (
-    <span data-slot="file-card-date" className={cn('text-muted-400 text-xs font-medium', className)} {...props}>
+    <span data-slot="file-card-date" dir="ltr" className={cn('text-fg-muted text-xs font-medium tabular-nums', className)} {...props}>
       {formatNullableDate(accessors.getDate(entry), constants.DateFormats.US_DATE, '')}
     </span>
   );
@@ -408,7 +420,7 @@ function FileCardRoot<TEntry>({ entry, accessors, onClick, className, children, 
     <FileCardContext.Provider value={contextValue as FileCardContextValue<unknown>}>
       <Card
         className={cn(
-          'border-primary-25 flex flex-col border transition-transform',
+          'border-border flex flex-col border transition-transform motion-reduce:transition-none',
           onClick && 'cursor-pointer hover:-translate-y-1',
           className,
         )}

@@ -93,7 +93,8 @@
   },
   "toast": {
     "label": "إشعار",
-    "region": "الإشعارات ({hotkey})"
+    "region": "الإشعارات ({hotkey})",
+    "action": "إجراء الإشعار"
   },
   "command": {
     "suggestions": "اقتراحات"
@@ -125,5 +126,19 @@
     "back": "رجوع"
   },
   "loadingMore": "جارٍ تحميل المزيد…",
-  "filters": "عوامل التصفية"
+  "filters": "عوامل التصفية",
+  "fileCard": {
+    "approve": "اعتماد",
+    "reject": "رفض",
+    "selectStatus": "اختر الحالة",
+    "noOptions": "لا توجد خيارات",
+    "unassigned": "غير مُسند",
+    "noAssignees": "لا يوجد مُسند إليهم",
+    "documents_zero": "مستندات",
+    "documents_one": "مستند",
+    "documents_two": "مستندان",
+    "documents_few": "مستندات",
+    "documents_many": "مستندًا",
+    "documents_other": "مستند"
+  }
 }

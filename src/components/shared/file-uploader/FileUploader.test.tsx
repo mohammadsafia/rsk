@@ -23,3 +23,21 @@ describe('FileUploader.FileList chips', () => {
     expect(handleChange).toHaveBeenCalledWith(null);
   });
 });
+describe('FileUploader keyboard access', () => {
+  it('keeps the file input focusable and the actions as buttons', () => {
+    const file = new File(['x'], 'scan.png', { type: 'image/png' });
+    render(
+      <FileUploader name="scan" value={[file]} onChange={vi.fn()}>
+        <FileUploader.DropzoneGroup>
+          <FileUploader.Dropzone placeholder="Upload scan" />
+          <FileUploader.Actions onDownload={vi.fn()} />
+        </FileUploader.DropzoneGroup>
+      </FileUploader>,
+    );
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(input.className).toContain('sr-only');
+    expect(input.className).not.toMatch(/(^|\s)hidden(\s|$)/);
+    expect(screen.getByRole('button', { name: 'Download' }).tagName).toBe('BUTTON');
+    expect(screen.getByRole('button', { name: 'Clear' }).tagName).toBe('BUTTON');
+  });
+});
