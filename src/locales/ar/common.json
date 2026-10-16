@@ -70,7 +70,16 @@
   "moreInfo": "مزيد من المعلومات",
   "calendar": {
     "previousMonth": "الشهر السابق",
-    "nextMonth": "الشهر التالي"
+    "nextMonth": "الشهر التالي",
+    "day": "يوم",
+    "week": "أسبوع",
+    "month": "شهر",
+    "views": "طرق العرض",
+    "listView": "عرض القائمة",
+    "calendarView": "عرض التقويم",
+    "jumpToDate": "الانتقال إلى تاريخ",
+    "today": "اليوم",
+    "more": "+{{count}} أخرى"
   },
   "timePicker": {
     "placeholder": "اختر الوقت",

@@ -62,7 +62,16 @@
   "moreInfo": "More information",
   "calendar": {
     "previousMonth": "Previous month",
-    "nextMonth": "Next month"
+    "nextMonth": "Next month",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month",
+    "views": "Views",
+    "listView": "List view",
+    "calendarView": "Calendar view",
+    "jumpToDate": "Jump to date",
+    "today": "Today",
+    "more": "+{{count}} more"
   },
   "timePicker": {
     "placeholder": "Select time",

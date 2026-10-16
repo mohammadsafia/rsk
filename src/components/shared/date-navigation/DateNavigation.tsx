@@ -15,26 +15,20 @@ function DateNavigation({ handlePrevious, handleNext, onSetDate, date }: DateNav
   const { toDate, constants } = useDate();
 
   return (
-    <div className="flex items-center space-x-2">
+    <div data-slot="date-navigation" className="flex items-center gap-2">
       <IconButton variant="outline" aria-label={t('previous')} onClick={handlePrevious}>
-        <ArrowLeft size={16} />
+        <ArrowLeft aria-hidden="true" className="rtl:-scale-x-100" />
       </IconButton>
 
       <IconButton variant="outline" aria-label={t('next')} onClick={handleNext}>
-        <ArrowRight size={16} />
+        <ArrowRight aria-hidden="true" className="rtl:-scale-x-100" />
       </IconButton>
 
-      <Button
-        variant="outline"
-        size="sm"
-        className="md:h-9 md:px-4 md:py-2"
-
-        onClick={() => onSetDate(toDate(undefined, constants.DateFormats.ISO_DATE))}
-      >
-        Today
+      <Button variant="outline" onClick={() => onSetDate(toDate(undefined, constants.DateFormats.ISO_DATE))}>
+        {t('calendar.today')}
       </Button>
 
-      <span className="md:text-md text-xs font-medium lg:text-lg xl:text-xl">
+      <span className="text-fg text-md font-medium lg:text-lg">
         {toDate(date, constants.DateFormats.FULL_WEEKDAY_SHORT_MONTH_DAY_YEAR)}
       </span>
     </div>

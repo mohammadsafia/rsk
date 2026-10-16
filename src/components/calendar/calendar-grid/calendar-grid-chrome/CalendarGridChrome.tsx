@@ -52,6 +52,7 @@ const Navigation: FC = () => {
 };
 
 const ViewTabs: FC = () => {
+  const { t } = useAppTranslation('common');
   const { view, setView } = useCalendarGridContext();
 
   return (
@@ -62,18 +63,19 @@ const ViewTabs: FC = () => {
         if (value === 'day' || value === 'week' || value === 'month') setView(value);
       }}
     >
-      <Tabs.List variant="contained" fullWidth>
-        <Tabs.Trigger value="day">Day</Tabs.Trigger>
+      <Tabs.List variant="contained" fullWidth aria-label={t('calendar.views')}>
+        <Tabs.Trigger value="day">{t('calendar.day')}</Tabs.Trigger>
 
-        <Tabs.Trigger value="week">Week</Tabs.Trigger>
+        <Tabs.Trigger value="week">{t('calendar.week')}</Tabs.Trigger>
 
-        <Tabs.Trigger value="month">Month</Tabs.Trigger>
+        <Tabs.Trigger value="month">{t('calendar.month')}</Tabs.Trigger>
       </Tabs.List>
     </Tabs>
   );
 };
 
 const ViewToggle: FC = () => {
+  const { t } = useAppTranslation('common');
   const { viewMode, setViewMode } = useCalendarGridContext();
 
   return (
@@ -85,18 +87,19 @@ const ViewToggle: FC = () => {
         if (value === 'calendar' || value === 'list') setViewMode(value);
       }}
     >
-      <ToggleGroup.Item value="list" aria-label="List view">
-        <ListIcon size={16} />
+      <ToggleGroup.Item value="list" aria-label={t('calendar.listView')}>
+        <ListIcon aria-hidden="true" />
       </ToggleGroup.Item>
 
-      <ToggleGroup.Item value="calendar" aria-label="Calendar view">
-        <CalendarIcon size={16} />
+      <ToggleGroup.Item value="calendar" aria-label={t('calendar.calendarView')}>
+        <CalendarIcon aria-hidden="true" />
       </ToggleGroup.Item>
     </ToggleGroup>
   );
 };
 
 const Picker: FC = () => {
+  const { t } = useAppTranslation('common');
   const { date, setDate, view } = useCalendarGridContext();
   const { toStartAndEndOf, toBoundaryDate, addDuration, toDate, constants } = useDate();
 
@@ -112,7 +115,7 @@ const Picker: FC = () => {
     <CalendarPicker
       value={date}
       selected={selected}
-      triggerTooltip="Jump to date"
+      triggerTooltip={t('calendar.jumpToDate')}
       calendarProps={{ captionLayout: 'dropdown', endMonth: toBoundaryDate(addDuration(toDate(), 10, constants.UnitOfTime.YEAR)) }}
       onChange={setDate}
     />

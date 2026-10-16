@@ -201,7 +201,7 @@ const TimeAxis: FC = () => {
       const isHourMark = min === 0;
 
       items.push({
-        label: isHourMark ? formatHour(hour, constants.TimeFormats.HOUR_MINUTES_12) : '',
+        label: isHourMark ? formatHour(hour, constants.TimeFormats.HOUR_12) : '',
         isHourMark,
       });
     }
@@ -213,7 +213,8 @@ const TimeAxis: FC = () => {
 };
 
 const EventSlot: FC<EventSlotProps> = ({ placement }) => {
-  const { renderEvent, popoverContent } = useCalendarGridContext();
+  const { renderEvent, popoverContent, eventAccessors } = useCalendarGridContext();
+  const { formatDate, constants } = useDate();
   const [open, setOpen] = useState(false);
 
   const trigger = (
@@ -224,6 +225,7 @@ const EventSlot: FC<EventSlotProps> = ({ placement }) => {
       width={placement.width}
       onClick={popoverContent ? () => setOpen(true) : undefined}
     >
+      <span className="sr-only">{`${formatDate(eventAccessors.getStartTime(placement.event), constants.DateFormats.FULL_MONTH_DAY_YEAR)}, `}</span>
       {renderEvent(placement.event, placement.status)}
     </CalendarTimeGrid.EventCard>
   );

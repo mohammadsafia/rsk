@@ -4,7 +4,7 @@ import { Button, CalendarMonthGrid, Popover } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { type EventTimeStatus, useCalendarGridContext } from '@components/calendar';
 
-import { useDate } from '@hooks/shared';
+import { useAppTranslation, useDate } from '@hooks/shared';
 
 type MonthEventItemProps = {
   event: unknown;
@@ -16,14 +16,15 @@ type CalendarGridMonthViewComponents = FC & {
 };
 
 const MAX_VISIBLE_MONTH_EVENTS = 3;
-const WEEK_HEADERS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] as const;
 
 const MonthEventItem: FC<MonthEventItemProps> = ({ event, status }) => {
-  const { renderEvent, popoverContent } = useCalendarGridContext();
+  const { renderEvent, popoverContent, eventAccessors } = useCalendarGridContext();
+  const { formatDate, constants } = useDate();
   const [open, setOpen] = useState(false);
 
   const trigger = (
     <CalendarMonthGrid.EventChip onClick={popoverContent ? () => setOpen(true) : undefined}>
+      <span className="sr-only">{`${formatDate(eventAccessors.getStartTime(event), constants.DateFormats.FULL_MONTH_DAY_YEAR)}, `}</span>
       {renderEvent(event, status)}
     </CalendarMonthGrid.EventChip>
   );
@@ -42,6 +43,12 @@ const MonthEventItem: FC<MonthEventItemProps> = ({ event, status }) => {
 const MonthView: FC = () => {
   const { view, viewMode, date, events, eventAccessors, slotCoverageDates } = useCalendarGridContext();
   const { formatDate, getMonthGrid, toDate, toDateUnits, isBefore, isAfter, constants } = useDate();
+  const { t } = useAppTranslation('common');
+
+  const weekdays = useMemo(
+    () => Array.from({ length: 7 }, (_, index) => formatDate(new Date(2023, 0, 1 + index), constants.DateFormats.SHORT_DAY)),
+    [formatDate, constants.DateFormats.SHORT_DAY],
+  );
 
   const todayKey = toDate();
 
@@ -74,7 +81,7 @@ const MonthView: FC = () => {
   return (
     <CalendarMonthGrid>
       <CalendarMonthGrid.Weekdays>
-        {WEEK_HEADERS.map((day) => (
+        {weekdays.map((day) => (
           <CalendarMonthGrid.Weekday key={day}>{day}</CalendarMonthGrid.Weekday>
         ))}
       </CalendarMonthGrid.Weekdays>
@@ -106,7 +113,7 @@ const MonthView: FC = () => {
                 <Popover>
                   <Popover.Trigger asChild>
                     <Button variant="link" tone="accent" className="text-2xs h-auto p-0 font-medium">
-                      +{overflowEvents.length} more
+                      {t('calendar.more', { count: overflowEvents.length })}
                     </Button>
                   </Popover.Trigger>
 
