@@ -1,6 +1,6 @@
 import type { ElementType } from 'react';
 
-import { LayoutDashboard, Component, Settings, Users } from 'lucide-react';
+import { Component, Contact, LayoutDashboard, Settings, Users } from 'lucide-react';
 
 export type AppMenu = {
   id: string;
@@ -39,10 +39,18 @@ export const FULL_ROUTES_PATH = {
   MEMBERS: {
     INDEX: '/members',
   },
+  PATIENTS: {
+    INDEX: '/patients',
+    NEW: '/patients/new',
+    DETAIL: '/patients/:id',
+  },
   ROOT: {
     INDEX: '..',
   },
 } as const;
+
+/** Path of a patient's profile. */
+export const patientPath = (id: string) => FULL_ROUTES_PATH.PATIENTS.DETAIL.replace(':id', encodeURIComponent(id));
 
 /** Flattened route map used by breadcrumb/navigation helpers. */
 export const PLAIN_ROUTES = FULL_ROUTES_PATH;
@@ -54,6 +62,13 @@ export const APP_MENU: AppMenu[] = [
     name: 'Dashboard',
     group: 'main',
     icon: LayoutDashboard,
+  },
+  {
+    id: 'patients',
+    path: FULL_ROUTES_PATH.PATIENTS.INDEX,
+    name: 'Patients',
+    group: 'main',
+    icon: Contact,
   },
   // The docs site is dev-only (see docs-routes.tsx).
   ...(import.meta.env.DEV

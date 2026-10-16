@@ -1,0 +1,23 @@
+{
+  "patients": {
+    "title": "Patients",
+    "description": "Everyone registered at the clinic.",
+    "newPatient": "New patient",
+    "searchPlaceholder": "Search by name, MRN or phone",
+    "totalLabel": "patients",
+    "selfPay": "Self-pay",
+    "columns": {
+      "name": "Name",
+      "mrn": "MRN",
+      "phone": "Phone",
+      "doctor": "Primary doctor",
+      "insurer": "Insurer",
+      "lastVisit": "Last visit",
+      "balance": "Balance"
+    },
+    "empty": { "title": "No patients yet", "description": "Register the first patient to start booking visits." },
+    "noResults": { "title": "No matching patients", "description": "Try another search or clear the filters." },
+    "error": { "title": "Patients couldn't be loaded", "description": "Something went wrong. Try again in a moment." }
+  },
+  "retry": "Retry"
+}

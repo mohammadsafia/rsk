@@ -10,6 +10,7 @@ import { LoginPlaceholder, NotFound, SettingsPlaceholder } from './RoutePlacehol
 const HomePage = lazy(() => import('@pages/home/HomePage'));
 const DashboardPage = lazy(() => import('@pages/dashboard/DashboardPage'));
 const MembersPage = lazy(() => import('@pages/members/MembersPage'));
+const PatientsPage = lazy(() => import('@pages/clinic/patients/PatientsPage'));
 
 export const router = createBrowserRouter([
   // Public documentation site (no auth) and redirects from the old /components gallery
@@ -55,6 +56,10 @@ export const router = createBrowserRouter([
           {
             path: FULL_ROUTES_PATH.HOME.DASHBOARD,
             element: <DashboardPage />,
+          },
+          {
+            path: FULL_ROUTES_PATH.PATIENTS.INDEX,
+            element: <PatientsPage />,
           },
           {
             path: FULL_ROUTES_PATH.MEMBERS.INDEX,
