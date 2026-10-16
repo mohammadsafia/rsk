@@ -1,0 +1,48 @@
+---
+id: rtl-i18n
+title: RTL & i18n
+section: Guides
+category: Guides
+description: English and Arabic side by side — translation keys, plurals, logical layout, mirrored icons and LTR data.
+order: 4
+tags: [guides, rtl, i18n, arabic]
+---
+
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+
+## Translations
+
+`useAppTranslation('namespace')` wraps react-i18next and also returns `direction` and `isRTL`. Copy lives in `src/locales/{en,ar}/<namespace>.json`; a parity test fails when a key exists in one language only.
+
+Arabic has six plural forms. Write `key_zero`, `key_one`, `key_two`, `key_few`, `key_many`, `key_other` in `ar` (English needs `_one` and `_other`) and pass `count`:
+
+```tsx
+t('table.total', { count: 11 }); // "11 نتيجةً"
+```
+
+## Logical layout
+
+Use logical utilities so layouts flip automatically: `ms-`/`me-`, `ps-`/`pe-`, `start-`/`end-`, `text-start`/`text-end`, `border-s`/`border-e`. Never `ml-`, `pl-`, `left-` or `text-left`.
+
+## Directional icons
+
+Arrows and chevrons that mean "back" or "forward" must mirror in RTL with `rtl:-scale-x-100`. Icons with no direction (search, bell) stay as they are.
+
+<DoDont
+  do={<span className="flex items-center gap-2 text-sm"><ArrowLeft aria-hidden="true" className="size-4 rtl:-scale-x-100" /> Back</span>}
+  doCaption="mirrors in Arabic"
+  dont={<span className="flex items-center gap-2 text-sm"><ArrowRight aria-hidden="true" className="size-4" /> Back</span>}
+  dontCaption="points the wrong way in RTL"
+/>
+
+## Data stays left-to-right
+
+IDs, amounts, dates, times and codes are single values, not prose. Isolate them with `dir="ltr"` and use `tabular-nums` so digits line up. Digits are always Western (0–9) in both languages.
+
+```tsx
+<span dir="ltr" className="font-mono tabular-nums">MRN-20391</span>
+```
+
+## Arabic typography
+
+Arabic renders in Noto Kufi with slightly taller line heights (the type scale adds an RTL boost). Never letter-space Arabic — tracking breaks the joined script — so pair any `tracking-*` with `rtl:tracking-normal`.
