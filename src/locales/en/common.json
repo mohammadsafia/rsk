@@ -89,7 +89,14 @@
     "allDay": "All day",
     "agenda": "Agenda",
     "agendaEmpty": "Nothing scheduled",
-    "agendaEmptyHint": "There are no events in these days."
+    "agendaEmptyHint": "There are no events in these days.",
+    "timeRange": "{{start}} to {{end}}",
+    "moved": "Moved to {{when}}",
+    "resized": "Resized to {{when}}",
+    "cancelled": "Change cancelled",
+    "changeFailed": "Couldn't save the change",
+    "changeFailedHint": "The event is back where it was.",
+    "unavailable": "unavailable"
   },
   "timePicker": {
     "placeholder": "Select time",

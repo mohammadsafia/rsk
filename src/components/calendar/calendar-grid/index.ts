@@ -2,6 +2,8 @@ export {
   default as CalendarGrid,
   useCalendarGridContext,
   type CalendarAccessors,
+  type CalendarEventChange,
+  type CalendarSlot,
   type CalendarLegendItem,
   type CalendarRange,
   type CalendarResource,

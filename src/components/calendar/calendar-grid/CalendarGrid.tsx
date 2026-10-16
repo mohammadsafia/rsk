@@ -18,7 +18,7 @@ import { CalendarGridChrome } from './calendar-grid-chrome';
 import { CalendarGridMonthView } from './calendar-grid-month-view';
 import { CalendarGridTimeView } from './calendar-grid-time-view';
 
-import { type DateInput, UnitOfTime, useDate } from '@hooks/shared';
+import { type DateInput, toast, UnitOfTime, useAppTranslation, useDate } from '@hooks/shared';
 
 import { cn } from '@utils';
 
@@ -46,6 +46,14 @@ export type CalendarAccessors<T> = {
 };
 
 export type CalendarResource = { id: string; label: string; avatar?: string };
+
+/** A selected empty range, as local wall times with offset (`2026-10-16T10:00:00+03:00`). */
+export type CalendarSlot = { start: string; end: string; resourceId?: string };
+
+/** A move or resize to save; reject the promise to put the event back. */
+export type CalendarEventChange<T> = { event: T; start: string; end: string; resourceId?: string };
+
+type Override = { start: string; end: string; resourceId?: string; settled: boolean };
 
 export type CalendarLegendItem = {
   label: string;
@@ -91,6 +99,14 @@ export type CalendarGridProps<TEvent> = {
   onResourceFilterChange?: (resourceId: string | null) => void;
   /** Days the agenda view lists and pages by. @default 7 */
   agendaDays?: number;
+  /** Click or drag on empty cells (or Enter on a focused cell) to select a range. */
+  onSlotSelect?: (slot: CalendarSlot) => void;
+  /** Let selection cover cells outside `slots`. @default false */
+  allowOutsideAvailability?: boolean;
+  /** Makes events draggable and resizable; shown optimistically, reverted with a toast if the promise rejects. */
+  onEventChange?: (change: CalendarEventChange<TEvent>) => Promise<void> | void;
+  /** Locks events (e.g. past ones) when `onEventChange` is set. */
+  canEdit?: (event: TEvent) => boolean;
   children: ReactNode;
 } & Omit<ComponentPropsWithoutRef<'div'>, 'children'>;
 
@@ -122,6 +138,11 @@ type CalendarGridContextValue<T> = {
   resourceFilter: string | null;
   setResourceFilter: (resourceId: string | null) => void;
   agendaDays: number;
+  onSlotSelect: ((slot: CalendarSlot) => void) | undefined;
+  allowOutsideAvailability: boolean;
+  isEditable: (event: T) => boolean;
+  commitChange: (change: CalendarEventChange<T>) => Promise<void>;
+  announce: (message: string) => void;
 };
 
 type CalendarGridComponents = (<TEvent>(props: CalendarGridProps<TEvent>) => ReactNode) & {
@@ -191,6 +212,10 @@ function CalendarGridRoot<TEvent>({
   resourceFilter: controlledResourceFilter,
   onResourceFilterChange,
   agendaDays = DEFAULT_AGENDA_DAYS,
+  onSlotSelect,
+  allowOutsideAvailability = false,
+  onEventChange,
+  canEdit,
   className,
   children,
   ...divProps
@@ -204,6 +229,52 @@ function CalendarGridRoot<TEvent>({
       ),
     [rawEvents, eventAccessors],
   );
+
+  const { t } = useAppTranslation('common');
+  const [overrides, setOverrides] = useState<Record<string, Override>>({});
+  const [announcement, setAnnouncement] = useState('');
+
+  // A saved change stays applied until the consumer hands over new events, so a refetch never flashes back.
+  useEffect(() => {
+    setOverrides((current) => {
+      const pending = Object.entries(current).filter(([, override]) => !override.settled);
+      return pending.length === Object.keys(current).length ? current : Object.fromEntries(pending);
+    });
+  }, [rawEvents]);
+
+  const accessors = useMemo<CalendarAccessors<TEvent>>(() => {
+    if (Object.keys(overrides).length === 0) return eventAccessors;
+    const find = (event: TEvent) => overrides[eventAccessors.getId(event)];
+    return {
+      ...eventAccessors,
+      getStartTime: (event) => find(event)?.start ?? eventAccessors.getStartTime(event),
+      getEndTime: (event) => find(event)?.end ?? eventAccessors.getEndTime(event),
+      getResourceId: (event) => {
+        const override = find(event);
+        return override ? override.resourceId : eventAccessors.getResourceId?.(event);
+      },
+    };
+  }, [eventAccessors, overrides]);
+
+  const commitChange = useCallback(
+    async (change: CalendarEventChange<TEvent>) => {
+      const id = eventAccessors.getId(change.event);
+      setOverrides((current) => ({
+        ...current,
+        [id]: { start: change.start, end: change.end, resourceId: change.resourceId, settled: false },
+      }));
+      try {
+        await onEventChange?.(change);
+        setOverrides((current) => (current[id] ? { ...current, [id]: { ...current[id], settled: true } } : current));
+      } catch {
+        setOverrides(({ [id]: _reverted, ...rest }) => rest);
+        toast({ title: t('calendar.changeFailed'), description: t('calendar.changeFailedHint'), tone: 'danger' });
+      }
+    },
+    [eventAccessors, onEventChange, t],
+  );
+
+  const isEditable = useCallback((event: TEvent) => !!onEventChange && (canEdit?.(event) ?? true), [onEventChange, canEdit]);
 
   const childArray = Children.toArray(children);
   const eventTemplateEl = childArray.find((c) => isValidElement(c) && c.type === EventTemplate);
@@ -332,7 +403,7 @@ function CalendarGridRoot<TEvent>({
       goPrev,
       goToday,
       events,
-      eventAccessors,
+      eventAccessors: accessors,
       renderEvent,
       popoverContent,
       slots,
@@ -347,6 +418,11 @@ function CalendarGridRoot<TEvent>({
       resourceFilter,
       setResourceFilter,
       agendaDays,
+      onSlotSelect,
+      allowOutsideAvailability,
+      isEditable,
+      commitChange,
+      announce: setAnnouncement,
     }),
     [
       view,
@@ -361,7 +437,7 @@ function CalendarGridRoot<TEvent>({
       goPrev,
       goToday,
       events,
-      eventAccessors,
+      accessors,
       renderEvent,
       popoverContent,
       slots,
@@ -376,6 +452,10 @@ function CalendarGridRoot<TEvent>({
       resourceFilter,
       setResourceFilter,
       agendaDays,
+      onSlotSelect,
+      allowOutsideAvailability,
+      isEditable,
+      commitChange,
     ],
   );
 
@@ -411,6 +491,10 @@ function CalendarGridRoot<TEvent>({
         {...divProps}
       >
         {otherChildren}
+
+        <div data-slot="calendar-grid-announcer" aria-live="polite" className="sr-only">
+          {announcement}
+        </div>
       </div>
     </CalendarGridContext.Provider>
   );

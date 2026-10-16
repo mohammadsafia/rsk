@@ -105,7 +105,14 @@
     "allDay": "طوال اليوم",
     "agenda": "جدول الأعمال",
     "agendaEmpty": "لا توجد مواعيد",
-    "agendaEmptyHint": "لا توجد أحداث في هذه الأيام."
+    "agendaEmptyHint": "لا توجد أحداث في هذه الأيام.",
+    "timeRange": "من {{start}} إلى {{end}}",
+    "moved": "نُقل إلى {{when}}",
+    "resized": "تغيّرت المدة إلى {{when}}",
+    "cancelled": "أُلغي التغيير",
+    "changeFailed": "تعذّر حفظ التغيير",
+    "changeFailedHint": "أُعيد الحدث إلى مكانه.",
+    "unavailable": "غير متاح"
   },
   "timePicker": {
     "placeholder": "اختر الوقت",
