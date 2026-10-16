@@ -1,4 +1,4 @@
-import { Hero, LandingNav } from '@views/home';
+import { Hero, LandingNav, Specimen } from '@views/home';
 
 function HomePage() {
   return (
@@ -7,6 +7,7 @@ function HomePage() {
 
       <main>
         <Hero />
+        <Specimen />
       </main>
     </div>
   );

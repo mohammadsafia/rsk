@@ -94,5 +94,39 @@
   "footer": {
     "builtBy": "Built by Mohammad Safia",
     "github": "GitHub"
+  },
+  "specimen": {
+    "label": "Component specimens",
+    "description": "A live sample of the kit: a day calendar with tinted events and the current-time line, a time field and an email field with an inline error, status tags, an invoice table with a selected row, a success toast and a delete confirmation.",
+    "calendar": "Calendar · Tue 13",
+    "fields": "Field family",
+    "status": "Status",
+    "table": "Table",
+    "rows": "1–10 of 248",
+    "events": {
+      "checkup": "Check-up · L. Haddad",
+      "consult": "Surgery consult",
+      "lab": "Lab review",
+      "insurance": "Insurance call"
+    },
+    "selectTime": "Select time",
+    "emailError": "Enter a complete email",
+    "tags": {
+      "active": "Active",
+      "pending": "Pending",
+      "urgent": "Urgent",
+      "cardiology": "Cardiology"
+    },
+    "columns": {
+      "invoice": "Invoice",
+      "patient": "Patient",
+      "amount": "Amount"
+    },
+    "toastTitle": "Appointment booked",
+    "toastBody": "Tue 13 Oct · 10:30",
+    "confirmTitle": "Delete record?",
+    "confirmBody": "This can't be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete"
   }
 }
