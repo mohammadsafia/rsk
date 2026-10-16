@@ -19,13 +19,14 @@ const rows: Visit[] = [
   { patient: 'Omar Nasser', amount: 80 },
 ];
 
-function Harness({ total, label }: { total?: number; label?: string }) {
+function Harness({ total, label, pageSize }: { total?: number; label?: string; pageSize?: number }) {
   const table = useReactTable({
     data: rows,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     enableGlobalFilter: true,
+    initialState: pageSize ? { pagination: { pageIndex: 0, pageSize } } : undefined,
   });
 
   return (
@@ -67,6 +68,12 @@ describe('DataTable', () => {
   it('keeps a caller label as "label: count"', () => {
     render(<Harness total={1} label="Members" />);
     expect(document.querySelector('[data-slot="data-table-toolbar"]')?.textContent).toContain('Members: 1');
+  });
+
+  it('shows the current page size even when it is not one of the options', () => {
+    render(<Harness pageSize={8} />);
+    const trigger = document.querySelector('[data-slot="data-table-pagination"] [role="combobox"]') as HTMLElement;
+    expect(trigger.textContent).toContain('8');
   });
 
   it('uses no legacy classes', () => {

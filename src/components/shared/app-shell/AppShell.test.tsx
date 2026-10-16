@@ -96,6 +96,13 @@ describe('AppShell', () => {
     expect(aside().getAttribute('data-open')).toBe('false');
   });
 
+  it('scopes the closed-drawer offset to mobile, so RTL desktop keeps the sidebar in place', () => {
+    renderShell();
+    const classes = aside().className.split(/\s+/);
+    expect(classes).toContain('max-md:invisible');
+    expect(classes.filter((name) => /translate-x-full|^invisible$/.test(name) && !name.startsWith('max-md:'))).toEqual([]);
+  });
+
   it('offers a skip link to the main content', () => {
     renderShell();
     const skip = screen.getByRole('link', { name: 'Skip to content' });

@@ -2,7 +2,7 @@
   "title": "Members",
   "description": "Everyone with access to this workspace and what they can do.",
   "addMember": "Add Member",
-  "totalLabel": "members",
+  "totalLabel": "Members",
   "searchPlaceholder": "Search members…",
   "columns": {
     "name": "Name",

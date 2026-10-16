@@ -193,9 +193,9 @@ const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY
           className={cn(
             'bg-sidebar border-sidebar-border fixed inset-y-0 start-0 z-50 flex w-72 flex-col border-e focus:outline-none',
             'transition-[translate,visibility] duration-200 ease-out motion-reduce:transition-none',
-            'md:visible md:static md:translate-x-0 md:transition-[width]',
+            'md:static md:transition-[width]',
             collapsed ? 'md:w-16' : 'md:w-64',
-            mobileOpen ? 'visible translate-x-0' : 'invisible -translate-x-full rtl:translate-x-full',
+            !mobileOpen && 'max-md:invisible max-md:-translate-x-full max-md:rtl:translate-x-full',
           )}
         >
           {sidebar}

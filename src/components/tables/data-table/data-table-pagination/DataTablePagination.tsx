@@ -44,6 +44,14 @@ const DataTablePagination: FC<PaginationProps> = ({ pageSizeOptions = [30, 50, 1
 
   const pageNumbers = useMemo(() => getPageNumbers(currentPage, totalPages), [currentPage, totalPages]);
 
+  const pageSize = table.getState().pagination.pageSize;
+
+  // A page size set in initialState may not be one of the options; list it so the select can show it.
+  const sizeOptions = useMemo(
+    () => (pageSizeOptions.includes(pageSize) ? pageSizeOptions : [...pageSizeOptions, pageSize].sort((a, b) => a - b)),
+    [pageSizeOptions, pageSize],
+  );
+
   const handlePageSizeChange = useCallback(
     (value: string) => {
       table.setPageSize(Number(value));
@@ -61,17 +69,17 @@ const DataTablePagination: FC<PaginationProps> = ({ pageSizeOptions = [30, 50, 1
             {t('pagination.rowsPerPage')}
           </span>
 
-          <Select value={`${table.getState().pagination.pageSize}`} onValueChange={handlePageSizeChange}>
+          <Select value={`${pageSize}`} onValueChange={handlePageSizeChange}>
             <Select.Trigger size="sm" aria-labelledby={rowsLabelId} className="w-20">
-              <Select.Value placeholder={table.getState().pagination.pageSize} />
+              <Select.Value placeholder={pageSize} />
 
               <Select.Icon />
             </Select.Trigger>
 
             <Select.Content side="top">
-              {pageSizeOptions.map((pageSize) => (
-                <Select.Item key={pageSize} value={`${pageSize}`}>
-                  <Select.Text>{pageSize}</Select.Text>
+              {sizeOptions.map((option) => (
+                <Select.Item key={option} value={`${option}`}>
+                  <Select.Text>{option}</Select.Text>
                 </Select.Item>
               ))}
             </Select.Content>

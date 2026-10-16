@@ -133,6 +133,36 @@ describe('clean primitives', () => {
     const present = componentFolders(`${REPO_ROOT}src/components`).filter((name) => retired.includes(name));
     expect(present).toEqual([]);
   });
+
+  it('Plan B app code contains no forbidden patterns', () => {
+    const scopes = [
+      'src/components/shared/',
+      'src/components/tables/',
+      'src/components/calendar/',
+      'src/layouts/',
+      'src/routes/',
+      'src/App.tsx',
+      'src/pages/dashboard/',
+      'src/pages/members/',
+    ];
+    const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) => scopes.some((scope) => file.startsWith(scope)));
+    expect(offenders).toEqual([]);
+  });
+
+  it('Plan B retired components are gone', () => {
+    const retired = ['prime-loader', 'blank-slate', 'action-panel', 'meta-card', 'grid-card', 'layout'];
+    const present = componentFolders(`${REPO_ROOT}src/components`).filter((name) => retired.includes(name));
+    expect(present).toEqual([]);
+    const retiredLayouts = [
+      'dashboard-layout',
+      'dashboard-sidebar',
+      'dashboard-sidebar-drawer',
+      'dashboard-sidebar-link',
+      'dashboard-header',
+    ];
+    const presentLayouts = componentFolders(`${REPO_ROOT}src/layouts`).filter((name) => retiredLayouts.includes(name));
+    expect(presentLayouts).toEqual([]);
+  });
 });
 
 /** Folders SP2 replaced (addendum §1, §8, §10). None may come back under src/components. */
