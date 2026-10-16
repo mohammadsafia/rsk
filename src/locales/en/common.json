@@ -160,5 +160,11 @@
     "yesterday": "Yesterday",
     "loadMore": "Load more",
     "empty": "No activity yet"
+  },
+  "charts": {
+    "viewTable": "View as table",
+    "viewChart": "View as chart",
+    "empty": "No data for this period",
+    "legend": "Series"
   }
 }

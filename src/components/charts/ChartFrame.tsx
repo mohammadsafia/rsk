@@ -1,0 +1,152 @@
+import { type ReactNode, useState } from 'react';
+
+import { Button, EmptyState, Skeleton, Table } from '@components/ui';
+import { Conditional } from '@components/utils';
+
+import { useAppTranslation } from '@hooks/shared';
+
+import { cn } from '@utils';
+
+import { toneColor } from './chart-theme';
+import type { ChartSeries, VisibleSeries } from './types';
+
+type FrameContext = { visible: VisibleSeries[]; isRTL: boolean; animate: boolean };
+
+export type ChartFrameProps<T> = {
+  'aria-label': string;
+  data: T[];
+  series: ChartSeries[];
+  xKey: keyof T & string;
+  formatValue: (value: number) => string;
+  formatX: (value: unknown) => string;
+  height?: number;
+  loading?: boolean;
+  empty?: ReactNode;
+  className?: string;
+  /** Override the table view (DonutChart lists slices). */
+  table?: { columns: string[]; rows: { key: string; cells: ReactNode[] }[] };
+  /** Show the series legend. @default series.length > 1 */
+  legend?: boolean;
+  children: (context: FrameContext) => ReactNode;
+};
+
+const prefersReducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+export function ChartFrame<T>({
+  'aria-label': ariaLabel,
+  data,
+  series,
+  xKey,
+  formatValue,
+  formatX,
+  height = 280,
+  loading = false,
+  empty,
+  className,
+  table,
+  legend,
+  children,
+}: ChartFrameProps<T>) {
+  const { t, isRTL } = useAppTranslation('common');
+  const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());
+  const [asTable, setAsTable] = useState(false);
+  const [animate] = useState(() => !prefersReducedMotion());
+
+  const colored: VisibleSeries[] = series.map((item, index) => ({ ...item, color: toneColor(item.tone, index) }));
+  const visible = colored.filter((item) => !hidden.has(item.key));
+  const showLegend = legend ?? series.length > 1;
+  const isEmpty = !loading && data.length === 0;
+
+  const toggle = (key: string) =>
+    setHidden((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else if (colored.length - next.size > 1) next.add(key);
+      return next;
+    });
+
+  const tableModel = table ?? {
+    columns: ['', ...colored.map((item) => item.label)],
+    rows: data.map((datum, index) => {
+      const record = datum as Record<string, unknown>;
+      return {
+        key: String(record[xKey] ?? index),
+        cells: [formatX(record[xKey]), ...colored.map((item) => formatValue(Number(record[item.key])))],
+      };
+    }),
+  };
+
+  return (
+    <figure
+      data-slot="chart"
+      aria-label={ariaLabel}
+      aria-busy={loading || undefined}
+      className={cn('flex w-full flex-col gap-3', className)}
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <Conditional.If condition={showLegend && !asTable}>
+          <div role="group" aria-label={t('charts.legend')} className="flex flex-wrap items-center gap-1">
+            {colored.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                aria-pressed={!hidden.has(item.key)}
+                onClick={() => toggle(item.key)}
+                className="focus-ring text-fg-muted aria-pressed:text-fg hover:bg-hover inline-flex items-center gap-1.5 rounded-sm px-1.5 py-0.5 text-xs transition-colors"
+              >
+                <span
+                  aria-hidden="true"
+                  className="size-2 rounded-full"
+                  style={{ background: hidden.has(item.key) ? 'var(--border-strong)' : item.color }}
+                />
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </Conditional.If>
+
+        <Button variant="ghost" size="sm" className="ms-auto" aria-pressed={asTable} onClick={() => setAsTable((value) => !value)}>
+          {t(asTable ? 'charts.viewChart' : 'charts.viewTable')}
+        </Button>
+      </div>
+
+      <Conditional>
+        <Conditional.If condition={loading}>
+          <Skeleton shape="block" className="w-full" style={{ height }} />
+        </Conditional.If>
+        <Conditional.If condition={isEmpty}>{empty ?? <EmptyState size="sm" kind="no-results" title={t('charts.empty')} />}</Conditional.If>
+        <Conditional.If condition={asTable}>
+          <div className="border-border overflow-hidden rounded-lg border">
+            <Table aria-label={ariaLabel}>
+              <Table.Header>
+                <Table.Row>
+                  {tableModel.columns.map((column, index) => (
+                    <Table.Head key={`${column}-${index}`} numeric={index > 0}>
+                      {column}
+                    </Table.Head>
+                  ))}
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {tableModel.rows.map((row) => (
+                  <Table.Row key={row.key}>
+                    {row.cells.map((cell, index) => (
+                      <Table.Cell key={index} numeric={index > 0}>
+                        {cell}
+                      </Table.Cell>
+                    ))}
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+          </div>
+        </Conditional.If>
+        <Conditional.Else>
+          <div data-slot="chart-plot" className="w-full" style={{ height }}>
+            {children({ visible, isRTL, animate })}
+          </div>
+        </Conditional.Else>
+      </Conditional>
+    </figure>
+  );
+}
