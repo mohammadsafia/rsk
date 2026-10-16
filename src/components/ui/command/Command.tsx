@@ -25,7 +25,11 @@ type CommandShortcutProps = HTMLAttributes<HTMLSpanElement>;
 
 type CommandSeparatorProps = ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>;
 
-type CommandDialogProps = ComponentPropsWithoutRef<typeof Dialog> & { title: string };
+type CommandDialogProps = ComponentPropsWithoutRef<typeof Dialog> & {
+  title: string;
+  /** Custom ranking (cmdk `filter`), e.g. to ignore diacritics. */
+  filter?: ComponentPropsWithoutRef<typeof CommandPrimitive>['filter'];
+};
 
 export type CommandProps = ComponentPropsWithoutRef<typeof CommandPrimitive>;
 
@@ -124,11 +128,12 @@ const CommandItemSeparator: FC<CommandSeparatorProps> = ({ className, ...props }
   <CommandPrimitive.Separator data-slot="command-separator" className={cn('bg-border-subtle -mx-1 my-1 h-px', className)} {...props} />
 );
 
-const CommandDialog: FC<CommandDialogProps> = ({ title, children, ...props }) => (
+const CommandDialog: FC<CommandDialogProps> = ({ title, filter, children, ...props }) => (
   <Dialog {...props}>
     <Dialog.Content title={title} hideTitle className="gap-0 overflow-hidden p-0">
       <Command
         label={title}
+        filter={filter}
         className={cn(
           '**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium',
           '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5',

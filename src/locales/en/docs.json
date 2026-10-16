@@ -45,5 +45,13 @@
   },
   "onThisPage": "On this page",
   "prev": "Previous",
-  "next": "Next"
+  "next": "Next",
+  "search": {
+    "trigger": "Search docs",
+    "placeholder": "Search components, guides and sections…",
+    "empty": "No results.",
+    "guides": "Guides",
+    "components": "Components",
+    "sections": "Sections"
+  }
 }
