@@ -1,7 +1,7 @@
 import { Children, Fragment, isValidElement, type ReactElement, type ReactNode, useEffect, useRef } from 'react';
 import { type FieldValues, FormProvider, type Path, type UseFormReturn } from 'react-hook-form';
 
-import { Badge, Button, Divider } from '@components/ui';
+import { Alert, Badge, Button, Divider } from '@components/ui';
 import { DescriptionList, Stepper } from '@components/shared';
 import { Conditional } from '@components/utils';
 
@@ -12,6 +12,7 @@ import { cn } from '@utils';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 import { FormWizardReview, type FormWizardReviewProps, FormWizardStep, type FormWizardStepProps, type ReviewRows } from './parts';
+import { useWizardDraft } from './useWizardDraft';
 import { useWizardSteps } from './useWizardSteps';
 
 export type FormWizardProps<TValues extends FieldValues> = {
@@ -89,12 +90,13 @@ function ReviewPanel({ steps, values, onEdit }: { steps: WizardStep[]; values: R
   );
 }
 
-function FormWizard<TValues extends FieldValues>({ form, onSubmit, className, children }: FormWizardProps<TValues>) {
+function FormWizard<TValues extends FieldValues>({ form, onSubmit, draftKey, className, children }: FormWizardProps<TValues>) {
   const { t } = useAppTranslation('common');
   const steps = readSteps(children, t('wizard.review'));
   const ids = steps.map((step) => step.id);
   const wizard = useWizardSteps(ids);
   const current = steps[wizard.index];
+  const draft = useWizardDraft(draftKey, form, wizard.index, wizard.goTo);
   const isLast = wizard.index === steps.length - 1;
   const headingRef = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
@@ -127,6 +129,7 @@ function FormWizard<TValues extends FieldValues>({ form, onSubmit, className, ch
 
   const submit = form.handleSubmit(async (values) => {
     await onSubmit(values);
+    draft.clear();
   });
 
   return (
@@ -182,6 +185,17 @@ function FormWizard<TValues extends FieldValues>({ form, onSubmit, className, ch
           </ol>
           <p className="text-fg-muted hidden text-xs sm:block">{t('wizard.stepOf', { current: wizard.index + 1, total: steps.length })}</p>
         </nav>
+
+        <Conditional.If condition={draft.restored}>
+          <Alert tone="info">
+            <Alert.Description className="flex flex-wrap items-center gap-2">
+              {t('wizard.draftRestored')}
+              <Button type="button" variant="link" size="sm" onClick={draft.discard}>
+                {t('wizard.discardDraft')}
+              </Button>
+            </Alert.Description>
+          </Alert>
+        </Conditional.If>
 
         <span aria-live="polite" className="sr-only">
           {moved.current && current
