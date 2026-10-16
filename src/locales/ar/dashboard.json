@@ -31,5 +31,13 @@
   "revenueOverview": "نظرة عامة على الإيرادات",
   "lastTwelveMonths": "آخر 12 شهرًا",
   "recentActivity": "النشاط الأخير",
-  "revenueTrend": "اتجاه الإيرادات"
+  "revenueTrend": "اتجاه الإيرادات",
+  "workspace": {
+    "title": "مساحة العمل",
+    "description": "خطتك واستخدامك في دورة الفوترة الحالية.",
+    "plan": "الخطة",
+    "planValue": "الأعمال",
+    "seats": "المقاعد المستخدمة",
+    "renewal": "تاريخ التجديد"
+  }
 }

@@ -104,18 +104,12 @@
     "legacy-color-name": 42,
     "arbitrary-length": 5
   },
-  "src/pages/dashboard/DashboardPage.tsx": {
-    "legacy-color-name": 11
-  },
   "src/pages/home/HomePage.tsx": {
     "legacy-color-ramp": 8,
     "legacy-color-name": 60,
     "legacy-shadow": 3,
     "hex-color": 2,
     "arbitrary-length": 29
-  },
-  "src/pages/members/MembersPage.tsx": {
-    "legacy-color-name": 5
   },
   "src/views/home/component-showcase/ComponentShowcase.tsx": {
     "legacy-color-ramp": 4,

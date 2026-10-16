@@ -95,12 +95,16 @@ const buildColumns = (t: TranslateFn): ColumnDef<Member>[] => {
       accessorKey: 'name',
       header: t('columns.name'),
       enableSorting: true,
-      cell: ({ row }) => <span className="text-foreground font-medium">{row.original.name}</span>,
+      cell: ({ row }) => <span className="text-fg font-medium">{row.original.name}</span>,
     },
     {
       accessorKey: 'email',
       header: t('columns.email'),
-      cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span>,
+      cell: ({ row }) => (
+        <span data-slot="member-email" dir="ltr" className="text-fg-muted">
+          {row.original.email}
+        </span>
+      ),
     },
     {
       accessorKey: 'role',
@@ -139,7 +143,11 @@ const buildColumns = (t: TranslateFn): ColumnDef<Member>[] => {
       enableSorting: true,
       sortDescFirst: true,
       filterFn: dateRangeFilterFn,
-      cell: ({ row }) => <span className="text-muted-foreground">{row.original.joined}</span>,
+      cell: ({ row }) => (
+        <span dir="ltr" className="text-fg-muted tabular-nums">
+          {row.original.joined}
+        </span>
+      ),
       meta: {
         label: t('columns.joined'),
         filterMeta: createFilterMeta({
@@ -154,7 +162,11 @@ const buildColumns = (t: TranslateFn): ColumnDef<Member>[] => {
       enableSorting: true,
       sortDescFirst: true,
       filterFn: dateFilterFn,
-      cell: ({ row }) => <span className="text-muted-foreground">{row.original.lastSeen}</span>,
+      cell: ({ row }) => (
+        <span dir="ltr" className="text-fg-muted tabular-nums">
+          {row.original.lastSeen}
+        </span>
+      ),
       meta: {
         label: t('columns.lastSeen'),
         filterMeta: createFilterMeta({
@@ -167,7 +179,11 @@ const buildColumns = (t: TranslateFn): ColumnDef<Member>[] => {
       accessorKey: 'shiftStart',
       header: t('columns.shiftStart'),
       filterFn: timeFilterFn,
-      cell: ({ row }) => <span className="text-muted-foreground">{row.original.shiftStart}</span>,
+      cell: ({ row }) => (
+        <span dir="ltr" className="text-fg-muted tabular-nums">
+          {row.original.shiftStart}
+        </span>
+      ),
       meta: {
         label: t('columns.shiftStart'),
         filterMeta: createFilterMeta({
@@ -202,7 +218,7 @@ function MembersPage() {
   const totalCount = table.getFilteredRowModel().rows.length;
 
   return (
-    <DataTable table={table}>
+    <div className="flex h-full min-h-0 flex-col">
       <PageHeader title={t('title')} description={t('description')}>
         <PageHeader.Actions>
           <Button>
@@ -212,12 +228,14 @@ function MembersPage() {
         </PageHeader.Actions>
       </PageHeader>
 
-      <DataTable.Toolbar totalCount={totalCount} totalLabel={t('totalLabel')} placeholder={t('searchPlaceholder')} />
+      <DataTable table={table} className="min-h-0 flex-1">
+        <DataTable.Toolbar totalCount={totalCount} totalLabel={t('totalLabel')} placeholder={t('searchPlaceholder')} />
 
-      <DataTable.Content emptyState={{ title: t('emptyState.title'), description: t('emptyState.description') }} />
+        <DataTable.Content emptyState={{ title: t('emptyState.title'), description: t('emptyState.description') }} />
 
-      <DataTable.Pagination />
-    </DataTable>
+        <DataTable.Pagination />
+      </DataTable>
+    </div>
   );
 }
 

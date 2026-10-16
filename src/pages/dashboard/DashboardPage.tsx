@@ -1,6 +1,8 @@
 import { type ElementType } from 'react';
 
 import { Card } from '@components/ui';
+import { CardGrid, DescriptionList, PageHeader } from '@components/shared';
+import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
 
@@ -33,23 +35,34 @@ function StatCard({ stat }: { stat: Stat }) {
   const positive = stat.delta >= 0;
 
   return (
-    <Card className="border-border border">
+    <Card>
       <Card.Content className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <span className="text-muted-foreground text-sm">{t(stat.labelKey)}</span>
+          <span className="text-fg-muted text-sm">{t(stat.labelKey)}</span>
 
-          <span className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-lg">
-            <stat.icon className="h-4 w-4" />
+          <span className="bg-surface-sunken text-fg-muted flex size-8 items-center justify-center rounded-md">
+            <stat.icon aria-hidden="true" className="size-4" />
           </span>
         </div>
 
-        <div className="flex items-end justify-between">
-          <span className="text-foreground text-2xl font-bold">
+        <div className="flex items-end justify-between gap-2">
+          <span data-slot="stat-value" dir="ltr" className="text-fg text-2xl font-semibold tabular-nums">
             {formatNumber(stat.value, { style: stat.format, maximumFractionDigits: stat.format === 'percent' ? 1 : 0 })}
           </span>
 
-          <span className={cn('flex items-center gap-0.5 text-xs font-medium', positive ? 'text-success' : 'text-destructive')}>
-            {positive ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
+          <span
+            dir="ltr"
+            className={cn('flex items-center gap-0.5 text-xs font-medium tabular-nums', positive ? 'text-success' : 'text-danger')}
+          >
+            <Conditional>
+              <Conditional.If condition={positive}>
+                <ArrowUpRight aria-hidden="true" className="size-3.5" />
+              </Conditional.If>
+
+              <Conditional.Else>
+                <ArrowDownRight aria-hidden="true" className="size-3.5" />
+              </Conditional.Else>
+            </Conditional>
             {formatNumber(Math.abs(stat.delta) / 100, { style: 'percent', maximumFractionDigits: 1 })}
           </span>
         </div>
@@ -73,8 +86,8 @@ function AreaChart({ data }: { data: number[] }) {
     <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="h-48 w-full" role="img" aria-label={t('revenueTrend')}>
       <defs>
         <linearGradient id="dashboard-area-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.25" />
-          <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
+          <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.18" />
+          <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
         </linearGradient>
       </defs>
 
@@ -83,7 +96,7 @@ function AreaChart({ data }: { data: number[] }) {
       <polyline
         points={linePoints}
         fill="none"
-        stroke="var(--primary)"
+        stroke="var(--accent)"
         strokeWidth="1.5"
         strokeLinejoin="round"
         strokeLinecap="round"
@@ -100,17 +113,20 @@ function ActivityList() {
     <ul className="flex flex-col">
       {ACTIVITY.map((item) => (
         <li key={item.id} className="border-border flex items-center gap-3 py-3 not-last:border-b">
-          <span className="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
+          <span
+            aria-hidden="true"
+            className="bg-surface-sunken text-fg-muted flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+          >
             {item.name.charAt(0)}
           </span>
 
           <div className="min-w-0 flex-1">
-            <p className="text-foreground truncate text-sm">
+            <p className="text-fg truncate text-sm">
               <span className="font-medium">{item.name}</span> {t(item.actionKey)}
             </p>
           </div>
 
-          <span className="text-muted-foreground shrink-0 text-xs">{t(item.timeKey, { count: item.timeCount })}</span>
+          <span className="text-fg-muted shrink-0 text-xs">{t(item.timeKey, { count: item.timeCount })}</span>
         </li>
       ))}
     </ul>
@@ -121,42 +137,41 @@ function DashboardPage() {
   const { t } = useAppTranslation('dashboard');
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-foreground text-2xl font-bold">{t('title')}</h1>
+    <div className="flex flex-col gap-4">
+      <PageHeader title={t('title')} description={t('subtitle')} className="pb-2" />
 
-        <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <CardGrid>
         {STATS.map((stat) => (
           <StatCard key={stat.labelKey} stat={stat} />
         ))}
-      </div>
+      </CardGrid>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card className="border-border border lg:col-span-2">
-          <Card.Header>
-            <Card.Title className="text-base">{t('revenueOverview')}</Card.Title>
-
-            <Card.Description>{t('lastTwelveMonths')}</Card.Description>
-          </Card.Header>
-
+      <CardGrid columns={{ base: 1, lg: 3 }}>
+        <Card className="lg:col-span-2" title={t('revenueOverview')} description={t('lastTwelveMonths')}>
           <Card.Content>
             <AreaChart data={CHART_DATA} />
           </Card.Content>
         </Card>
 
-        <Card className="border-border border">
-          <Card.Header>
-            <Card.Title className="text-base">{t('recentActivity')}</Card.Title>
-          </Card.Header>
-
+        <Card title={t('recentActivity')}>
           <Card.Content className="py-0">
             <ActivityList />
           </Card.Content>
         </Card>
-      </div>
+      </CardGrid>
+
+      <Card title={t('workspace.title')} description={t('workspace.description')}>
+        <Card.Content>
+          <DescriptionList
+            columns={3}
+            items={[
+              { term: t('workspace.plan'), value: t('workspace.planValue') },
+              { term: t('workspace.seats'), value: '18 / 25', numeric: true },
+              { term: t('workspace.renewal'), value: '2026-12-01', numeric: true },
+            ]}
+          />
+        </Card.Content>
+      </Card>
     </div>
   );
 }

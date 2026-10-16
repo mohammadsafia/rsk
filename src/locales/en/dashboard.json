@@ -23,5 +23,13 @@
   "revenueOverview": "Revenue overview",
   "lastTwelveMonths": "Last 12 months",
   "recentActivity": "Recent activity",
-  "revenueTrend": "Revenue trend"
+  "revenueTrend": "Revenue trend",
+  "workspace": {
+    "title": "Workspace",
+    "description": "Your plan and usage this billing cycle.",
+    "plan": "Plan",
+    "planValue": "Business",
+    "seats": "Seats used",
+    "renewal": "Renews on"
+  }
 }
