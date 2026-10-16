@@ -8,139 +8,86 @@ tags: [ui, alert, feedback]
 ---
 
 import { Alert } from '@components/ui';
-import { InfoIcon } from 'lucide-react';
+import { CircleAlert, CircleCheck, Info, TriangleAlert } from 'lucide-react';
 
-## Demo
+## Tones
 
-<div className="space-y-6">
-  <div>
-    <p className="text-fg-muted mb-2 text-xs font-medium">Soft (default)</p>
-    <div className="space-y-2">
-      <Alert>
-        <InfoIcon />
-        <Alert.Title>Default</Alert.Title>
-        <Alert.Description>Neutral filled-light alert.</Alert.Description>
-      </Alert>
+`tone` is the meaning of the message. The soft variant (default) tints the background.
 
-      <Alert tone="info">
-        <InfoIcon />
-        <Alert.Title>Info</Alert.Title>
-        <Alert.Description>Informational alert with a primary tone.</Alert.Description>
-      </Alert>
-
-      <Alert tone="success">
-        <InfoIcon />
-        <Alert.Title>Success</Alert.Title>
-        <Alert.Description>Operation completed successfully.</Alert.Description>
-      </Alert>
-
-      <Alert tone="warning">
-        <InfoIcon />
-        <Alert.Title>Warning</Alert.Title>
-        <Alert.Description>This action requires your attention.</Alert.Description>
-      </Alert>
-
-      <Alert tone="danger">
-        <InfoIcon />
-        <Alert.Title>Error</Alert.Title>
-        <Alert.Description>Something went wrong.</Alert.Description>
-      </Alert>
-    </div>
-  </div>
-
-  <div>
-    <p className="text-fg-muted mb-2 text-xs font-medium">Outline</p>
-    <div className="space-y-2">
-      <Alert variant="outline">
-        <InfoIcon />
-        <Alert.Title>Outline</Alert.Title>
-        <Alert.Description>Outline-only primary alert with no background fill.</Alert.Description>
-      </Alert>
-
-      <Alert variant="outline" tone="info">
-        <InfoIcon />
-        <Alert.Title>Outline Info</Alert.Title>
-        <Alert.Description>Plain background informational alert.</Alert.Description>
-      </Alert>
-
-      <Alert variant="outline" tone="danger">
-        <InfoIcon />
-        <Alert.Title>Outline Error</Alert.Title>
-        <Alert.Description>Outline-only error alert.</Alert.Description>
-      </Alert>
-
-      <Alert variant="outline" tone="success">
-        <InfoIcon />
-        <Alert.Title>Outline Success</Alert.Title>
-        <Alert.Description>Outline-only success alert.</Alert.Description>
-      </Alert>
-    </div>
-  </div>
-
-  <div>
-    <p className="text-fg-muted mb-2 text-xs font-medium">Without Icon</p>
+<Example title="Soft tones">
+  <div className="grid w-full max-w-md gap-2">
     <Alert>
-      <Alert.Title>Simple Alert</Alert.Title>
-      <Alert.Description>Alert without an icon.</Alert.Description>
+      <Info />
+      <Alert.Title>Sync scheduled</Alert.Title>
+      <Alert.Description>Records sync every night at 02:00.</Alert.Description>
+    </Alert>
+    <Alert tone="info">
+      <Info />
+      <Alert.Title>New lab results</Alert.Title>
+      <Alert.Description>3 results arrived since your last visit.</Alert.Description>
+    </Alert>
+    <Alert tone="success">
+      <CircleCheck />
+      <Alert.Title>Invoice paid</Alert.Title>
+      <Alert.Description>The payment was received.</Alert.Description>
+    </Alert>
+    <Alert tone="warning">
+      <TriangleAlert />
+      <Alert.Title>Licence expires soon</Alert.Title>
+      <Alert.Description>Renew within 14 days to avoid interruption.</Alert.Description>
+    </Alert>
+    <Alert tone="danger">
+      <CircleAlert />
+      <Alert.Title>Payment failed</Alert.Title>
+      <Alert.Description>The card was declined. Try another method.</Alert.Description>
     </Alert>
   </div>
-</div>
+</Example>
 
-## Imports
+## Outline
 
-```tsx
-import { Alert } from '@components/ui';
-import { InfoIcon } from 'lucide-react';
-```
+`outline` keeps the surface background and a neutral hairline; the tone shows only on the icon. There is no coloured side stripe.
 
-## Variant and tone
+<Example title="Outline">
+  <div className="grid w-full max-w-md gap-2">
+    <Alert variant="outline" tone="info">
+      <Info />
+      <Alert.Title>Maintenance window</Alert.Title>
+      <Alert.Description>Sunday 01:00–03:00.</Alert.Description>
+    </Alert>
+    <Alert variant="outline" tone="danger">
+      <CircleAlert />
+      <Alert.Title>Upload failed</Alert.Title>
+      <Alert.Description>The file is larger than 10 MB.</Alert.Description>
+    </Alert>
+  </div>
+</Example>
 
-`variant` is the treatment, `tone` is the meaning. Danger alerts use `role="alert"` (announced immediately); every other tone uses `role="status"`.
+## Without icon
 
-| Prop | Values | Use |
-|---|---|---|
-| `variant` | `soft` (default) | Tinted background with a hairline tone border |
-| | `outline` | Surface background, neutral hairline; tone only on the icon — no side stripe |
-| `tone` | `neutral` (default), `info`, `success`, `warning`, `danger` | The message's meaning |
+<Example title="Text only">
+  <Alert className="max-w-md">
+    <Alert.Title>Draft saved</Alert.Title>
+    <Alert.Description>Your changes are kept for 30 days.</Alert.Description>
+  </Alert>
+</Example>
 
-## Code
+## API
 
-```tsx
-// Soft (default)
-<Alert>
-  <InfoIcon />
-  <Alert.Title>Default</Alert.Title>
-  <Alert.Description>Description</Alert.Description>
-</Alert>
+<PropsTable
+  rows={[
+    { prop: 'variant', type: "'soft' | 'outline'", default: "'soft'", description: 'Tinted background, or surface with a neutral hairline.' },
+    { prop: 'tone', type: "'neutral' | 'info' | 'success' | 'warning' | 'danger'", default: "'neutral'", description: 'The meaning of the message.' },
+  ]}
+/>
 
-<Alert tone="success">
-  <InfoIcon />
-  <Alert.Title>Success</Alert.Title>
-  <Alert.Description>Operation completed</Alert.Description>
-</Alert>
+Put an optional icon first, then `Alert.Title` and `Alert.Description`; the layout aligns them in a grid.
 
-<Alert tone="warning">
-  <InfoIcon />
-  <Alert.Title>Warning</Alert.Title>
-  <Alert.Description>Needs attention</Alert.Description>
-</Alert>
+## Accessibility
 
-<Alert tone="danger">
-  <InfoIcon />
-  <Alert.Title>Error</Alert.Title>
-  <Alert.Description>Something went wrong</Alert.Description>
-</Alert>
+- `tone="danger"` renders `role="alert"` and is announced immediately; every other tone renders `role="status"` (polite).
+- Icons are decorative; the title carries the meaning, so never rely on colour alone.
 
-// Outline
-<Alert variant="outline" tone="danger">
-  <InfoIcon />
-  <Alert.Title>Subtle Error</Alert.Title>
-  <Alert.Description>Outline-only error message</Alert.Description>
-</Alert>
+## RTL notes
 
-// Without Icon
-<Alert>
-  <Alert.Title>Title</Alert.Title>
-  <Alert.Description>Description</Alert.Description>
-</Alert>
-```
+- The icon sits at the start and text aligns to the start; no icon needs mirroring.

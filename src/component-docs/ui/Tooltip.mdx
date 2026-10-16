@@ -7,50 +7,60 @@ description: 'Short inverse hint on hover or keyboard focus. Pass the text as co
 tags: [ui, tooltip, feedback]
 ---
 
-import { Tooltip, Button, IconButton } from '@components/ui';
-import { ArchiveIcon } from 'lucide-react';
+import { Button, IconButton, Tooltip } from '@components/ui';
+import { Archive } from 'lucide-react';
 
-## Demo
+## Basic
 
-<div className="flex gap-3">
-  <Tooltip content="Helpful hint">
-    <Button variant="outline">Hover me</Button>
+The child is the trigger; `content` is the hint.
+
+<Example title="Hover or focus">
+  <Tooltip content="Exports the current filters">
+    <Button variant="outline">Export</Button>
   </Tooltip>
+</Example>
+
+## Placement
+
+<Example title="Side and align">
   <Tooltip content="Shown below, aligned to the start" side="bottom" align="start">
     <Button variant="outline">Bottom start</Button>
   </Tooltip>
+  <Tooltip content="Shown on the end side" side="right">
+    <Button variant="outline">Right</Button>
+  </Tooltip>
+</Example>
+
+## Icon buttons
+
+`IconButton` already shows its `aria-label` as a tooltip, so don't wrap it in another one.
+
+<Example title="Built in">
   <IconButton aria-label="Archive record">
-    <ArchiveIcon />
+    <Archive />
   </IconButton>
-</div>
-
-## Imports
-
-```tsx
-import { Tooltip } from '@components/ui';
-```
-
-## Code
-
-```tsx
-<Tooltip content="Helpful hint">
-  <Button variant="outline">Hover me</Button>
-</Tooltip>
-
-<Tooltip content="Shown below" side="bottom" align="start">
-  <Button variant="outline">Bottom start</Button>
-</Tooltip>
-```
-
-`IconButton` shows its `aria-label` as a tooltip automatically. A single `Tooltip.Provider` is mounted at the app root, so you never add one yourself.
+</Example>
 
 ## API
 
-| Prop | Type | Default | Notes |
-|---|---|---|---|
-| `content` | `ReactNode` | — | Tooltip text. Empty content renders only the trigger. |
-| `side` | `'top' \| 'right' \| 'bottom' \| 'left'` | `'top'` | Preferred side. |
-| `align` | `'start' \| 'center' \| 'end'` | `'center'` | Alignment against the trigger. |
-| `delayDuration` | `number` | provider (300ms) | Hover delay before opening. |
-| `disabled` | `boolean` | `false` | Render the trigger with no tooltip. |
-| `className` | `string` | — | Applied to the bubble. |
+<PropsTable
+  rows={[
+    { prop: 'content', type: 'ReactNode', required: true, description: 'The hint. Empty content renders only the trigger.' },
+    { prop: 'side', type: "'top' | 'right' | 'bottom' | 'left'", default: "'top'", description: 'Preferred side; flips when there is no room.' },
+    { prop: 'align', type: "'start' | 'center' | 'end'", default: "'center'", description: 'Alignment against the trigger.' },
+    { prop: 'sideOffset', type: 'number', default: '4', description: 'Gap from the trigger in px.' },
+    { prop: 'delayDuration', type: 'number', default: 'provider (300ms)', description: 'Hover delay before opening.' },
+    { prop: 'disabled', type: 'boolean', default: 'false', description: 'Render the trigger with no tooltip.' },
+  ]}
+/>
+
+The child must be a single element that can hold a ref (a button or link). The app root provides `Tooltip.Provider`.
+
+## Accessibility
+
+- The trigger gets `aria-describedby` pointing at the tooltip; it opens on keyboard focus and closes on Escape.
+- Tooltips only describe; never put essential information or actions in one.
+
+## RTL notes
+
+- `align="start"` and `"end"` follow the reading direction; `side="left"` and `"right"` are physical and do not flip.

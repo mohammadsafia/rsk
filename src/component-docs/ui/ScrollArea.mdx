@@ -3,34 +3,63 @@ id: scroll-area
 title: ScrollArea
 section: Components
 category: UI
-description: 'Custom styled scrollable area.'
+description: 'Scrollable region with a thin token-coloured scrollbar.'
 tags: [ui, scroll, scrollarea]
 ---
 
 import { ScrollArea } from '@components/ui';
 
-## Demo
+## Vertical
 
-<ScrollArea className="h-48 w-80 rounded-md border p-4">
-  <div className="space-y-2">
-    {Array.from({ length: 20 }).map((_, i) => (
-      <div key={i} className="text-sm">
-        Item {i + 1}
-      </div>
-    ))}
-  </div>
-</ScrollArea>
+Give the area a fixed or flex-constrained height, and always render `ScrollArea.Bar`.
 
-## Imports
+<Example title="List">
+  <ScrollArea className="border-border h-48 w-72 rounded-md border">
+    <div className="grid gap-2 p-3">
+      {Array.from({ length: 20 }, (_, index) => (
+        <div key={index} className="text-sm">
+          Patient {index + 1}
+        </div>
+      ))}
+    </div>
+    <ScrollArea.Bar />
+  </ScrollArea>
+</Example>
 
-```tsx
-import { ScrollArea } from '@components/ui';
-```
+<Callout tone="warning" title="The bar is what makes it scroll">
+  Radix only enables overflow on the viewport while a scrollbar is mounted. A ScrollArea without `ScrollArea.Bar` clips its content instead of scrolling.
+</Callout>
 
-## Code
+## Horizontal
 
-```tsx
-<ScrollArea className="h-48 w-80">
-  <div>Long scrollable content...</div>
-</ScrollArea>
-```
+<Example title="Wide row">
+  <ScrollArea className="border-border w-72 rounded-md border" orientation="horizontal">
+    <div className="flex w-max gap-2 p-3">
+      {Array.from({ length: 12 }, (_, index) => (
+        <div key={index} className="bg-surface-sunken text-fg-muted rounded-md px-3 py-6 text-sm">
+          Slot {index + 1}
+        </div>
+      ))}
+    </div>
+    <ScrollArea.Bar orientation="horizontal" />
+  </ScrollArea>
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Main scroll direction; vertical also stops content from stretching wider than the area.' },
+    { prop: 'viewportClassName', type: 'string', description: 'Classes for the inner viewport, e.g. to make it a flex column.' },
+    { prop: 'Bar · orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Which bar to render; render both for two-way scrolling.' },
+  ]}
+/>
+
+## Accessibility
+
+- The viewport is a native scroll container, so wheel, touch, keyboard and screen readers work as usual.
+- If the region holds important content, make it focusable (`tabIndex={0}`) and label it so keyboard users can scroll it.
+
+## RTL notes
+
+- The vertical bar sits at the inline end (left in Arabic); horizontal scrolling starts from the right.

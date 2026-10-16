@@ -7,38 +7,68 @@ description: 'Text field in three sizes with invalid and disabled states; shares
 tags: [ui, forms, input]
 ---
 
-import { FieldFamilyDemo } from '@pages/components/components.data.demos';
+import { FormattedNumber, Input, Select, TimePicker } from '@components/ui';
 
-import { Input } from '@components/ui';
+## Sizes
 
-## Demo
+`sm` 28px · `md` 32px (default) · `lg` 40px.
 
-<div className="grid max-w-sm gap-3">
-  <Input placeholder="Patient name" />
-  <Input size="sm" placeholder="Search" />
-  <Input size="lg" placeholder="Search" />
-  <Input invalid defaultValue="2981-44" />
-  <Input disabled value="Locked" />
-</div>
+<Example title="Sizes">
+  <div className="grid w-full max-w-sm gap-3">
+    <Input size="sm" aria-label="Small" placeholder="Search" />
+    <Input aria-label="Medium" placeholder="Patient name" />
+    <Input size="lg" aria-label="Large" placeholder="Search records" />
+  </div>
+</Example>
 
-<div className="flex w-80 flex-col gap-3">
-  <Input placeholder="Email" />
-</div>
+## States
+
+<Example title="Invalid and disabled">
+  <div className="grid w-full max-w-sm gap-3">
+    <Input aria-label="Record number" invalid defaultValue="2981-44" />
+    <Input aria-label="Locked" disabled value="Locked" />
+  </div>
+</Example>
 
 ## Field family
 
-Every field shares Input's shape: `sm` 28px · `md` 32px (default) · `lg` 40px, the same border, focus ring and invalid state.
+Every field shares Input's shape: the same heights, border, focus ring and invalid state, so they line up in a row.
 
-<FieldFamilyDemo />
+<Example title="Fields side by side">
+  <div className="grid w-full gap-3 sm:grid-cols-2">
+    <Input aria-label="Name" placeholder="Layla Haddad" />
+    <Select>
+      <Select.Trigger aria-label="Role">
+        <Select.Value placeholder="Role" />
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Item value="admin">Admin</Select.Item>
+        <Select.Item value="editor">Editor</Select.Item>
+      </Select.Content>
+    </Select>
+    <TimePicker name="time" placeholder="Time" />
+    <FormattedNumber aria-label="Amount" showStepButtons />
+  </div>
+</Example>
 
-## Imports
+In forms, use [FormInput](/docs/components/form-input), which adds the label, description and error message.
 
-```tsx
-import { Input } from '@components/ui';
-```
+## API
 
-## Code
+<PropsTable
+  rows={[
+    { prop: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '28px · 32px · 40px.' },
+    { prop: 'invalid', type: 'boolean', default: 'false', description: 'Danger border and aria-invalid.' },
+  ]}
+/>
 
-```tsx
-<Input placeholder="Email" />
-```
+Every native `<input>` attribute passes through (`type`, `value`, `onChange`, `disabled`, …).
+
+## Accessibility
+
+- A native input: give it a `<label htmlFor>`, `aria-label`, or use the form field, which wires the label and the error's `aria-describedby`.
+- A placeholder is not a label.
+
+## RTL notes
+
+- The input uses `dir="auto"`, so typed text takes the direction of its first strong character: Arabic reads right to left, an email address left to right.

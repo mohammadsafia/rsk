@@ -9,50 +9,43 @@ tags: [ui, spinner, loading, overlay]
 
 import { Spinner } from '@components/ui';
 
-## Demo
+## Sizes
 
-<div className="flex w-full flex-col gap-6">
-  <div className="flex items-center gap-6">
-    <Spinner size="sm" />
-    <Spinner />
-    <Spinner size="lg" />
-  </div>
+<Example title="Sizes">
+  <Spinner size="sm" />
+  <Spinner />
+  <Spinner size="lg" />
+</Example>
 
-  <div className="border-border relative h-32 rounded-lg border p-4">
+## Overlay
+
+`overlay` covers the nearest positioned ancestor with a translucent scrim. Add `fixed` to cover the viewport.
+
+<Example title="Container overlay">
+  <div className="border-border relative h-32 w-full max-w-md rounded-lg border p-4">
     <p className="text-fg-muted text-sm">Visit summary is refreshing…</p>
     <Spinner overlay label="Refreshing visit summary" />
   </div>
-</div>
-
-## Imports
-
-```tsx
-import { Spinner } from '@components/ui';
-```
-
-## Code
-
-```tsx
-<Spinner size="sm" />
-<Spinner />
-<Spinner size="lg" />
-
-// Covers the nearest positioned parent
-<div className="relative h-32 rounded-lg border">
-  <Spinner overlay label="Refreshing visit summary" />
-</div>
-
-// Route-level fallback: covers the viewport
-<Suspense fallback={<Spinner overlay fixed size="lg" />}>…</Suspense>
-```
+</Example>
 
 ## API
 
-| Prop | Type | Default | Notes |
-|---|---|---|---|
-| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | 16, 24 or 32 px. |
-| `label` | `string` | `t('common:loading')` | Screen-reader text inside the `role="status"` region. |
-| `overlay` | `boolean` | `false` | Absolutely covers the nearest positioned ancestor with a translucent canvas scrim. |
-| `fixed` | `boolean` | `false` | With `overlay`, covers the viewport instead. |
+<PropsTable
+  rows={[
+    { prop: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '16px · 24px · 32px.' },
+    { prop: 'label', type: 'string', default: '"Loading"', description: 'Screen-reader text inside the status region (translated by default).' },
+    { prop: 'overlay', type: 'boolean', default: 'false', description: 'Covers the nearest positioned ancestor with a scrim.' },
+    { prop: 'fixed', type: 'boolean', default: 'false', description: 'With overlay, covers the viewport instead.' },
+  ]}
+/>
 
-Rotation stops under `prefers-reduced-motion`.
+For known progress use [Progress](/docs/components/progress); for content placeholders use [Skeleton](/docs/components/skeleton).
+
+## Accessibility
+
+- Renders `role="status"` with the label as text, so screen readers announce it politely; the icon is `aria-hidden`.
+- Rotation stops under `prefers-reduced-motion`.
+
+## RTL notes
+
+- No direction-specific behaviour.

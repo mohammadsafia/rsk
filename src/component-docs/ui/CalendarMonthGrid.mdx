@@ -9,77 +9,56 @@ tags: [ui, calendar, calendar-month-grid, calendar-grid, month-view, schedule, p
 
 import { CalendarEvent, CalendarMonthGrid } from '@components/ui';
 
-## Demo
+## Month
 
-A compact month grid — weekday header strip, then a days area with a few day cells (one current-month available day, one current-month unavailable day, one with events including the today highlight, and one out-of-month day).
+A weekday strip, then the day cells. The consumer computes each cell's flags; the primitive only renders them.
 
-<div className="flex h-100 flex-col rounded-lg border border-border overflow-clip">
-  <CalendarMonthGrid>
-    <CalendarMonthGrid.Weekdays>
-      <CalendarMonthGrid.Weekday>SUN</CalendarMonthGrid.Weekday>
-      <CalendarMonthGrid.Weekday>MON</CalendarMonthGrid.Weekday>
-      <CalendarMonthGrid.Weekday>TUE</CalendarMonthGrid.Weekday>
-      <CalendarMonthGrid.Weekday>WED</CalendarMonthGrid.Weekday>
-      <CalendarMonthGrid.Weekday>THU</CalendarMonthGrid.Weekday>
-      <CalendarMonthGrid.Weekday>FRI</CalendarMonthGrid.Weekday>
-      <CalendarMonthGrid.Weekday>SAT</CalendarMonthGrid.Weekday>
-    </CalendarMonthGrid.Weekdays>
+<Example title="Two weeks of a month">
+  <div className="border-border flex h-100 w-full flex-col overflow-clip rounded-lg border">
+    <CalendarMonthGrid>
+      <CalendarMonthGrid.Weekdays>
+        <CalendarMonthGrid.Weekday>SUN</CalendarMonthGrid.Weekday>
+        <CalendarMonthGrid.Weekday>MON</CalendarMonthGrid.Weekday>
+        <CalendarMonthGrid.Weekday>TUE</CalendarMonthGrid.Weekday>
+        <CalendarMonthGrid.Weekday>WED</CalendarMonthGrid.Weekday>
+        <CalendarMonthGrid.Weekday>THU</CalendarMonthGrid.Weekday>
+        <CalendarMonthGrid.Weekday>FRI</CalendarMonthGrid.Weekday>
+        <CalendarMonthGrid.Weekday>SAT</CalendarMonthGrid.Weekday>
+      </CalendarMonthGrid.Weekdays>
+      <CalendarMonthGrid.Days>
+        <CalendarMonthGrid.DayCell dayNumber={28} isCurrentMonth={false} available={false} />
+        <CalendarMonthGrid.DayCell dayNumber={29} isCurrentMonth={false} available={false} />
+        <CalendarMonthGrid.DayCell dayNumber={30} isCurrentMonth={false} available={false} />
+        <CalendarMonthGrid.DayCell dayNumber={1} isCurrentMonth available />
+        <CalendarMonthGrid.DayCell dayNumber={2} isCurrentMonth available={false} />
+        <CalendarMonthGrid.DayCell dayNumber={3} isCurrentMonth available />
+        <CalendarMonthGrid.DayCell dayNumber={4} isCurrentMonth available />
+        <CalendarMonthGrid.DayCell dayNumber={5} isCurrentMonth available isToday>
+          <CalendarMonthGrid.EventChip>
+            <CalendarEvent tone="info">09:00 · Check-up</CalendarEvent>
+          </CalendarMonthGrid.EventChip>
+          <CalendarMonthGrid.EventChip>
+            <CalendarEvent tone="accent">11:00 · Consult</CalendarEvent>
+          </CalendarMonthGrid.EventChip>
+        </CalendarMonthGrid.DayCell>
+        <CalendarMonthGrid.DayCell dayNumber={6} isCurrentMonth available />
+        <CalendarMonthGrid.DayCell dayNumber={7} isCurrentMonth available />
+        <CalendarMonthGrid.DayCell dayNumber={8} isCurrentMonth available={false} />
+        <CalendarMonthGrid.DayCell dayNumber={9} isCurrentMonth available>
+          <CalendarMonthGrid.EventChip>
+            <CalendarEvent tone="danger">14:00 · Deposition</CalendarEvent>
+          </CalendarMonthGrid.EventChip>
+        </CalendarMonthGrid.DayCell>
+        <CalendarMonthGrid.DayCell dayNumber={10} isCurrentMonth available />
+        <CalendarMonthGrid.DayCell dayNumber={11} isCurrentMonth available />
+      </CalendarMonthGrid.Days>
+    </CalendarMonthGrid>
+  </div>
+</Example>
 
-    <CalendarMonthGrid.Days>
-      <CalendarMonthGrid.DayCell dayNumber={28} isCurrentMonth={false} available={false} />
-      <CalendarMonthGrid.DayCell dayNumber={29} isCurrentMonth={false} available={false} />
-      <CalendarMonthGrid.DayCell dayNumber={30} isCurrentMonth={false} available={false} />
-      <CalendarMonthGrid.DayCell dayNumber={1} isCurrentMonth available />
-      <CalendarMonthGrid.DayCell dayNumber={2} isCurrentMonth available={false} />
-      <CalendarMonthGrid.DayCell dayNumber={3} isCurrentMonth available />
-      <CalendarMonthGrid.DayCell dayNumber={4} isCurrentMonth available />
+## Usage
 
-      <CalendarMonthGrid.DayCell dayNumber={5} isCurrentMonth available isToday>
-        <CalendarMonthGrid.EventChip>
-          <CalendarEvent tone="info">9 AM Patient A</CalendarEvent>
-        </CalendarMonthGrid.EventChip>
-        <CalendarMonthGrid.EventChip>
-          <CalendarEvent tone="accent">11 AM Patient B</CalendarEvent>
-        </CalendarMonthGrid.EventChip>
-      </CalendarMonthGrid.DayCell>
-
-      <CalendarMonthGrid.DayCell dayNumber={6} isCurrentMonth available />
-      <CalendarMonthGrid.DayCell dayNumber={7} isCurrentMonth available />
-      <CalendarMonthGrid.DayCell dayNumber={8} isCurrentMonth available={false} />
-
-      <CalendarMonthGrid.DayCell dayNumber={9} isCurrentMonth available>
-        <CalendarMonthGrid.EventChip>
-          <CalendarEvent tone="danger">2 PM Deposition</CalendarEvent>
-        </CalendarMonthGrid.EventChip>
-      </CalendarMonthGrid.DayCell>
-
-      <CalendarMonthGrid.DayCell dayNumber={10} isCurrentMonth available />
-      <CalendarMonthGrid.DayCell dayNumber={11} isCurrentMonth available />
-      <CalendarMonthGrid.DayCell dayNumber={12} isCurrentMonth available />
-    </CalendarMonthGrid.Days>
-  </CalendarMonthGrid>
-</div>
-
-## Imports
-
-```tsx
-import { CalendarMonthGrid } from '@components/ui';
-```
-
-## Sub-Components
-
-```
-CalendarMonthGrid              — Root container. Scrollable column with chrome bg and thin scrollbar.
-CalendarMonthGrid.Weekdays     — 7-column header strip for weekday labels. One Weekday child per column.
-CalendarMonthGrid.Weekday      — One weekday header cell (e.g., "MON"). Just text.
-CalendarMonthGrid.Days         — Grid container for all day cells. 7 columns, auto-rows.
-CalendarMonthGrid.DayCell      — One day in the grid. Renders the day-number chip + a flex-column area for children (events).
-CalendarMonthGrid.EventChip    — A button-shaped event preview inside a DayCell. Render a CalendarEvent inside for the tone tint and dot.
-```
-
-## Code
-
-### Basic month
+Map your data to cells. `DayCell` renders its own day-number chip; its children fill the events area.
 
 ```tsx
 <CalendarMonthGrid>
@@ -109,56 +88,32 @@ CalendarMonthGrid.EventChip    — A button-shaped event preview inside a DayCel
 </CalendarMonthGrid>
 ```
 
-### DayCell states
+## Overflow
 
-The cell automatically renders the day-number chip with appropriate styling based on three flags:
+The primitive does not limit how many events a day shows. Render the first few as `EventChip`s and add your own "+N more" control (for example a link-style `Button` opening a `Popover`) below them.
 
-```tsx
-{/* Today — accent day number */}
-<CalendarMonthGrid.DayCell dayNumber={5} isToday isCurrentMonth available />
+For a ready-made month view with overflow, navigation and popovers, use [CalendarGrid](/docs/components/calendar-grid).
 
-{/* Current month, has availability — normal foreground */}
-<CalendarMonthGrid.DayCell dayNumber={6} isCurrentMonth available />
+## API
 
-{/* Current month, no availability — muted bg */}
-<CalendarMonthGrid.DayCell dayNumber={7} isCurrentMonth available={false} />
+<PropsTable
+  rows={[
+    { prop: 'DayCell · dayNumber', type: 'number', required: true, description: 'The day shown in the chip.' },
+    { prop: 'DayCell · isCurrentMonth', type: 'boolean', required: true, description: 'false dims padding days from the previous/next month.' },
+    { prop: 'DayCell · available', type: 'boolean', required: true, description: 'false gives the cell a muted background.' },
+    { prop: 'DayCell · isToday', type: 'boolean', default: 'false', description: 'Accent day number and aria-current="date".' },
+    { prop: 'EventChip', type: "ComponentProps<'button'>", description: 'A button: pass onClick, aria-label, or use as Popover.Trigger asChild.' },
+  ]}
+/>
 
-{/* Out-of-month padding day — dimmed foreground */}
-<CalendarMonthGrid.DayCell dayNumber={29} isCurrentMonth={false} available={false} />
-```
+`CalendarMonthGrid`, `Weekdays`, `Weekday` and `Days` are styled `div`s with no props of their own. The parts share no context, so no provider is needed.
 
-### Overflow events
+## Accessibility
 
-When a day has more events than fit visually, render the first N as `EventChip` children and add a custom "+N more" button below them. The primitive doesn't enforce a count — that's a consumer decision.
+- Today's cell carries `aria-current="date"`.
+- `EventChip` is a native button; give it an `aria-label` with the full event (time, title) when the visible label is shortened.
 
-```tsx
-<CalendarMonthGrid.DayCell {...dayProps}>
-  {visibleEvents.map((event) => (
-    <CalendarMonthGrid.EventChip key={event.id} {...chipProps}>
-      {event.title}
-    </CalendarMonthGrid.EventChip>
-  ))}
+## RTL notes
 
-  {overflow.length > 0 && (
-    <Popover>
-      <Popover.Trigger asChild>
-        <Button variant="link" tone="accent" className="text-2xs h-auto p-0 font-medium">
-          +{overflow.length} more
-        </Button>
-      </Popover.Trigger>
-      <Popover.Content>
-        {overflow.map((event) => (...))}
-      </Popover.Content>
-    </Popover>
-  )}
-</CalendarMonthGrid.DayCell>
-```
-
-## Notes
-
-- **Pure rendering — no domain logic**. Consumers compute `dayNumber` / `isCurrentMonth` / `available` / `isToday` from their data and pass them in. The primitive doesn't iterate dates or know what a "month" is.
-- **Sub-parts are independent** (no Context). Render them in any order; no Provider wrapper needed.
-- **`DayCell` renders its own day-number chip** — children populate the events area below the chip.
-- **`EventChip` is a `<button>`** — full button props (`onClick`, `disabled`, `aria-label`). Pair with `Popover.Trigger asChild` to open a popover on click.
-- **`isToday` carries `aria-current="date"` automatically** for screen-reader emphasis.
-- **Overflow / "+N more" is consumer-handled** — the primitive renders whatever you put in. Use `EventChip` for the visible events plus your own overflow control below them.
+- The 7-column grid follows the document direction, so Sunday starts on the right in Arabic.
+- Translate the weekday labels you pass in; day numbers stay Western digits.

@@ -3,45 +3,53 @@ id: collapsible
 title: Collapsible
 section: Components
 category: UI
-description: 'Expandable/collapsible content section.'
+description: 'Show and hide one block of content with a trigger.'
 tags: [ui, collapsible, disclosure]
 ---
 
 import { Collapsible, Button } from '@components/ui';
+import { ChevronsUpDown } from 'lucide-react';
 
-## Demo
+## Basic
 
-<Collapsible className="w-80 space-y-2">
-    <div className="flex items-center justify-between space-x-4">
-        <h4 className="text-sm font-semibold">@username has 3 repositories</h4>
-        <Collapsible.Trigger asChild>
-            <Button variant="ghost" size="sm">
-                Toggle
-            </Button>
-        </Collapsible.Trigger>
+Use Collapsible for a single show/hide region. For several stacked sections, use [Accordion](/docs/components/accordion).
+
+<Example title="Show more">
+  <Collapsible className="w-80 space-y-2">
+    <div className="flex items-center justify-between gap-4">
+      <h4 className="text-fg text-sm font-semibold">3 attachments</h4>
+      <Collapsible.Trigger asChild>
+        <Button variant="ghost" size="sm">
+          <ChevronsUpDown aria-hidden="true" className="size-4" />
+          Show
+        </Button>
+      </Collapsible.Trigger>
     </div>
-
+    <div className="border-border rounded-md border px-3 py-2 text-sm">lab-results.pdf</div>
     <Collapsible.Content className="space-y-2">
-        <div className="rounded-md border px-4 py-2 text-sm">Repository 1</div>
-        <div className="rounded-md border px-4 py-2 text-sm">Repository 2</div>
-        <div className="rounded-md border px-4 py-2 text-sm">Repository 3</div>
+      <div className="border-border rounded-md border px-3 py-2 text-sm">x-ray-front.png</div>
+      <div className="border-border rounded-md border px-3 py-2 text-sm">referral-letter.pdf</div>
     </Collapsible.Content>
+  </Collapsible>
+</Example>
 
-</Collapsible>
+## API
 
-## Imports
+<PropsTable
+  rows={[
+    { prop: 'open · defaultOpen', type: 'boolean', description: 'Controlled or initial state.' },
+    { prop: 'onOpenChange', type: '(open: boolean) => void', description: 'Called when the trigger toggles.' },
+    { prop: 'disabled', type: 'boolean', default: 'false', description: 'Prevents toggling.' },
+  ]}
+/>
 
-```tsx
-import { Collapsible, Button } from '@components/ui';
-```
+`Collapsible.Trigger` takes `asChild` to use your own button; `Collapsible.Content` animates its height and respects reduced motion.
 
-## Code
+## Accessibility
 
-```tsx
-<Collapsible>
-  <Collapsible.Trigger asChild>
-    <Button>Toggle</Button>
-  </Collapsible.Trigger>
-  <Collapsible.Content>Hidden content here</Collapsible.Content>
-</Collapsible>
-```
+- The trigger gets `aria-expanded` and `aria-controls`; Enter and Space toggle it.
+- Hidden content is removed from the accessibility tree while closed.
+
+## RTL notes
+
+- No direction-specific behaviour.

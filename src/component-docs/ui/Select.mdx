@@ -9,34 +9,96 @@ tags: [ui, input, select]
 
 import { Select } from '@components/ui';
 
-## Demo
+## Basic
 
-<Select defaultValue="apple">
-  <Select.Trigger className="w-48">
-    <Select.Value />
-  </Select.Trigger>
-  <Select.Content>
-    <Select.Item value="apple">Apple</Select.Item>
-    <Select.Item value="orange">Orange</Select.Item>
-    <Select.Item value="banana">Banana</Select.Item>
-  </Select.Content>
-</Select>
+<Example title="Single choice">
+  <Select defaultValue="cardiology">
+    <Select.Trigger aria-label="Department" className="w-56">
+      <Select.Value />
+    </Select.Trigger>
+    <Select.Content>
+      <Select.Item value="cardiology">Cardiology</Select.Item>
+      <Select.Item value="dermatology">Dermatology</Select.Item>
+      <Select.Item value="pediatrics">Pediatrics</Select.Item>
+    </Select.Content>
+  </Select>
+</Example>
 
-## Imports
+## Groups
 
-```tsx
-import { Select } from '@components/ui';
-```
+<Example title="Grouped options">
+  <Select>
+    <Select.Trigger aria-label="Time zone" className="w-56">
+      <Select.Value placeholder="Time zone" />
+    </Select.Trigger>
+    <Select.Content>
+      <Select.Group>
+        <Select.Label>Middle East</Select.Label>
+        <Select.Item value="amman">Amman (GMT+3)</Select.Item>
+        <Select.Item value="riyadh">Riyadh (GMT+3)</Select.Item>
+      </Select.Group>
+      <Select.Separator />
+      <Select.Group>
+        <Select.Label>Europe</Select.Label>
+        <Select.Item value="london">London (GMT+0)</Select.Item>
+      </Select.Group>
+    </Select.Content>
+  </Select>
+</Example>
 
-## Code
+## Sizes and states
 
-```tsx
-<Select defaultValue="apple">
-  <Select.Trigger>
-    <Select.Value />
-  </Select.Trigger>
-  <Select.Content>
-    <Select.Item value="apple">Apple</Select.Item>
-  </Select.Content>
-</Select>
-```
+The trigger has Input's heights and invalid state, so it lines up with other fields.
+
+<Example title="Sizes, invalid, disabled">
+  <div className="grid w-56 gap-3">
+    <Select>
+      <Select.Trigger size="sm" aria-label="Small">
+        <Select.Value placeholder="Small" />
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Item value="a">Option</Select.Item>
+      </Select.Content>
+    </Select>
+    <Select>
+      <Select.Trigger invalid aria-label="Invalid">
+        <Select.Value placeholder="Required" />
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Item value="a">Option</Select.Item>
+      </Select.Content>
+    </Select>
+    <Select disabled>
+      <Select.Trigger aria-label="Disabled">
+        <Select.Value placeholder="Disabled" />
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Item value="a">Option</Select.Item>
+      </Select.Content>
+    </Select>
+  </div>
+</Example>
+
+For long or searchable lists use [Combobox](/docs/components/combobox); in forms, [FormSelect](/docs/components/form-select).
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'value · defaultValue · onValueChange', type: 'string · (value) => void', description: 'On Select: the chosen item, controlled or initial.' },
+    { prop: 'disabled', type: 'boolean', default: 'false', description: 'On Select: blocks opening.' },
+    { prop: 'Trigger · size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Same heights as Input.' },
+    { prop: 'Trigger · invalid', type: 'boolean', default: 'false', description: 'Danger border and aria-invalid.' },
+    { prop: 'Value · placeholder', type: 'ReactNode', description: 'Shown when nothing is selected.' },
+    { prop: 'Item · value · disabled', type: 'string · boolean', description: 'Plain-text children are wrapped in Select.Text automatically.' },
+  ]}
+/>
+
+## Accessibility
+
+- Radix renders a `combobox` trigger and a `listbox`; Arrow keys move, typing jumps to a match, Enter selects, Escape closes.
+- Label the trigger with a `<label>`, `aria-label`, or the form field.
+
+## RTL notes
+
+- The chevron sits at the end and the check mark at the start of each item, so both swap sides in Arabic.

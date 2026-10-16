@@ -9,55 +9,60 @@ tags: [ui, input, number]
 
 import { FormattedNumber } from '@components/ui';
 
-## Demo
+## Basic
 
-<div className="space-y-4">
-  <div>
-    <p className="text-fg-muted mb-2 text-xs font-medium">Basic</p>
-    <FormattedNumber placeholder="Enter a number" />
+The value is end-aligned in tabular mono digits.
+
+<Example title="Number">
+  <div className="w-60">
+    <FormattedNumber aria-label="Quantity" placeholder="0" />
   </div>
+</Example>
 
-<div>
-  <p className="text-fg-muted mb-2 text-xs font-medium">With Step Buttons</p>
-  <FormattedNumber showStepButtons min={0} max={100} stepper={5} placeholder="0" />
-</div>
+## Step buttons
 
-  <div>
-    <p className="text-fg-muted mb-2 text-xs font-medium">Currency</p>
-    <FormattedNumber prefix="$" thousandSeparator decimalScale={2} placeholder="$0.00" />
+`showStepButtons` adds labelled − / + buttons, disabled at `min` and `max`; ↑ and ↓ step too.
+
+<Example title="Stepper">
+  <div className="w-60">
+    <FormattedNumber aria-label="Seats" showStepButtons min={0} max={100} stepper={5} defaultValue={10} />
   </div>
-</div>
+</Example>
 
-## Imports
+## Currency and units
 
-```tsx
-import { FormattedNumber } from '@components/ui';
-```
-
-## Code
-
-```tsx
-// Basic
-<FormattedNumber placeholder="Enter a number" />
-
-// With step buttons and constraints
-<FormattedNumber showStepButtons min={0} max={100} stepper={5} />
-
-// Currency formatting
-<FormattedNumber prefix="$" thousandSeparator decimalScale={2} />
-
-// With suffix
-<FormattedNumber suffix="%" max={100} />
-```
+<Example title="Prefix, suffix and grouping">
+  <div className="grid w-60 gap-3">
+    <FormattedNumber aria-label="Amount" prefix="$" thousandSeparator="," decimalScale={2} placeholder="$0.00" />
+    <FormattedNumber aria-label="Dose" suffix=" mg" isDecimal={false} placeholder="0 mg" />
+  </div>
+</Example>
 
 ## API
 
-| Prop | Type | Default | Notes |
-|---|---|---|---|
-| `showStepButtons` | `boolean` | `false` | Shows labelled − / + buttons, disabled at `min` / `max`. |
-| `stepper` | `number` | `1` | Step for the buttons and the ↑ / ↓ keys. |
-| `min` / `max` | `number` | `0` / — | Values outside the range are rejected. |
-| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Same heights as `Input`. |
-| `invalid` | `boolean` | `false` | Sets `aria-invalid` and the danger border. |
+<PropsTable
+  rows={[
+    { prop: 'value', type: 'number | null', description: 'Controlled value; null when empty.' },
+    { prop: 'onChange', type: '(value: number | null) => void', description: 'Called with the parsed number, not the formatted text.' },
+    { prop: 'min · max', type: 'number', default: '0 · —', description: 'Values outside the range are rejected.' },
+    { prop: 'stepper', type: 'number', default: '1', description: 'Step for the buttons and the ↑ / ↓ keys.' },
+    { prop: 'showStepButtons', type: 'boolean', default: 'false', description: 'Shows labelled − / + buttons.' },
+    { prop: 'prefix · suffix', type: 'string', description: 'Fixed text around the number, e.g. "$" or " mg".' },
+    { prop: 'thousandSeparator', type: 'string', description: 'Digit-group separator, e.g. ",".' },
+    { prop: 'decimalScale · isDecimal', type: 'number · boolean', default: '— · true', description: 'Decimal places; isDecimal={false} allows integers only.' },
+    { prop: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Same heights as Input.' },
+    { prop: 'invalid', type: 'boolean', default: 'false', description: 'Danger border and aria-invalid.' },
+  ]}
+/>
 
-The control stays left-to-right in Arabic, so signs and digit groups keep their order. The value is end-aligned in tabular mono digits.
+Note `min` defaults to `0`: pass a negative `min` to allow negative numbers. In forms, use `FormNumber`.
+
+## Accessibility
+
+- A native text input in decimal mode; label it with a `<label>`, `aria-label`, or the form field.
+- The step buttons have translated `aria-label`s ("Decrease", "Increase").
+
+## RTL notes
+
+- The control follows the page direction (padding, step buttons, error icon), while the number itself uses plaintext bidi, so `-1,250.50` keeps its order in Arabic.
+- Digits stay Western.

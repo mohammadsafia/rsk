@@ -3,46 +3,17 @@ id: pagination
 title: Pagination
 section: Components
 category: UI
-description: 'Navigation component for paginated content with previous, next, and page number controls.'
+description: 'Previous, next and page-number controls for paged content.'
 tags: [ui, pagination, navigation]
 ---
 
 import { Pagination } from '@components/ui';
 
-## Demo
+## Pages
 
-<div className="space-y-6">
-  <div>
-    <p className="text-fg-muted mb-3 text-xs font-medium">Basic Pagination</p>
-    <Pagination>
-      <Pagination.List>
-        <Pagination.Item>
-          <Pagination.Previous />
-        </Pagination.Item>
-        <Pagination.Item>
-          <Pagination.NavButton>1</Pagination.NavButton>
-        </Pagination.Item>
-        <Pagination.Item>
-          <Pagination.NavButton>2</Pagination.NavButton>
-        </Pagination.Item>
-        <Pagination.Item>
-          <Pagination.NavButton isActive>3</Pagination.NavButton>
-        </Pagination.Item>
-        <Pagination.Item>
-          <Pagination.NavButton>4</Pagination.NavButton>
-        </Pagination.Item>
-        <Pagination.Item>
-          <Pagination.NavButton>5</Pagination.NavButton>
-        </Pagination.Item>
-        <Pagination.Item>
-          <Pagination.Next />
-        </Pagination.Item>
-      </Pagination.List>
-    </Pagination>
-  </div>
+The active page is solid; others are ghost buttons.
 
-<div>
-  <p className="text-fg-muted mb-3 text-xs font-medium">With Ellipsis</p>
+<Example title="Page numbers">
   <Pagination>
     <Pagination.List>
       <Pagination.Item>
@@ -68,103 +39,46 @@ import { Pagination } from '@components/ui';
       </Pagination.Item>
     </Pagination.List>
   </Pagination>
-</div>
+</Example>
 
-  <div>
-    <p className="text-fg-muted mb-3 text-xs font-medium">Compact</p>
-    <Pagination>
-      <Pagination.List>
-        <Pagination.Item>
-          <Pagination.Previous />
-        </Pagination.Item>
-        <Pagination.Item>
-          <Pagination.NavButton isActive>5</Pagination.NavButton>
-        </Pagination.Item>
-        <Pagination.Item>
-          <Pagination.Next />
-        </Pagination.Item>
-      </Pagination.List>
-    </Pagination>
-  </div>
-</div>
+## Compact
 
-## Imports
+<Example title="Current page only">
+  <Pagination>
+    <Pagination.List>
+      <Pagination.Item>
+        <Pagination.Previous />
+      </Pagination.Item>
+      <Pagination.Item>
+        <Pagination.NavButton isActive>5</Pagination.NavButton>
+      </Pagination.Item>
+      <Pagination.Item>
+        <Pagination.Next disabled />
+      </Pagination.Item>
+    </Pagination.List>
+  </Pagination>
+</Example>
 
-```tsx
-import { Pagination } from '@components/ui';
-```
+Tables don't need this: `DataTable.Pagination` builds it from the table state.
 
-## Code
+## API
 
-```tsx
-import { Pagination } from '@components/ui';
+<PropsTable
+  rows={[
+    { prop: 'NavButton · isActive', type: 'boolean', default: 'false', description: 'Marks the current page (solid, aria-current="page").' },
+    { prop: 'NavButton', type: 'ButtonProps', description: 'A Button without variant, tone or size; pass onClick or asChild with a Link.' },
+    { prop: 'Previous · Next', type: 'IconButtonProps', description: 'aria-label defaults to the translated "Previous page" / "Next page".' },
+  ]}
+/>
 
-// Basic Pagination
-<Pagination>
-  <Pagination.List>
-    <Pagination.Item>
-      <Pagination.Previous />
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.NavButton>1</Pagination.NavButton>
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.NavButton>2</Pagination.NavButton>
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.NavButton isActive>3</Pagination.NavButton>
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.NavButton>4</Pagination.NavButton>
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.NavButton>5</Pagination.NavButton>
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.Next />
-    </Pagination.Item>
-  </Pagination.List>
-</Pagination>
+`Pagination` is a `nav`, `List` an `ol`, `Item` an `li`; `Ellipsis` shows a gap and tells screen readers "More pages".
 
-// With Ellipsis
-<Pagination>
-  <Pagination.List>
-    <Pagination.Item>
-      <Pagination.Previous />
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.NavButton>1</Pagination.NavButton>
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.NavButton isActive>2</Pagination.NavButton>
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.NavButton>3</Pagination.NavButton>
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.Ellipsis />
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.NavButton>10</Pagination.NavButton>
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.Next />
-    </Pagination.Item>
-  </Pagination.List>
-</Pagination>
+## Accessibility
 
-// Compact
-<Pagination>
-  <Pagination.List>
-    <Pagination.Item>
-      <Pagination.Previous />
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.NavButton isActive>5</Pagination.NavButton>
-    </Pagination.Item>
-    <Pagination.Item>
-      <Pagination.Next />
-    </Pagination.Item>
-  </Pagination.List>
-</Pagination>
-```
+- `Pagination` is a navigation landmark labelled for screen readers; the active page has `aria-current="page"`.
+- Disable `Previous` or `Next` at the ends rather than hiding them, so the layout doesn't shift.
+
+## RTL notes
+
+- The previous/next chevrons rotate in Arabic, so "previous" always points back along the reading direction.
+- Page numbers stay Western digits.

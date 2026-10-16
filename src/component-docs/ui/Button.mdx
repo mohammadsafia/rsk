@@ -3,65 +3,110 @@ id: button
 title: Button
 section: Components
 category: UI
-description: 'Actions with three weights (solid, outline, ghost, link) and three tones (neutral, accent, danger).'
+description: 'Actions with four weights (solid, outline, ghost, link) and three tones (neutral, accent, danger).'
 tags: [ui, button, actions]
 ---
 
+import { Link } from 'react-router-dom';
 import { Button } from '@components/ui';
 
-## Demo
+## Variants
 
-<div className="grid gap-4">
-  <div className="flex flex-wrap items-center gap-2">
-    <Button>Save</Button>
-    <Button tone="accent">Approve</Button>
-    <Button tone="danger">Delete</Button>
+`variant` is visual weight: one `solid` button per view for the primary action, `outline` for secondary actions, `ghost` for low-emphasis and toolbar actions, `link` for inline navigation.
+
+<Example title="Variants">
+  <Button>Save</Button>
+  <Button variant="outline">Export</Button>
+  <Button variant="ghost">Cancel</Button>
+  <Button variant="link">View chart</Button>
+</Example>
+
+## Tones
+
+`tone` is meaning: `neutral` for ordinary actions, `accent` for the Oxblood brand action, `danger` for destructive ones.
+
+<Example title="Tones across variants">
+  <div className="grid gap-3">
+    <div className="flex flex-wrap items-center gap-2">
+      <Button>Save</Button>
+      <Button tone="accent">Approve</Button>
+      <Button tone="danger">Delete</Button>
+    </div>
+    <div className="flex flex-wrap items-center gap-2">
+      <Button variant="outline">Export</Button>
+      <Button variant="outline" tone="accent">Assign</Button>
+      <Button variant="outline" tone="danger">Revoke</Button>
+    </div>
+    <div className="flex flex-wrap items-center gap-2">
+      <Button variant="ghost">Cancel</Button>
+      <Button variant="ghost" tone="accent">Details</Button>
+      <Button variant="ghost" tone="danger">Remove</Button>
+    </div>
   </div>
-  <div className="flex flex-wrap items-center gap-2">
-    <Button variant="outline">Export</Button>
-    <Button variant="outline" tone="accent">Assign</Button>
-    <Button variant="outline" tone="danger">Revoke</Button>
-  </div>
-  <div className="flex flex-wrap items-center gap-2">
-    <Button variant="ghost">Cancel</Button>
-    <Button variant="ghost" tone="accent">Details</Button>
-    <Button variant="ghost" tone="danger">Remove</Button>
-    <Button variant="link" tone="accent">View chart</Button>
-  </div>
-  <div className="flex flex-wrap items-center gap-2">
-    <Button size="sm">Small</Button>
-    <Button>Medium</Button>
-    <Button size="lg">Large</Button>
-    <Button loading>Saving</Button>
-    <Button disabled>Disabled</Button>
-  </div>
-  <Button fullWidth>Full width</Button>
-</div>
+</Example>
+
+## Sizes
+
+<Example title="Sizes">
+  <Button size="sm">Small</Button>
+  <Button>Medium</Button>
+  <Button size="lg">Large</Button>
+</Example>
+
+## States
+
+`loading` shows a spinner and blocks clicks while keeping the label; `disabled` dims the button.
+
+<Example title="Loading and disabled">
+  <Button loading>Saving</Button>
+  <Button disabled>Disabled</Button>
+  <Button fullWidth variant="outline">Full width</Button>
+</Example>
+
+## As a link
+
+`asChild` passes the button styling to its child, such as a router `Link`.
+
+<Example title="Router link">
+  <Button asChild variant="outline">
+    <Link to="/members">Members</Link>
+  </Button>
+</Example>
 
 ## Choosing variant and tone
 
-- **`variant` is visual weight.** One `solid` button per view for the primary action; `outline` for secondary actions; `ghost` for low-emphasis and toolbar actions; `link` for inline navigation.
-- **`tone` is meaning.** `neutral` (default) for ordinary actions, `accent` for the Oxblood brand action, `danger` for destructive ones. Success-colored buttons do not exist — a successful action is just the primary action.
+- **One solid button per view.** Everything else is `outline`, `ghost` or `link`.
+- **Success-coloured buttons do not exist.** A successful action is just the primary action.
 - **Icon-only actions use `IconButton`**, which requires an `aria-label` and shows it as a tooltip.
-- Use `asChild` to render a router `Link` with button styling. Use `className` only for layout (width, margin, position), never for color.
+- Use `className` only for layout (width, margin, position), never for colour.
 
-## Imports
+<DoDont
+  do={<div className="flex gap-2"><Button variant="outline">Cancel</Button><Button>Save</Button></div>}
+  doCaption="one primary action"
+  dont={<div className="flex gap-2"><Button>Cancel</Button><Button>Save</Button></div>}
+  dontCaption="two competing primaries"
+/>
 
-```tsx
-import { Button } from '@components/ui';
-```
+## API
 
-## Code
+<PropsTable
+  rows={[
+    { prop: 'variant', type: "'solid' | 'outline' | 'ghost' | 'link'", default: "'solid'", description: 'Visual weight.' },
+    { prop: 'tone', type: "'neutral' | 'accent' | 'danger'", default: "'neutral'", description: 'Meaning of the action.' },
+    { prop: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Matches the control heights of Input and Select.' },
+    { prop: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner, sets aria-busy and blocks clicks.' },
+    { prop: 'fullWidth', type: 'boolean', default: 'false', description: 'Stretches to the container width.' },
+    { prop: 'asChild', type: 'boolean', default: 'false', description: 'Renders the child element (e.g. a Link) with button styling.' },
+  ]}
+/>
 
-```tsx
-<Button>Save</Button>
-<Button tone="accent">Approve</Button>
-<Button variant="outline" tone="danger">Revoke</Button>
-<Button variant="ghost">Cancel</Button>
-<Button variant="link" tone="accent">View chart</Button>
-<Button size="sm" loading>Saving</Button>
-<Button type="submit" loading={isSubmitting}>Save</Button>
-<Button asChild variant="outline">
-  <Link to="/patients">Patients</Link>
-</Button>
-```
+All native `<button>` attributes pass through. The default `type` is the browser's (`submit` inside a form), so set `type="button"` for buttons that should not submit.
+
+## Accessibility
+
+- A native `<button>`: Enter and Space activate it, and the focus ring uses the shared `focus-ring` token.
+- While `loading`, the label stays readable by screen readers and the button reports `aria-busy`.
+
+## RTL notes
+
+- Icons placed before the label sit at the start; mirror directional ones (arrows, chevrons) with `rtl:-scale-x-100`.

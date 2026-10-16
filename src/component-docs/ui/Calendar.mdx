@@ -7,48 +7,65 @@ description: '32px day cells: today has a hairline ring, selection and range end
 tags: [ui, calendar, date-picker]
 ---
 
+import { useState } from 'react';
 import { Calendar } from '@components/ui';
 
-## Demo
+export const RangeDemo = () => {
+  const [range, setRange] = useState({ from: new Date(2026, 9, 12), to: new Date(2026, 9, 16) });
+  return <Calendar mode="range" defaultMonth={new Date(2026, 9, 1)} selected={range} onSelect={setRange} />;
+};
 
-<div className="space-y-4">
-  <div>
-    <p className="text-fg-muted mb-2 text-xs font-medium">Single Date</p>
-    <Calendar mode="single" />
-  </div>
+## Single date
 
-  <div>
-    <p className="text-fg-muted mb-2 text-xs font-medium">With Dropdown Navigation</p>
-    <Calendar mode="single" captionLayout="dropdown" />
-  </div>
-</div>
+<Example title="Single date">
+  <Calendar mode="single" defaultMonth={new Date(2026, 9, 1)} />
+</Example>
 
-## Imports
+## Range
 
-```tsx
-import { Calendar } from '@components/ui';
-```
+The range ends use the accent; the days between sit on a soft accent tint.
 
-## Code
+<Example
+  title="Controlled range"
+  code={`const [range, setRange] = useState<CalendarRange>();
 
-```tsx
-// Single date selection
-<Calendar mode="single" />
+<Calendar mode="range" selected={range} onSelect={setRange} />`}
+>
+  <RangeDemo />
+</Example>
 
-// Range selection
-<Calendar mode="range" />
+## Month and year dropdowns
 
-// With dropdown month/year navigation
-<Calendar mode="single" captionLayout="dropdown" />
-
-// Custom button variant
-<Calendar mode="single" buttonVariant="outline" />
-```
+<Example title="Dropdown navigation">
+  <Calendar mode="single" captionLayout="dropdown" defaultMonth={new Date(2026, 9, 1)} startMonth={new Date(2020, 0)} endMonth={new Date(2030, 11)} />
+</Example>
 
 ## Look and language
 
-- **Today** — hairline `border-strong` ring, never a fill.
-- **Selected / range ends** — `bg-accent text-accent-fg`; the **range middle** sits on `bg-accent-subtle`.
-- **Outside days** — `text-fg-subtle`; **disabled days** are struck through.
-- Previous/next buttons are ghost icon buttons with translated labels and mirror in Arabic.
-- The calendar's locale and direction follow the app language, and day numbers always use Western digits.
+- **Today** has a hairline `border-strong` ring, never a fill.
+- **Outside days** use `text-fg-subtle`; **disabled days** are struck through.
+- The locale and direction follow the app language, and day numbers always use Western digits.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'mode', type: "'single' | 'multiple' | 'range'", description: 'Selection model (react-day-picker).' },
+    { prop: 'selected · onSelect', type: 'Date | Date[] | CalendarRange', description: 'Controlled selection for the chosen mode.' },
+    { prop: 'captionLayout', type: "'label' | 'dropdown'", default: "'label'", description: 'Month/year as text, or as Select dropdowns.' },
+    { prop: 'buttonVariant', type: "Button['variant']", default: "'ghost'", description: 'Style of the previous/next buttons.' },
+    { prop: 'disabled', type: 'Matcher | Matcher[]', description: 'Days that cannot be picked, e.g. { before: new Date() }.' },
+  ]}
+/>
+
+Every other `DayPicker` prop passes through. For a field with a popover, use `DatePicker` or the form `FormDatePicker`.
+
+## Accessibility
+
+- Days form a grid: arrow keys move by day and week, Page Up/Down by month, Home/End to the week's edges.
+- Previous/next buttons and the dropdowns have translated `aria-label`s.
+
+## RTL notes
+
+- In Arabic the grid runs right to left, weekday names are Arabic, and the previous/next chevrons swap sides.
+- Day numbers stay Western (0–9).

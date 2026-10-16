@@ -3,91 +3,62 @@ id: avatar
 title: Avatar
 section: Components
 category: UI
-description: 'User profile image with fallback support and different sizes.'
+description: 'Round profile image with an initials or icon fallback, in three sizes.'
 tags: [ui, avatar, image]
 ---
 
 import { Avatar } from '@components/ui';
 import { User } from 'lucide-react';
 
-## Demo
+## Sizes
 
-<div className="space-y-4">
-  <div>
-    <p className="text-fg-muted mb-2 text-xs font-medium">With Image</p>
-    <div className="flex gap-2">
-      <Avatar size="sm">
-        <Avatar.Image src="https://github.com/shadcn.png" alt="User" />
-        <Avatar.Fallback>SM</Avatar.Fallback>
-      </Avatar>
+<Example title="Sizes">
+  <Avatar size="sm">
+    <Avatar.Image src="https://github.com/shadcn.png" alt="Sara Haddad" />
+    <Avatar.Fallback>SH</Avatar.Fallback>
+  </Avatar>
+  <Avatar>
+    <Avatar.Image src="https://github.com/shadcn.png" alt="Sara Haddad" />
+    <Avatar.Fallback>SH</Avatar.Fallback>
+  </Avatar>
+  <Avatar size="lg">
+    <Avatar.Image src="https://github.com/shadcn.png" alt="Sara Haddad" />
+    <Avatar.Fallback>SH</Avatar.Fallback>
+  </Avatar>
+</Example>
 
-      <Avatar>
-        <Avatar.Image src="https://github.com/shadcn.png" alt="User" />
-        <Avatar.Fallback>MD</Avatar.Fallback>
-      </Avatar>
+## Fallback
 
-      <Avatar size="lg">
-        <Avatar.Image src="https://github.com/shadcn.png" alt="User" />
-        <Avatar.Fallback>LG</Avatar.Fallback>
-      </Avatar>
-    </div>
+When the image is missing or fails to load, the fallback shows initials or an icon.
 
-  </div>
-
-  <div>
-    <p className="text-fg-muted mb-2 text-xs font-medium">Fallback (Text & Icon)</p>
-    <div className="flex gap-2">
-      <Avatar>
-        <Avatar.Image alt="User" />
-        <Avatar.Fallback>JD</Avatar.Fallback>
-      </Avatar>
-
-      <Avatar>
-        <Avatar.Image alt="User" />
-        <Avatar.Fallback>
-          <User size={16} />
-        </Avatar.Fallback>
-      </Avatar>
-    </div>
-
-  </div>
-</div>
-
-## Imports
-
-```tsx
-import { Avatar } from '@components/ui';
-import { User } from 'lucide-react';
-```
-
-## Code
-
-```tsx
-// With Image
-<Avatar>
-  <Avatar.Image src="..." alt="User" />
-  <Avatar.Fallback>CN</Avatar.Fallback>
-</Avatar>
-
-// Custom Size
-<Avatar size="lg">
-  <Avatar.Image src="..." alt="User" />
-  <Avatar.Fallback>LG</Avatar.Fallback>
-</Avatar>
-
-// Icon Fallback
-<Avatar>
-  <Avatar.Image alt="User" />
-  <Avatar.Fallback>
-    <User />
-  </Avatar.Fallback>
-</Avatar>
-```
+<Example title="Initials and icon">
+  <Avatar>
+    <Avatar.Image alt="Omar Khalil" />
+    <Avatar.Fallback>OK</Avatar.Fallback>
+  </Avatar>
+  <Avatar>
+    <Avatar.Image alt="Unknown user" />
+    <Avatar.Fallback>
+      <User aria-hidden="true" className="size-4" />
+    </Avatar.Fallback>
+  </Avatar>
+</Example>
 
 ## API
 
-| Prop | Type | Default | Notes |
-|---|---|---|---|
-| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | 24px · 32px · 40px |
+<PropsTable
+  rows={[
+    { prop: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '24px · 32px · 40px.' },
+  ]}
+/>
 
-The fallback shows initials in `text-fg-muted` on the hover tint.
+`Avatar.Image` takes `src` and `alt`; `Avatar.Fallback` takes initials or an icon and accepts `delayMs` to avoid a flash while the image loads.
+
+## Accessibility
+
+- Give `Avatar.Image` an `alt` with the person's name. When the name is already next to the avatar, pass `alt=""` so it is not read twice.
+- An icon fallback is decorative (`aria-hidden`).
+
+## RTL notes
+
+- No direction-specific behaviour. Write Arabic initials as one or two letters; they render in the Arabic font.

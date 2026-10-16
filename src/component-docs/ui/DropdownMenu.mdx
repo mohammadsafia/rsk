@@ -3,56 +3,109 @@ id: dropdown-menu
 title: DropdownMenu
 section: Components
 category: UI
-description: 'Context menu with items, checkboxes, and radio options.'
+description: 'Menu of actions, checkboxes and radio options opened from a trigger.'
 tags: [ui, dropdown, menu]
 ---
 
-import { DropdownMenu, Button } from '@components/ui';
+import { useState } from 'react';
+import { Button, DropdownMenu } from '@components/ui';
+import { LogOut, Settings, User } from 'lucide-react';
 
-## Demo
+export const ViewOptionsDemo = () => {
+  const [density, setDensity] = useState('comfortable');
+  const [showArchived, setShowArchived] = useState(false);
+  return (
+    <DropdownMenu>
+      <DropdownMenu.Trigger asChild>
+        <Button variant="outline">View</Button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content className="w-56">
+        <DropdownMenu.CheckboxItem checked={showArchived} onCheckedChange={setShowArchived}>
+          Show archived
+        </DropdownMenu.CheckboxItem>
+        <DropdownMenu.Separator />
+        <DropdownMenu.Label inset>Density</DropdownMenu.Label>
+        <DropdownMenu.RadioGroup value={density} onValueChange={setDensity}>
+          <DropdownMenu.RadioItem value="comfortable">Comfortable</DropdownMenu.RadioItem>
+          <DropdownMenu.RadioItem value="compact">Compact</DropdownMenu.RadioItem>
+        </DropdownMenu.RadioGroup>
+      </DropdownMenu.Content>
+    </DropdownMenu>
+  );
+};
 
-<DropdownMenu>
-  <DropdownMenu.Trigger asChild>
-    <Button variant="outline">Open Menu</Button>
-  </DropdownMenu.Trigger>
-  <DropdownMenu.Content className="w-56">
-    <DropdownMenu.Label>My Account</DropdownMenu.Label>
-    <DropdownMenu.Separator />
-    <DropdownMenu.Item>Profile</DropdownMenu.Item>
-    <DropdownMenu.Item>
-      Settings
-      <DropdownMenu.Shortcut>⌘,</DropdownMenu.Shortcut>
-    </DropdownMenu.Item>
-    <DropdownMenu.Separator />
-    <DropdownMenu.Item tone="danger">Logout</DropdownMenu.Item>
-  </DropdownMenu.Content>
-</DropdownMenu>
+## Actions
 
-## Imports
+<Example title="Account menu">
+  <DropdownMenu>
+    <DropdownMenu.Trigger asChild>
+      <Button variant="outline">Account</Button>
+    </DropdownMenu.Trigger>
+    <DropdownMenu.Content className="w-56">
+      <DropdownMenu.Label>Layla Haddad</DropdownMenu.Label>
+      <DropdownMenu.Separator />
+      <DropdownMenu.Item>
+        <User aria-hidden="true" />
+        Profile
+      </DropdownMenu.Item>
+      <DropdownMenu.Item>
+        <Settings aria-hidden="true" />
+        Settings
+        <DropdownMenu.Shortcut>⌘,</DropdownMenu.Shortcut>
+      </DropdownMenu.Item>
+      <DropdownMenu.Separator />
+      <DropdownMenu.Item tone="danger">
+        <LogOut aria-hidden="true" />
+        Sign out
+      </DropdownMenu.Item>
+    </DropdownMenu.Content>
+  </DropdownMenu>
+</Example>
 
-```tsx
-import { DropdownMenu, Button } from '@components/ui';
-```
+## Checkbox and radio items
 
-## Code
+Use `inset` on labels and items so they line up with the check and radio marks.
 
-```tsx
-<DropdownMenu>
-  <DropdownMenu.Trigger asChild>
-    <Button>Open</Button>
-  </DropdownMenu.Trigger>
-  <DropdownMenu.Content>
-    <DropdownMenu.Label>Menu</DropdownMenu.Label>
-    <DropdownMenu.Item>Item 1</DropdownMenu.Item>
-    <DropdownMenu.Item>Item 2</DropdownMenu.Item>
-  </DropdownMenu.Content>
-</DropdownMenu>
-```
+<Example
+  title="View options"
+  code={`const [density, setDensity] = useState('comfortable');
+const [showArchived, setShowArchived] = useState(false);
+
+<DropdownMenu.Content>
+  <DropdownMenu.CheckboxItem checked={showArchived} onCheckedChange={setShowArchived}>
+    Show archived
+  </DropdownMenu.CheckboxItem>
+  <DropdownMenu.Separator />
+  <DropdownMenu.Label inset>Density</DropdownMenu.Label>
+  <DropdownMenu.RadioGroup value={density} onValueChange={setDensity}>
+    <DropdownMenu.RadioItem value="comfortable">Comfortable</DropdownMenu.RadioItem>
+    <DropdownMenu.RadioItem value="compact">Compact</DropdownMenu.RadioItem>
+  </DropdownMenu.RadioGroup>
+</DropdownMenu.Content>`}
+>
+  <ViewOptionsDemo />
+</Example>
 
 ## API
 
-| Prop | On | Values |
-|---|---|---|
-| `tone` | `Item` | `neutral` (default), `danger` |
-| `inset` | `Item`, `Label`, `SubTrigger` | aligns with checkbox/radio items |
-| `Shortcut` | slot | mono hint at the inline end |
+<PropsTable
+  rows={[
+    { prop: 'Item · tone', type: "'neutral' | 'danger'", default: "'neutral'", description: 'danger for destructive actions.' },
+    { prop: 'Item · Label · SubTrigger · inset', type: 'boolean', default: 'false', description: 'Indents to align with checkbox and radio items.' },
+    { prop: 'Item · onSelect', type: '(event) => void', description: 'Called on click or Enter; the menu then closes.' },
+    { prop: 'CheckboxItem · checked · onCheckedChange', type: 'boolean · (checked) => void', description: 'A toggle inside the menu.' },
+    { prop: 'RadioGroup · value · onValueChange', type: 'string · (value) => void', description: 'One choice among RadioItems.' },
+    { prop: 'Shortcut', type: 'ReactNode', description: 'Mono key hint at the end of an item.' },
+  ]}
+/>
+
+`Sub`, `SubTrigger` and `SubContent` build nested menus.
+
+## Accessibility
+
+- The trigger gets `aria-haspopup` and `aria-expanded`; the content is a `role="menu"` with `menuitem`, `menuitemcheckbox` and `menuitemradio` items.
+- Arrow keys move, typing jumps to an item, Enter selects, Escape closes and returns focus to the trigger.
+
+## RTL notes
+
+- The submenu chevron rotates in Arabic; check and radio marks sit at the start and shortcuts at the end.

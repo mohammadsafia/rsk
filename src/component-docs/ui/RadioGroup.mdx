@@ -8,46 +8,73 @@ tags: [ui, radio, input]
 ---
 
 import { RadioGroup } from '@components/ui';
-import { RadioGroupDemo } from '@pages/components/components.data.demos';
 
-## Demo
+## Option cards
 
-<div className="flex items-center gap-3">
+Each item is a whole-card radio; the checked card takes the accent border and tint.
+
+<Example title="Plan">
+  <RadioGroup aria-label="Plan" defaultValue="clinic" className="max-w-sm">
+    <RadioGroup.Item value="solo">
+      <span className="flex-1">Solo practice</span>
+      <RadioGroup.Indicator />
+    </RadioGroup.Item>
+    <RadioGroup.Item value="clinic">
+      <span className="flex-1">Clinic</span>
+      <RadioGroup.Indicator />
+    </RadioGroup.Item>
+    <RadioGroup.Item value="hospital" disabled>
+      <span className="flex-1">Hospital (contact sales)</span>
+      <RadioGroup.Indicator />
+    </RadioGroup.Item>
+  </RadioGroup>
+</Example>
+
+## In a row
+
+The root is a grid, so `grid-cols-*` lays the cards out side by side.
+
+<Example title="Two columns">
+  <RadioGroup aria-label="Visit type" defaultValue="in-person" className="max-w-md grid-cols-2">
+    <RadioGroup.Item value="in-person">
+      <span className="flex-1">In person</span>
+      <RadioGroup.Indicator />
+    </RadioGroup.Item>
+    <RadioGroup.Item value="video">
+      <span className="flex-1">Video call</span>
+      <RadioGroup.Indicator />
+    </RadioGroup.Item>
+  </RadioGroup>
+</Example>
+
+## Dot
+
+`RadioGroup.Dot` is the same circle without behaviour, for custom single-select lists such as table filters.
+
+<Example title="Non-interactive indicator">
   <RadioGroup.Dot checked />
   <RadioGroup.Dot />
-</div>
+</Example>
 
-<RadioGroupDemo />
+In forms, use [FormRadioGroup](/docs/components/form-radio-group).
 
-## Imports
+## API
 
-```tsx
-import { RadioGroup } from '@components/ui';
-import { CheckCircleFilled } from '@assets/icons';
-import { Circle } from 'lucide-react';
-```
+<PropsTable
+  rows={[
+    { prop: 'value · defaultValue · onValueChange', type: 'string · (value) => void', description: 'The selected item, controlled or initial.' },
+    { prop: 'invalid', type: 'boolean', default: 'false', description: 'Danger border on every item and aria-invalid.' },
+    { prop: 'Item · value', type: 'string', required: true, description: 'The value this card selects.' },
+    { prop: 'Item · disabled', type: 'boolean', default: 'false', description: 'Dims and skips one option.' },
+    { prop: 'Dot · checked', type: 'boolean', default: 'false', description: 'Filled or empty circle (aria-hidden).' },
+  ]}
+/>
 
-## Code
+## Accessibility
 
-```tsx
-<RadioGroup value={value} onValueChange={setValue}>
-  <RadioGroup.Item value="option1">
-    <span className="...">Option 1</span>
-    <RadioGroup.Indicator>
-      <CheckCircleFilled className="text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
-      <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
-    </RadioGroup.Indicator>
-  </RadioGroup.Item>
-</RadioGroup>
+- Radix renders `role="radiogroup"` with `role="radio"` items; Arrow keys move and select, Tab leaves the group.
+- Label the group with `aria-label` or `aria-labelledby`; each card's text is its option name.
 
-// Custom Icons
-<RadioGroup value={value} onValueChange={setValue}>
-  <RadioGroup.Item value="option1">
-    <span className="...">Option 1</span>
-    <RadioGroup.Indicator>
-      <Star size={20} className="text-warning hidden fill-warning group-data-[state=checked]/radio-item:block" />
-      <Star size={20} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
-    </RadioGroup.Indicator>
-  </RadioGroup.Item>
-</RadioGroup>
-```
+## RTL notes
+
+- The label sits at the start and the indicator at the end, so they swap sides in Arabic; Arrow keys follow the reading direction.

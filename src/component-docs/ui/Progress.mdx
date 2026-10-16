@@ -9,73 +9,57 @@ tags: [ui, progress, loading]
 
 import { Progress } from '@components/ui';
 
-## Demo
+## Tones
 
-<div className="w-full space-y-4">
-    <div>
-        <p className="text-fg-muted mb-2 text-xs font-medium">Variants</p>
-        <div className="space-y-2">
-            <div className="space-y-1">
-                <span className="text-xs">Default (30%)</span>
-                <Progress value={30}/>
-            </div>
-            <div className="space-y-1">
-                <span className="text-xs">Success (60%)</span>
-                <Progress tone="success" value={60}/>
-            </div>
-            <div className="space-y-1">
-                <span className="text-xs">Destructive (90%)</span>
-                <Progress tone="danger" value={90}/>
-            </div>
-            <div className="space-y-1">
-                <span className="text-xs">Secondary (50%)</span>
-                <Progress tone="neutral" value={50}/>
-            </div>
-            <div className="space-y-1">
-                <span className="text-xs">Accent Indicator (75%)</span>
-                <Progress value={75}/>
-            </div>
-        </div>
+<Example title="Tones">
+  <div className="grid w-full max-w-sm gap-3">
+    <Progress aria-label="Upload" value={30} />
+    <Progress aria-label="Profile complete" tone="success" value={60} />
+    <Progress aria-label="Storage used" tone="danger" value={90} />
+    <Progress aria-label="Import" tone="neutral" value={50} />
+  </div>
+</Example>
+
+## Sizes
+
+<Example title="Thickness">
+  <div className="grid w-full max-w-sm gap-3">
+    <Progress aria-label="Small" size="sm" value={70} />
+    <Progress aria-label="Medium" value={70} />
+    <Progress aria-label="Large" size="lg" value={70} />
+  </div>
+</Example>
+
+## Custom scale
+
+`fullValue` sets what counts as full, so you can pass raw counts.
+
+<Example title="3 of 8 steps">
+  <div className="grid w-full max-w-sm gap-1.5">
+    <div className="text-fg-muted flex justify-between text-xs">
+      <span>Onboarding</span>
+      <span dir="ltr" className="tabular-nums">3 / 8</span>
     </div>
+    <Progress aria-label="Onboarding" value={3} fullValue={8} />
+  </div>
+</Example>
 
-    <div>
-        <p className="text-fg-muted mb-2 text-xs font-medium">Sizes</p>
-        <div className="space-y-2">
-            <div className="space-y-1">
-                <span className="text-xs">Small</span>
-                <Progress size="sm" value={70}/>
-            </div>
-            <div className="space-y-1">
-                <span className="text-xs">Medium</span>
-                <Progress size="md" value={70}/>
-            </div>
-            <div className="space-y-1">
-                <span className="text-xs">Large</span>
-                <Progress size="lg" value={70}/>
-            </div>
-        </div>
-    </div>
+## API
 
-</div>
+<PropsTable
+  rows={[
+    { prop: 'value', type: 'number', required: true, description: 'Current value, clamped to 0 – fullValue.' },
+    { prop: 'fullValue', type: 'number', default: '100', description: 'The value that means complete.' },
+    { prop: 'tone', type: "'accent' | 'neutral' | 'success' | 'danger'", default: "'accent'", description: 'Fill colour.' },
+    { prop: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '4px · 6px · 8px.' },
+  ]}
+/>
 
-## Imports
+## Accessibility
 
-```tsx
-import { Progress } from '@components/ui';
-```
+- Radix renders `role="progressbar"` with `aria-valuenow` and `aria-valuemax`; give it an `aria-label` or `aria-labelledby`.
+- For unknown durations use a [Spinner](/docs/components/spinner) instead.
 
-## Code
+## RTL notes
 
-```tsx
-// Variants
-<Progress value={30} />
-<Progress tone="success" value={60} />
-<Progress tone="danger" value={90} />
-<Progress tone="neutral" value={50} />
-<Progress value={75} />
-
-// Sizes
-<Progress size="sm" value={70} />
-<Progress size="md" value={70} />
-<Progress size="lg" value={70} />
-```
+- The bar fills from the inline start: left to right in English, right to left in Arabic.

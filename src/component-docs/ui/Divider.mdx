@@ -9,41 +9,47 @@ tags: [ui, divider, separator]
 
 import { Divider } from '@components/ui';
 
-## Demo
+## Horizontal
 
-<div className="w-full space-y-4">
-    <div>
-        <p className="text-fg-muted mb-2 text-xs font-medium">Horizontal</p>
-        <div className="space-y-1">
-            <div className="text-sm">Section 1</div>
-            <Divider/>
-            <div className="text-sm">Section 2</div>
-        </div>
-    </div>
+<Example title="Between sections">
+  <div className="w-full max-w-sm space-y-2 text-sm">
+    <div>Personal details</div>
+    <Divider />
+    <div>Insurance</div>
+    <Divider variant="dashed" />
+    <div>Emergency contact</div>
+  </div>
+</Example>
 
-    <div>
-        <p className="text-fg-muted mb-2 text-xs font-medium">Vertical</p>
-        <div className="flex h-12 items-center space-x-2">
-            <div className="text-sm">Left</div>
-            <Divider orientation="vertical"/>
-            <div className="text-sm">Right</div>
-        </div>
-    </div>
+## Vertical
 
-</div>
+A vertical divider stretches to its flex row's height.
 
-## Imports
+<Example title="Inline">
+  <div className="flex h-6 items-center gap-3 text-sm">
+    <span>Patients</span>
+    <Divider orientation="vertical" />
+    <span>Visits</span>
+    <Divider orientation="vertical" variant="dashed" />
+    <span>Invoices</span>
+  </div>
+</Example>
 
-```tsx
-import { Divider } from '@components/ui';
-```
+## API
 
-## Code
+<PropsTable
+  rows={[
+    { prop: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Direction of the line.' },
+    { prop: 'variant', type: "'solid' | 'dashed'", default: "'solid'", description: 'Line style.' },
+  ]}
+/>
 
-```tsx
-// Horizontal
-<Divider />
+All other `<hr>` attributes pass through.
 
-// Vertical
-<Divider orientation="vertical" />
-```
+## Accessibility
+
+- Renders an `<hr>` (implicit `role="separator"`) with `aria-orientation`. For a purely visual line inside a group, pass `aria-hidden="true"`.
+
+## RTL notes
+
+- No direction-specific behaviour; the dashed vertical line uses the logical `border-s`.

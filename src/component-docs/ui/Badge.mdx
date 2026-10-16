@@ -9,80 +9,55 @@ tags: [ui, badge]
 
 import { Badge } from '@components/ui';
 
-## Demo
+## Dot
 
-<div className="flex flex-wrap gap-2">
+The default variant: a small tone dot next to neutral text. Use it in dense tables and lists.
+
+<Example title="Dot">
   <Badge>Draft</Badge>
   <Badge tone="accent">Assigned</Badge>
   <Badge tone="success">Active</Badge>
   <Badge tone="warning">Pending</Badge>
   <Badge tone="danger">Overdue</Badge>
   <Badge tone="info">Referred</Badge>
-</div>
-<div className="flex flex-wrap gap-2">
+</Example>
+
+## Soft
+
+A tinted background for when the status should stand out.
+
+<Example title="Soft">
   <Badge variant="soft">Draft</Badge>
   <Badge variant="soft" tone="accent">Assigned</Badge>
   <Badge variant="soft" tone="success">Active</Badge>
   <Badge variant="soft" tone="warning">Pending</Badge>
   <Badge variant="soft" tone="danger">Overdue</Badge>
   <Badge variant="soft" tone="info">Referred</Badge>
-  <Badge variant="soft" tone="success" size="sm">sm</Badge>
-</div>
+</Example>
 
-<div className="space-y-4">
-  <div>
-    <p className="text-fg-muted mb-2 text-xs font-medium">Variants</p>
-    <div className="flex flex-wrap items-center gap-2">
-      <Badge>Default</Badge>
-      <Badge>Success</Badge>
-      <Badge tone="danger">Destructive</Badge>
-      <Badge tone="warning">Warning</Badge>
-      <Badge>Muted</Badge>
-      <Badge>Neutral</Badge>
-      <Badge tone="accent">Accent</Badge>
-    </div>
+## Sizes
 
-  </div>
+<Example title="Sizes">
+  <Badge variant="soft" tone="success" size="sm">Active</Badge>
+  <Badge variant="soft" tone="success">Active</Badge>
+</Example>
 
-  <div>
-    <p className="text-fg-muted mb-2 text-xs font-medium">Usage Examples</p>
-    <div className="flex flex-wrap items-center gap-2">
-      <Badge size="sm">Default</Badge>
-      <Badge size="sm">Success</Badge>
-      <Badge tone="danger" size="sm">Destructive</Badge>
-      <Badge tone="warning" size="md">Warning</Badge>
-      <Badge size="md">Muted</Badge>
-      <Badge size="sm">Neutral</Badge>
-      <Badge tone="accent" size="sm">Accent</Badge>
-    </div>
+## API
 
-  </div>
-</div>
+<PropsTable
+  rows={[
+    { prop: 'variant', type: "'dot' | 'soft'", default: "'dot'", description: 'A tone dot with neutral text, or a tinted background.' },
+    { prop: 'tone', type: "'neutral' | 'accent' | 'success' | 'warning' | 'danger' | 'info'", default: "'neutral'", description: 'The meaning of the status.' },
+    { prop: 'size', type: "'sm' | 'md'", default: "'md'", description: '20px or 22px tall.' },
+  ]}
+/>
 
-## Imports
+Badges are never interactive. For removable or clickable labels use [Tag](/docs/components/tag).
 
-```tsx
-import { Badge } from '@components/ui';
-```
+## Accessibility
 
-## Code
+- Renders a plain `<span>`; the dot is `aria-hidden`, so the text must say the status (don't rely on colour).
 
-```tsx
-// Variants
-<Badge>Default</Badge>
-<Badge>Success</Badge>
-<Badge tone="danger">Destructive</Badge>
-<Badge tone="warning">Warning</Badge>
-<Badge>Muted</Badge>
-<Badge>Neutral</Badge>
-<Badge tone="accent">Accent</Badge>
+## RTL notes
 
-// Examples
-<Badge size="sm">Default</Badge>
-<Badge size="sm">Success</Badge>
-<Badge tone="danger" size="sm">Destructive</Badge>
-<Badge tone="warning" size="md">Warning</Badge>
-<Badge size="md">Muted</Badge>
-<Badge size="sm">Neutral</Badge>
-<Badge tone="accent" size="sm">Accent</Badge>
-```
+- The dot sits at the start of the label, so it moves to the right in Arabic automatically.

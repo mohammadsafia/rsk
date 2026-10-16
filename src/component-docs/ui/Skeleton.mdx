@@ -9,166 +9,61 @@ tags: [ui, skeleton, loading]
 
 import { Skeleton } from '@components/ui';
 
-## Demo
+## Shapes
 
-<div className="w-full space-y-4">
-  <div>
-    <p className="text-fg-muted mb-2 text-xs font-medium">Sizes</p>
-    <div className="space-y-2">
-      <Skeleton size="sm" />
+`line` for text, `circle` for avatars, `block` for images and cards. Each comes in `sm`, `md` and `lg`.
+
+<Example title="Line, circle, block">
+  <div className="grid w-full max-w-md gap-4">
+    <div className="grid gap-2">
       <Skeleton size="sm" />
       <Skeleton />
-      <Skeleton />
-      <Skeleton size="lg" />
       <Skeleton size="lg" />
     </div>
+    <div className="flex items-center gap-3">
+      <Skeleton shape="circle" size="sm" />
+      <Skeleton shape="circle" />
+      <Skeleton shape="circle" size="lg" />
+    </div>
+    <div className="grid grid-cols-3 gap-3">
+      <Skeleton shape="block" size="sm" />
+      <Skeleton shape="block" />
+      <Skeleton shape="block" size="lg" />
+    </div>
   </div>
+</Example>
 
-<div>
-  <p className="text-fg-muted mb-2 text-xs font-medium">Shapes: Text</p>
-  <div className="flex gap-3">
-    <Skeleton size="sm" />
-    <Skeleton size="sm" />
-    <Skeleton />
-    <Skeleton size="lg" />
-    <Skeleton size="lg" />
-  </div>
-</div>
+## Composed
 
-<div>
-  <p className="text-fg-muted mb-2 text-xs font-medium">Shapes: Avatar</p>
-  <div className="flex gap-3">
-    <Skeleton shape="circle" size="sm" />
-    <Skeleton shape="circle" size="sm" />
+Match the shape of the content that will arrive, so the layout doesn't jump.
+
+<Example title="List row">
+  <div className="flex w-full max-w-md items-center gap-3">
     <Skeleton shape="circle" />
-    <Skeleton shape="circle" size="lg" />
-    <Skeleton shape="circle" size="lg" />
-  </div>
-</div>
-
-<div>
-  <p className="text-fg-muted mb-2 text-xs font-medium">Shapes: Thumbnail</p>
-  <div className="flex gap-3">
-    <Skeleton shape="block" size="sm" />
-    <Skeleton shape="block" size="sm" />
-    <Skeleton shape="block" />
-    <Skeleton shape="block" size="lg" />
-    <Skeleton shape="block" size="lg" />
-  </div>
-</div>
-
-<div>
-  <p className="text-fg-muted mb-2 text-xs font-medium">Shapes: Banner</p>
-  <div className="flex gap-3">
-    <Skeleton shape="block" size="sm" />
-    <Skeleton shape="block" size="sm" />
-    <Skeleton shape="block" />
-    <Skeleton shape="block" size="lg" />
-    <Skeleton shape="block" size="lg" />
-  </div>
-</div>
-
-<div>
-  <p className="text-fg-muted mb-2 text-xs font-medium">Shapes: square</p>
-  <div className="flex gap-3">
-    <Skeleton shape="block" size="sm" />
-    <Skeleton shape="block" size="sm" />
-    <Skeleton shape="block" />
-    <Skeleton shape="block" size="lg" />
-    <Skeleton shape="block" size="lg" />
-  </div>
-</div>
-
-<div>
-  <p className="text-fg-muted mb-2 text-xs font-medium">Shapes: rectangle</p>
-  <div className="flex gap-3">
-    <Skeleton shape="block" size="sm" />
-    <Skeleton shape="block" size="sm" />
-    <Skeleton shape="block" />
-    <Skeleton shape="block" size="lg" />
-    <Skeleton shape="block" size="lg" />
-  </div>
-</div>
-
-<div>
-  <h2>Sharp Edges</h2>
-  <p className="text-fg-muted mb-2 text-xs font-medium">Shapes: Square Sharp</p>
-  <div className="flex gap-3">
-    <Skeleton shape="block" size="sm" />
-    <Skeleton shape="block" size="sm" />
-    <Skeleton shape="block" />
-    <Skeleton shape="block" size="lg" />
-    <Skeleton shape="block" size="lg" />
-  </div>
-</div>
-
-<div>
-  <h2>Sharp Edges</h2>
-  <p className="text-fg-muted mb-2 text-xs font-medium">Shapes: Rectangle Sharp</p>
-  <div className="flex gap-3">
-    <Skeleton shape="block" size="sm" />
-    <Skeleton shape="block" size="sm" />
-    <Skeleton shape="block" />
-    <Skeleton shape="block" size="lg" />
-    <Skeleton shape="block" size="lg" />
-  </div>
-</div>
-
-<div>
-  <p className="text-fg-muted mb-2 text-xs font-medium">Variants</p>
-  <div className="space-y-2">
-    <Skeleton className="h-4 w-full" />
-    <Skeleton className="h-4 w-full" />
-    <Skeleton className="h-4 w-full" />
-  </div>
-</div>
-
-  <div>
-    <p className="text-fg-muted mb-2 text-xs font-medium">Card Example</p>
-    <div className="space-y-2">
-      <div className="flex items-center space-x-4">
-        <Skeleton shape="circle" />
-        <div className="flex-1 space-y-2">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-        </div>
-      </div>
+    <div className="grid flex-1 gap-2">
+      <Skeleton className="w-1/2" />
+      <Skeleton size="sm" className="w-3/4" />
     </div>
   </div>
-</div>
+</Example>
 
-## Imports
+`Card` and `DataTable` have their own `loading` states built on Skeleton.
 
-```tsx
-import { Skeleton } from '@components/ui';
-```
+## API
 
-## Code
+<PropsTable
+  rows={[
+    { prop: 'shape', type: "'line' | 'circle' | 'block'", default: "'line'", description: 'Line is full width; circle is square; block is full width.' },
+    { prop: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Line 12·14·18px tall, circle 24·32·40px, block 64·96·160px.' },
+  ]}
+/>
 
-```tsx
-// Sizes
-<Skeleton size="sm" />
-<Skeleton size="sm" />
-<Skeleton />
-<Skeleton />
-<Skeleton size="lg" />
-<Skeleton size="lg" />
+Set widths with `className` (e.g. `w-1/2`) to vary line lengths.
 
-// Shapes
-<Skeleton size="sm" />
-<Skeleton shape="circle" />
-<Skeleton shape="block" />
-<Skeleton shape="block" size="lg" />
-<Skeleton shape="block" size="sm" />
-<Skeleton shape="block" />
-<Skeleton shape="block" size="sm" />
-<Skeleton shape="block" />
+## Accessibility
 
-// Variants
-<Skeleton className="h-4 w-full" />
-<Skeleton className="h-4 w-full" />
-<Skeleton className="h-4 w-full" />
+- Skeletons are `aria-hidden`; mark the loading region with `aria-busy="true"` so screen readers know content is on its way.
 
-// Custom
-<Skeleton className="h-4 w-full" />
-```
+## RTL notes
+
+- No direction-specific behaviour; shortened lines align to the start.

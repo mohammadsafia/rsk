@@ -3,29 +3,64 @@ id: popover
 title: Popover
 section: Components
 category: UI
-description: 'Floating content on click.'
+description: 'Floating panel opened by a click, for small forms, details and pickers.'
 tags: [ui, popover]
 ---
 
-import { PopoverDemo } from '@pages/components/components.data.demos';
+import { Button, Input, Popover } from '@components/ui';
 
-## Demo
+## Basic
 
-<PopoverDemo />
+<Example title="Details">
+  <Popover>
+    <Popover.Trigger asChild>
+      <Button variant="outline">Visit details</Button>
+    </Popover.Trigger>
+    <Popover.Content className="w-72">
+      <div className="space-y-1">
+        <p className="text-fg text-sm font-medium">Check-up · 10:30</p>
+        <p className="text-fg-muted text-sm">Room 4 with Dr. Haddad.</p>
+      </div>
+    </Popover.Content>
+  </Popover>
+</Example>
 
-## Imports
+## With a small form
 
-```tsx
-import { Popover, Button } from '@components/ui';
-```
+Keep popover forms to one or two fields; anything longer belongs in a [Dialog](/docs/components/dialog).
 
-## Code
+<Example title="Rename">
+  <Popover>
+    <Popover.Trigger asChild>
+      <Button variant="outline">Rename</Button>
+    </Popover.Trigger>
+    <Popover.Content className="w-72">
+      <div className="grid gap-2">
+        <Input aria-label="Folder name" defaultValue="Lab results" />
+        <Button size="sm" className="justify-self-end">Save</Button>
+      </div>
+    </Popover.Content>
+  </Popover>
+</Example>
 
-```tsx
-<Popover>
-  <Popover.Trigger asChild>
-    <Button>Open</Button>
-  </Popover.Trigger>
-  <Popover.Content>Content here</Popover.Content>
-</Popover>
-```
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'open · defaultOpen · onOpenChange', type: 'boolean · (open) => void', description: 'On Popover, to control it from state.' },
+    { prop: 'Content · side', type: "'top' | 'right' | 'bottom' | 'left'", default: "'bottom'", description: 'Preferred side; flips when there is no room.' },
+    { prop: 'Content · align', type: "'start' | 'center' | 'end'", default: "'center'", description: 'Alignment against the trigger.' },
+    { prop: 'Content · sideOffset', type: 'number', default: '4', description: 'Gap from the trigger in px.' },
+  ]}
+/>
+
+`Popover.Trigger` takes `asChild` to use your own button.
+
+## Accessibility
+
+- The trigger gets `aria-expanded` and `aria-controls`; focus moves into the content and returns to the trigger on close.
+- Escape and outside clicks close it.
+
+## RTL notes
+
+- `align="start"` and `"end"` follow the reading direction, so they mirror in Arabic.

@@ -9,91 +9,49 @@ tags: [ui, input]
 
 import { Switch } from '@components/ui';
 
-## Demo
+## States
 
-<div className="space-y-4">
-    <div>
-        <p className="text-fg-muted mb-2 text-xs font-medium">Variants</p>
-        <div className="flex flex-wrap items-center gap-4">
-            <div className="flex flex-col gap-2">
-                <span className="text-xs">Default</span>
-                <Switch defaultChecked/>
-            </div>
-            <div className="flex flex-col gap-2">
-                <span className="text-xs">Success</span>
-                <Switch defaultChecked/>
-            </div>
-            <div className="flex flex-col gap-2">
-                <span className="text-xs">Destructive</span>
-                <Switch defaultChecked/>
-            </div>
-            <div className="flex flex-col gap-2">
-                <span className="text-xs">Secondary</span>
-                <Switch defaultChecked/>
-            </div>
-        </div>
-    </div>
+<Example title="Off, on, disabled">
+  <Switch aria-label="Off" />
+  <Switch aria-label="On" defaultChecked />
+  <Switch aria-label="Disabled" disabled />
+  <Switch aria-label="Disabled on" disabled defaultChecked />
+</Example>
 
-    <div>
-        <p className="text-fg-muted mb-2 text-xs font-medium">Sizes</p>
-        <div className="flex flex-wrap items-center gap-4">
-            <div className="flex flex-col gap-2">
-                <span className="text-xs">Small</span>
-                <Switch size="sm" defaultChecked/>
-            </div>
-            <div className="flex flex-col gap-2">
-                <span className="text-xs">Medium</span>
-                <Switch size="md" defaultChecked/>
-            </div>
-            <div className="flex flex-col gap-2">
-                <span className="text-xs">Large</span>
-                <Switch size="md" defaultChecked/>
-            </div>
-        </div>
-    </div>
+## Sizes
 
-    <div>
-        <p className="text-fg-muted mb-2 text-xs font-medium">States</p>
-        <div className="flex flex-wrap items-center gap-4">
-            <div className="flex flex-col gap-2">
-                <span className="text-xs">Unchecked</span>
-                <Switch/>
-            </div>
-            <div className="flex flex-col gap-2">
-                <span className="text-xs">Checked</span>
-                <Switch defaultChecked/>
-            </div>
-            <div className="flex flex-col gap-2">
-                <span className="text-xs">Disabled</span>
-                <Switch disabled/>
-            </div>
-        </div>
-    </div>
+<Example title="Small and medium">
+  <Switch aria-label="Small" size="sm" defaultChecked />
+  <Switch aria-label="Medium" defaultChecked />
+</Example>
 
-</div>
+## With a label
 
-## Imports
+A switch applies immediately; use a checkbox when the choice is submitted with a form.
 
-```tsx
-import { Switch } from '@components/ui';
-```
+<Example title="Setting row">
+  <label className="flex w-full max-w-sm items-center justify-between gap-4 text-sm">
+    <span className="text-fg">Email notifications</span>
+    <Switch defaultChecked />
+  </label>
+</Example>
 
-## Code
+## API
 
-```tsx
-// Variants
-<Switch defaultChecked />
-<Switch defaultChecked />
-<Switch defaultChecked />
-<Switch defaultChecked />
+<PropsTable
+  rows={[
+    { prop: 'checked · defaultChecked', type: 'boolean', description: 'Controlled or initial state.' },
+    { prop: 'onCheckedChange', type: '(checked: boolean) => void', description: 'Called when the user toggles it.' },
+    { prop: 'size', type: "'sm' | 'md'", default: "'md'", description: '14×26px or 18×32px.' },
+    { prop: 'disabled', type: 'boolean', default: 'false', description: 'Dims and blocks interaction.' },
+  ]}
+/>
 
-// Sizes
-<Switch size="sm" defaultChecked />
-<Switch size="md" defaultChecked />
-<Switch size="md" defaultChecked />
+## Accessibility
 
-// States
-<Switch />
-<Switch defaultChecked />
-<Switch disabled />
-```
+- Radix renders `role="switch"` with `aria-checked`; Space and Enter toggle it.
+- Label it with a wrapping `<label>`, `aria-labelledby`, or `aria-label`.
+
+## RTL notes
+
+- The thumb starts at the inline start and slides toward the end, so "on" sits on the left in Arabic.
