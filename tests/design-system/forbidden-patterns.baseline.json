@@ -94,11 +94,5 @@
     "legacy-color-ramp": 43,
     "legacy-color-name": 42,
     "arbitrary-length": 5
-  },
-  "src/views/home/component-showcase/ComponentShowcase.tsx": {
-    "legacy-color-ramp": 4,
-    "legacy-color-name": 18,
-    "legacy-shadow": 1,
-    "arbitrary-length": 11
   }
 }
