@@ -1,6 +1,6 @@
 import { type ComponentDocEntry, normalizeCategoryKey } from '@component-docs/registry';
 
-const ORDER = ['GUIDES', 'FOUNDATIONS', 'UI', 'FORMS', 'SHARED', 'TABLES', 'CALENDAR', 'HOOKS'] as const;
+const ORDER = ['GUIDES', 'FOUNDATIONS', 'UI', 'FORMS', 'SHARED', 'TABLES', 'CALENDAR', 'CHARTS', 'HOOKS'] as const;
 const LABEL_KEY: Record<(typeof ORDER)[number], string> = {
   GUIDES: 'guides',
   FOUNDATIONS: 'foundations',
@@ -9,6 +9,7 @@ const LABEL_KEY: Record<(typeof ORDER)[number], string> = {
   SHARED: 'shared',
   TABLES: 'tables',
   CALENDAR: 'calendar',
+  CHARTS: 'charts',
   HOOKS: 'hooks',
 };
 

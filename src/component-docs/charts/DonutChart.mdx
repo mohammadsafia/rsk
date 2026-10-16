@@ -1,0 +1,48 @@
+---
+id: donut-chart
+title: DonutChart
+section: Components
+category: Charts
+description: 'Share of a whole as donut slices, with the total in the centre; slices toggle from the legend.'
+tags: [charts, donut, pie, share]
+importFrom: '@components/charts'
+---
+
+import { DonutChart } from '@components/charts';
+
+export const VISIT_TYPES = [
+  { type: 'In person', count: 62 },
+  { type: 'Video', count: 23 },
+  { type: 'Phone', count: 15 },
+];
+
+## Share of visits
+
+<Example title="Visits by type">
+  <div className="w-full max-w-sm">
+    <DonutChart aria-label="Visits by type: 62 in person, 23 video, 15 phone" data={VISIT_TYPES} nameKey="type" valueKey="count" centerLabel="Visits" centerValue="100" />
+  </div>
+</Example>
+
+Keep donuts to five slices or fewer; for more categories use a [BarChart](/docs/components/bar-chart).
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'aria-label', type: 'string', required: true, description: 'One-line summary, ideally with the values.' },
+    { prop: 'data · nameKey · valueKey', type: 'T[] · keyof T · keyof T', required: true, description: 'Slices and the keys for their name and value.' },
+    { prop: 'centerLabel · centerValue', type: 'ReactNode', description: 'Text in the hole, e.g. the total.' },
+    { prop: 'valueFormat · currency', type: "'number' | 'percent' | 'money' | (v) => string · string", default: "'number'", description: 'How values read in the tooltip and table.' },
+    { prop: 'height · loading · empty', type: 'number · boolean · ReactNode', default: '240 · false · —', description: 'Plot height, skeleton, empty content.' },
+  ]}
+/>
+
+## Accessibility
+
+- A `figure` named by `aria-label`; legend buttons toggle slices with `aria-pressed`, and the last slice can't be hidden.
+- "View as table" lists each slice with its value; the centre text is decorative and repeated in the label.
+
+## RTL notes
+
+- Slices start at the top and the legend follows the reading direction; the centre value is LTR-isolated.

@@ -14,7 +14,7 @@ import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
 
-import { CalendarDays, Component, FormInput, Puzzle, Table2, Wrench } from 'lucide-react';
+import { CalendarDays, ChartLine, Component, FormInput, Puzzle, Table2, Wrench } from 'lucide-react';
 
 const PAGE_CATEGORIES = new Set(['GUIDES', 'FOUNDATIONS']);
 
@@ -24,6 +24,7 @@ const GLYPH: Record<string, typeof Component> = {
   SHARED: Puzzle,
   TABLES: Table2,
   CALENDAR: CalendarDays,
+  CHARTS: ChartLine,
   HOOKS: Wrench,
 };
 

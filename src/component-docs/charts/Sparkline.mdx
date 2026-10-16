@@ -1,0 +1,53 @@
+---
+id: sparkline
+title: Sparkline
+section: Components
+category: Charts
+description: 'A tiny trend line without axes, for StatCards and table cells.'
+tags: [charts, sparkline, trend, kpi]
+importFrom: '@components/charts'
+---
+
+import { Sparkline } from '@components/charts';
+import { StatCard } from '@components/shared';
+
+export const TREND = [{ v: 30 }, { v: 34 }, { v: 31 }, { v: 40 }, { v: 38 }, { v: 45 }, { v: 48 }];
+export const DROP = [{ v: 12 }, { v: 10 }, { v: 11 }, { v: 8 }, { v: 7 }, { v: 5 }];
+
+## In a StatCard
+
+<Example title="KPI with trend">
+  <div className="w-72">
+    <StatCard label="Visits today" value="48" trend={{ value: 12.4 }} caption="vs last week" sparkline={<Sparkline aria-label="Visits, last 7 days" data={TREND} valueKey="v" />} />
+  </div>
+</Example>
+
+## Tones
+
+<Example title="Accent and danger">
+  <div className="grid w-40 gap-3">
+    <Sparkline aria-label="Visits, last 7 days, rising" data={TREND} valueKey="v" />
+    <Sparkline aria-label="No-shows, last 6 days, falling" data={DROP} valueKey="v" tone="danger" />
+  </div>
+</Example>
+
+With fewer than two points the sparkline renders an empty, still-labelled box.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'aria-label', type: 'string', required: true, description: 'What the trend shows, e.g. "Visits, last 7 days".' },
+    { prop: 'data · valueKey', type: 'T[] · keyof T', required: true, description: 'Points and the key to plot.' },
+    { prop: 'tone', type: 'ChartTone', default: "'accent'", description: 'Line colour.' },
+    { prop: 'height', type: 'number', default: '32', description: 'Height in px; width fills the container.' },
+  ]}
+/>
+
+## Accessibility
+
+- `role="img"` named by `aria-label`; it has no tooltip or table, so put the numbers next to it (StatCard's value and trend).
+
+## RTL notes
+
+- In Arabic time runs right to left, so the latest point sits on the left.
