@@ -18,7 +18,7 @@ type ToolbarProps = PropsWithChildren<{
 }>;
 
 const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholder, children, className }) => {
-  const { t } = useAppTranslation('common');
+  const { t, direction } = useAppTranslation('common');
   const { table } = useDataTableContext();
   const filtersId = useId();
 
@@ -78,6 +78,7 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
               type="search"
               size="sm"
               name="data-table-search"
+              dir={direction}
               aria-label={placeholder ?? t('search')}
               placeholder={placeholder ?? t('searchHere')}
               value={search}

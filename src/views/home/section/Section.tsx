@@ -21,7 +21,7 @@ function Section({ id, eyebrow, title, description, className, children }: Secti
       <div className={cn('mx-auto max-w-6xl px-4 py-14 md:px-6', className)}>
         <p className="text-fg-muted font-mono text-xs font-medium tracking-wider uppercase rtl:font-sans rtl:tracking-normal">{eyebrow}</p>
 
-        <h2 id={titleId} className="text-fg mt-2 text-2xl font-semibold tracking-tight rtl:leading-snug">
+        <h2 id={titleId} className="text-fg mt-2 text-2xl font-semibold tracking-tight rtl:leading-snug rtl:tracking-normal">
           {title}
         </h2>
 

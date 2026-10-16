@@ -86,4 +86,10 @@ describe('DataTable', () => {
     render(<Harness total={2} />);
     expect(document.querySelector('[aria-label="Filters"]')?.getAttribute('role')).toBe('group');
   });
+
+  it('pins the search input to the document direction so the start icon and padding stay aligned', async () => {
+    await act(() => i18n.changeLanguage('ar'));
+    render(<Harness total={2} />);
+    expect(document.querySelector('input[name="data-table-search"]')?.getAttribute('dir')).toBe('rtl');
+  });
 });

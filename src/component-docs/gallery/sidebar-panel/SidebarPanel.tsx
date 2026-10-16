@@ -69,7 +69,7 @@ const DocListItem = forwardRef<
 });
 
 const SidebarPanel = (props: SidebarPanelProps) => {
-  const { t } = useAppTranslation('components');
+  const { t, direction } = useAppTranslation('components');
   const {
     activeCategoryKey,
     hasActiveFilters,
@@ -131,6 +131,7 @@ const SidebarPanel = (props: SidebarPanelProps) => {
 
           <Input
             type="search"
+            dir={direction}
             aria-label={t('gallery.search')}
             placeholder={t('gallery.search')}
             value={searchText}

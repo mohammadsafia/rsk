@@ -30,7 +30,7 @@ describe('Specimen bento', () => {
         <Specimen />
       </Tooltip.Provider>,
     );
-    for (const slot of ['calendar-event', 'tag', 'table', 'toast', 'input']) {
+    for (const slot of ['calendar-event', 'tag', 'table', 'specimen-toast', 'input']) {
       expect(document.querySelector(`[data-slot="${slot}"]`), slot).not.toBeNull();
     }
     expect(document.querySelector('[data-slot="table"] [data-state="selected"]')).not.toBeNull();
@@ -47,5 +47,16 @@ describe('Specimen bento', () => {
     const eyebrows = [...document.querySelectorAll('span')].filter((node) => node.className.includes('tracking-wider'));
     expect(eyebrows.length).toBeGreaterThan(0);
     eyebrows.forEach((node) => expect(node.className).toContain('rtl:tracking-normal'));
+  });
+
+  it('announces nothing from outside the inert grid (no live regions leak through portals)', async () => {
+    render(
+      <Tooltip.Provider>
+        <Specimen />
+      </Tooltip.Provider>,
+    );
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const live = [...document.querySelectorAll('[aria-live], [role="status"], [role="alert"]')].filter((node) => !node.closest('[inert]'));
+    expect(live.map((node) => node.outerHTML.slice(0, 80))).toEqual([]);
   });
 });

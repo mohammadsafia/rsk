@@ -53,6 +53,7 @@ describe('HomePage', () => {
     await act(() => i18n.changeLanguage('ar'));
     renderHome();
     expect(screen.getByRole('heading', { level: 1 }).className).toMatch(/rtl:leading-snug|leading-snug/);
+    expect(screen.getByRole('heading', { level: 1 }).className).toContain('rtl:tracking-normal');
     expect(document.body.innerHTML).not.toMatch(/text-muted-foreground|bg-primary|text-primary(?!-)|\[\d+px\]|tracking-\[/);
   });
 });

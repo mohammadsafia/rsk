@@ -33,7 +33,7 @@ function Hero() {
 
       <h1
         id="landing-hero-title"
-        className="text-fg mx-auto mt-4 max-w-[18ch] text-3xl font-semibold tracking-tight md:text-4xl rtl:leading-snug"
+        className="text-fg mx-auto mt-4 max-w-[18ch] text-3xl font-semibold tracking-tight md:text-4xl rtl:leading-snug rtl:tracking-normal"
       >
         {t('hero.titleLead')}
         <span className="text-accent">{t('hero.titleEmphasis')}</span>

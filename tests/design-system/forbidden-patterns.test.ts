@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { compareToBaseline, countPatterns, nextBaseline, scanRepo, type Baseline } from './forbidden-patterns';
+import { compareToBaseline, countPatterns, listSourceFiles, nextBaseline, scanRepo, type Baseline } from './forbidden-patterns';
 
 const REPO_ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const BASELINE_PATH = fileURLToPath(new URL('./forbidden-patterns.baseline.json', import.meta.url));
@@ -31,6 +31,16 @@ describe('countPatterns', () => {
       'raw-color-function': 1,
       'arbitrary-length': 2,
     });
+  });
+
+  it('counts side-border and ring-offset legacy names, and palette colours the theme does not define', () => {
+    const source = [
+      '<div className="border-s-destructive ring-offset-background focus-visible:ring-primary/40" />',
+      '<Star className="text-yellow-500 fill-yellow-500" />',
+      '<p className="text-green-600 bg-red-50" />',
+    ].join('\n');
+
+    expect(countPatterns(source)).toEqual({ 'legacy-color-name': 3, 'palette-color': 4 });
   });
 
   it('does not count legitimate code', () => {
@@ -216,6 +226,14 @@ describe('SP2 exit', () => {
       (DELETED_COMPONENT_FOLDERS as readonly string[]).includes(name),
     );
     expect(present).toEqual([]);
+  });
+});
+
+describe('scan scope', () => {
+  it('scans .ts sources as well as .tsx and .mdx, but not tests', () => {
+    const files = listSourceFiles(REPO_ROOT);
+    expect(files).toContain('src/lib/utils/tailwind.ts');
+    expect(files.some((file) => /\.test\.tsx?$/.test(file))).toBe(false);
   });
 });
 

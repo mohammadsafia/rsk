@@ -1053,7 +1053,7 @@ export function RadioGroupDemo() {
               Option 1
             </span>
             <RadioGroup.Indicator>
-              <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/radio-item:block" />
+              <Star size={20} className="fill-warning text-warning hidden group-data-[state=checked]/radio-item:block" />
               <StarOffIcon size={20} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
@@ -1062,7 +1062,7 @@ export function RadioGroupDemo() {
               Option 2
             </span>
             <RadioGroup.Indicator>
-              <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/radio-item:block" />
+              <Star size={20} className="fill-warning text-warning hidden group-data-[state=checked]/radio-item:block" />
               <StarOffIcon size={20} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
@@ -1190,7 +1190,7 @@ export function CheckboxGroupDemo() {
               Option 1
             </span>
             <CheckboxGroup.Indicator>
-              <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/checkbox-item:block" />
+              <Star size={20} className="fill-warning text-warning hidden group-data-[state=checked]/checkbox-item:block" />
               <Star size={20} className="text-fg-subtle block group-data-[state=checked]/checkbox-item:hidden" />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>
@@ -1199,7 +1199,7 @@ export function CheckboxGroupDemo() {
               Option 2
             </span>
             <CheckboxGroup.Indicator>
-              <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/checkbox-item:block" />
+              <Star size={20} className="fill-warning text-warning hidden group-data-[state=checked]/checkbox-item:block" />
               <Star size={20} className="text-fg-subtle block group-data-[state=checked]/checkbox-item:hidden" />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>

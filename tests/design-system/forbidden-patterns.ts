@@ -14,13 +14,15 @@ export type PatternId =
   | 'removed-button-variant'
   | 'hex-color'
   | 'raw-color-function'
-  | 'arbitrary-length';
+  | 'arbitrary-length'
+  | 'palette-color';
 
 export type PatternCounts = Partial<Record<PatternId, number>>;
 
 export type Baseline = Record<string, PatternCounts>;
 
-const UTILITY_PREFIX = '(?:bg|text|border|ring|fill|stroke|outline|divide|decoration|caret|placeholder|from|to|via)';
+const UTILITY_PREFIX =
+  '(?:border-[setbxy]|ring-offset|bg|text|border|ring|fill|stroke|outline|divide|decoration|caret|placeholder|from|to|via)';
 
 export const FORBIDDEN_PATTERNS: ReadonlyArray<{ id: PatternId; regex: RegExp; why: string }> = [
   { id: 'prime-component', regex: /\bPrime[A-Z]\w*/g, why: 'Prime* components are consolidated (spec §8.2)' },
@@ -46,6 +48,14 @@ export const FORBIDDEN_PATTERNS: ReadonlyArray<{ id: PatternId; regex: RegExp; w
   },
   { id: 'hex-color', regex: /(?<![\w&#])#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b/g, why: 'Colors come from tokens' },
   { id: 'raw-color-function', regex: /\b(?:rgba?|hsla?|oklch)\(/g, why: 'Colors come from tokens' },
+  {
+    id: 'palette-color',
+    regex: new RegExp(
+      `\\b${UTILITY_PREFIX}-(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone)-\\d{2,3}\\b`,
+      'g',
+    ),
+    why: 'The theme clears the Tailwind palette (--color-*: initial); palette classes render nothing',
+  },
   { id: 'arbitrary-length', regex: /\b[a-z][\w-]*-\[-?\d*\.?\d+(?:px|rem)\]/g, why: 'Use the Tailwind scale (README code standards)' },
 ];
 
@@ -70,7 +80,7 @@ export function listSourceFiles(repoRoot: string): string[] {
     });
 
   return walk(join(repoRoot, 'src'))
-    .filter((file) => /\.(tsx|mdx)$/.test(file) && !file.endsWith('.test.tsx'))
+    .filter((file) => /\.(tsx?|mdx)$/.test(file) && !/\.(test|d)\.tsx?$/.test(file))
     .map((file) => toPosix(relative(repoRoot, file)))
     .sort();
 }

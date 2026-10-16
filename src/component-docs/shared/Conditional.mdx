@@ -14,16 +14,16 @@ import { Conditional } from '@components/utils';
 <div className="space-y-2">
   <Conditional>
     <Conditional.If condition={true}>
-      <div className="text-green-600">✓ Condition is true</div>
+      <div className="text-success">✓ Condition is true</div>
     </Conditional.If>
     <Conditional.Else>
-      <div className="text-red-600">✗ Condition is false</div>
+      <div className="text-danger">✗ Condition is false</div>
     </Conditional.Else>
   </Conditional>
 
   <Conditional>
     <Conditional.If condition={false}>
-      <div className="text-green-600">✓ This won't show</div>
+      <div className="text-success">✓ This won't show</div>
     </Conditional.If>
     <Conditional.Else>
       <div className="text-fg-muted">→ Fallback content</div>

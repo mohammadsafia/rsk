@@ -76,4 +76,17 @@ describe('landing sections', () => {
     expect(eyebrows.length).toBeGreaterThan(0);
     eyebrows.forEach((node) => expect(node.className).toContain('rtl:tracking-normal'));
   });
+
+  it('isolates translated log lines so Arabic reads right-to-left inside the LTR terminal', async () => {
+    await act(() => i18n.changeLanguage('ar'));
+    renderAll();
+    const lines = document.querySelectorAll('[data-slot="landing-terminal"] bdi');
+    expect(lines).toHaveLength(5);
+    lines.forEach((line) => expect(line.getAttribute('dir')).toBe('auto'));
+  });
+
+  it('drops negative tracking on Arabic headings', () => {
+    renderAll();
+    screen.getAllByRole('heading', { level: 2 }).forEach((heading) => expect(heading.className).toContain('rtl:tracking-normal'));
+  });
 });

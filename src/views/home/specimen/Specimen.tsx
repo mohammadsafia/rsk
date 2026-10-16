@@ -133,17 +133,19 @@ function Specimen() {
         </div>
 
         <div className="md:col-span-1">
-          <Toast.Provider>
-            <Toast open tone="success" duration={Infinity}>
-              <Toast.Icon tone="success" />
-              <div className="grid gap-0.5">
-                <Toast.Title>{t('specimen.toastTitle')}</Toast.Title>
-                <Toast.Description>{t('specimen.toastBody')}</Toast.Description>
-              </div>
-            </Toast>
+          {/* Static toast look: a real Radix Toast portals a live announcer outside the inert grid. */}
+          <div
+            data-slot="specimen-toast"
+            className="bg-surface-raised shadow-overlay border-border flex items-start gap-3 rounded-lg border p-4"
+          >
+            <Toast.Icon tone="success" />
 
-            <Toast.Viewport className="static inset-auto m-0 w-full max-w-none p-0" />
-          </Toast.Provider>
+            <div className="grid gap-0.5">
+              <p className="text-fg text-sm font-semibold">{t('specimen.toastTitle')}</p>
+
+              <p className="text-fg-muted text-sm">{t('specimen.toastBody')}</p>
+            </div>
+          </div>
         </div>
 
         <Card className="shadow-raised md:col-span-2">

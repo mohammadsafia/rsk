@@ -20,7 +20,7 @@ function Tooling() {
         {LOG.map((key) => (
           <span key={key} className="flex items-center gap-2">
             <Check aria-hidden="true" className="text-success size-3.5" />
-            {t(`cli.${key}`)}
+            <bdi dir="auto">{t(`cli.${key}`)}</bdi>
           </span>
         ))}
       </pre>

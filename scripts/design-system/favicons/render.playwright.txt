@@ -1,17 +1,22 @@
 async (page) => {
   const root = 'public/'; // relative to the directory playwright-cli was started from (the repo root)
+  const INK = { fg: 'oklch(0.928 0.003 264.5)', canvas: 'oklch(0.173 0.004 264.5)', accent: 'oklch(0.698 0.125 12)' };
+  // Transparent icons: light tile, dark squares (the mark as on a dark UI).
+  // Opaque (iOS): full-bleed graphite tile, light squares — iOS applies its own mask and blackens transparency.
   const svg = (size, opaque) => {
     const g = size <= 16 ? { s: 8.5, n: 6.5, f: 17, ac: 4.25 } : { s: 8, n: 7, f: 17, ac: 4 };
-    const pad = opaque ? `<rect width="32" height="32" fill="oklch(0.173 0.004 264.5)"/>` : '';
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="${size}" height="${size}">${pad}
-      <rect width="32" height="32" rx="${opaque ? 0 : 8}" fill="oklch(0.928 0.003 264.5)"/>
-      <rect x="${g.n}" y="${g.n}" width="${g.s}" height="${g.s}" rx="2.5" fill="oklch(0.173 0.004 264.5)"/>
-      <rect x="${g.f}" y="${g.n}" width="${g.s}" height="${g.s}" rx="2.5" fill="oklch(0.173 0.004 264.5)"/>
-      <rect x="${g.n}" y="${g.f}" width="${g.s}" height="${g.s}" rx="2.5" fill="oklch(0.173 0.004 264.5)"/>
-      <rect x="${g.f}" y="${g.f}" width="${g.s}" height="${g.s}" rx="${g.ac}" fill="oklch(0.698 0.125 12)"/></svg>`;
+    const tile = opaque ? INK.canvas : INK.fg;
+    const square = opaque ? INK.fg : INK.canvas;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="${size}" height="${size}" style="display:block">
+      <rect width="32" height="32" rx="${opaque ? 0 : 8}" fill="${tile}"/>
+      <rect x="${g.n}" y="${g.n}" width="${g.s}" height="${g.s}" rx="2.5" fill="${square}"/>
+      <rect x="${g.f}" y="${g.n}" width="${g.s}" height="${g.s}" rx="2.5" fill="${square}"/>
+      <rect x="${g.n}" y="${g.f}" width="${g.s}" height="${g.s}" rx="2.5" fill="${square}"/>
+      <rect x="${g.f}" y="${g.f}" width="${g.s}" height="${g.s}" rx="${g.ac}" fill="${INK.accent}"/></svg>`;
   };
+  // Small viewports are clamped by the browser (that corrupted earlier renders): use one large viewport and clip.
+  await page.setViewportSize({ width: 800, height: 800 });
   const shoot = async (size, file, opaque) => {
-    await page.setViewportSize({ width: size, height: size });
     await page.setContent(`<body style="margin:0">${svg(size, opaque)}</body>`);
     await page.screenshot({ path: root + file, omitBackground: !opaque, clip: { x: 0, y: 0, width: size, height: size } });
   };
