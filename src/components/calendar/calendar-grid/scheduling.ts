@@ -38,6 +38,9 @@ export const minuteOfDay = (input: string) => {
 
 export const dayKeyOf = (input: string) => format(toLocal(input), DAY_KEY);
 
+/** End minute measured from the start's day: an end at the next midnight is 1440, not 0. */
+export const endMinuteOf = (start: string, end: string) => (dayKeyOf(end) > dayKeyOf(start) ? 24 * 60 : 0) + minuteOfDay(end);
+
 /** The last day an event touches; an end exactly at midnight belongs to the day before. */
 export const lastDayKeyOf = (start: string, end: string) => {
   const startDate = toLocal(start);

@@ -20,6 +20,7 @@ import {
   createRange,
   dayKeyOf,
   DRAG_THRESHOLD_PX,
+  endMinuteOf,
   isWithin,
   minuteOfDay,
   moveRange,
@@ -83,13 +84,24 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
   useLayoutEffect(() => {
     const id = pendingFocus.current;
     if (!id) return;
-    const card = [...(scrollerRef.current?.querySelectorAll<HTMLElement>('[data-event-id]') ?? [])].find(
-      (element) => element.dataset.eventId === id,
-    );
+    const card = findCard(id);
     if (!card) return;
     pendingFocus.current = null;
     card.focus();
   });
+
+  function findCard(id: string) {
+    return [...(scrollerRef.current?.querySelectorAll<HTMLElement>('[data-event-id]') ?? [])].find(
+      (element) => element.dataset.eventId === id,
+    );
+  }
+
+  /** Refocuses an event card unless the user has already moved focus somewhere outside the grid. */
+  const refocus = (id: string) => {
+    const active = document.activeElement;
+    if (active && active !== document.body && scrollerRef.current?.contains(active) === false) return;
+    findCard(id)?.focus();
+  };
 
   const min = startHour * 60;
   const max = endHour * 60;
@@ -126,10 +138,15 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
   };
 
   /** Column and minute under a pointer. Outside every column, the last known column is kept. */
+  const axisRect = () => scrollerRef.current?.querySelector<HTMLElement>('[data-slot="calendar-time-grid-axis"]')?.getBoundingClientRect();
+
   const hitTest = (clientX: number, clientY: number, fallback: number) => {
     const elements = [...(scrollerRef.current?.querySelectorAll<HTMLElement>('[data-calendar-column]') ?? [])];
     const rects = elements.map((element) => element.getBoundingClientRect());
-    const found = columnAt(clientX, rects);
+    // Over the pinned axis a column may be scrolled underneath it: that counts as outside every column.
+    const axis = axisRect();
+    const overAxis = !!axis && axis.width > 0 && clientX >= axis.left && clientX < axis.right;
+    const found = overAxis ? -1 : columnAt(clientX, rects);
     const columnIndex = found === -1 ? fallback : found;
     const rect = rects[columnIndex] ?? rects[0];
     return { columnIndex, minute: rect ? offsetToMinutes(clientY - rect.top, rect.height, startHour, endHour) : min };
@@ -155,11 +172,11 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
     const unchanged =
       dayKeyOf(originalStart) === column.dayKey &&
       minuteOfDay(originalStart) === next.start &&
-      minuteOfDay(originalEnd) === next.end &&
+      endMinuteOf(originalStart, originalEnd) === next.end &&
       resourceId === originalResource;
     if (unchanged) return;
-    void commitChange({ event, start: wallTime(column.dayKey, next.start), end: wallTime(column.dayKey, next.end), resourceId });
     announce(t(next.kind === 'move' ? 'calendar.moved' : 'calendar.resized', { when: describe(next.columnIndex, next.start, next.end) }));
+    return commitChange({ event, start: wallTime(column.dayKey, next.start), end: wallTime(column.dayKey, next.end), resourceId });
   };
 
   const startSession = (pressEvent: ReactPointerEvent<HTMLElement>, session: Session) => {
@@ -172,6 +189,7 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
     let current: Draft | null = null;
     let lastColumn = session.columnIndex;
     let edge = 0;
+    let edgeX = 0;
     let frame = 0;
 
     try {
@@ -208,11 +226,13 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
 
     const scrollTick = () => {
       const scroller = scrollerRef.current;
-      if (!scroller || edge === 0) {
+      if (!scroller || (edge === 0 && edgeX === 0)) {
         frame = 0;
         return;
       }
       scroller.scrollTop += edge * SCROLL_STEP_PX;
+      // Physical direction: in RTL Chrome's scrollLeft is negative, so moving left still means decreasing it.
+      scroller.scrollLeft += edgeX * SCROLL_STEP_PX;
       update();
       frame = requestAnimationFrame(scrollTick);
     };
@@ -225,7 +245,17 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
       update();
       const rect = scrollerRef.current?.getBoundingClientRect();
       edge = rect ? (last.y < rect.top + EDGE_PX ? -1 : last.y > rect.bottom - EDGE_PX ? 1 : 0) : 0;
-      if (edge !== 0 && frame === 0) frame = requestAnimationFrame(scrollTick);
+      // Inline edges, measured from the visible column area beside the pinned axis, so off-screen resources are reachable.
+      const axis = axisRect();
+      const pinned = !!axis && axis.width > 0;
+      const inner = rect
+        ? {
+            left: pinned && axis.left <= rect.left + 1 ? axis.right : rect.left,
+            right: pinned && axis.right >= rect.right - 1 ? axis.left : rect.right,
+          }
+        : null;
+      edgeX = session.kind === 'move' && inner ? (last.x < inner.left + EDGE_PX ? -1 : last.x > inner.right - EDGE_PX ? 1 : 0) : 0;
+      if ((edge !== 0 || edgeX !== 0) && frame === 0) frame = requestAnimationFrame(scrollTick);
     };
 
     const cleanup = () => {
@@ -246,7 +276,7 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
         // A click: on an empty cell it selects one step; on an event it falls through to the popover.
         if (session.kind === 'create') {
           const range = createRange(session.anchor, session.anchor, stepMinutes, min, max);
-          apply(
+          void apply(
             {
               kind: 'create',
               columnIndex: session.columnIndex,
@@ -266,7 +296,7 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
           suppressClick.current = false;
         }, 0);
       }
-      if (current) apply(current, session.kind === 'create' ? undefined : session.event);
+      if (current) void apply(current, session.kind === 'create' ? undefined : session.event);
     };
 
     function onUp(event: PointerEvent) {
@@ -306,7 +336,7 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
   const onEventPointerDown = (pressEvent: ReactPointerEvent<HTMLElement>, event: unknown, columnIndex: number) => {
     if (!isEditable(event) || pressEvent.button !== 0) return;
     const start = minuteOfDay(eventAccessors.getStartTime(event));
-    const end = minuteOfDay(eventAccessors.getEndTime(event));
+    const end = endMinuteOf(eventAccessors.getStartTime(event), eventAccessors.getEndTime(event));
     if ((pressEvent.target as HTMLElement).closest('[data-resize-handle]')) {
       startSession(pressEvent, { kind: 'resize', event, columnIndex, start });
       return;
@@ -321,14 +351,15 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
     const active = draft && draft.via === 'keyboard' && draft.eventId === id ? draft : null;
 
     if (!active) {
-      if (!isEditable(event)) return;
+      // Leave browser and OS shortcuts (Cmd/Ctrl+R, Ctrl+M…) alone.
+      if (!isEditable(event) || keyEvent.metaKey || keyEvent.ctrlKey || keyEvent.altKey) return;
       const key = keyEvent.key.toLowerCase();
       const kind = key === 'm' || keyEvent.code === 'KeyM' ? 'move' : key === 'r' || keyEvent.code === 'KeyR' ? 'resize' : null;
       if (!kind) return;
       keyEvent.preventDefault();
       stopSession.current?.();
       const start = minuteOfDay(eventAccessors.getStartTime(event));
-      const end = Math.max(minuteOfDay(eventAccessors.getEndTime(event)), start + stepMinutes);
+      const end = Math.max(endMinuteOf(eventAccessors.getStartTime(event), eventAccessors.getEndTime(event)), start + stepMinutes);
       setDraft({ kind, columnIndex, start, end, eventId: id, via: 'keyboard', allowed: true });
       announce(t(kind === 'move' ? 'calendar.moving' : 'calendar.resizing'));
       return;
@@ -358,7 +389,8 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
         keyEvent.preventDefault();
         setDraft(null);
         pendingFocus.current = id;
-        apply(active, event);
+        // If the save is rejected the card remounts in its old column; bring focus back there too.
+        void apply(active, event)?.finally(() => setTimeout(() => refocus(id), 0));
         return;
       case 'Escape':
         keyEvent.preventDefault();
@@ -412,7 +444,7 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
     keyEvent.preventDefault();
     const start = min + row * stepMinutes;
     if (isAllowed(column, start, start + stepMinutes)) {
-      apply({ kind: 'create', columnIndex: column, start, end: start + stepMinutes, via: 'keyboard', allowed: true }, undefined);
+      void apply({ kind: 'create', columnIndex: column, start, end: start + stepMinutes, via: 'keyboard', allowed: true }, undefined);
     }
   };
 

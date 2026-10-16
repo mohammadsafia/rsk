@@ -9,6 +9,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -53,7 +54,16 @@ export type CalendarSlot = { start: string; end: string; resourceId?: string };
 /** A move or resize to save; reject the promise to put the event back. */
 export type CalendarEventChange<T> = { event: T; start: string; end: string; resourceId?: string };
 
-type Override = { start: string; end: string; resourceId?: string; settled: boolean };
+type Override = {
+  start: string;
+  end: string;
+  resourceId?: string;
+  settled: boolean;
+  /** Identifies the commit that wrote this override; replies from older commits must not touch it. */
+  token: number;
+  /** What to show if this commit is rejected: the last saved override, or nothing (the event's own times). */
+  fallback?: Override;
+};
 
 export type CalendarLegendItem = {
   label: string;
@@ -256,18 +266,43 @@ function CalendarGridRoot<TEvent>({
     };
   }, [eventAccessors, overrides]);
 
+  const commitToken = useRef(0);
+
+  /**
+   * Shows a change at once and saves it. Overlapping changes to one event are ordered by token: a reply only settles
+   * or reverts the override it wrote, and a rejection falls back to the last saved position, not the original one.
+   */
   const commitChange = useCallback(
     async (change: CalendarEventChange<TEvent>) => {
       const id = eventAccessors.getId(change.event);
-      setOverrides((current) => ({
-        ...current,
-        [id]: { start: change.start, end: change.end, resourceId: change.resourceId, settled: false },
-      }));
+      const token = (commitToken.current += 1);
+      setOverrides((current) => {
+        const previous = current[id];
+        const fallback = previous?.settled ? previous : previous?.fallback;
+        return {
+          ...current,
+          [id]: { start: change.start, end: change.end, resourceId: change.resourceId, settled: false, token, fallback },
+        };
+      });
       try {
         await onEventChange?.(change);
-        setOverrides((current) => (current[id] ? { ...current, [id]: { ...current[id], settled: true } } : current));
+        setOverrides((current) => {
+          const override = current[id];
+          if (!override) return current;
+          if (override.token === token) return { ...current, [id]: { ...override, settled: true, fallback: undefined } };
+          // A newer change is still pending: this one is now its saved fallback.
+          return {
+            ...current,
+            [id]: { ...override, fallback: { start: change.start, end: change.end, resourceId: change.resourceId, settled: true, token } },
+          };
+        });
       } catch {
-        setOverrides(({ [id]: _reverted, ...rest }) => rest);
+        setOverrides((current) => {
+          const override = current[id];
+          if (!override || override.token !== token) return current;
+          const { [id]: _reverted, ...rest } = current;
+          return override.fallback ? { ...rest, [id]: override.fallback } : rest;
+        });
         toast({ title: t('calendar.changeFailed'), description: t('calendar.changeFailedHint'), tone: 'danger' });
       }
     },
