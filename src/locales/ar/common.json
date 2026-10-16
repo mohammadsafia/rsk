@@ -99,7 +99,9 @@
     "calendarView": "عرض التقويم",
     "jumpToDate": "الانتقال إلى تاريخ",
     "today": "اليوم",
-    "more": "+{{count}} أخرى"
+    "more": "+{{count}} أخرى",
+    "allResources": "كل الموارد",
+    "resource": "المورد"
   },
   "timePicker": {
     "placeholder": "اختر الوقت",

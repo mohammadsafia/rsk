@@ -83,7 +83,9 @@
     "calendarView": "Calendar view",
     "jumpToDate": "Jump to date",
     "today": "Today",
-    "more": "+{{count}} more"
+    "more": "+{{count}} more",
+    "allResources": "All resources",
+    "resource": "Resource"
   },
   "timePicker": {
     "placeholder": "Select time",

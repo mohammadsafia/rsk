@@ -21,6 +21,8 @@ import { type DateInput, UnitOfTime, useDate } from '@hooks/shared';
 
 import { cn } from '@utils';
 
+import { type CalendarSlots, slotDates } from './scheduling';
+
 export type CalendarView = 'day' | 'week' | 'month';
 
 export type CalendarViewMode = 'calendar' | 'list';
@@ -36,7 +38,13 @@ export type CalendarAccessors<T> = {
   getId: (event: T) => string;
   getStartTime: (event: T) => string;
   getEndTime: (event: T) => string;
+  /** The resource (doctor, room…) an event belongs to; used by `resources` columns and the week filter. */
+  getResourceId?: (event: T) => string | undefined;
+  /** Puts an event in the all-day row. Events spanning midnight go there anyway. */
+  isAllDay?: (event: T) => boolean;
 };
+
+export type CalendarResource = { id: string; label: string; avatar?: string };
 
 export type CalendarLegendItem = {
   label: string;
@@ -45,7 +53,8 @@ export type CalendarLegendItem = {
 
 export type TimeRange = { startTime: string; endTime: string };
 
-type SlotsByDate = Record<string, TimeRange[]> | null | undefined;
+/** Availability by date (`{ '2026-10-16': [...] }`) or by resource then date (`{ haddad: { '2026-10-16': [...] } }`). */
+type SlotsByDate = CalendarSlots | null | undefined;
 
 type EventTemplateProps<TEvent> = {
   children: (event: TEvent, status: EventTimeStatus) => ReactNode;
@@ -75,6 +84,10 @@ export type CalendarGridProps<TEvent> = {
   showStepLabels?: boolean;
   nowLine?: NowLineMode;
   isLoading?: boolean;
+  /** Day view shows one column per resource; week view filters by `resourceFilter`. */
+  resources?: CalendarResource[];
+  resourceFilter?: string | null;
+  onResourceFilterChange?: (resourceId: string | null) => void;
   children: ReactNode;
 } & Omit<ComponentPropsWithoutRef<'div'>, 'children'>;
 
@@ -102,6 +115,9 @@ type CalendarGridContextValue<T> = {
   showStepLabels: boolean;
   nowLine: NowLineMode;
   isLoading: boolean;
+  resources: CalendarResource[];
+  resourceFilter: string | null;
+  setResourceFilter: (resourceId: string | null) => void;
 };
 
 type CalendarGridComponents = (<TEvent>(props: CalendarGridProps<TEvent>) => ReactNode) & {
@@ -111,6 +127,7 @@ type CalendarGridComponents = (<TEvent>(props: CalendarGridProps<TEvent>) => Rea
   ViewToggle: typeof CalendarGridChrome.ViewToggle;
   Picker: typeof CalendarGridChrome.Picker;
   Legend: typeof CalendarGridChrome.Legend;
+  ResourceFilter: typeof CalendarGridChrome.ResourceFilter;
   EventTemplate: <T>(props: EventTemplateProps<T>) => null;
   PopoverTemplate: <T>(props: PopoverTemplateProps<T>) => null;
   DayView: typeof CalendarGridTimeView.DayView;
@@ -162,6 +179,9 @@ function CalendarGridRoot<TEvent>({
   showStepLabels = false,
   nowLine = 'in-range',
   isLoading = false,
+  resources,
+  resourceFilter: controlledResourceFilter,
+  onResourceFilterChange,
   className,
   children,
   ...divProps
@@ -192,10 +212,13 @@ function CalendarGridRoot<TEvent>({
   const [internalView, setInternalView] = useState<CalendarView>(initialView);
   const [internalDate, setInternalDate] = useState<string>(() => toDate(initialDate));
   const [internalViewMode, setInternalViewMode] = useState<CalendarViewMode>(initialViewMode);
+  const [internalResourceFilter, setInternalResourceFilter] = useState<string | null>(null);
 
   const view = controlledView ?? internalView;
   const date = controlledDate !== undefined ? toDate(controlledDate) : internalDate;
   const viewMode = controlledViewMode ?? internalViewMode;
+  const resourceFilter = controlledResourceFilter !== undefined ? controlledResourceFilter : internalResourceFilter;
+  const resourceList = useMemo(() => resources ?? [], [resources]);
 
   const range = useMemo<CalendarRange>(() => {
     if (view === 'day') return { startDate: date, endDate: date };
@@ -230,7 +253,7 @@ function CalendarGridRoot<TEvent>({
     return formatDate(date, constants.DateFormats.FULL_MONTH_YEAR);
   }, [view, date, range, formatDate, constants]);
 
-  const slotCoverageDates = useMemo(() => (slots ? new Set(Object.keys(slots)) : new Set<string>()), [slots]);
+  const slotCoverageDates = useMemo(() => (slots ? slotDates(slots) : new Set<string>()), [slots]);
 
   const setView = useCallback(
     (v: CalendarView) => {
@@ -257,6 +280,14 @@ function CalendarGridRoot<TEvent>({
       if (controlledViewMode === undefined) setInternalViewMode(m);
     },
     [controlledViewMode, onViewModeChange],
+  );
+
+  const setResourceFilter = useCallback(
+    (resourceId: string | null) => {
+      onResourceFilterChange?.(resourceId);
+      if (controlledResourceFilter === undefined) setInternalResourceFilter(resourceId);
+    },
+    [controlledResourceFilter, onResourceFilterChange],
   );
 
   const goNext = useCallback(() => {
@@ -296,6 +327,9 @@ function CalendarGridRoot<TEvent>({
       showStepLabels,
       nowLine,
       isLoading,
+      resources: resourceList,
+      resourceFilter,
+      setResourceFilter,
     }),
     [
       view,
@@ -321,6 +355,9 @@ function CalendarGridRoot<TEvent>({
       showStepLabels,
       nowLine,
       isLoading,
+      resourceList,
+      resourceFilter,
+      setResourceFilter,
     ],
   );
 
@@ -369,6 +406,7 @@ CalendarGrid.ViewTabs = CalendarGridChrome.ViewTabs;
 CalendarGrid.ViewToggle = CalendarGridChrome.ViewToggle;
 CalendarGrid.Picker = CalendarGridChrome.Picker;
 CalendarGrid.Legend = CalendarGridChrome.Legend;
+CalendarGrid.ResourceFilter = CalendarGridChrome.ResourceFilter;
 CalendarGrid.EventTemplate = EventTemplate;
 CalendarGrid.PopoverTemplate = PopoverTemplate;
 CalendarGrid.DayView = CalendarGridTimeView.DayView;

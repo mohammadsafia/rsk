@@ -1,6 +1,6 @@
 import { type ComponentPropsWithoutRef, type FC, useMemo } from 'react';
 
-import { Tabs, ToggleGroup, IconButton } from '@components/ui';
+import { IconButton, Select, Tabs, ToggleGroup } from '@components/ui';
 import { type CalendarLegendItem, CalendarPicker, type CalendarPickerSelected, useCalendarGridContext } from '@components/calendar';
 
 import { useAppTranslation, useDate } from '@hooks/shared';
@@ -20,6 +20,7 @@ type CalendarGridChromeComponents = FC & {
   ViewToggle: FC;
   Picker: FC;
   Legend: FC<LegendProps>;
+  ResourceFilter: FC;
 };
 
 const Header: FC<HeaderProps> = ({ className, children, ...props }) => (
@@ -134,6 +135,34 @@ const Legend: FC<LegendProps> = ({ items, className, ...props }) => (
   </div>
 );
 
+const ALL_RESOURCES = '__all__';
+
+/** Week view: pick one resource or all of them. Renders nothing in other views or without resources. */
+const ResourceFilter: FC = () => {
+  const { t } = useAppTranslation('common');
+  const { resources, resourceFilter, setResourceFilter, view } = useCalendarGridContext();
+
+  if (view !== 'week' || resources.length === 0) return null;
+
+  return (
+    <Select value={resourceFilter ?? ALL_RESOURCES} onValueChange={(value) => setResourceFilter(value === ALL_RESOURCES ? null : value)}>
+      <Select.Trigger size="sm" aria-label={t('calendar.resource')} className="w-48">
+        <Select.Value />
+      </Select.Trigger>
+
+      <Select.Content>
+        <Select.Item value={ALL_RESOURCES}>{t('calendar.allResources')}</Select.Item>
+
+        {resources.map((resource) => (
+          <Select.Item key={resource.id} value={resource.id}>
+            {resource.label}
+          </Select.Item>
+        ))}
+      </Select.Content>
+    </Select>
+  );
+};
+
 const CalendarGridChrome: CalendarGridChromeComponents = () => null;
 
 CalendarGridChrome.Header = Header;
@@ -142,5 +171,6 @@ CalendarGridChrome.ViewTabs = ViewTabs;
 CalendarGridChrome.ViewToggle = ViewToggle;
 CalendarGridChrome.Picker = Picker;
 CalendarGridChrome.Legend = Legend;
+CalendarGridChrome.ResourceFilter = ResourceFilter;
 
 export default CalendarGridChrome;

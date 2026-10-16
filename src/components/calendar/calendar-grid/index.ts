@@ -4,6 +4,7 @@ export {
   type CalendarAccessors,
   type CalendarLegendItem,
   type CalendarRange,
+  type CalendarResource,
   type EventTimeStatus,
   type CalendarView,
   type CalendarViewMode,

@@ -1,41 +1,17 @@
-import { type FC, useMemo, useState } from 'react';
+import { type FC, type ReactNode, useMemo, useState } from 'react';
 
 import { Conditional } from '@components/utils';
-import { CalendarTimeGrid, type CalendarTimeGridAxisRow, Popover } from '@components/ui';
-import { type CalendarAccessors, type EventTimeStatus, useCalendarGridContext } from '@components/calendar';
+import { Avatar, CalendarTimeGrid, type CalendarTimeGridAxisRow, Popover } from '@components/ui';
+import { type CalendarResource, useCalendarGridContext } from '@components/calendar';
 
 import { type DateInput, useDate } from '@hooks/shared';
 
-type ParsedEvent<T> = {
-  event: T;
-  start: string;
-  end: string;
-  startMins: number;
-  endMins: number;
-};
+import { cn } from '@utils';
 
-type PlacedEvent<T> = {
-  event: T;
-  status: EventTimeStatus;
-  top: number;
-  height: number;
-  left: number;
-  width: number;
-  isOverflow: boolean;
-};
+import { dayKeyOf, slotRangesFor } from '../scheduling';
+import { isAllDayEvent, type PlacedEvent, placeEvents } from './placement';
 
-type PlaceEventsParams<T> = {
-  events: T[];
-  accessors: CalendarAccessors<T>;
-  startHour: number;
-  endHour: number;
-  dayKey: string;
-  isoFor: (date: DateInput) => string;
-  now: DateInput;
-  toMinutes: (date: DateInput) => number;
-  isBefore: (a: DateInput, b: DateInput) => boolean;
-  isAfter: (a: DateInput, b: DateInput) => boolean;
-};
+export type GridColumn = { key: string; dayKey: string; resourceId?: string };
 
 type EventSlotProps = {
   placement: PlacedEvent<unknown>;
@@ -46,138 +22,10 @@ type CalendarGridTimeViewComponents = FC & {
   WeekView: FC;
 };
 
-const MAX_VISIBLE_COLUMNS = 4;
-const MIN_HEIGHT_PERCENT = 2;
-
-const parseTimeMinutes = (time: string): number => {
-  const [hStr, mStr] = time.split(':');
-  return Number(hStr) * 60 + Number(mStr ?? 0);
-};
-
 const computeRowCount = (startHour: number, endHour: number, stepMinutes: number): number => {
   const totalMinutes = (endHour - startHour) * 60;
   return Math.max(Math.floor(totalMinutes / stepMinutes), 1);
 };
-
-function parseEventsForDay<T>(
-  events: T[],
-  accessors: CalendarAccessors<T>,
-  dayKey: string,
-  isoFor: (date: DateInput) => string,
-  toMinutes: (date: DateInput) => number,
-  startMinutes: number,
-  endMinutes: number,
-): ParsedEvent<T>[] {
-  return events
-    .filter((event) => isoFor(accessors.getStartTime(event)) === dayKey)
-    .map((event) => {
-      const start = accessors.getStartTime(event);
-      const end = accessors.getEndTime(event);
-      const rawStart = toMinutes(start);
-      const rawEnd = toMinutes(end);
-
-      return {
-        event,
-        start,
-        end,
-        startMins: Math.max(rawStart, startMinutes),
-        endMins: rawEnd === rawStart ? rawStart + 1 : Math.min(rawEnd, endMinutes),
-      };
-    })
-    .sort((a, b) => a.startMins - b.startMins || b.endMins - b.startMins - (a.endMins - a.startMins));
-}
-
-function clusterEvents<T>(parsed: ParsedEvent<T>[]): ParsedEvent<T>[][] {
-  const clusters: ParsedEvent<T>[][] = [];
-  const visited = new Set<number>();
-
-  for (let i = 0; i < parsed.length; i++) {
-    if (visited.has(i)) continue;
-
-    const cluster = [parsed[i]];
-    visited.add(i);
-    let clusterEnd = parsed[i].endMins;
-
-    for (let j = i + 1; j < parsed.length; j++) {
-      if (visited.has(j)) continue;
-      if (parsed[j].startMins < clusterEnd) {
-        cluster.push(parsed[j]);
-        visited.add(j);
-        clusterEnd = Math.max(clusterEnd, parsed[j].endMins);
-      }
-    }
-
-    clusters.push(cluster);
-  }
-
-  return clusters;
-}
-
-function placeCluster<T>(
-  cluster: ParsedEvent<T>[],
-  startMinutes: number,
-  totalMinutes: number,
-  now: DateInput,
-  isBefore: (a: DateInput, b: DateInput) => boolean,
-  isAfter: (a: DateInput, b: DateInput) => boolean,
-): PlacedEvent<T>[] {
-  const columnMap = new Map<number, ParsedEvent<T>[]>();
-  const result: PlacedEvent<T>[] = [];
-
-  for (const item of cluster) {
-    let col = 0;
-
-    for (; ; col++) {
-      const colEvents = columnMap.get(col) ?? [];
-      if (!colEvents.some((e) => item.startMins < e.endMins && item.endMins > e.startMins)) break;
-    }
-
-    if (!columnMap.has(col)) columnMap.set(col, []);
-    columnMap.get(col)!.push(item);
-
-    let maxConcurrent = 0;
-    for (const other of cluster) {
-      if (item.startMins < other.endMins && item.endMins > other.startMins) maxConcurrent++;
-    }
-
-    const effectiveColumns = Math.min(maxConcurrent, MAX_VISIBLE_COLUMNS);
-    const isOverflow = col >= MAX_VISIBLE_COLUMNS;
-
-    result.push({
-      event: item.event,
-      status: isBefore(item.end, now) ? 'past' : isAfter(item.start, now) ? 'future' : 'current',
-      top: ((item.startMins - startMinutes) / totalMinutes) * 100,
-      height: Math.max(((item.endMins - item.startMins) / totalMinutes) * 100, MIN_HEIGHT_PERCENT),
-      left: isOverflow ? 0 : col * (100 / effectiveColumns),
-      width: isOverflow ? 0 : 100 / effectiveColumns,
-      isOverflow,
-    });
-  }
-
-  return result;
-}
-
-function placeEvents<T>({
-  events,
-  accessors,
-  startHour,
-  endHour,
-  dayKey,
-  isoFor,
-  now,
-  toMinutes,
-  isBefore,
-  isAfter,
-}: PlaceEventsParams<T>): PlacedEvent<T>[] {
-  const startMinutes = startHour * 60;
-  const endMinutes = endHour * 60;
-  const totalMinutes = endMinutes - startMinutes;
-
-  const parsed = parseEventsForDay(events, accessors, dayKey, isoFor, toMinutes, startMinutes, endMinutes);
-  const clusters = clusterEvents(parsed);
-
-  return clusters.flatMap((cluster) => placeCluster(cluster, startMinutes, totalMinutes, now, isBefore, isAfter));
-}
 
 const DayHeader: FC<{ day: DateInput }> = ({ day }) => {
   const { formatDate, toDate, constants } = useDate();
@@ -188,7 +36,7 @@ const DayHeader: FC<{ day: DateInput }> = ({ day }) => {
   return <CalendarTimeGrid.Header dayName={dayName} dayNumber={dayNumber} isToday={isToday} />;
 };
 
-const TimeAxis: FC = () => {
+const TimeAxis: FC<{ className?: string }> = ({ className }) => {
   const { startHour, endHour, stepMinutes, showStepLabels } = useCalendarGridContext();
   const { formatHour, constants } = useDate();
 
@@ -210,7 +58,7 @@ const TimeAxis: FC = () => {
     return items;
   }, [startHour, endHour, stepMinutes, formatHour, constants]);
 
-  return <CalendarTimeGrid.Axis rows={rows} showStepLabels={showStepLabels} />;
+  return <CalendarTimeGrid.Axis rows={rows} showStepLabels={showStepLabels} className={className} />;
 };
 
 const EventSlot: FC<EventSlotProps> = ({ placement }) => {
@@ -260,27 +108,45 @@ const NowIndicator: FC<{ day: DateInput }> = ({ day }) => {
   return <CalendarTimeGrid.NowLine percent={percent} mode={nowLine} />;
 };
 
-const DayColumn: FC<{ day: DateInput; className?: string }> = ({ day, className }) => {
+const initials = (label: string) =>
+  label
+    .replace(/^(dr|mr|mrs|ms)\.?\s+/i, '')
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+
+const ResourceHeader: FC<{ resource: CalendarResource }> = ({ resource }) => (
+  <div
+    data-slot="calendar-grid-resource-header"
+    className="border-border-subtle bg-surface flex min-w-44 flex-1 items-center justify-center gap-2 border-y border-e px-2 py-2 last:border-e-0"
+  >
+    <Avatar size="sm">
+      {resource.avatar ? <Avatar.Image src={resource.avatar} alt="" /> : <></>}
+      <Avatar.Fallback>{initials(resource.label)}</Avatar.Fallback>
+    </Avatar>
+
+    <span className="text-fg truncate text-sm font-medium">{resource.label}</span>
+  </div>
+);
+
+const DayColumn: FC<{ column: GridColumn; index: number; className?: string }> = ({ column, index, className }) => {
   const { events, eventAccessors, slots, startHour, endHour, stepMinutes } = useCalendarGridContext();
   const { toDate, toDateUnits, isBefore, isAfter } = useDate();
 
-  const dayKey = toDate(day);
+  const { dayKey, resourceId } = column;
   const rowCount = computeRowCount(startHour, endHour, stepMinutes);
 
   const cells = useMemo(() => {
-    const slotRanges = (slots?.[dayKey] ?? []).map((s) => ({
-      start: parseTimeMinutes(s.startTime),
-      end: parseTimeMinutes(s.endTime),
-    }));
+    const ranges = slotRangesFor(slots, dayKey, resourceId) ?? [];
 
     return Array.from({ length: rowCount }, (_, idx) => {
       const cellStart = startHour * 60 + idx * stepMinutes;
       const cellEnd = cellStart + stepMinutes;
-      const isAvailable = slotRanges.some((r) => cellStart < r.end && cellEnd > r.start);
 
-      return { isAvailable };
+      return { isAvailable: ranges.some((range) => cellStart < range.end && cellEnd > range.start) };
     });
-  }, [slots, dayKey, rowCount, startHour, stepMinutes]);
+  }, [slots, dayKey, resourceId, rowCount, startHour, stepMinutes]);
 
   const placements = useMemo(() => {
     const toMinutes = (input: DateInput): number => {
@@ -293,18 +159,27 @@ const DayColumn: FC<{ day: DateInput; className?: string }> = ({ day, className 
       accessors: eventAccessors,
       startHour,
       endHour,
-      dayKey,
-      isoFor: toDate,
+      belongs: (event) =>
+        dayKeyOf(eventAccessors.getStartTime(event)) === dayKey &&
+        (resourceId === undefined || eventAccessors.getResourceId?.(event) === resourceId) &&
+        !isAllDayEvent(event, eventAccessors),
       now: toDate(),
       toMinutes,
       isBefore,
       isAfter,
     });
-  }, [events, eventAccessors, startHour, endHour, dayKey, toDate, toDateUnits, isBefore, isAfter]);
+  }, [events, eventAccessors, startHour, endHour, dayKey, resourceId, toDate, toDateUnits, isBefore, isAfter]);
 
   return (
-    <CalendarTimeGrid.Column rowCount={rowCount} className={className}>
-      <NowIndicator day={day} />
+    <CalendarTimeGrid.Column
+      rowCount={rowCount}
+      data-calendar-column=""
+      data-column-index={index}
+      data-day={dayKey}
+      data-resource={resourceId}
+      className={cn('border-border-subtle border-e last:border-e-0', resourceId !== undefined ? 'min-w-44' : 'min-w-0', className)}
+    >
+      <NowIndicator day={dayKey} />
 
       {placements.map((placement, idx) => (
         <EventSlot key={`${eventAccessors.getId(placement.event)}-${idx}`} placement={placement} />
@@ -317,36 +192,57 @@ const DayColumn: FC<{ day: DateInput; className?: string }> = ({ day, className 
   );
 };
 
+/** Shared layout of the day and week views: one scroller with a sticky header row and a sticky time axis. */
+const TimeGrid: FC<{ slot: string; columns: GridColumn[]; headers: ReactNode }> = ({ slot, columns, headers }) => (
+  <div data-slot={slot} className="flex min-h-0 flex-1 flex-col">
+    <div
+      data-slot="calendar-grid-body"
+      className="relative min-h-128 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--color-border-strong)_transparent] overflow-auto"
+    >
+      <div className="flex w-max min-w-full flex-col">
+        <div data-slot="calendar-grid-header-row" className="bg-surface sticky top-0 z-40 flex flex-col">
+          <div className="flex">
+            <CalendarTimeGrid.Spacer className="sticky start-0 z-10" />
+
+            <div data-slot="calendar-grid-day-headers" className="flex flex-1">
+              {headers}
+            </div>
+          </div>
+        </div>
+
+        <div data-slot="calendar-grid-body-row" className="flex flex-1">
+          <TimeAxis className="sticky start-0 z-30" />
+
+          {columns.map((column, index) => (
+            <DayColumn key={column.key} column={column} index={index} />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 const DayView: FC = () => {
-  const { view, viewMode, date } = useCalendarGridContext();
+  const { view, viewMode, date, resources } = useCalendarGridContext();
+
+  const columns = useMemo<GridColumn[]>(
+    () =>
+      resources.length > 0
+        ? resources.map((resource) => ({ key: `${date}:${resource.id}`, dayKey: date, resourceId: resource.id }))
+        : [{ key: date, dayKey: date }],
+    [resources, date],
+  );
 
   if (view !== 'day' || viewMode !== 'calendar') return null;
 
-  return (
-    <div data-slot="calendar-grid-day-view" className="flex min-h-0 flex-1 flex-col">
-      <div
-        data-slot="calendar-grid-header-row"
-        className="flex shrink-0 [scrollbar-width:thin] [scrollbar-color:var(--color-surface)_var(--color-surface)] [scrollbar-gutter:stable] overflow-y-scroll"
-      >
-        <CalendarTimeGrid.Spacer />
+  const headers =
+    resources.length > 0 ? resources.map((resource) => <ResourceHeader key={resource.id} resource={resource} />) : <DayHeader day={date} />;
 
-        <DayHeader day={date} />
-      </div>
-
-      <div
-        data-slot="calendar-grid-body-row"
-        className="flex min-h-128 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--color-border-strong)_transparent] [scrollbar-gutter:stable] overflow-y-auto"
-      >
-        <TimeAxis />
-
-        <DayColumn day={date} />
-      </div>
-    </div>
-  );
+  return <TimeGrid slot="calendar-grid-day-view" columns={columns} headers={headers} />;
 };
 
 const WeekView: FC = () => {
-  const { view, viewMode, range } = useCalendarGridContext();
+  const { view, viewMode, range, resourceFilter } = useCalendarGridContext();
 
   const { addDuration, toDate, constants } = useDate();
 
@@ -355,42 +251,29 @@ const WeekView: FC = () => {
     let current = range.startDate;
 
     for (let i = 0; i < 7; i++) {
-      result.push(current);
+      result.push(toDate(current));
 
       current = addDuration(current, 1, constants.UnitOfTime.DAY);
     }
 
     return result;
-  }, [range.startDate, addDuration, constants]);
+  }, [range.startDate, addDuration, toDate, constants]);
+
+  const columns = useMemo<GridColumn[]>(
+    () => days.map((day) => ({ key: day, dayKey: day, resourceId: resourceFilter ?? undefined })),
+    [days, resourceFilter],
+  );
 
   if (view !== 'week' || viewMode !== 'calendar') return null;
 
   return (
-    <div data-slot="calendar-grid-week-view" className="flex min-h-0 flex-1 flex-col">
-      <div
-        data-slot="calendar-grid-header-row"
-        className="flex shrink-0 [scrollbar-width:thin] [scrollbar-color:var(--color-surface)_var(--color-surface)] [scrollbar-gutter:stable] overflow-y-scroll"
-      >
-        <CalendarTimeGrid.Spacer />
-
-        <div data-slot="calendar-grid-day-headers" className="flex flex-1">
-          {days.map((day) => (
-            <DayHeader key={toDate(day)} day={day} />
-          ))}
-        </div>
-      </div>
-
-      <div
-        data-slot="calendar-grid-body-row"
-        className="flex min-h-128 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--color-border-strong)_transparent] [scrollbar-gutter:stable] overflow-y-auto"
-      >
-        <TimeAxis />
-
-        {days.map((day) => (
-          <DayColumn key={toDate(day)} day={day} className="border-border-subtle border-e last:border-e-0" />
-        ))}
-      </div>
-    </div>
+    <TimeGrid
+      slot="calendar-grid-week-view"
+      columns={columns}
+      headers={days.map((day) => (
+        <DayHeader key={day} day={day} />
+      ))}
+    />
   );
 };
 
