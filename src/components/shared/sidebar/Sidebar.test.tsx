@@ -36,6 +36,13 @@ const menu = (collapsed = false) => (
 );
 
 describe('Sidebar', () => {
+  it('lets a long menu scroll (the viewport only scrolls while a vertical bar is mounted)', () => {
+    const { container } = wrap(menu());
+    const viewport = container.querySelector<HTMLElement>('[data-slot="sidebar"] [data-slot="scroll-area-viewport"]');
+
+    expect(viewport?.style.overflowY).toBe('scroll');
+  });
+
   it('marks the active item with aria-current and a hover tint, never a stripe', () => {
     wrap(menu());
     const active = screen.getByRole('link', { name: 'Dashboard' });
