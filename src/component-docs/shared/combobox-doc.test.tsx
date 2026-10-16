@@ -5,6 +5,8 @@ import { afterEach, describe, expect, it } from 'vite-plus/test';
 import { Tooltip } from '@components/ui';
 
 import { getComponentDocsRegistry } from '@component-docs/registry';
+import { mdxComponents } from '@component-docs/gallery/utils';
+import { MDXProvider } from '@mdx-js/react';
 
 import '../../i18n';
 
@@ -16,7 +18,9 @@ const renderDoc = async () => {
     .load();
   render(
     <Tooltip.Provider>
-      <Doc />
+      <MDXProvider components={mdxComponents}>
+        <Doc />
+      </MDXProvider>
     </Tooltip.Provider>,
   );
   return document.querySelector('[data-slot="combobox-value"]')!.closest('button') as HTMLElement;

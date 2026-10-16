@@ -30,6 +30,24 @@ describe('demoSource', () => {
 }`);
   });
 
+  it('also reads `export const Name = () =>` demos, as declared in MDX files', () => {
+    const mdx = `import { useState } from 'react';
+
+export const OPTIONS = ['a'];
+
+export const PickerDemo = () => {
+  const [value, setValue] = useState();
+  return <Picker value={value} onChange={setValue} />;
+};
+
+## Heading
+`;
+    expect(demoSource('PickerDemo', mdx)).toBe(`export const PickerDemo = () => {
+  const [value, setValue] = useState();
+  return <Picker value={value} onChange={setValue} />;
+};`);
+  });
+
   it('throws for an unknown demo so a renamed demo fails loudly', () => {
     expect(() => demoSource('MissingDemo', SOURCE)).toThrow(/MissingDemo/);
   });

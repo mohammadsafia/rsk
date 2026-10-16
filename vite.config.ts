@@ -12,25 +12,33 @@ import remarkGfm from 'remark-gfm';
 import remarkDocs from './scripts/docs/remark-docs';
 import { scanDocCounts } from './scripts/docs/doc-counts';
 
-const mdxPlugin = Object.assign(
-  mdx({
-    providerImportSource: '@mdx-js/react',
-    remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: 'frontmatter', exportType: 'const' }], remarkGfm, remarkDocs],
-    rehypePlugins: [
-      [
-        rehypePrettyCode,
-        {
-          theme: {
-            light: 'github-light',
-            dark: 'github-dark',
-          },
-          keepBackground: false,
+const mdxBase = mdx({
+  providerImportSource: '@mdx-js/react',
+  remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: 'frontmatter', exportType: 'const' }], remarkGfm, remarkDocs],
+  rehypePlugins: [
+    [
+      rehypePrettyCode,
+      {
+        theme: {
+          light: 'github-light',
+          dark: 'github-dark',
         },
-      ],
+        keepBackground: false,
+      },
     ],
-  }) as unknown as VitePlugin,
-  { enforce: 'pre' as const },
-);
+  ],
+}) as unknown as VitePlugin;
+
+// `import source from './Page.mdx?raw'` must stay raw text (docs Code tabs read it), but @mdx-js/rollup
+// strips the query before filtering, so skip `?raw` ids here and let Vite's raw loader handle them.
+const mdxPlugin: VitePlugin = {
+  ...mdxBase,
+  enforce: 'pre',
+  transform(this: unknown, ...args: [string, string]) {
+    if (/[?&]raw\b/.test(args[1])) return null;
+    return (mdxBase.transform as (...a: [string, string]) => unknown).apply(this, args);
+  },
+} as VitePlugin;
 
 export default defineConfig({
   lint: {

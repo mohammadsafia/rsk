@@ -3,45 +3,81 @@ id: file-uploader
 title: FileUploader
 section: Components
 category: Shared
-description: 'Drag-and-drop file upload with preview, file list, and download actions.'
+description: 'Drop zone with file list, chips and image previews; compose the parts you need.'
 tags: [shared, file, upload, dropzone]
 ---
 
+import { useState } from 'react';
+import { demoSource } from '@component-docs/blocks';
 import { FileUploader } from '@components/shared';
+import pageSource from './FileUploader.mdx?raw';
 
-## Demo
+export const SingleDemo = () => {
+  const [file, setFile] = useState(null);
+  return (
+    <div className="w-96">
+      <FileUploader name="referral" value={file} onChange={setFile}>
+        <FileUploader.DropzoneGroup>
+          <FileUploader.Dropzone accept=".pdf,.doc,.docx" placeholder="Drop the referral letter or click to browse" />
+          <FileUploader.Actions />
+        </FileUploader.DropzoneGroup>
+      </FileUploader>
+    </div>
+  );
+};
 
-<div className="w-96">
-  <FileUploader>
-    <FileUploader.DropzoneGroup>
-      <FileUploader.Dropzone accept=".pdf,.doc,.docx" placeholder="Drop files here or click to browse" />
-    </FileUploader.DropzoneGroup>
-  </FileUploader>
-</div>
+export const GalleryDemo = () => {
+  const [files, setFiles] = useState([]);
+  return (
+    <div className="w-96">
+      <FileUploader name="photos" value={files} onChange={setFiles} accept="image/*" multiple>
+        <FileUploader.DropzoneGroup>
+          <FileUploader.Dropzone placeholder="Drop images" />
+        </FileUploader.DropzoneGroup>
+        <FileUploader.FileList variant="chips" />
+        <FileUploader.ImagePreview />
+      </FileUploader>
+    </div>
+  );
+};
 
-## Imports
+## Single file
 
-```tsx
-import { FileUploader } from '@components/shared';
-```
+`DropzoneGroup` holds the drop zone and, for one file, `Actions` (clear, optional download).
 
-## Code
+<Example title="One document" code={demoSource('SingleDemo', pageSource)}>
+  <SingleDemo />
+</Example>
 
-```tsx
-// Basic dropzone
-<FileUploader name="document" value={file} onChange={setFile}>
-  <FileUploader.DropzoneGroup>
-    <FileUploader.Dropzone accept=".pdf,.doc" placeholder="Drop file here" />
-    <FileUploader.Actions />
-  </FileUploader.DropzoneGroup>
-</FileUploader>
+## Multiple, with previews
 
-// With file list and image preview
-<FileUploader name="files" value={files} onChange={setFiles} multiple>
-  <FileUploader.DropzoneGroup>
-    <FileUploader.Dropzone accept="image/*" />
-  </FileUploader.DropzoneGroup>
-  <FileUploader.FileList />
-  <FileUploader.ImagePreview />
-</FileUploader>
-```
+With `multiple`, the value is `File[]`. Add `FileList` (list or chips) and `ImagePreview` below the zone.
+
+<Example title="Images" code={demoSource('GalleryDemo', pageSource)}>
+  <GalleryDemo />
+</Example>
+
+In forms, use [FormUploadFile](/docs/components/form-upload-file), which wires these parts to react-hook-form.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'name', type: 'string', required: true, description: 'Input name and id prefix.' },
+    { prop: 'value · onChange', type: 'File | File[] | null', required: true, description: 'Controlled value; File[] when multiple.' },
+    { prop: 'accept · multiple', type: 'string · boolean', description: 'Allowed types and whether several files are kept.' },
+    { prop: 'disabled · isUploading', type: 'boolean', description: 'Block changes; isUploading also shows a spinner.' },
+    { prop: 'Dropzone · placeholder', type: 'ReactNode', description: 'Text in the drop zone.' },
+    { prop: 'Actions · onDownload · clearable', type: '() => void · boolean', description: 'Download and clear buttons for a single file.' },
+    { prop: 'FileList · variant', type: "'list' | 'chips'", default: "'list'", description: 'How picked files are shown.' },
+  ]}
+/>
+
+## Accessibility
+
+- The drop zone wraps a native file input, so it is focusable and opens the file picker with Enter or Space.
+- Clear, remove and download buttons have translated labels.
+
+## RTL notes
+
+- File sizes are isolated left to right; remove buttons sit at the end of each row, on the left in Arabic.

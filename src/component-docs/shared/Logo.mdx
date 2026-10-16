@@ -3,52 +3,55 @@ id: logo
 title: Logo
 section: Components
 category: Shared
-description: 'The RSK building-block mark and lockup, drawn from tokens so it inverts with the theme.'
-tags: [shared, logo, brand, mark]
+description: 'The RSK mark and lockup in three sizes; the accent square is the only accent near it.'
+tags: [shared, brand, logo]
 ---
 
 import { Logo } from '@components/shared';
 
-## Demo
+## Mark
 
-<div className="flex w-full flex-col gap-6">
-  <div className="flex items-center gap-6">
-    <Logo size="sm" />
-    <Logo size="md" />
-    <Logo size="lg" />
-  </div>
+<Example title="Sizes">
+  <Logo size="sm" />
+  <Logo />
+  <Logo size="lg" />
+</Example>
 
-  <div className="flex flex-wrap items-center gap-8">
-    <Logo variant="lockup" size="md" />
-    <Logo variant="lockup" size="lg" tagline />
-  </div>
+## Lockup
 
-  <div className="bg-surface-sunken border-border flex w-fit items-center gap-4 rounded-lg border p-4">
+The lockup adds the wordmark as real text; `tagline` adds "React Starter Kit".
+
+<Example title="Lockup and tagline">
+  <Logo variant="lockup" />
+  <Logo variant="lockup" size="lg" tagline />
+</Example>
+
+## On surfaces
+
+<Example title="Sunken surface">
+  <div className="bg-surface-sunken border-border flex items-center gap-4 rounded-lg border p-4">
     <Logo size="lg" />
     <span className="text-fg-muted text-sm">Reads on sunken and raised surfaces alike.</span>
   </div>
-</div>
+</Example>
 
-## Imports
-
-```tsx
-import { Logo } from '@components/shared';
-```
-
-## Code
-
-```tsx
-<Logo />                               // mark, 24px
-<Logo size="sm" />                     // 16px geometry
-<Logo variant="lockup" size="lg" tagline />
-```
+Never place the logo on an accent background: its accent square must be the only accent around it.
 
 ## API
 
-| Prop | Type | Default | Notes |
-|---|---|---|---|
-| `variant` | `'mark' \| 'lockup'` | `'mark'` | The mark is `role="img"` named "RSK"; the lockup shows the wordmark as text. |
-| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | 16, 24 or 32 px. `sm` uses larger squares so they survive rasterising. |
-| `tagline` | `boolean` | `false` | Lockup only: adds "React Starter Kit". |
+<PropsTable
+  rows={[
+    { prop: 'variant', type: "'mark' | 'lockup'", default: "'mark'", description: 'Mark only, or mark with the wordmark.' },
+    { prop: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '16 · 24 · 32px; sm uses larger squares so they survive rasterising.' },
+    { prop: 'tagline', type: 'boolean', default: 'false', description: 'Lockup only: adds "React Starter Kit".' },
+  ]}
+/>
 
-The accent square is the only accent on a surface that shows the logo — never place it on an accent background.
+## Accessibility
+
+- The mark is `role="img"` named "RSK"; the lockup's wordmark is text, so screen readers read it once.
+- When the logo is a home link, give the link the label ("RSK home") rather than the image.
+
+## RTL notes
+
+- The lockup keeps the mark at the start, so it sits to the right of the wordmark in Arabic; the Latin wordmark never mirrors.

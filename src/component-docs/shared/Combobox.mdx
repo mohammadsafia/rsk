@@ -62,39 +62,28 @@ export const DoctorPicker = () => {
   );
 };
 
-## Demo
+## Single select
 
-Click or focus the trigger, type to filter, use the arrow keys to move and Enter to choose; Escape closes without choosing.
+Click or focus the trigger, type to filter, use the arrow keys to move and Enter to choose; Escape closes without choosing. The search box gets focus when the list opens.
 
-<DoctorPicker />
-
-## Imports
-
-```tsx
-import { Combobox } from '@components/shared';
-```
-
-## Code
-
-```tsx
-const [open, setOpen] = useState(false);
+<Example
+  title="Doctor picker"
+  code={`const [open, setOpen] = useState(false);
 const [doctorId, setDoctorId] = useState<string>();
 const selected = DOCTORS.find((doctor) => doctor.id === doctorId);
 
 <Combobox open={open} onOpenChange={setOpen}>
-  <Combobox.Trigger>
+  <Combobox.Trigger className="w-72">
     <Combobox.Value placeholder="Choose a doctor">{selected?.name}</Combobox.Value>
   </Combobox.Trigger>
-
   <Combobox.Content>
-    <Combobox.Input placeholder="Search..." />
-
+    <Combobox.Input placeholder="Search doctors…" />
     <Combobox.List>
-      <Combobox.Empty>No results.</Combobox.Empty>
+      <Combobox.Empty>No doctors match.</Combobox.Empty>
       {DOCTORS.map((doctor) => (
         <Combobox.Item
           key={doctor.id}
-          value={doctor.name}
+          value={\`\${doctor.name} \${doctor.specialty}\`}
           onSelect={() => {
             setDoctorId(doctor.id);
             setOpen(false);
@@ -105,5 +94,39 @@ const selected = DOCTORS.find((doctor) => doctor.id === doctorId);
       ))}
     </Combobox.List>
   </Combobox.Content>
-</Combobox>
-```
+</Combobox>`}
+>
+  <DoctorPicker />
+</Example>
+
+`value` is the text matched by the search, so include anything users might type, such as the specialty.
+
+## Building blocks
+
+Combobox is the low-level UI behind [FormCombobox](/docs/components/form-combobox) and [FormMultiCombobox](/docs/components/form-multi-combobox). Use those in forms; use Combobox directly for filters and toolbars.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'open · onOpenChange', type: 'boolean · (open) => void', description: 'Controlled open state; close it yourself in onSelect.' },
+    { prop: 'Trigger · size · invalid', type: "'sm' | 'md' | 'lg' · boolean", description: 'Field-shaped trigger, same heights as Input.' },
+    { prop: 'Value · placeholder', type: 'string', description: 'Shown when the Value has no children.' },
+    { prop: 'Content · shouldFilter', type: 'boolean', default: 'true', description: 'Turn off client filtering for server-side search.' },
+    { prop: 'Item · value · onSelect', type: 'string · () => void', description: 'Search text and the choose handler.' },
+    { prop: 'Clear · when · onClear', type: 'boolean · () => void', description: 'A clear control inside the trigger.' },
+    { prop: 'Loader · when · message', type: 'boolean · string', description: 'Loading row inside the list.' },
+    { prop: 'Empty', type: 'ReactNode', description: 'Shown when nothing matches.' },
+  ]}
+/>
+
+`Indicator` and `Icon` render the check mark and the chevron.
+
+## Accessibility
+
+- The trigger is a button that opens a popover; the search input controls a `listbox` of options.
+- Arrow keys move, Enter chooses, Escape closes and returns focus to the trigger.
+
+## RTL notes
+
+- The chevron sits at the end of the trigger; the list text aligns to the start.

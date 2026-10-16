@@ -3,41 +3,58 @@ id: toaster
 title: Toaster
 section: Components
 category: Shared
-description: 'Toast notification renderer for displaying alerts with title, description, and actions.'
+description: 'Renders the toasts queued with useToast; mount it once per layout.'
 tags: [shared, toast, notification]
 ---
 
-## Demo
+import { Button } from '@components/ui';
+import { useToast } from '@hooks/shared';
 
-<p className="text-fg-muted text-sm">
-  The Toaster component renders at the root level and displays notifications triggered via the <code>useToast</code> hook. It is typically
-  placed once in the app layout.
-</p>
+export const ToasterDemo = () => {
+  const { toast } = useToast();
+  return (
+    <Button variant="outline" onClick={() => toast({ tone: 'success', title: 'Changes saved', description: 'The patient record was updated.' })}>
+      Show a toast
+    </Button>
+  );
+};
 
-## Imports
+## Mount once
+
+The Toaster draws whatever `useToast().toast()` queues. The app layout, the auth layout and this docs layout each mount one, so you rarely add it yourself.
 
 ```tsx
-import { Toaster } from '@components/shared';
-import { useToast } from 'hooks/useToast';
+function AppLayout() {
+  return (
+    <>
+      <AppShell sidebar={<AppSidebar />}>…</AppShell>
+      <Toaster />
+    </>
+  );
+}
 ```
 
-## Code
+## Trigger from anywhere
 
-```tsx
-// Place once in app layout
-<Toaster />;
+<Example
+  title="Queue a toast"
+  code={`const { toast } = useToast();
 
-// Trigger toasts via hook
-const { toast } = useToast();
+toast({ tone: 'success', title: 'Changes saved', description: 'The patient record was updated.' });`}
+>
+  <ToasterDemo />
+</Example>
 
-toast({
-  title: 'Success',
-  description: 'Your changes have been saved.',
-});
+Toast options (tone, action, position) are on the [Toast](/docs/components/toast) page.
 
-toast({
-  tone: 'danger',
-  title: 'Error',
-  description: 'Something went wrong.',
-});
-```
+## API
+
+Toaster takes no props. It shows up to the queue limit, closes each toast after 5 seconds, and places the viewport using the newest toast's `position`.
+
+## Accessibility
+
+- The viewport is a labelled region; toasts are announced politely and F8 moves focus to them.
+
+## RTL notes
+
+- Swipe-to-dismiss follows the reading direction (swipe left in Arabic), and the default corner is top-end.

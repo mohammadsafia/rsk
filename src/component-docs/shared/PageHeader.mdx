@@ -3,18 +3,20 @@ id: page-header
 title: PageHeader
 section: Components
 category: Shared
-description: 'Top of a page: level-1 title, description, optional back control and breadcrumb, and an actions slot.'
-tags: [shared, page-header, breadcrumb, actions, layout]
+description: 'The top of a page: title, description, back link, breadcrumb and an action row.'
+tags: [shared, layout, header, title]
 ---
 
 import { Button } from '@components/ui';
 import { PageHeader } from '@components/shared';
 import { Download, Plus } from 'lucide-react';
 
-## Demo
+## With actions
 
-<div className="flex w-full flex-col gap-8">
-  <PageHeader title="Patients" description="Everyone registered at the Amman clinic.">
+`PageHeader.Actions` is end-aligned and wraps under the title on narrow screens.
+
+<Example title="List page">
+  <PageHeader className="w-full" title="Patients" description="Everyone registered at the Amman clinic.">
     <PageHeader.Actions>
       <Button variant="outline">
         <Download aria-hidden="true" />
@@ -26,44 +28,40 @@ import { Download, Plus } from 'lucide-react';
       </Button>
     </PageHeader.Actions>
   </PageHeader>
+</Example>
 
+## Back link and breadcrumb
+
+`back` takes a path (a link) or a function (a button); `breadcrumb` renders a [Breadcrumb](/docs/components/breadcrumb) above the title.
+
+<Example title="Detail page">
   <PageHeader
+    className="w-full"
     title="Sara Haddad"
     description="MRN-20391 · Last visit 12 Oct 2026"
-    back="/components/page-header"
-    breadcrumb={[{ title: 'Patients', href: 'components/page-header' }, { title: 'Sara Haddad' }]}
+    back="/docs/components/page-header"
+    breadcrumb={[{ title: 'Patients', href: '/docs/components/page-header' }, { title: 'Sara Haddad' }]}
   />
-</div>
-
-## Imports
-
-```tsx
-import { PageHeader } from '@components/shared';
-```
-
-## Code
-
-```tsx
-<PageHeader title="Patients" description="Everyone registered at the Amman clinic.">
-  <PageHeader.Actions>
-    <Button variant="outline">Export</Button>
-    <Button>Register patient</Button>
-  </PageHeader.Actions>
-</PageHeader>
-
-<PageHeader
-  title="Sara Haddad"
-  back="/patients"
-  breadcrumb={[{ title: 'Patients', href: 'patients' }, { title: 'Sara Haddad' }]}
-/>
-```
+</Example>
 
 ## API
 
-| Prop | Type | Default | Notes |
-|---|---|---|---|
-| `title` | `ReactNode` | — | Rendered as the page's `h1`. |
-| `description` | `ReactNode` | — | Muted line under the title. |
-| `back` | `string \| () => void` | — | A path renders a link; a function renders a button. Labelled `t('common:pageHeader.back')`; the chevron mirrors in RTL. |
-| `breadcrumb` | `BreadcrumbLink[]` | — | Rendered with `Breadcrumb` above the title. |
-| `PageHeader.Actions` | `div` | — | End-aligned action row that wraps under the title on narrow screens. |
+<PropsTable
+  rows={[
+    { prop: 'title', type: 'ReactNode', required: true, description: 'Rendered as the page’s h1.' },
+    { prop: 'description', type: 'ReactNode', description: 'Muted line under the title.' },
+    { prop: 'back', type: 'string | () => void', description: 'A path renders a link; a function renders a button. Labelled "Back".' },
+    { prop: 'breadcrumb', type: 'BreadcrumbLink[]', description: 'Rendered with Breadcrumb above the title.' },
+  ]}
+/>
+
+`PageHeader.Actions` is a `div` for the page's buttons; keep one primary action.
+
+## Accessibility
+
+- The title is the page's only `h1`; the back control has a translated label.
+- Put actions in the order they should be tabbed; the primary action last.
+
+## RTL notes
+
+- The back chevron mirrors in Arabic, and the action row aligns to the end (left).

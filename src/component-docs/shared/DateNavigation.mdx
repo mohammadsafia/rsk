@@ -3,24 +3,37 @@ id: date-navigation
 title: DateNavigation
 section: Components
 category: Shared
-description: Navigation controls for dates with prev/next/today buttons.
-tags: [shared, date-navigation, date, navigation]
+description: 'Previous, next and Today controls with the current date, for day-based views.'
+tags: [shared, date, navigation, calendar]
 ---
 
+import { demoSource } from '@component-docs/blocks';
 import { DateNavigationDemo } from '@pages/components/components.data.demos';
 
-## Demo
+## Day stepper
 
-<DateNavigationDemo />
+You own the date and the step: the component calls `handlePrevious`, `handleNext`, and `onSetDate` with today's ISO date.
 
-## Imports
+<Example title="Step by day" code={demoSource('DateNavigationDemo')}>
+  <DateNavigationDemo />
+</Example>
 
-```tsx
-import { DateNavigation } from '@components/shared';
-```
+Step by week or month by changing what your handlers add. For a full calendar with this header built in, see [CalendarGrid](/docs/components/calendar-grid).
 
-## Code
+## API
 
-```tsx
-<DateNavigation date={currentDate} onSetDate={setCurrentDate} handlePrevious={handlePrevious} handleNext={handleNext} />
-```
+<PropsTable
+  rows={[
+    { prop: 'date', type: 'string (ISO date)', required: true, description: 'The date shown, e.g. "2026-10-16".' },
+    { prop: 'handlePrevious · handleNext', type: '() => void', required: true, description: 'Step back and forward.' },
+    { prop: 'onSetDate', type: '(date: string) => void', required: true, description: 'Called with today’s ISO date by the Today button.' },
+  ]}
+/>
+
+## Accessibility
+
+- The arrow buttons have translated labels ("Previous", "Next"); the date is plain text next to them.
+
+## RTL notes
+
+- The arrows mirror in Arabic, so "previous" points right; the date is formatted for the app language with Western digits.

@@ -3,75 +3,74 @@ id: card-grid
 title: CardGrid
 section: Components
 category: Shared
-description: 'Responsive grid for cards — a column count or per-breakpoint columns and a gap; layout only, no surface of its own.'
-tags: [shared, card-grid, layout, grid, kpi]
+description: 'Responsive grid for cards: one column on phones, more as the screen widens.'
+tags: [shared, layout, grid, card]
 ---
 
 import { Card } from '@components/ui';
 import { CardGrid } from '@components/shared';
 
-## Demo
+## Default
 
-<div className="flex w-full flex-col gap-6">
-  <CardGrid>
+One column, two from `sm`, four from `lg`. Resize the window to see it reflow.
+
+<Example title="Stat cards">
+  <CardGrid className="w-full">
     <Card>
       <Card.Content className="flex flex-col gap-1">
         <span className="text-fg-muted text-sm">Visits today</span>
         <span dir="ltr" className="text-fg font-mono text-2xl font-semibold tabular-nums">48</span>
-        <span className="text-fg-muted text-xs">6 walk-ins</span>
       </Card.Content>
     </Card>
     <Card>
       <Card.Content className="flex flex-col gap-1">
         <span className="text-fg-muted text-sm">No-shows</span>
         <span dir="ltr" className="text-fg font-mono text-2xl font-semibold tabular-nums">3</span>
-        <span className="text-fg-muted text-xs">6% of bookings</span>
       </Card.Content>
     </Card>
     <Card>
       <Card.Content className="flex flex-col gap-1">
         <span className="text-fg-muted text-sm">Average wait</span>
         <span dir="ltr" className="text-fg font-mono text-2xl font-semibold tabular-nums">14 min</span>
-        <span className="text-fg-muted text-xs">2 min faster than last week</span>
       </Card.Content>
     </Card>
     <Card>
       <Card.Content className="flex flex-col gap-1">
         <span className="text-fg-muted text-sm">Collected</span>
         <span dir="ltr" className="text-fg font-mono text-2xl font-semibold tabular-nums">JOD 2,940</span>
-        <span className="text-fg-muted text-xs">Card and cash</span>
       </Card.Content>
     </Card>
   </CardGrid>
+</Example>
 
-  <CardGrid columns={2} gap="lg">
+## Fixed and per-breakpoint columns
+
+A number fixes the count; an object sets it per breakpoint.
+
+<Example title="Two columns, large gap">
+  <CardGrid columns={2} gap="lg" className="w-full">
     <Card title="Morning shift" description="08:00 – 14:00" />
     <Card title="Evening shift" description="14:00 – 20:00" />
   </CardGrid>
-</div>
-
-## Imports
+</Example>
 
 ```tsx
-import { CardGrid } from '@components/shared';
-```
-
-## Code
-
-```tsx
-// Default: 1 column, 2 from sm, 4 from lg
-<CardGrid>
-  <Card>…</Card>
-</CardGrid>
-
-<CardGrid columns={2} gap="lg">…</CardGrid>
-
 <CardGrid columns={{ base: 1, md: 2, xl: 3 }}>…</CardGrid>
 ```
 
 ## API
 
-| Prop | Type | Default | Notes |
-|---|---|---|---|
-| `columns` | `1–6 \| { base?, sm?, md?, lg?, xl? }` | `{ base: 1, sm: 2, lg: 4 }` | A number fixes the count; an object sets it per breakpoint. |
-| `gap` | `'sm' \| 'md' \| 'lg'` | `'md'` | 8, 16 or 24 px. |
+<PropsTable
+  rows={[
+    { prop: 'columns', type: '1–6 | { base?, sm?, md?, lg?, xl? }', default: '{ base: 1, sm: 2, lg: 4 }', description: 'Fixed count, or count per breakpoint.' },
+    { prop: 'gap', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '8px · 16px · 24px.' },
+  ]}
+/>
+
+## Accessibility
+
+- A plain grid `div`; cards keep their own headings, so the reading order is the source order.
+
+## RTL notes
+
+- Cards flow right to left in Arabic; wrap numbers in `dir="ltr"` as above.

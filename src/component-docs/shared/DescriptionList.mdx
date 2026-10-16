@@ -3,17 +3,17 @@ id: description-list
 title: DescriptionList
 section: Components
 category: Shared
-description: 'Term–value pairs for record details, stacked or inline, in one to three columns; numeric values are isolated left-to-right.'
-tags: [shared, description-list, details, key-value]
+description: 'Term and value pairs for detail views, stacked or inline, in one to three columns.'
+tags: [shared, list, details, key-value]
 ---
 
 import { Card } from '@components/ui';
 import { DescriptionList } from '@components/shared';
 
-## Demo
+## Stacked in columns
 
-<div className="flex w-full flex-col gap-6">
-  <Card title="Patient summary" description="Registered 3 March 2024">
+<Example title="Patient summary">
+  <Card className="w-full" title="Patient summary" description="Registered 3 March 2024">
     <Card.Content>
       <DescriptionList
         columns={2}
@@ -27,50 +27,39 @@ import { DescriptionList } from '@components/shared';
       />
     </Card.Content>
   </Card>
+</Example>
 
-  <div className="border-border max-w-sm rounded-lg border p-4">
-    <DescriptionList
-      layout="inline"
-      items={[
-        { term: 'Doctor', value: 'Dr. Lina Khoury' },
-        { term: 'Room', value: 'B-204', numeric: true },
-        { term: 'Duration', value: '30 min', numeric: true },
-      ]}
-    />
+An empty value (`null`, `undefined`, `''`) renders an em dash, as for Mobile above.
+
+## Inline
+
+`layout="inline"` puts each value at the end of its term's row; good for narrow side panels.
+
+<Example title="Visit details">
+  <div className="border-border w-full max-w-sm rounded-lg border p-4">
+    <DescriptionList layout="inline">
+      <DescriptionList.Item term="Doctor" value="Dr. Lina Khoury" />
+      <DescriptionList.Item term="Room" value="B-204" numeric />
+      <DescriptionList.Item term="Duration" value="30 min" numeric />
+    </DescriptionList>
   </div>
-</div>
-
-## Imports
-
-```tsx
-import { DescriptionList } from '@components/shared';
-```
-
-## Code
-
-```tsx
-<DescriptionList
-  columns={2}
-  items={[
-    { term: 'Full name', value: 'Sara Haddad' },
-    { term: 'File number', value: 'MRN-20391', numeric: true },
-    { term: 'Mobile', value: null }, // renders "—"
-  ]}
-/>
-
-<DescriptionList layout="inline">
-  <DescriptionList.Item term="Doctor" value="Dr. Lina Khoury" />
-  <DescriptionList.Item term="Room" value="B-204" numeric />
-</DescriptionList>
-```
+</Example>
 
 ## API
 
-| Prop | Type | Default | Notes |
-|---|---|---|---|
-| `items` | `{ term, value?, numeric? }[]` | — | Or pass `DescriptionList.Item` children. |
-| `columns` | `1 \| 2 \| 3` | `1` | Responsive: one column on phones, two from `sm`, three from `lg`. |
-| `layout` | `'stacked' \| 'inline'` | `'stacked'` | Inline puts the value at the end of the term's row. |
-| `numeric` (item) | `boolean` | `false` | Wraps the value in `dir="ltr"` tabular mono, for IDs, amounts and dates. |
+<PropsTable
+  rows={[
+    { prop: 'items', type: '{ term, value?, numeric? }[]', description: 'The pairs; or pass DescriptionList.Item children.' },
+    { prop: 'columns', type: '1 | 2 | 3', default: '1', description: 'Responsive: one column on phones, two from sm, three from lg.' },
+    { prop: 'layout', type: "'stacked' | 'inline'", default: "'stacked'", description: 'Value under the term, or at the end of its row.' },
+    { prop: 'Item · numeric', type: 'boolean', default: 'false', description: 'LTR-isolated tabular mono, for IDs, amounts and dates.' },
+  ]}
+/>
 
-An empty value (`null`, `undefined`, `''`) renders an em dash.
+## Accessibility
+
+- Renders a native `<dl>` with `<dt>` and `<dd>`, so screen readers announce each term with its value.
+
+## RTL notes
+
+- Terms align to the start; numeric values are wrapped in `dir="ltr"` so IDs and dates keep their order.
