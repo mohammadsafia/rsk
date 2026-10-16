@@ -10,6 +10,7 @@ import remarkMdxFrontmatter from 'remark-mdx-frontmatter';
 import rehypePrettyCode from 'rehype-pretty-code';
 import remarkGfm from 'remark-gfm';
 import remarkDocs from './scripts/docs/remark-docs';
+import { scanDocCounts } from './scripts/docs/doc-counts';
 
 const mdxPlugin = Object.assign(
   mdx({
@@ -176,6 +177,10 @@ export default defineConfig({
     ignorePatterns: ['**/*.hbs', '**/*.mdx', '.claude/skills/**'],
   },
   plugins: lazyPlugins(() => [mdxPlugin, react(), tailwindcss()]),
+  // The docs site is dev-only; the landing page's component counts are baked in at build time instead.
+  define: {
+    __RSK_DOC_COUNTS__: JSON.stringify(scanDocCounts(path.resolve(__dirname, 'src/component-docs'))),
+  },
   server: {
     port: 3000,
     open: true,

@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@components/ui';
@@ -6,7 +5,7 @@ import { Button } from '@components/ui';
 import { useAppTranslation } from '@hooks/shared';
 
 import { FULL_ROUTES_PATH } from '@routes';
-import { getComponentDocsRegistry } from '@component-docs/registry';
+import { LANDING_COUNTS } from '../landing-stats';
 
 import Section from '../section/Section';
 
@@ -14,7 +13,7 @@ const PAGES = ['Button', 'Dialog', 'Tabs', 'Calendar', 'Table'];
 
 function Documented() {
   const { t } = useAppTranslation('home');
-  const total = useMemo(() => getComponentDocsRegistry().length, []);
+  const total = LANDING_COUNTS.total;
 
   return (
     <Section eyebrow={t('showcase.eyebrow')} title={t('showcase.title')} description={t('showcase.desc', { count: total })}>

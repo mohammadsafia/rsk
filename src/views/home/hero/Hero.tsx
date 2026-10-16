@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@components/ui';
@@ -6,13 +5,11 @@ import { Button } from '@components/ui';
 import { useAppTranslation } from '@hooks/shared';
 
 import { FULL_ROUTES_PATH } from '@routes';
-import { getComponentDocsRegistry } from '@component-docs/registry';
 
-import { countDocs } from '../landing-stats';
+import { LANDING_COUNTS as counts } from '../landing-stats';
 
 function Hero() {
   const { t } = useAppTranslation('home');
-  const counts = useMemo(() => countDocs(getComponentDocsRegistry()), []);
 
   const stats = [
     { value: counts.ui, label: t('stats.uiComponents') },
@@ -49,9 +46,11 @@ function Hero() {
           <Link to={FULL_ROUTES_PATH.HOME.DASHBOARD}>{t('hero.ctaPrimary')}</Link>
         </Button>
 
-        <Button size="lg" variant="outline" asChild>
-          <Link to={FULL_ROUTES_PATH.DOCS.COMPONENTS}>{t('hero.ctaSecondary')}</Link>
-        </Button>
+        {import.meta.env.DEV && (
+          <Button size="lg" variant="outline" asChild>
+            <Link to={FULL_ROUTES_PATH.DOCS.COMPONENTS}>{t('hero.ctaSecondary')}</Link>
+          </Button>
+        )}
       </div>
 
       <dl className="border-border-subtle mt-12 grid grid-cols-2 border-y text-start md:grid-cols-4">

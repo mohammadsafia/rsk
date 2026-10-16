@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Tooltip } from '@components/ui';
 
@@ -13,6 +13,7 @@ import i18n from '../../i18n';
 
 afterEach(async () => {
   cleanup();
+  vi.unstubAllEnvs();
   await act(() => i18n.changeLanguage('en'));
 });
 
@@ -28,6 +29,22 @@ const renderHome = () =>
   );
 
 describe('HomePage', () => {
+  it('links to the docs in development', () => {
+    renderHome();
+    expect(document.querySelector('a[href^="/docs"]')).not.toBeNull();
+  });
+
+  it('keeps the docs out of a production build: no docs links, no docs showcase, stats still filled', () => {
+    vi.stubEnv('DEV', false);
+    renderHome();
+
+    expect(document.querySelector('a[href^="/docs"]')).toBeNull();
+    expect(screen.queryByText('Open Gallery')).toBeNull();
+    for (const value of document.querySelectorAll('[data-slot="landing-stat-value"]')) {
+      expect(Number(value.textContent)).toBeGreaterThan(0);
+    }
+  });
+
   it('has a sticky nav with the logo lockup and one level-1 heading with the accent word', () => {
     renderHome();
     const nav = screen.getByRole('navigation', { name: 'Primary' });

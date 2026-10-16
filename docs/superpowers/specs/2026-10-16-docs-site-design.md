@@ -19,6 +19,7 @@ Turn the component gallery into a standalone, public documentation site that rea
 | Question | Decision |
 |---|---|
 | Audience | **Public showcase site**. It is standalone, outside the app shell, and needs no sign-in. The team uses it too. |
+| Build (amended 2026-10-16) | **Development only.** The user asked for the docs to stay out of `vp build`. Docs routes, the Components menu item, the landing page's docs links and showcase, and the `docs` locale namespace exist only under `import.meta.env.DEV`. The landing stats come from a build-time `__RSK_DOC_COUNTS__` define (`scripts/docs/doc-counts.ts`), so production never imports the registry. |
 | v1 features | Nav + ⌘K search + "On this page" outline; Preview · Code tabs; consistent props tables; a Guides section. |
 | Page layout | **A: one reference page** with framed examples and a right-hand outline. No page-level tabs and no playground. |
 | Example source | **`<Example>` in MDX.** A build-time MDX plugin captures each example's JSX source, so the Code tab always matches the preview. |

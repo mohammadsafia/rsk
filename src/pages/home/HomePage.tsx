@@ -9,7 +9,8 @@ function HomePage() {
         <Hero />
         <Specimen />
         <Features />
-        <Documented />
+        {/* The docs site is dev-only, so its showcase is too. */}
+        {import.meta.env.DEV && <Documented />}
         <Tooling />
         <Structure />
         <GetGoing />

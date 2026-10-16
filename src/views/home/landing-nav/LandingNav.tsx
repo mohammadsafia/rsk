@@ -25,13 +25,17 @@ function LandingNav() {
         </Link>
 
         <nav aria-label={t('nav.primary')} className="hidden items-center gap-5 md:flex">
-          <Link to={FULL_ROUTES_PATH.DOCS.COMPONENTS} className={LINK}>
-            {t('nav.components')}
-          </Link>
+          {import.meta.env.DEV && (
+            <>
+              <Link to={FULL_ROUTES_PATH.DOCS.COMPONENTS} className={LINK}>
+                {t('nav.components')}
+              </Link>
 
-          <Link to={FULL_ROUTES_PATH.DOCS.INDEX} className={LINK}>
-            {t('nav.docs')}
-          </Link>
+              <Link to={FULL_ROUTES_PATH.DOCS.INDEX} className={LINK}>
+                {t('nav.docs')}
+              </Link>
+            </>
+          )}
 
           <a href="#tooling" className={LINK}>
             {t('nav.cli')}

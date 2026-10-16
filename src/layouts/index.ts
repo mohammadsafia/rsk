@@ -3,4 +3,3 @@ export * from './app-layout';
 export * from './auth-guard';
 export * from './auth-layout';
 export * from './error-boundary';
-export * from './docs-layout';

@@ -1,17 +1,13 @@
-import { useMemo } from 'react';
-
 import { useAppTranslation } from '@hooks/shared';
 
-import { getComponentDocsRegistry } from '@component-docs/registry';
-
-import { countDocs } from '../landing-stats';
+import { LANDING_COUNTS } from '../landing-stats';
 import Section from '../section/Section';
 
 const KEYS = ['componentLibrary', 'formSystem', 'dataTables', 'authentication', 'internationalization', 'errorMonitoring'] as const;
 
 function Features() {
   const { t } = useAppTranslation('home');
-  const forms = useMemo(() => countDocs(getComponentDocsRegistry()).forms, []);
+  const forms = LANDING_COUNTS.forms;
 
   return (
     <Section eyebrow={t('features.eyebrow')} title={t('features.title')}>

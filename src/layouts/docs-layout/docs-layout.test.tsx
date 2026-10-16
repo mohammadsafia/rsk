@@ -2,7 +2,7 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Tooltip } from '@components/ui';
 
@@ -26,6 +26,9 @@ const at = (path: string) => {
   );
   return router;
 };
+
+// The docs layout is lazy (dev-only chunk); warm its module graph once so each test only waits on rendering.
+beforeAll(() => import('./DocsLayout'), 30_000);
 
 describe('docs shell and routes', () => {
   it('renders a component page publicly with the docs top bar and grouped nav', async () => {

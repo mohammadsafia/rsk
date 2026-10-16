@@ -55,13 +55,18 @@ export const APP_MENU: AppMenu[] = [
     group: 'main',
     icon: LayoutDashboard,
   },
-  {
-    id: 'components',
-    path: FULL_ROUTES_PATH.DOCS.COMPONENTS,
-    name: 'Components',
-    group: 'main',
-    icon: Component,
-  },
+  // The docs site is dev-only (see docs-routes.tsx).
+  ...(import.meta.env.DEV
+    ? [
+        {
+          id: 'components',
+          path: FULL_ROUTES_PATH.DOCS.COMPONENTS,
+          name: 'Components',
+          group: 'main',
+          icon: Component,
+        },
+      ]
+    : []),
   {
     id: 'members',
     path: FULL_ROUTES_PATH.MEMBERS.INDEX,
