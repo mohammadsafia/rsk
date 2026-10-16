@@ -2,7 +2,7 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Tooltip } from '@components/ui';
 
@@ -52,5 +52,22 @@ describe('docs shell and routes', () => {
   it('renders the introduction at /docs', async () => {
     at('/docs');
     expect(await screen.findByRole('heading', { level: 1, name: 'Introduction' })).toBeTruthy();
+  });
+
+  it('shows the outline and prev/next, and scrolls a #section link into view', async () => {
+    const scrolled: string[] = [];
+    vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(function (this: Element) {
+      scrolled.push(this.id);
+    });
+    at('/docs/components/button#choosing-variant-and-tone');
+    await screen.findByRole('heading', { level: 1, name: 'Button' });
+    expect(await screen.findByRole('navigation', { name: 'On this page' })).toBeTruthy();
+    expect(document.querySelector('[data-slot="docs-prev-next"]')).not.toBeNull();
+    expect(document.querySelector('[data-slot="docs-import"] code')?.textContent).toBe("import { Button } from '@components/ui';");
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(scrolled).toContain('choosing-variant-and-tone');
+    vi.restoreAllMocks();
   });
 });

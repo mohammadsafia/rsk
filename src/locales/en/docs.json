@@ -39,5 +39,11 @@
     "title": "Page not found",
     "description": "This page doesn't exist or has moved.",
     "action": "Browse components"
-  }
+  },
+  "header": {
+    "copyImport": "Copy import"
+  },
+  "onThisPage": "On this page",
+  "prev": "Previous",
+  "next": "Next"
 }
