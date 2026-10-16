@@ -1,8 +1,8 @@
 import { Children, Fragment, isValidElement, type ReactElement, type ReactNode, useEffect, useRef } from 'react';
 import { type FieldValues, FormProvider, type Path, type UseFormReturn } from 'react-hook-form';
 
-import { Button, Divider } from '@components/ui';
-import { Stepper } from '@components/shared';
+import { Badge, Button, Divider } from '@components/ui';
+import { DescriptionList, Stepper } from '@components/shared';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -11,7 +11,7 @@ import { cn } from '@utils';
 
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
-import { FormWizardReview, type FormWizardReviewProps, FormWizardStep, type FormWizardStepProps } from './parts';
+import { FormWizardReview, type FormWizardReviewProps, FormWizardStep, type FormWizardStepProps, type ReviewRows } from './parts';
 import { useWizardSteps } from './useWizardSteps';
 
 export type FormWizardProps<TValues extends FieldValues> = {
@@ -48,6 +48,46 @@ export const stepFields = (step: WizardStep): string[] => {
   const shape = (step.schema as { shape?: Record<string, unknown> } | undefined)?.shape;
   return shape ? Object.keys(shape) : (step.fields ?? []);
 };
+
+/** Read-only summary of the earlier steps, each with an Edit link back to it. */
+function ReviewPanel({ steps, values, onEdit }: { steps: WizardStep[]; values: Record<string, unknown>; onEdit: (index: number) => void }) {
+  const { t } = useAppTranslation('common');
+
+  return (
+    <div data-slot="form-wizard-review" className="flex flex-col gap-4">
+      {steps.map((step, index) => {
+        if (step.kind !== 'step') return null;
+        const rows: ReviewRows | null =
+          typeof step.review === 'function' ? null : (step.review ?? stepFields(step).map((name) => ({ name, label: name })));
+
+        return (
+          <section key={step.id} className="border-border flex flex-col gap-3 rounded-lg border p-4">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-fg text-sm font-semibold">{step.title}</h3>
+              <Button type="button" variant="link" size="sm" aria-label={`${t('wizard.edit')} ${step.title}`} onClick={() => onEdit(index)}>
+                {t('wizard.edit')}
+              </Button>
+            </div>
+            {typeof step.review === 'function' ? (
+              step.review(values)
+            ) : (
+              <DescriptionList
+                layout="inline"
+                items={(rows ?? []).map((row) => {
+                  const value = values[row.name];
+                  return {
+                    term: row.label,
+                    value: row.format ? row.format(value) : value === undefined || value === null || value === '' ? null : String(value),
+                  };
+                })}
+              />
+            )}
+          </section>
+        );
+      })}
+    </div>
+  );
+}
 
 function FormWizard<TValues extends FieldValues>({ form, onSubmit, className, children }: FormWizardProps<TValues>) {
   const { t } = useAppTranslation('common');
@@ -151,16 +191,27 @@ function FormWizard<TValues extends FieldValues>({ form, onSubmit, className, ch
 
         <section data-slot="form-wizard-step" className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h2 ref={headingRef} tabIndex={-1} className="text-fg text-lg font-semibold focus:outline-none">
-              {current?.title}
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 ref={headingRef} tabIndex={-1} className="text-fg text-lg font-semibold focus:outline-none">
+                {current?.title}
+              </h2>
+              <Conditional.If condition={current?.kind === 'step' && !!current.optional}>
+                <Badge variant="soft">{t('wizard.optional')}</Badge>
+              </Conditional.If>
+            </div>
             <Conditional.If condition={current?.kind === 'step' && !!current.description}>
               <p className="text-fg-muted text-sm">{current?.kind === 'step' ? current.description : ''}</p>
             </Conditional.If>
           </div>
           {/* Keyed by step: without it React reuses one step's field instances for the next step's fields,
               renaming them in place, which confuses react-hook-form's registrations. */}
-          <Fragment key={current?.id}>{current?.kind === 'step' ? current.children : null}</Fragment>
+          <Fragment key={current?.id}>
+            {current?.kind === 'step' ? (
+              current.children
+            ) : (
+              <ReviewPanel steps={steps.slice(0, wizard.index)} values={form.getValues() as Record<string, unknown>} onEdit={wizard.goTo} />
+            )}
+          </Fragment>
         </section>
 
         <div data-slot="form-wizard-actions" className="border-border-subtle flex items-center gap-2 border-t pt-4">
@@ -172,6 +223,18 @@ function FormWizard<TValues extends FieldValues>({ form, onSubmit, className, ch
           </Conditional.If>
 
           <div className="ms-auto flex items-center gap-2">
+            <Conditional.If condition={current?.kind === 'step' && !!current.optional && !isLast}>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  wizard.markCompleted(current.id);
+                  wizard.goTo(wizard.index + 1);
+                }}
+              >
+                {t('wizard.skip')}
+              </Button>
+            </Conditional.If>
             <Button type="submit" loading={isLast && form.formState.isSubmitting}>
               {isLast ? t('wizard.submit') : t('wizard.next')}
               <Conditional.If condition={!isLast}>

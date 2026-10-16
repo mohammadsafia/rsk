@@ -113,3 +113,54 @@ describe('FormWizard navigation', () => {
     await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ name: 'Sara', phone: '0790000000' })));
   });
 });
+
+type Intake2 = { name: string; insured: boolean; insurer: string; notes: string };
+
+function ReviewHarness({ insured = true }: { insured?: boolean }) {
+  const form = useForm<Intake2>({ defaultValues: { name: 'Sara Haddad', insured, insurer: '', notes: '' } });
+  return (
+    <MemoryRouter>
+      <Tooltip.Provider>
+        <FormWizard form={form} onSubmit={vi.fn()}>
+          <FormWizard.Step id="patient" title="Patient" fields={['name']} review={[{ name: 'name', label: 'Full name' }]}>
+            <FormInput name="name" label="Full name" />
+          </FormWizard.Step>
+          <FormWizard.Step id="insurance" title="Insurance" optional condition={insured} review={[{ name: 'insurer', label: 'Insurer' }]}>
+            <FormInput name="insurer" label="Insurer" />
+          </FormWizard.Step>
+          <FormWizard.Review />
+        </FormWizard>
+      </Tooltip.Provider>
+    </MemoryRouter>
+  );
+}
+
+describe('FormWizard steps', () => {
+  it('skips an optional step without validating it', async () => {
+    render(<ReviewHarness />);
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+    await screen.findByRole('heading', { name: 'Insurance' });
+    expect(screen.getByText('Optional')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Skip' }));
+    expect(await screen.findByRole('heading', { name: 'Review' })).toBeTruthy();
+  });
+
+  it('hides a step whose condition is false', () => {
+    render(<ReviewHarness insured={false} />);
+    expect(screen.getByText('Step 1 of 2')).toBeTruthy();
+  });
+
+  it('summarises every step with Edit links that jump back', async () => {
+    render(<ReviewHarness />);
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+    await screen.findByRole('heading', { name: 'Insurance' });
+    fireEvent.change(screen.getByLabelText('Insurer'), { target: { value: 'Jordan Health Mutual' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+    await screen.findByRole('heading', { name: 'Review' });
+
+    expect(screen.getByText('Full name').closest('dl')?.textContent).toContain('Sara Haddad');
+    expect(screen.getByText('Jordan Health Mutual')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Edit Insurance' }));
+    expect(await screen.findByRole('heading', { name: 'Insurance' })).toBeTruthy();
+  });
+});
