@@ -37,6 +37,7 @@ type ColumnsInput = {
   formatVisit: (iso: string | null) => string;
   doctors: Doctor[];
   insurers: Insurer[];
+  language: string;
 };
 
 const optionFilter = (label: string, options: Option[]) =>
@@ -48,7 +49,7 @@ const optionFilter = (label: string, options: Option[]) =>
     getOptionValue: (option: Option) => option.id,
   });
 
-const buildColumns = ({ t, localize, formatVisit, doctors, insurers }: ColumnsInput): ColumnDef<PatientSummary>[] => {
+const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }: ColumnsInput): ColumnDef<PatientSummary>[] => {
   const doctorName = (id: string) => localize(doctors.find((doctor) => doctor.id === id)?.name) || '—';
   const insurerName = (id: string | null) =>
     id ? localize(insurers.find((insurer) => insurer.id === id)?.name) || '—' : t('patients.selfPay');
@@ -64,6 +65,8 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers }: ColumnsIn
       accessorFn: (patient) => localize(patient.name),
       header: t('patients.columns.name'),
       enableSorting: true,
+      // Alphabetical in the active language (Arabic names sort as Arabic, not by code point).
+      sortingFn: (a, b) => String(a.getValue('name')).localeCompare(String(b.getValue('name')), language),
       filterFn: containsFilterFn,
       cell: ({ row }) => (
         <div className="flex flex-col">
@@ -137,7 +140,7 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers }: ColumnsIn
 
 /** Everyone registered at the clinic: search, filter by doctor, insurer and last visit; a row opens the profile. */
 function PatientsPage() {
-  const { t } = useAppTranslation('clinic');
+  const { t, i18n } = useAppTranslation('clinic');
   const navigate = useNavigate();
   const localize = useLocalized();
   const { formatNullableDate, constants } = useDate();
@@ -148,9 +151,9 @@ function PatientsPage() {
   const formatVisit = (iso: string | null) => formatNullableDate(iso, constants.DateFormats.SHORT_MONTH_DAY_YEAR, '—');
 
   const columns = useMemo(
-    () => buildColumns({ t, localize, formatVisit, doctors: doctors.data ?? [], insurers: insurers.data ?? [] }),
+    () => buildColumns({ t, localize, formatVisit, doctors: doctors.data ?? [], insurers: insurers.data ?? [], language: i18n.language }),
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- localize/formatVisit follow the language, which `t` already tracks
-    [t, doctors.data, insurers.data],
+    [t, i18n.language, doctors.data, insurers.data],
   );
   const filters = useDataTableFilters({ columns, urlSync: true, storageKey: 'clinic-patients' });
 
@@ -164,7 +167,7 @@ function PatientsPage() {
     globalFilterFn: 'includesString',
     getColumnCanGlobalFilter: () => true,
     enableSortingRemoval: true,
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { pagination: { pageSize: 10 }, sorting: [{ id: 'name', desc: false }] },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

@@ -62,10 +62,20 @@ const ALLERGIES: Allergy[] = ['penicillin', 'latex', 'peanuts', 'aspirin', 'poll
 
 const pad = (value: number, length: number) => String(value).padStart(length, '0');
 
+/** Every first/last pair once, shuffled: 60 patients never share a full name. */
+const uniqueNames = (rng: Random) => {
+  const pairs = FIRST.flatMap((first) => LAST.map((last) => ({ first, last })));
+  for (let i = pairs.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rng.next() * (i + 1));
+    [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+  }
+  return pairs;
+};
+
 function createPatients(rng: Random, today: string): Patient[] {
+  const names = uniqueNames(rng);
   return Array.from({ length: 60 }, (_, index) => {
-    const first = rng.pick(FIRST);
-    const last = rng.pick(LAST);
+    const { first, last } = names[index];
     const insured = rng.chance(0.7);
     const allergies = ALLERGIES.filter(() => rng.chance(0.15)).slice(0, 2);
     return {

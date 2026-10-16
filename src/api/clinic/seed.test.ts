@@ -31,6 +31,7 @@ describe('clinic seed', () => {
     expect(new Set(patients.map((p) => p.mrn)).size).toBe(60);
     expect(new Set(patients.map((p) => p.phone)).size).toBe(60);
     expect(patients.every((p) => p.name.en && p.name.ar && /^\+962 7\d \d{3} \d{4}$/.test(p.phone))).toBe(true);
+    expect(new Set(patients.map((p) => p.name.en)).size).toBe(60);
   });
 
   it('never double-books a doctor, books Fridays in the morning only, and nothing on leave days', () => {

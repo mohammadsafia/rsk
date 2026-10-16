@@ -62,8 +62,10 @@ describe('PatientsPage', () => {
   it('shows Arabic names and keeps phones left-to-right with Western digits', async () => {
     await act(() => i18n.changeLanguage('ar'));
     renderPage();
-    const arabicFirst = [...clinicStore.read().patients].sort((a, b) => a.name.en.localeCompare(b.name.en))[0];
+    const arabicFirst = [...clinicStore.read().patients].sort((a, b) => a.name.ar.localeCompare(b.name.ar, 'ar'))[0];
     expect(await screen.findByText(arabicFirst.name.ar)).toBeTruthy();
+    // Sorted by the Arabic name: the Arabic-alphabetical first patient heads the table.
+    expect(screen.getAllByRole('row')[1].textContent).toContain(arabicFirst.name.ar);
     expect(screen.getByRole('heading', { level: 1, name: 'المرضى' })).toBeTruthy();
     expect(document.body.textContent).not.toMatch(/[٠-٩]/);
   });
