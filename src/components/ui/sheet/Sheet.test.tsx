@@ -2,7 +2,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
-import { Button, Sheet } from '@components/ui';
+import { Button, Dialog, Sheet } from '@components/ui';
 
 import '../../../i18n';
 
@@ -25,6 +25,12 @@ const Example = ({ dismissible, side }: { dismissible?: boolean; side?: 'end' | 
 );
 
 describe('Sheet', () => {
+  it('has its own parts and never replaces Dialog\'s (both wrap the same Radix root)', () => {
+    expect(Sheet).not.toBe(Dialog);
+    expect(Sheet.Content).not.toBe(Dialog.Content);
+    expect(Dialog.Content.displayName).toBe('DialogContent');
+  });
+
   it('is a dialog named by its title, with a sticky footer for actions', () => {
     render(<Example />);
     fireEvent.click(screen.getByRole('button', { name: 'Book' }));

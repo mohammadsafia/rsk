@@ -138,7 +138,9 @@ const SheetFooter: FC<SheetSectionProps> = ({ className, ...props }) => (
   <div data-slot="sheet-footer" className={cn('border-border-subtle flex justify-end gap-2 border-t px-5 py-3', className)} {...props} />
 );
 
-const Sheet = DialogPrimitive.Root as unknown as SheetComponent;
+// A component of its own: Dialog also hangs its parts on DialogPrimitive.Root, so assigning Sheet's parts to
+// that shared object would replace Dialog.Content everywhere.
+const Sheet = ((props: SheetProps) => <DialogPrimitive.Root {...props} />) as SheetComponent;
 
 // React 18 bridge — remove forwardRef wrappers when upgrading to React 19
 Sheet.Trigger = forwardRef<HTMLButtonElement, SheetTriggerProps>((props, ref) => (
