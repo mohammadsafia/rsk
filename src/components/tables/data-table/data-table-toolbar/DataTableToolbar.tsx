@@ -23,7 +23,7 @@ type ToolbarProps = PropsWithChildren<{
  */
 const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholder, children, className }) => {
   const { t, direction } = useAppTranslation('common');
-  const { table } = useDataTableContext();
+  const { table, onResetFilters } = useDataTableContext();
 
   const [search, setSearch] = useState(table.getState().globalFilter ?? '');
   const debouncedSearch = useDebounce(search, 500);
@@ -35,6 +35,7 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
   const filterableColumns = table.getAllColumns().filter((column) => column.getCanFilter() && column.columnDef.meta?.filterMeta);
   const activeCount = filterableColumns.filter((column) => column.getIsFiltered()).length;
   const hasActive = activeCount > 0;
+  const isSearching = !!table.getState().globalFilter;
 
   // Client-side tables can say how much the list was narrowed; server-side ones only know the filtered total.
   const unfilteredTotal = table.options.manualFiltering ? undefined : table.getCoreRowModel().rows.length;
@@ -73,8 +74,20 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
         <DataTableFacetedFilter key={column.id} column={column} />
       ))}
 
-      <Conditional.If condition={hasActive}>
-        <Button variant="ghost" tone="accent" size="sm" onClick={() => table.resetColumnFilters(true)}>
+      <Conditional.If condition={hasActive || isSearching}>
+        <Button
+          variant="ghost"
+          tone="accent"
+          size="sm"
+          onClick={() => {
+            if (onResetFilters) onResetFilters();
+            else {
+              table.resetColumnFilters(true);
+              table.setGlobalFilter('');
+            }
+            setSearch('');
+          }}
+        >
           {t('clearFilters')}
         </Button>
       </Conditional.If>

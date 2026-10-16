@@ -14,6 +14,8 @@ type DataTableRootProps<TData> = PropsWithChildren<{
   isLoading?: boolean;
   onRowClick?: (row: Row<TData>) => void;
   getRowClassName?: (row: Row<TData>) => string;
+  /** Clears filters, search and any persisted copy (from `useDataTableFilters().reset`). */
+  onResetFilters?: () => void;
 }>;
 
 type DataTableComponents = (<TData>(props: DataTableRootProps<TData>) => ReactNode) & {
@@ -27,6 +29,7 @@ type DataTableContextValue<TData> = {
   isLoading: boolean;
   onRowClick?: (row: Row<TData>) => void;
   getRowClassName?: (row: Row<TData>) => string;
+  onResetFilters?: () => void;
 };
 
 const DataTableContext = createContext<DataTableContextValue<unknown> | null>(null);
@@ -39,15 +42,24 @@ export const useDataTableContext = <TData = unknown,>() => {
   return context;
 };
 
-function DataTableRoot<TData>({ table, isLoading = false, onRowClick, getRowClassName, children, className }: DataTableRootProps<TData>) {
+function DataTableRoot<TData>({
+  table,
+  isLoading = false,
+  onRowClick,
+  getRowClassName,
+  onResetFilters,
+  children,
+  className,
+}: DataTableRootProps<TData>) {
   const contextValue = useMemo<DataTableContextValue<unknown>>(
     () => ({
       table: table as TanstackTable<unknown>,
       isLoading,
       onRowClick: onRowClick as DataTableContextValue<unknown>['onRowClick'],
       getRowClassName: getRowClassName as DataTableContextValue<unknown>['getRowClassName'],
+      onResetFilters,
     }),
-    [table, isLoading, onRowClick, getRowClassName],
+    [table, isLoading, onRowClick, getRowClassName, onResetFilters],
   );
 
   return (
