@@ -9,6 +9,8 @@ import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
 
+import { parseAsString, useQueryState } from 'nuqs';
+
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 import { FormWizardReview, type FormWizardReviewProps, FormWizardStep, type FormWizardStepProps, type ReviewRows } from './parts';
@@ -51,6 +53,48 @@ export const stepFields = (step: WizardStep): string[] => {
   return shape ? Object.keys(shape) : (step.fields ?? []);
 };
 
+/**
+ * Keeps ?step=<id> in sync. A component of its own so wizards without urlSync never need a nuqs adapter.
+ * On mount a URL step is honoured only if reachable; otherwise the wizard opens the first incomplete step.
+ */
+function WizardUrlSync({
+  ids,
+  index,
+  canJumpTo,
+  completed,
+  goTo,
+}: {
+  ids: string[];
+  index: number;
+  canJumpTo: (i: number) => boolean;
+  completed: ReadonlySet<string>;
+  goTo: (i: number) => void;
+}) {
+  const [step, setStep] = useQueryState('step', parseAsString);
+  const started = useRef(false);
+
+  useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+    const target = step ? ids.indexOf(step) : -1;
+    if (target >= 0 && canJumpTo(target)) goTo(target);
+    else
+      goTo(
+        Math.max(
+          0,
+          ids.findIndex((id) => !completed.has(id)),
+        ),
+      );
+  }, [step, ids, canJumpTo, completed, goTo]);
+
+  useEffect(() => {
+    if (ids[index] && ids[index] !== step) void setStep(ids[index]);
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- write only when the wizard moves
+  }, [index]);
+
+  return null;
+}
+
 /** Read-only summary of the earlier steps, each with an Edit link back to it. */
 function ReviewPanel({ steps, values, onEdit }: { steps: WizardStep[]; values: Record<string, unknown>; onEdit: (index: number) => void }) {
   const { t } = useAppTranslation('common');
@@ -91,7 +135,15 @@ function ReviewPanel({ steps, values, onEdit }: { steps: WizardStep[]; values: R
   );
 }
 
-function FormWizard<TValues extends FieldValues>({ form, onSubmit, draftKey, onCancel, className, children }: FormWizardProps<TValues>) {
+function FormWizard<TValues extends FieldValues>({
+  form,
+  onSubmit,
+  draftKey,
+  urlSync = false,
+  onCancel,
+  className,
+  children,
+}: FormWizardProps<TValues>) {
   const { t } = useAppTranslation('common');
   const steps = readSteps(children, t('wizard.review'));
   const ids = steps.map((step) => step.id);
@@ -218,6 +270,10 @@ function FormWizard<TValues extends FieldValues>({ form, onSubmit, draftKey, onC
           </ol>
           <p className="text-fg-muted hidden text-xs sm:block">{t('wizard.stepOf', { current: wizard.index + 1, total: steps.length })}</p>
         </nav>
+
+        <Conditional.If condition={urlSync}>
+          <WizardUrlSync ids={ids} index={wizard.index} canJumpTo={wizard.canJumpTo} completed={wizard.completed} goTo={wizard.goTo} />
+        </Conditional.If>
 
         <Conditional.If condition={draft.restored}>
           <Alert tone="info">
