@@ -21,7 +21,7 @@ export function LineChart<T>({
   curve = 'monotone',
   ...rest
 }: LineChartProps<T>) {
-  const { formatValue, formatX } = useChartFormat({ valueFormat, currency, xFormat: x.format });
+  const { formatValue, formatTick, formatX } = useChartFormat({ valueFormat, currency, xFormat: x.format });
 
   return (
     <ChartFrame
@@ -41,7 +41,7 @@ export function LineChart<T>({
           <RechartsLineChart data={data} accessibilityLayer margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
             <CartesianGrid vertical={false} {...GRID} />
             <XAxis dataKey={x.key as string} reversed={isRTL} tickFormatter={formatX} {...AXIS} />
-            <YAxis orientation={isRTL ? 'right' : 'left'} width={64} tickFormatter={(value: number) => formatValue(value)} {...AXIS} />
+            <YAxis orientation={isRTL ? 'right' : 'left'} width={64} tickFormatter={(value: number) => formatTick(value)} {...AXIS} />
             <Tooltip content={<ChartTooltip formatValue={formatValue} formatX={formatX} />} cursor={{ stroke: 'var(--border-strong)' }} />
             {visible.map((item) => (
               <Line

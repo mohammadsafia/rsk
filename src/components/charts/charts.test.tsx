@@ -90,6 +90,27 @@ describe('AreaChart', () => {
 });
 
 describe('BarChart', () => {
+  it('labels a money axis compactly and consistently, keeping full values for the tooltip and table', () => {
+    const revenue = [
+      { clinic: 'Abdoun', paid: 18200 },
+      { clinic: 'Zarqa', paid: 4800 },
+    ];
+    render(
+      <BarChart
+        aria-label="Revenue"
+        data={revenue}
+        series={[{ key: 'paid', label: 'Paid' }]}
+        x={{ key: 'clinic' }}
+        valueFormat="money"
+        currency="USD"
+      />,
+    );
+    const ticks = [...document.querySelectorAll('.recharts-cartesian-axis-tick-value')].map((node) => node.textContent ?? '');
+    const money = ticks.filter((text) => text.includes('$'));
+    expect(money.length).toBeGreaterThan(1);
+    expect(money.every((text) => !text.includes('.00'))).toBe(true);
+  });
+
   it('draws a bar per datum and series, horizontally on request', () => {
     const { rerender } = render(<BarChart aria-label="Revenue by clinic" data={data} series={series} x={{ key: 'day' }} />);
     expect(document.querySelectorAll('.recharts-bar-rectangle')).toHaveLength(6);

@@ -23,7 +23,7 @@ export function BarChart<T>({
   stacked = false,
   ...rest
 }: BarChartProps<T>) {
-  const { formatValue, formatX } = useChartFormat({ valueFormat, currency, xFormat: x.format });
+  const { formatValue, formatTick, formatX } = useChartFormat({ valueFormat, currency, xFormat: x.format });
   const horizontal = orientation === 'horizontal';
 
   return (
@@ -50,7 +50,7 @@ export function BarChart<T>({
             <CartesianGrid vertical={horizontal} horizontal={!horizontal} {...GRID} />
             {horizontal ? (
               <>
-                <XAxis type="number" reversed={isRTL} tickFormatter={(value: number) => formatValue(value)} {...AXIS} />
+                <XAxis type="number" reversed={isRTL} tickFormatter={(value: number) => formatTick(value)} {...AXIS} />
                 <YAxis
                   type="category"
                   dataKey={x.key as string}
@@ -63,7 +63,7 @@ export function BarChart<T>({
             ) : (
               <>
                 <XAxis dataKey={x.key as string} reversed={isRTL} tickFormatter={formatX} {...AXIS} />
-                <YAxis orientation={isRTL ? 'right' : 'left'} width={64} tickFormatter={(value: number) => formatValue(value)} {...AXIS} />
+                <YAxis orientation={isRTL ? 'right' : 'left'} width={64} tickFormatter={(value: number) => formatTick(value)} {...AXIS} />
               </>
             )}
             <Tooltip content={<ChartTooltip formatValue={formatValue} formatX={formatX} />} cursor={{ fill: 'var(--hover)' }} />
