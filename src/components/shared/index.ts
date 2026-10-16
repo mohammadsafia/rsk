@@ -10,7 +10,7 @@ export * from './file-icon';
 export * from './file-uploader';
 export * from './date-navigation';
 export * from './breadcrumb';
-export * from './action-panel';
+export * from './page-header';
 export * from './combobox';
 export * from './grid-card';
 export * from './stepper';

@@ -97,13 +97,6 @@
   "src/component-docs/ui/ToggleGroup.mdx": {
     "legacy-color-name": 3
   },
-  "src/components/shared/action-panel/ActionPanel.tsx": {
-    "legacy-color-name": 1
-  },
-  "src/components/shared/breadcrumb/Breadcrumb.tsx": {
-    "legacy-color-ramp": 1,
-    "legacy-color-name": 1
-  },
   "src/components/shared/faceted-filter/FacetedFilter.tsx": {
     "legacy-color-name": 3,
     "arbitrary-length": 4

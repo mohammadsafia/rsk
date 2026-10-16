@@ -12,14 +12,15 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import { Badge } from '@components/ui';
+import { Badge, Button } from '@components/ui';
 import { DataTable } from '@components/tables';
 
 import { useAppTranslation } from '@hooks/shared';
 
 import { createFilterMeta, dateFilterFn, dateRangeFilterFn, timeFilterFn } from '@utils';
-import { ActionPanel } from '@components/shared';
-import { AddCircle } from 'iconsax-react';
+import { PageHeader } from '@components/shared';
+
+import { Plus } from 'lucide-react';
 
 type Member = {
   id: string;
@@ -202,18 +203,14 @@ function MembersPage() {
 
   return (
     <DataTable table={table}>
-      <ActionPanel>
-        <ActionPanel.Header>
-          <ActionPanel.Title>{t('title')}</ActionPanel.Title>
-        </ActionPanel.Header>
-
-        <ActionPanel.Actions>
-          <ActionPanel.Action>
-            <AddCircle size={20} />
+      <PageHeader title={t('title')} description={t('description')}>
+        <PageHeader.Actions>
+          <Button>
+            <Plus aria-hidden="true" />
             {t('addMember')}
-          </ActionPanel.Action>
-        </ActionPanel.Actions>
-      </ActionPanel>
+          </Button>
+        </PageHeader.Actions>
+      </PageHeader>
 
       <DataTable.Toolbar totalCount={totalCount} totalLabel={t('totalLabel')} placeholder={t('searchPlaceholder')} />
 

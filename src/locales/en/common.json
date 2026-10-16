@@ -100,5 +100,8 @@
       "title": "Something went wrong",
       "description": "We couldn't load this. Please try again."
     }
+  },
+  "pageHeader": {
+    "back": "Back"
   }
 }

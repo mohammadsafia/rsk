@@ -1,0 +1,69 @@
+---
+id: page-header
+title: PageHeader
+section: Components
+category: Shared
+description: 'Top of a page: level-1 title, description, optional back control and breadcrumb, and an actions slot.'
+tags: [shared, page-header, breadcrumb, actions, layout]
+---
+
+import { Button } from '@components/ui';
+import { PageHeader } from '@components/shared';
+import { Download, Plus } from 'lucide-react';
+
+## Demo
+
+<div className="flex w-full flex-col gap-8">
+  <PageHeader title="Patients" description="Everyone registered at the Amman clinic.">
+    <PageHeader.Actions>
+      <Button variant="outline">
+        <Download aria-hidden="true" />
+        Export
+      </Button>
+      <Button>
+        <Plus aria-hidden="true" />
+        Register patient
+      </Button>
+    </PageHeader.Actions>
+  </PageHeader>
+
+  <PageHeader
+    title="Sara Haddad"
+    description="MRN-20391 · Last visit 12 Oct 2026"
+    back="/components/page-header"
+    breadcrumb={[{ title: 'Patients', href: 'components/page-header' }, { title: 'Sara Haddad' }]}
+  />
+</div>
+
+## Imports
+
+```tsx
+import { PageHeader } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<PageHeader title="Patients" description="Everyone registered at the Amman clinic.">
+  <PageHeader.Actions>
+    <Button variant="outline">Export</Button>
+    <Button>Register patient</Button>
+  </PageHeader.Actions>
+</PageHeader>
+
+<PageHeader
+  title="Sara Haddad"
+  back="/patients"
+  breadcrumb={[{ title: 'Patients', href: 'patients' }, { title: 'Sara Haddad' }]}
+/>
+```
+
+## API
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `title` | `ReactNode` | — | Rendered as the page's `h1`. |
+| `description` | `ReactNode` | — | Muted line under the title. |
+| `back` | `string \| () => void` | — | A path renders a link; a function renders a button. Labelled `t('common:pageHeader.back')`; the chevron mirrors in RTL. |
+| `breadcrumb` | `BreadcrumbLink[]` | — | Rendered with `Breadcrumb` above the title. |
+| `PageHeader.Actions` | `div` | — | End-aligned action row that wraps under the title on narrow screens. |

@@ -13,59 +13,22 @@ DataTable is a compound component that provides a complete table experience: too
 
 It uses `h-full min-h-0` internally, so it fills whatever height its parent provides and the table body scrolls within that constraint.
 
-## Usage Patterns
+## Usage Pattern
 
-There are two ways to compose DataTable with page-level elements like ActionPanel.
-
-### Pattern 1: ActionPanel inside DataTable (Preferred)
-
-Place ActionPanel as a direct child of DataTable. Since DataTable is the page root, it inherits the full page height directly. No wrapper needed, no extra `h-full` to manage.
+Put the page's `PageHeader` above the table and give both a flex column with **`h-full`**, so the table takes the remaining height:
 
 ```tsx
-<DataTable table={table} isLoading={isFetching}>
-  <ActionPanel>
-    <ActionPanel.Header>
-      <ActionPanel.Title>Doctors</ActionPanel.Title>
-    </ActionPanel.Header>
+<div className="flex h-full min-h-0 flex-col">
+  <PageHeader title="Doctors" description="Everyone who can be booked for a visit.">
+    <PageHeader.Actions>
+      <Button onClick={handleCreate}>
+        <Plus aria-hidden="true" />
+        Add doctor
+      </Button>
+    </PageHeader.Actions>
+  </PageHeader>
 
-    <ActionPanel.Actions>
-      <ActionPanel.Action onClick={handleCreate}>
-        <AddCircle />
-        Add Doctor
-      </ActionPanel.Action>
-    </ActionPanel.Actions>
-  </ActionPanel>
-
-  <DataTable.Toolbar totalCount={totalCount} totalLabel="Doctors" />
-
-  <DataTable.Content />
-
-  <DataTable.Pagination />
-</DataTable>
-```
-
-**Why this works:** DataTable's root is `flex h-full min-h-0 flex-col`. It takes the page container's height directly. ActionPanel gets its natural height, and `DataTable.Content` (which is `flex-1 min-h-0`) fills the remaining space with a scrollable table body.
-
-### Pattern 2: ActionPanel outside DataTable
-
-When ActionPanel needs to be a sibling (e.g. different layout requirements), wrap both in a flex container **with `h-full`**:
-
-```tsx
-<div className="flex h-full w-full flex-col gap-3">
-  <ActionPanel>
-    <ActionPanel.Header>
-      <ActionPanel.Title>Doctors</ActionPanel.Title>
-    </ActionPanel.Header>
-
-    <ActionPanel.Actions>
-      <ActionPanel.Action onClick={handleCreate}>
-        <AddCircle />
-        Add Doctor
-      </ActionPanel.Action>
-    </ActionPanel.Actions>
-  </ActionPanel>
-
-  <DataTable table={table} isLoading={isFetching}>
+  <DataTable table={table} isLoading={isFetching} className="min-h-0 flex-1">
     <DataTable.Toolbar totalCount={totalCount} totalLabel="Doctors" />
 
     <DataTable.Content />
@@ -77,14 +40,7 @@ When ActionPanel needs to be a sibling (e.g. different layout requirements), wra
 
 **Why `h-full` is required on the wrapper:** DataTable uses `h-full` to fill its parent. If the wrapper is `height: auto` (the default), `h-full` resolves to nothing and the table expands to its full content height instead of constraining to a scrollable area. The wrapper must pass through the height chain from the page container.
 
-**Why no page scroll:** DataTable has `min-h-0`, which allows it to shrink below its content size in a flex container. This means ActionPanel takes its natural height and DataTable takes the rest, without pushing the total beyond 100%.
-
-### Why Pattern 1 is preferred
-
-- No wrapper div needed, less markup
-- No need to remember `h-full` on the wrapper
-- The height chain is unbroken: page container -> DataTable -> Content
-- DataTable's `flex-col gap-3` already handles the spacing between ActionPanel and table sub-components
+**Why no page scroll:** DataTable has `min-h-0`, which allows it to shrink below its content size in a flex container. The page header takes its natural height and DataTable takes the rest, without pushing the total beyond 100%.
 
 ## Column Sizing
 
@@ -370,7 +326,7 @@ For all the above, prefer the action-icon pattern.
 
 ```tsx
 import { DataTable } from '@components/tables';
-import { ActionPanel } from '@components/shared';
+import { PageHeader } from '@components/shared';
 ```
 
 ## Height Constraint Explained
