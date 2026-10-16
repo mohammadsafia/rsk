@@ -19,11 +19,11 @@ export const ACCESSORS = {
 };
 
 export const STATUS_OPTIONS = [
-  { id: 'todo', label: 'To Do', dotClass: 'bg-primary' },
+  { id: 'todo', label: 'To Do', dotClass: 'bg-accent' },
   { id: 'in-progress', label: 'In Progress', dotClass: 'bg-warning' },
   { id: 'in-review', label: 'In Review', dotClass: 'bg-accent' },
   { id: 'done', label: 'Done', dotClass: 'bg-success' },
-  { id: 'blocked', label: 'Blocked', dotClass: 'bg-destructive' },
+  { id: 'blocked', label: 'Blocked', dotClass: 'bg-danger' },
 ];
 
 export const ASSIGNEE_OPTIONS = [
@@ -344,7 +344,7 @@ import { FileCard, type FileCardAccessors } from '@components/shared';
 | `<FileCard.StatusPill>` | alias of `Badge` | Soft status badge: `tone` (neutral / accent / success / warning / danger / info) and `size` (sm / md) |
 | `<FileCard.ApprovalPrompt>` | visual primitive | text styling for approval-required copy |
 | `<FileCard.Approve>` | wraps `ComposedButton` (outline-success) | `forwardRef` — works as `Dialog.Trigger asChild` |
-| `<FileCard.Reject>` | wraps `ComposedButton` (outline-destructive) | `forwardRef` — works as `Dialog.Trigger asChild` |
+| `<FileCard.Reject>` | wraps `ComposedButton` (outline-danger) | `forwardRef` — works as `Dialog.Trigger asChild` |
 | `<FileCard.Status>` | baked combobox | DI: `options`, `getOption*`, `value`, `onChange` (sync or async) |
 | `<FileCard.Footer>` | container | — |
 | `<FileCard.Assignee>` | baked combobox | DI: `options`, `getOption*`, `value`, `onChange` (sync or async) |

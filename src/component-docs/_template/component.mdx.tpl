@@ -7,35 +7,32 @@ description: {{description}}
 tags: [{{tagsInline}}]
 ---
 
-## Demo
-
-Replace this with a live demo for the component.
-
-```tsx
 import { {{componentName}} } from '{{importPath}}';
 
-export function Demo() {
-  return (
-    <div className="space-y-4">
-      <{{componentName}} />
-    </div>
-  );
-}
-```
+## Demo
 
+<div className="flex w-full flex-col gap-6">
+  <{{componentName}} />
+</div>
 
 ## Imports
+
 ```tsx
 import { {{componentName}} } from '{{importPath}}';
 ```
 
 ## Code
 
-Write your code examples here.
-
 ```tsx
-import { {{componentName}} } from '{{importPath}}';
-
-// Example
 <{{componentName}} />
 ```
+
+## API
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `className` | `string` | — | Merged with `cn`; style with semantic tokens (`bg-surface`, `text-fg-muted`), never palette or legacy names. |
+
+## Conventions
+
+- Every part sets `data-slot`; JSX branches use `Conditional`; copy comes from i18n (EN and AR).

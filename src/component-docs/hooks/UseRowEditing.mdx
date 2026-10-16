@@ -131,7 +131,7 @@ export const RowActions = ({ row }) => {
         </IconButton>
 
         <IconButton type="button" onClick={() => cancel(rowId)} aria-label="Cancel">
-          <X className="text-muted size-4" />
+          <X className="text-fg-muted size-4" />
         </IconButton>
       </div>
     );
@@ -150,7 +150,7 @@ export const RowActions = ({ row }) => {
         onConfirm={() => removeRow(rowId)}
       >
         <IconButton type="button" disabled={isAnyEditing} aria-label="Delete">
-          <Trash className="text-destructive size-4" />
+          <Trash className="text-danger size-4" />
         </IconButton>
       </ConfirmDialog>
     </div>

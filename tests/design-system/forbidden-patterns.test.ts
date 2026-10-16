@@ -163,6 +163,18 @@ describe('clean primitives', () => {
     const presentLayouts = componentFolders(`${REPO_ROOT}src/layouts`).filter((name) => retiredLayouts.includes(name));
     expect(presentLayouts).toEqual([]);
   });
+
+  it('component docs contain no forbidden patterns (SP3 Plan C)', () => {
+    const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) => file.startsWith('src/component-docs/'));
+    expect(offenders).toEqual([]);
+  });
+
+  it('the docs:new template emits the kit conventions', () => {
+    const template = readFileSync(`${REPO_ROOT}src/component-docs/_template/component.mdx.tpl`, 'utf8');
+    expect(template).toMatch(/## API/);
+    expect(template).toMatch(/text-fg-muted|bg-surface/);
+    expect(template).not.toMatch(/muted-foreground|primary|bg-background/);
+  });
 });
 
 /** Folders SP2 replaced (addendum §1, §8, §10). None may come back under src/components. */

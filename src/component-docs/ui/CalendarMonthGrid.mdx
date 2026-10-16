@@ -13,7 +13,7 @@ import { CalendarEvent, CalendarMonthGrid } from '@components/ui';
 
 A compact month grid — weekday header strip, then a days area with a few day cells (one current-month available day, one current-month unavailable day, one with events including the today highlight, and one out-of-month day).
 
-<div className="flex h-[400px] flex-col rounded-lg border border-border overflow-clip">
+<div className="flex h-100 flex-col rounded-lg border border-border overflow-clip">
   <CalendarMonthGrid>
     <CalendarMonthGrid.Weekdays>
       <CalendarMonthGrid.Weekday>SUN</CalendarMonthGrid.Weekday>
@@ -159,6 +159,6 @@ When a day has more events than fit visually, render the first N as `EventChip` 
 - **Pure rendering — no domain logic**. Consumers compute `dayNumber` / `isCurrentMonth` / `available` / `isToday` from their data and pass them in. The primitive doesn't iterate dates or know what a "month" is.
 - **Sub-parts are independent** (no Context). Render them in any order; no Provider wrapper needed.
 - **`DayCell` renders its own day-number chip** — children populate the events area below the chip.
-- **`EventChip` is a `<button>`** — full button props (`onClick`, `disabled`, `aria-label`). Pair with `Popover.Trigger asChild` for click-to-popover behavior.
+- **`EventChip` is a `<button>`** — full button props (`onClick`, `disabled`, `aria-label`). Pair with `Popover.Trigger asChild` to open a popover on click.
 - **`isToday` carries `aria-current="date"` automatically** for screen-reader emphasis.
 - **Overflow / "+N more" is consumer-handled** — the primitive renders whatever you put in. Use `EventChip` for the visible events plus your own overflow control below them.

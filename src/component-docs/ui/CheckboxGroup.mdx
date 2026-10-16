@@ -28,8 +28,8 @@ import { Square } from 'lucide-react';
   <CheckboxGroup.Item checked={checked} onCheckedChange={setChecked}>
     <span className="...">Option 1</span>
     <CheckboxGroup.Indicator>
-      <CheckSquareFilled className="hidden text-secondary group-data-[state=checked]/checkbox-item:block" />
-      <Square size={24} strokeWidth={1.5} className="block rounded text-muted-300 group-data-[state=checked]/checkbox-item:hidden" />
+      <CheckSquareFilled className="hidden text-fg-muted group-data-[state=checked]/checkbox-item:block" />
+      <Square size={24} strokeWidth={1.5} className="block rounded text-fg-subtle group-data-[state=checked]/checkbox-item:hidden" />
     </CheckboxGroup.Indicator>
   </CheckboxGroup.Item>
 </CheckboxGroup>
@@ -40,7 +40,7 @@ import { Square } from 'lucide-react';
     <span className="...">Option 1</span>
     <CheckboxGroup.Indicator>
       <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/checkbox-item:block" />
-      <Star size={20} className="block text-muted-300 group-data-[state=checked]/checkbox-item:hidden" />
+      <Star size={20} className="block text-fg-subtle group-data-[state=checked]/checkbox-item:hidden" />
     </CheckboxGroup.Indicator>
   </CheckboxGroup.Item>
 </CheckboxGroup>

@@ -13,17 +13,17 @@ import { FormattedNumber } from '@components/ui';
 
 <div className="space-y-4">
   <div>
-    <p className="text-muted-foreground mb-2 text-xs font-medium">Basic</p>
+    <p className="text-fg-muted mb-2 text-xs font-medium">Basic</p>
     <FormattedNumber placeholder="Enter a number" />
   </div>
 
 <div>
-  <p className="text-muted-foreground mb-2 text-xs font-medium">With Step Buttons</p>
+  <p className="text-fg-muted mb-2 text-xs font-medium">With Step Buttons</p>
   <FormattedNumber showStepButtons min={0} max={100} stepper={5} placeholder="0" />
 </div>
 
   <div>
-    <p className="text-muted-foreground mb-2 text-xs font-medium">Currency</p>
+    <p className="text-fg-muted mb-2 text-xs font-medium">Currency</p>
     <FormattedNumber prefix="$" thousandSeparator decimalScale={2} placeholder="$0.00" />
   </div>
 </div>

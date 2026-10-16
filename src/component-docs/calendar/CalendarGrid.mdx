@@ -122,7 +122,7 @@ export const CalendarGridDemo = () => {
   }, [range, hasSlots, hasEvents, events, slots]);
 
   return (
-    <div className="flex h-[760px] flex-col">
+    <div className="flex h-190 flex-col">
       <CalendarGrid
         initialView="week"
         viewMode={viewMode}
@@ -477,7 +477,7 @@ const LEGEND_ITEMS: CalendarLegendItem[] = [
 
 ### With event popover
 
-`<CalendarGrid.PopoverTemplate>` is an optional slot. Function-as-children receives the event and an `onClose` callback. Omit the slot to disable click-to-popover (events become non-interactive).
+`<CalendarGrid.PopoverTemplate>` is an optional slot. Function-as-children receives the event and an `onClose` callback. Omit the slot to disable the click popover (events become non-interactive).
 
 ```tsx
 <CalendarGrid {...props}>

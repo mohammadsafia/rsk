@@ -26,7 +26,7 @@ export const SingleDefaultDemo = () => {
     <div className="flex items-center gap-3">
       <CalendarPicker value={iso} onChange={setIso} />
 
-      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+      <span className="text-fg-muted text-sm">{iso ?? 'No date picked'}</span>
     </div>
   );
 };
@@ -53,7 +53,7 @@ export const ShorthandDemo = () => {
         popoverSideOffset={8}
       />
 
-      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+      <span className="text-fg-muted text-sm">{iso ?? 'No date picked'}</span>
     </div>
   );
 };
@@ -78,7 +78,7 @@ export const RangeDemo = () => {
         triggerTooltip="Pick a date range"
       />
 
-      <span className="text-muted text-sm">
+      <span className="text-fg-muted text-sm">
         {range ? `${range.from} → ${range.to}` : 'No range picked'}
       </span>
     </div>
@@ -106,10 +106,10 @@ export const RangeVisualizationDemo = () => {
           triggerTooltip="Jump to date"
         />
 
-        <span className="text-muted text-sm">Highlighted week: {weekRange.from} → {weekRange.to}</span>
+        <span className="text-fg-muted text-sm">Highlighted week: {weekRange.from} → {weekRange.to}</span>
       </div>
 
-      <span className="text-muted text-xs">Picked: {iso ?? 'None'} (single date — week is decoration only)</span>
+      <span className="text-fg-muted text-xs">Picked: {iso ?? 'None'} (single date — week is decoration only)</span>
     </div>
   );
 };
@@ -177,7 +177,7 @@ export const ContentFunctionDemo = () => {
         <CalendarPicker.Content side="bottom" align="start">
           {({ selected, onSelect, close }) => (
             <div className="flex flex-col gap-2 p-3">
-              <span className="text-muted text-xs">Currently picked: {String(selected ?? 'none')}</span>
+              <span className="text-fg-muted text-xs">Currently picked: {String(selected ?? 'none')}</span>
 
               <div className="flex flex-col gap-1">
                 {presets.map((date) => (
@@ -199,7 +199,7 @@ export const ContentFunctionDemo = () => {
         </CalendarPicker.Content>
       </CalendarPicker>
 
-      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+      <span className="text-fg-muted text-sm">{iso ?? 'No date picked'}</span>
     </div>
   );
 };
@@ -229,7 +229,7 @@ export const ControlledOpenDemo = () => {
         </CalendarPicker.Trigger>
       </CalendarPicker>
 
-      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+      <span className="text-fg-muted text-sm">{iso ?? 'No date picked'}</span>
     </div>
   );
 };
@@ -266,7 +266,7 @@ export const NonDismissableDemo = () => {
         </CalendarPicker.Trigger>
       </CalendarPicker>
 
-      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+      <span className="text-fg-muted text-sm">{iso ?? 'No date picked'}</span>
     </div>
   );
 };
@@ -320,7 +320,7 @@ export const CloseOnNeverDemo = () => {
         Done
       </Button>
 
-      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+      <span className="text-fg-muted text-sm">{iso ?? 'No date picked'}</span>
     </div>
   );
 };
@@ -370,7 +370,7 @@ export const BothSlotsRangeDemo = () => {
         </CalendarPicker.Content>
       </CalendarPicker>
 
-      <span className="text-muted text-sm">{range ? `${range.from} → ${range.to}` : 'No range picked'}</span>
+      <span className="text-fg-muted text-sm">{range ? `${range.from} → ${range.to}` : 'No range picked'}</span>
     </div>
   );
 };
@@ -402,7 +402,7 @@ export const FilterSingleClearDemo = () => {
         </Button>
       )}
 
-      <span className="text-muted text-sm">{filterDate ? `Filtering: ${filterDate}` : 'No filter applied'}</span>
+      <span className="text-fg-muted text-sm">{filterDate ? `Filtering: ${filterDate}` : 'No filter applied'}</span>
     </div>
   );
 };
@@ -437,7 +437,7 @@ export const FilterRangeClearDemo = () => {
         </Button>
       )}
 
-      <span className="text-muted text-sm">
+      <span className="text-fg-muted text-sm">
         {range ? `Filtering: ${range.from} → ${range.to}` : 'No range filter'}
       </span>
     </div>
@@ -479,13 +479,13 @@ export const DateTimePickerDemo = () => {
               />
 
               <div className="flex items-center gap-2 px-1">
-                <span className="text-muted text-xs">Time</span>
+                <span className="text-fg-muted text-xs">Time</span>
 
                 <input
                   type="time"
                   value={pendingTime}
                   onChange={(e) => setPendingTime(e.target.value)}
-                  className="border-muted-200 rounded-md border px-2 py-1 text-sm"
+                  className="border-border rounded-md border px-2 py-1 text-sm"
                 />
               </div>
 
@@ -503,7 +503,7 @@ export const DateTimePickerDemo = () => {
         </CalendarPicker.Content>
       </CalendarPicker>
 
-      <span className="text-muted text-sm">{dateTime ?? 'Not set'}</span>
+      <span className="text-fg-muted text-sm">{dateTime ?? 'Not set'}</span>
     </div>
   );
 };

@@ -36,10 +36,10 @@ const frameworks = [
   <Popover.Trigger asChild>
     <Button variant="outline" role="combobox" aria-expanded={open}>
       {value ? frameworks.find((f) => f.value === value)?.label : 'Select...'}
-      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+      <ChevronsUpDown className="ms-2 size-4 shrink-0 opacity-50" />
     </Button>
   </Popover.Trigger>
-  <Popover.Content className="w-[200px] p-0">
+  <Popover.Content className="w-50 p-0">
     <Command>
       <Command.Input placeholder="Search..." />
       <Command.List>
