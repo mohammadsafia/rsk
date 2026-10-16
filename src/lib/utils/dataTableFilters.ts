@@ -6,7 +6,7 @@ export type FilterCodec = {
   /** `undefined` means "no filter": omit the URL param / storage entry. */
   serialize: (value: unknown) => string | undefined;
   /** `undefined` means "ignore": malformed or empty input never throws. */
-  parse: (raw: string) => unknown | undefined;
+  parse: (raw: string) => unknown;
 };
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -117,7 +117,7 @@ export const filterCodecFor = (meta: DataTableFilterMeta): FilterCodec => {
 
 /** Lower-cases and strips Latin accents and Arabic tashkeel so "محمد" matches "مُحَمَّد". */
 const fold = (value: unknown) =>
-  String(value ?? '')
+  (typeof value === 'string' || typeof value === 'number' ? String(value) : '')
     .normalize('NFD')
     .replace(/[̀-ًͯ-ٰٟ]/g, '')
     .toLowerCase();
