@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 
-import { AuthGuard, AuthLayout, DashboardLayout, ErrorBoundary } from '@layouts';
+import { AppLayout, AuthGuard, AuthLayout, ErrorBoundary } from '@layouts';
 
 import { FULL_ROUTES_PATH } from './routes';
 import { LoginPlaceholder, NotFound, SettingsPlaceholder } from './RoutePlaceholders';
@@ -48,7 +48,7 @@ export const router = createBrowserRouter([
     errorElement: <ErrorBoundary />,
     children: [
       {
-        element: <DashboardLayout />,
+        element: <AppLayout />,
         children: [
           {
             path: FULL_ROUTES_PATH.HOME.DASHBOARD,

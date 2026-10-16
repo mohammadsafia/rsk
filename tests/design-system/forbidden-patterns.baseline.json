@@ -78,9 +78,6 @@
   "src/component-docs/ui/FormattedNumber.mdx": {
     "legacy-color-name": 3
   },
-  "src/component-docs/ui/Layout.mdx": {
-    "legacy-color-name": 3
-  },
   "src/component-docs/ui/Progress.mdx": {
     "legacy-color-name": 2
   },
@@ -129,23 +126,6 @@
   },
   "src/layouts/auth-layout/AuthLayout.tsx": {
     "legacy-color-name": 1
-  },
-  "src/layouts/dashboard-header/DashboardHeader.tsx": {
-    "legacy-color-ramp": 1,
-    "legacy-color-name": 11,
-    "arbitrary-length": 1
-  },
-  "src/layouts/dashboard-layout/DashboardLayout.tsx": {
-    "legacy-shadow": 1
-  },
-  "src/layouts/dashboard-sidebar-link/DashboardSidebarLink.tsx": {
-    "legacy-color-name": 2,
-    "arbitrary-length": 1
-  },
-  "src/layouts/dashboard-sidebar/DashboardSidebar.tsx": {
-    "legacy-color-name": 12,
-    "legacy-shadow": 1,
-    "arbitrary-length": 1
   },
   "src/layouts/error-boundary/ErrorBoundary.tsx": {
     "legacy-color-name": 5,
