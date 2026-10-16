@@ -1,0 +1,75 @@
+---
+id: sheet
+title: Sheet
+section: Components
+category: UI
+description: 'Side panel for forms and details: slides in from the end on desktop, a bottom sheet on phones.'
+tags: [ui, sheet, drawer, panel, overlay]
+---
+
+import { Button, Input, Sheet } from '@components/ui';
+
+## Side panel
+
+`Sheet.Body` scrolls; the header and `Sheet.Footer` stay put.
+
+<Example title="Booking form">
+  <Sheet>
+    <Sheet.Trigger asChild>
+      <Button>New appointment</Button>
+    </Sheet.Trigger>
+    <Sheet.Content title="New appointment" description="Fri 16 Oct · 10:30">
+      <Sheet.Body className="grid gap-3">
+        <Input aria-label="Patient" placeholder="Patient" />
+        <Input aria-label="Reason" placeholder="Reason for visit" />
+      </Sheet.Body>
+      <Sheet.Footer>
+        <Sheet.Close asChild>
+          <Button variant="outline">Cancel</Button>
+        </Sheet.Close>
+        <Button>Book</Button>
+      </Sheet.Footer>
+    </Sheet.Content>
+  </Sheet>
+</Example>
+
+## Side and size
+
+<Example title="Start side, large">
+  <Sheet>
+    <Sheet.Trigger asChild>
+      <Button variant="outline">Filters</Button>
+    </Sheet.Trigger>
+    <Sheet.Content title="Filters" side="start" size="lg">
+      <Sheet.Body>
+        <p className="text-fg-muted text-sm">Large panels suit detail views and long forms.</p>
+      </Sheet.Body>
+    </Sheet.Content>
+  </Sheet>
+</Example>
+
+Below the `md` breakpoint every sheet becomes a bottom sheet. Use [Dialog](/docs/components/dialog) for short, focused decisions.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'Content · title', type: 'ReactNode', required: true, description: 'Names the sheet for assistive tech.' },
+    { prop: 'Content · description · hideTitle', type: 'ReactNode · boolean', description: 'As on Dialog.' },
+    { prop: 'Content · side', type: "'end' | 'start'", default: "'end'", description: 'Logical side, so it mirrors in Arabic.' },
+    { prop: 'Content · size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '384px · 512px · 768px wide from md up.' },
+    { prop: 'Content · dismissible', type: 'boolean', default: 'true', description: 'false removes the close button and ignores Escape and outside clicks.' },
+    { prop: 'open · onOpenChange', type: 'boolean · (open) => void', description: 'On Sheet, to control it from state.' },
+  ]}
+/>
+
+`Sheet.Body` is the scrolling region; `Sheet.Footer` holds end-aligned actions.
+
+## Accessibility
+
+- A modal dialog (Radix): `role="dialog"`, `aria-modal`, named by the title; focus is trapped and returns to the trigger.
+- Escape and the scrim close a dismissible sheet.
+
+## RTL notes
+
+- `side="end"` opens from the left in Arabic and `side="start"` from the right; the close button sits at the inline end.
