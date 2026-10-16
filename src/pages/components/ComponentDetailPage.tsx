@@ -6,7 +6,7 @@ import { MDXProvider } from '@mdx-js/react';
 import { Alert, Button, Spinner, Tag } from '@components/ui';
 import { EmptyState, PageHeader } from '@components/shared';
 import { Conditional } from '@components/utils';
-import { DocsLayout } from '@component-docs';
+import { DocsProse } from '@component-docs';
 import { componentDocsErrors, getComponentDocsRegistry } from '@component-docs/registry';
 import { useSelectedDocComponent } from '@component-docs/gallery';
 import { mdxComponents } from '@component-docs/gallery/utils';
@@ -80,11 +80,11 @@ const ComponentDetailPage = () => {
               </div>
             }
           >
-            <DocsLayout variant="panel">
+            <DocsProse variant="panel">
               <MDXProvider components={mdxComponents}>
                 <Doc />
               </MDXProvider>
-            </DocsLayout>
+            </DocsProse>
           </Suspense>
         </Conditional.Else>
       </Conditional>

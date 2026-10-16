@@ -1,0 +1,1 @@
+export { DocsProse } from './DocsProse';

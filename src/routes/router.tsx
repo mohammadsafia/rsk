@@ -3,16 +3,18 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import { AppLayout, AuthGuard, AuthLayout, ErrorBoundary } from '@layouts';
 
+import { docsRoutes } from './docs-routes';
 import { FULL_ROUTES_PATH } from './routes';
 import { LoginPlaceholder, NotFound, SettingsPlaceholder } from './RoutePlaceholders';
 
 const HomePage = lazy(() => import('@pages/home/HomePage'));
-const ComponentsGalleryPage = lazy(() => import('@pages/components/ComponentsGalleryPage'));
-const ComponentDetailPage = lazy(() => import('@pages/components/ComponentDetailPage'));
 const DashboardPage = lazy(() => import('@pages/dashboard/DashboardPage'));
 const MembersPage = lazy(() => import('@pages/members/MembersPage'));
 
 export const router = createBrowserRouter([
+  // Public documentation site (no auth) and redirects from the old /components gallery
+  ...docsRoutes.map((route) => (route.path === '/docs' ? { ...route, errorElement: <ErrorBoundary /> } : route)),
+
   // Public routes
   {
     path: FULL_ROUTES_PATH.HOME.INDEX,
@@ -53,14 +55,6 @@ export const router = createBrowserRouter([
           {
             path: FULL_ROUTES_PATH.HOME.DASHBOARD,
             element: <DashboardPage />,
-          },
-          {
-            path: FULL_ROUTES_PATH.COMPONENTS.INDEX,
-            element: <ComponentsGalleryPage />,
-          },
-          {
-            path: FULL_ROUTES_PATH.COMPONENTS.DETAIL,
-            element: <ComponentDetailPage />,
           },
           {
             path: FULL_ROUTES_PATH.MEMBERS.INDEX,

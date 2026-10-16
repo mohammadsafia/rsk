@@ -17,7 +17,7 @@ function LandingFooter() {
         <span>{t('footer.license')}</span>
 
         <span className="ms-auto flex gap-4">
-          <Link to={FULL_ROUTES_PATH.COMPONENTS.INDEX} className="hover:text-fg">
+          <Link to={FULL_ROUTES_PATH.DOCS.COMPONENTS} className="hover:text-fg">
             {t('nav.components')}
           </Link>
 

@@ -9,7 +9,35 @@
     "rtl": "من اليمين",
     "ltr": "من اليسار"
   },
-  "props": { "prop": "الخاصية", "type": "النوع", "default": "الافتراضي", "description": "الوصف", "required": "مطلوب" },
+  "props": {
+    "prop": "الخاصية",
+    "type": "النوع",
+    "default": "الافتراضي",
+    "description": "الوصف",
+    "required": "مطلوب"
+  },
   "do": "افعل",
-  "dont": "لا تفعل"
+  "dont": "لا تفعل",
+  "nav": {
+    "label": "التوثيق",
+    "docs": "التوثيق",
+    "components": "المكوّنات",
+    "foundations": "الأسس",
+    "github": "GitHub",
+    "groups": {
+      "guides": "البدء",
+      "foundations": "الأسس",
+      "ui": "الواجهة",
+      "forms": "النماذج",
+      "shared": "المشتركة",
+      "tables": "الجداول",
+      "calendar": "التقويم",
+      "hooks": "الخطافات"
+    }
+  },
+  "notFound": {
+    "title": "الصفحة غير موجودة",
+    "description": "هذه الصفحة غير موجودة أو تم نقلها.",
+    "action": "تصفّح المكوّنات"
+  }
 }

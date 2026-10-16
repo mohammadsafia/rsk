@@ -5,7 +5,7 @@ import { MDXProvider } from '@mdx-js/react';
 import { Alert, Card, Divider, ScrollArea, Spinner, Tag } from '@components/ui';
 import { EmptyState } from '@components/shared';
 import { Conditional } from '@components/utils';
-import { DocsLayout } from '@component-docs';
+import { DocsProse } from '@component-docs';
 
 import { useAppTranslation } from '@hooks/shared';
 
@@ -78,11 +78,11 @@ const DocPanel = (props: DocPanelProps) => {
                 </div>
               }
             >
-              <DocsLayout variant="panel">
+              <DocsProse variant="panel">
                 <MDXProvider components={mdxComponents}>
                   <Doc />
                 </MDXProvider>
-              </DocsLayout>
+              </DocsProse>
             </Suspense>
           </Conditional.If>
 

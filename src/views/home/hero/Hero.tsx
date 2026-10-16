@@ -50,7 +50,7 @@ function Hero() {
         </Button>
 
         <Button size="lg" variant="outline" asChild>
-          <Link to={FULL_ROUTES_PATH.COMPONENTS.INDEX}>{t('hero.ctaSecondary')}</Link>
+          <Link to={FULL_ROUTES_PATH.DOCS.COMPONENTS}>{t('hero.ctaSecondary')}</Link>
         </Button>
       </div>
 

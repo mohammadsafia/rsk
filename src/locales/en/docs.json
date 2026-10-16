@@ -9,7 +9,35 @@
     "rtl": "RTL",
     "ltr": "LTR"
   },
-  "props": { "prop": "Prop", "type": "Type", "default": "Default", "description": "Description", "required": "Required" },
+  "props": {
+    "prop": "Prop",
+    "type": "Type",
+    "default": "Default",
+    "description": "Description",
+    "required": "Required"
+  },
   "do": "Do",
-  "dont": "Don’t"
+  "dont": "Don’t",
+  "nav": {
+    "label": "Documentation",
+    "docs": "Docs",
+    "components": "Components",
+    "foundations": "Foundations",
+    "github": "GitHub",
+    "groups": {
+      "guides": "Getting started",
+      "foundations": "Foundations",
+      "ui": "UI",
+      "forms": "Forms",
+      "shared": "Shared",
+      "tables": "Tables",
+      "calendar": "Calendar",
+      "hooks": "Hooks"
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "This page doesn't exist or has moved.",
+    "action": "Browse components"
+  }
 }

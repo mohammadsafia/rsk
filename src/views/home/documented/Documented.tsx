@@ -20,7 +20,7 @@ function Documented() {
     <Section eyebrow={t('showcase.eyebrow')} title={t('showcase.title')} description={t('showcase.desc', { count: total })}>
       <div className="mt-6 grid items-start gap-8 md:grid-cols-[1fr_1.35fr]">
         <Button variant="outline" asChild className="justify-self-start">
-          <Link to={FULL_ROUTES_PATH.COMPONENTS.INDEX}>{t('showcase.cta')}</Link>
+          <Link to={FULL_ROUTES_PATH.DOCS.COMPONENTS}>{t('showcase.cta')}</Link>
         </Button>
 
         <div aria-hidden="true" className="bg-surface border-border overflow-hidden rounded-lg border">

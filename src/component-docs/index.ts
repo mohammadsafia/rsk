@@ -1,4 +1,4 @@
 export { CodeBlock } from './code-block';
-export { DocsLayout } from './docs-layout';
+export { DocsProse } from './docs-prose';
 export * from './registry';
 export * from './gallery';

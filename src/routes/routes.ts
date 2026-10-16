@@ -27,6 +27,12 @@ export const FULL_ROUTES_PATH = {
     INDEX: '/components',
     DETAIL: '/components/:id',
   },
+  DOCS: {
+    INDEX: '/docs',
+    DOC: '/docs/:docId',
+    COMPONENTS: '/docs/components',
+    COMPONENT: '/docs/components/:id',
+  },
   SETTINGS: {
     INDEX: '/settings',
   },
@@ -51,7 +57,7 @@ export const APP_MENU: AppMenu[] = [
   },
   {
     id: 'components',
-    path: FULL_ROUTES_PATH.COMPONENTS.INDEX,
+    path: FULL_ROUTES_PATH.DOCS.COMPONENTS,
     name: 'Components',
     group: 'main',
     icon: Component,
