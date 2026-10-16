@@ -51,8 +51,8 @@ describe('semantic color roles', () => {
 });
 
 describe('index.css import order', () => {
-  it('imports palette → tokens → theme → legacy bridge', () => {
-    const order = ['./styles/palette.css', './styles/tokens.css', './styles/theme.css', './styles/legacy-tokens.css'].map((file) =>
+  it('imports palette → tokens → theme', () => {
+    const order = ['./styles/palette.css', './styles/tokens.css', './styles/theme.css'].map((file) =>
       indexCss.indexOf(`@import '${file}';`),
     );
     order.forEach((position) => expect(position).toBeGreaterThan(-1));
@@ -135,10 +135,8 @@ describe('shape, motion and states', () => {
     expect(reduced).not.toContain('--tw-enter-opacity');
   });
 
-  it('imports utilities.css after the legacy bridge', () => {
-    expect(indexCss.indexOf("@import './styles/utilities.css';")).toBeGreaterThan(
-      indexCss.indexOf("@import './styles/legacy-tokens.css';"),
-    );
+  it('imports utilities.css after the theme', () => {
+    expect(indexCss.indexOf("@import './styles/utilities.css';")).toBeGreaterThan(indexCss.indexOf("@import './styles/theme.css';"));
   });
 });
 

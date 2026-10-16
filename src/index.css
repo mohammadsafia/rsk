@@ -6,7 +6,6 @@
 @import './styles/palette.css';
 @import './styles/tokens.css';
 @import './styles/theme.css';
-@import './styles/legacy-tokens.css';
 @import './styles/utilities.css';
 
 @custom-variant dark (&:is(.dark *));

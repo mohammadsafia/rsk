@@ -1,7 +1,6 @@
 /*
  * Tailwind theme — exposes the semantic layer (tokens.css) and the foundation scales as utilities.
- * Must be imported BEFORE legacy-tokens.css: `--color-*: initial` clears Tailwind's default palette,
- * and a later reset would also wipe the legacy colors.
+ * `--color-*: initial` clears Tailwind's default palette so only these tokens generate colour utilities.
  */
 @theme inline {
   --color-*: initial;

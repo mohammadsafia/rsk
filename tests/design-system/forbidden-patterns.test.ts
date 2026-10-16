@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vite-plus/test';
@@ -216,5 +216,18 @@ describe('SP2 exit', () => {
       (DELETED_COMPONENT_FOLDERS as readonly string[]).includes(name),
     );
     expect(present).toEqual([]);
+  });
+});
+
+describe('SP3 exit', () => {
+  it('the forbidden-pattern baseline is empty', () => {
+    const baseline = JSON.parse(readFileSync(BASELINE_PATH, 'utf8')) as Baseline;
+    expect(baseline).toEqual({});
+    expect(scanRepo(REPO_ROOT)).toEqual({});
+  });
+
+  it('the legacy bridge is gone', () => {
+    expect(existsSync(`${REPO_ROOT}src/styles/legacy-tokens.css`)).toBe(false);
+    expect(readFileSync(`${REPO_ROOT}src/index.css`, 'utf8')).not.toContain('legacy-tokens');
   });
 });
