@@ -13,6 +13,7 @@ export * from './page-header';
 export * from './combobox';
 export * from './card-grid';
 export * from './stat-card';
+export * from './timeline';
 export * from './stepper';
 export * from './composed-components';
 export * from './file-card';

@@ -156,5 +156,11 @@
     "flat": "دون تغيير",
     "trend": "{{direction}} {{value}}",
     "trendWithCaption": "{{direction}} {{value}} {{caption}}"
+  },
+  "timeline": {
+    "today": "اليوم",
+    "yesterday": "أمس",
+    "loadMore": "عرض المزيد",
+    "empty": "لا يوجد نشاط بعد"
   }
 }

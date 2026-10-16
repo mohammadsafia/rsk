@@ -144,5 +144,11 @@
     "flat": "No change",
     "trend": "{{direction}} {{value}}",
     "trendWithCaption": "{{direction}} {{value}} {{caption}}"
+  },
+  "timeline": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "loadMore": "Load more",
+    "empty": "No activity yet"
   }
 }

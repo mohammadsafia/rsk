@@ -1,0 +1,105 @@
+---
+id: timeline
+title: Timeline
+section: Components
+category: Shared
+description: 'Activity feed on a hairline rail: icon or avatar markers, actor, relative time with the full date on hover, grouped by day.'
+tags: [shared, timeline, activity, feed, history]
+---
+
+import { Timeline, useGroupedByDay } from '@components/shared';
+import { Avatar } from '@components/ui';
+import { CalendarCheck, FileText, Receipt } from 'lucide-react';
+
+export const NOW = Date.now();
+export const EVENTS = [
+  { id: 1, title: 'Visit completed', meta: 'Dr. Lina Khoury', at: new Date(NOW - 20 * 60_000), icon: CalendarCheck },
+  { id: 2, title: 'Invoice INV-2026-0142 paid', meta: 'Card', at: new Date(NOW - 3 * 3_600_000), icon: Receipt },
+  { id: 3, title: 'Lab results uploaded', meta: 'Sara Haddad', at: new Date(NOW - 27 * 3_600_000), icon: FileText },
+];
+
+export const GroupedFeed = () => {
+  const groups = useGroupedByDay(EVENTS, (event) => event.at);
+  return (
+    <Timeline className="w-full max-w-md">
+      {groups.map((group) => (
+        <Timeline.Group key={group.key} label={group.label}>
+          {group.items.map((event) => {
+            const Icon = event.icon;
+            return <Timeline.Item key={event.id} title={event.title} meta={event.meta} time={event.at} icon={<Icon />} />;
+          })}
+        </Timeline.Group>
+      ))}
+    </Timeline>
+  );
+};
+
+## Feed
+
+<Example title="Items with tones and avatars">
+  <Timeline className="w-full max-w-md">
+    <Timeline.Item title="Appointment booked" meta="Reception" time={new Date(NOW - 5 * 60_000)} tone="accent" />
+    <Timeline.Item
+      title="Note added"
+      meta="Dr. Omar Nasser"
+      time={new Date(NOW - 2 * 3_600_000)}
+      avatar={
+        <Avatar size="sm">
+          <Avatar.Fallback>ON</Avatar.Fallback>
+        </Avatar>
+      }
+    >
+      Patient reports improved sleep since the dose change.
+    </Timeline.Item>
+    <Timeline.Item title="Payment failed" meta="Card declined" time={new Date(NOW - 26 * 3_600_000)} tone="danger" />
+  </Timeline>
+</Example>
+
+## Grouped by day
+
+`useGroupedByDay(items, getTime)` returns `{ key, label, items }` groups, newest first, labelled Today, Yesterday or the date.
+
+<Example title="Today and yesterday" code={`const groups = useGroupedByDay(events, (event) => event.at);
+
+<Timeline>
+  {groups.map((group) => (
+    <Timeline.Group key={group.key} label={group.label}>
+      {group.items.map((event) => (
+        <Timeline.Item key={event.id} title={event.title} meta={event.meta} time={event.at} icon={<event.icon />} />
+      ))}
+    </Timeline.Group>
+  ))}
+</Timeline>`}>
+  <GroupedFeed />
+</Example>
+
+## States
+
+<Example title="Loading and empty">
+  <div className="grid w-full max-w-md gap-6">
+    <Timeline loading />
+    <Timeline />
+  </div>
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'loading · empty', type: 'boolean · ReactNode', description: 'Skeleton rows, or the content shown when there are no items.' },
+    { prop: 'hasMore · onLoadMore · loadingMore', type: 'boolean · () => void · boolean', description: 'A Load more button under the feed.' },
+    { prop: 'Item · title · meta', type: 'ReactNode', description: 'What happened, and who or how.' },
+    { prop: 'Item · time', type: 'DateInput', description: 'Relative time, full date in a tooltip; omitted when missing or invalid.' },
+    { prop: 'Item · icon · avatar · tone', type: "ReactNode · ReactNode · 'neutral' | 'accent' | …", description: 'Marker on the rail: an icon, an avatar, or a tone dot.' },
+    { prop: 'Group · label', type: 'ReactNode', required: true, description: 'Day heading for a group of items.' },
+  ]}
+/>
+
+## Accessibility
+
+- An ordered list; each time is a focusable `<time dateTime>` whose tooltip gives the full date on hover and focus.
+- Markers are decorative; titles carry the meaning.
+
+## RTL notes
+
+- The rail and markers sit at the start (right in Arabic); relative times use Western digits.
