@@ -1,0 +1,15 @@
+{
+  "example": {
+    "preview": "Preview",
+    "code": "Code",
+    "copy": "Copy code",
+    "copied": "Copied",
+    "dark": "Dark",
+    "light": "Light",
+    "rtl": "RTL",
+    "ltr": "LTR"
+  },
+  "props": { "prop": "Prop", "type": "Type", "default": "Default", "description": "Description", "required": "Required" },
+  "do": "Do",
+  "dont": "Don’t"
+}

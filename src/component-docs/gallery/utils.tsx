@@ -2,6 +2,7 @@ import { type ComponentPropsWithoutRef } from 'react';
 
 import Table from '@components/ui/table/Table';
 import { CodeBlock } from '@component-docs';
+import { Callout, DoDont, Example, PropsTable } from '@component-docs/blocks';
 
 import { cn } from '@utils';
 
@@ -78,6 +79,10 @@ export function countTagsByLabel(docs: ReadonlyArray<Readonly<ComponentDocEntry>
 }
 
 export const mdxComponents: MDXComponents = {
+  Example,
+  PropsTable,
+  Callout,
+  DoDont,
   pre: (props: PreProps) => <CodeBlock {...props} />,
   // Inline code (block code is wrapped by CodeBlock's LTR <pre>): keep identifiers left-to-right inside Arabic prose.
   code: ({ className, ...props }: ComponentPropsWithoutRef<'code'>) => <code dir="ltr" className={cn('font-mono', className)} {...props} />,

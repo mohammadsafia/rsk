@@ -9,7 +9,12 @@ import { cn } from '@utils';
 
 import { Check, Copy } from 'lucide-react';
 
-type CodeBlockProps = Readonly<ComponentPropsWithoutRef<'pre'>>;
+type CodeBlockProps = Readonly<
+  ComponentPropsWithoutRef<'pre'> & {
+    /** Show the copy button. Off when a parent (e.g. Example) provides its own. @default true */
+    copyable?: boolean;
+  }
+>;
 
 const preStyles =
   'bg-code-surface text-code-foreground border-border overflow-x-auto rounded-lg border p-5 pt-7 text-start font-mono text-sm leading-relaxed';
@@ -52,7 +57,7 @@ function useCopyToClipboard(text: string) {
   return { copied, canCopy, copy };
 }
 
-export function CodeBlock({ children, className, ...props }: CodeBlockProps) {
+export function CodeBlock({ children, className, copyable = true, ...props }: CodeBlockProps) {
   const { t } = useAppTranslation('components');
   const text = extractText(children).trim();
   const { copied, canCopy, copy } = useCopyToClipboard(text);
@@ -61,24 +66,26 @@ export function CodeBlock({ children, className, ...props }: CodeBlockProps) {
 
   return (
     <div data-slot="code-block" className="not-prose group relative my-6">
-      <IconButton
-        size="sm"
-        variant="ghost"
-        aria-label={t(copied ? 'code.copied' : 'code.copy')}
-        disabled={!canCopy}
-        onClick={copy}
-        className="text-code-muted hover:text-code-foreground absolute end-3 top-3 z-10"
-      >
-        <Conditional>
-          <Conditional.If condition={copied}>
-            <Check aria-hidden="true" className="text-success" />
-          </Conditional.If>
+      <Conditional.If condition={copyable}>
+        <IconButton
+          size="sm"
+          variant="ghost"
+          aria-label={t(copied ? 'code.copied' : 'code.copy')}
+          disabled={!canCopy}
+          onClick={copy}
+          className="text-code-muted hover:text-code-foreground absolute end-3 top-3 z-10"
+        >
+          <Conditional>
+            <Conditional.If condition={copied}>
+              <Check aria-hidden="true" className="text-success" />
+            </Conditional.If>
 
-          <Conditional.Else>
-            <Copy aria-hidden="true" />
-          </Conditional.Else>
-        </Conditional>
-      </IconButton>
+            <Conditional.Else>
+              <Copy aria-hidden="true" />
+            </Conditional.Else>
+          </Conditional>
+        </IconButton>
+      </Conditional.If>
 
       <pre dir="ltr" {...props} className={cn(preStyles, className)}>
         {children}
