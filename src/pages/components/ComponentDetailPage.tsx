@@ -1,17 +1,21 @@
-import { useMemo, Suspense } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Suspense, useMemo } from 'react';
+import { Link, useParams } from 'react-router-dom';
 
 import { MDXProvider } from '@mdx-js/react';
-import { ChevronRight } from 'lucide-react';
 
-import { Tag } from '@components/ui';
+import { Alert, Button, Spinner, Tag } from '@components/ui';
+import { EmptyState, PageHeader } from '@components/shared';
+import { Conditional } from '@components/utils';
 import { DocsLayout } from '@component-docs';
-import { getComponentDocsRegistry, componentDocsErrors } from '@component-docs/registry';
+import { componentDocsErrors, getComponentDocsRegistry } from '@component-docs/registry';
 import { useSelectedDocComponent } from '@component-docs/gallery';
 import { mdxComponents } from '@component-docs/gallery/utils';
-import { FULL_ROUTES_PATH } from '@routes';
 
 import { useAppTranslation } from '@hooks/shared';
+
+import { FULL_ROUTES_PATH } from '@routes';
+
+const NoDoc = () => null;
 
 const ComponentDetailPage = () => {
   const { t } = useAppTranslation('components');
@@ -22,79 +26,68 @@ const ComponentDetailPage = () => {
   const selectedDoc = useMemo(() => allDocs.find((doc) => doc.id === id) ?? null, [allDocs, id]);
 
   const SelectedDocComponent = useSelectedDocComponent(selectedDoc);
+  const Doc = SelectedDocComponent ?? NoDoc;
   const tags = selectedDoc?.tags ?? [];
 
-  // Not found
-  if (!selectedDoc) {
-    return (
-      <div className="bg-background min-h-screen">
-        <div className="mx-auto w-full max-w-480 px-6 py-8">
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-foreground text-lg font-medium">{t('detail.notFoundTitle')}</p>
-            <p className="text-muted-400 mt-1 text-sm">{t('detail.notFoundDescription', { id })}</p>
-            <Link to={FULL_ROUTES_PATH.COMPONENTS.INDEX} className="text-foreground mt-4 text-sm font-medium underline underline-offset-4">
-              {t('detail.backToGallery')}
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-background min-h-screen">
-      <div className="mx-auto w-full max-w-480 px-6 py-8">
-        {/* Breadcrumb */}
-        <nav className="mb-6 flex items-center gap-1.5 text-sm">
-          <Link to={FULL_ROUTES_PATH.COMPONENTS.INDEX} className="text-muted-400 hover:text-foreground transition-colors">
-            {t('detail.breadcrumbComponents')}
-          </Link>
-          <ChevronRight className="text-muted-300 h-3.5 w-3.5" />
-          <span className="text-foreground font-medium">{selectedDoc.title}</span>
-        </nav>
+    <div className="mx-auto w-full max-w-6xl">
+      <Conditional>
+        <Conditional.If condition={!selectedDoc}>
+          <EmptyState kind="no-results" title={t('detail.notFoundTitle')} description={t('detail.notFoundDescription', { id })}>
+            <EmptyState.Actions>
+              <Button variant="outline" asChild>
+                <Link to={FULL_ROUTES_PATH.COMPONENTS.INDEX}>{t('detail.backToGallery')}</Link>
+              </Button>
+            </EmptyState.Actions>
+          </EmptyState>
+        </Conditional.If>
 
-        {/* Header */}
-        <header className="mb-8">
-          <h1 className="text-foreground text-2xl font-semibold">{selectedDoc.title}</h1>
+        <Conditional.Else>
+          <PageHeader
+            title={selectedDoc?.title}
+            description={selectedDoc?.description}
+            breadcrumb={[{ title: t('detail.breadcrumbComponents'), href: 'components' }, { title: selectedDoc?.title ?? '' }]}
+          >
+            <Conditional.If condition={tags.length > 0}>
+              <div className="flex flex-wrap gap-1.5">
+                {tags.map((tag) => (
+                  <Tag size="sm" key={tag}>
+                    {tag}
+                  </Tag>
+                ))}
+              </div>
+            </Conditional.If>
+          </PageHeader>
 
-          {selectedDoc.description ? <p className="text-muted-400 mt-2 max-w-2xl text-sm">{selectedDoc.description}</p> : null}
+          <Conditional.If condition={componentDocsErrors.length > 0}>
+            <Alert tone="danger" className="mb-6">
+              <Alert.Title>{t('detail.mdxValidationIssues')}</Alert.Title>
 
-          {tags.length > 0 ? (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {tags.map((tag) => (
-                <Tag size="sm" key={tag}>
-                  {tag}
-                </Tag>
-              ))}
-            </div>
-          ) : null}
-        </header>
+              <Alert.Description>
+                <ul className="list-disc space-y-1 ps-5">
+                  {componentDocsErrors.map((error, index) => (
+                    <li key={`${index}-${error}`}>{error}</li>
+                  ))}
+                </ul>
+              </Alert.Description>
+            </Alert>
+          </Conditional.If>
 
-        {/* MDX Validation Errors */}
-        {componentDocsErrors.length > 0 ? (
-          <div className="border-destructive/30 bg-destructive-200 mb-6 rounded-xl border p-4 text-sm">
-            <div className="mb-2 font-semibold">{t('detail.mdxValidationIssues')}</div>
-            <ul className="list-disc space-y-1 ps-5">
-              {componentDocsErrors.map((error, index) => (
-                <li key={`${index}-${error}`}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-
-        {/* MDX Content — renders live preview, code examples, and props as natural MDX flow */}
-        <Suspense
-          fallback={
-            <div className="flex items-center justify-center py-20">
-              <p className="text-muted-400 text-sm">{t('detail.loadingDocumentation')}</p>
-            </div>
-          }
-        >
-          <DocsLayout variant="panel">
-            <MDXProvider components={mdxComponents}>{SelectedDocComponent ? <SelectedDocComponent /> : null}</MDXProvider>
-          </DocsLayout>
-        </Suspense>
-      </div>
+          <Suspense
+            fallback={
+              <div className="relative min-h-40">
+                <Spinner overlay label={t('detail.loadingDocumentation')} />
+              </div>
+            }
+          >
+            <DocsLayout variant="panel">
+              <MDXProvider components={mdxComponents}>
+                <Doc />
+              </MDXProvider>
+            </DocsLayout>
+          </Suspense>
+        </Conditional.Else>
+      </Conditional>
     </div>
   );
 };

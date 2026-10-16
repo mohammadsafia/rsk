@@ -1,6 +1,10 @@
 import { forwardRef, useCallback, useRef } from 'react';
 
-import { Card, Tag, Divider, Input, ScrollArea } from '@components/ui';
+import { Button, Card, Tag, Divider, Input, ScrollArea } from '@components/ui';
+import { EmptyState } from '@components/shared';
+import { Conditional } from '@components/utils';
+
+import { useAppTranslation } from '@hooks/shared';
 
 import { formatCategoryLabel } from '@component-docs/gallery/utils';
 
@@ -36,13 +40,16 @@ const DocListItem = forwardRef<
       ref={ref}
       onClick={() => onSelect(doc.id)}
       data-active={isActive}
-      className="bg-muted-50 hover:bg-muted-200 data-[active=true]:bg-primary data-[active=true]:text-primary-foreground border-muted-200 flex w-full flex-col items-start gap-1 rounded-lg border px-4 py-3 text-left transition-all data-[active=true]:border-transparent"
+      aria-current={isActive ? 'true' : undefined}
+      className="text-fg-muted hover:bg-hover hover:text-fg data-[active=true]:bg-hover data-[active=true]:text-fg focus-visible:ring-ring flex w-full flex-col items-start gap-1 rounded-md px-3 py-2.5 text-start transition-colors focus-visible:ring-2 focus-visible:outline-none"
     >
-      <span className="text-sm font-semibold">{doc.title}</span>
+      <span className="text-fg text-sm font-medium">{doc.title}</span>
 
-      {doc.description ? <span className="text-xs leading-relaxed opacity-60">{doc.description}</span> : null}
+      <Conditional.If condition={!!doc.description}>
+        <span className="text-xs leading-relaxed">{doc.description}</span>
+      </Conditional.If>
 
-      {tags.length ? (
+      <Conditional.If condition={tags.length > 0}>
         <div className="mt-1 flex items-center gap-1.5">
           {tags.slice(0, 3).map((tag) => (
             <Tag size="sm" key={tag}>
@@ -50,14 +57,19 @@ const DocListItem = forwardRef<
             </Tag>
           ))}
 
-          {tags.length > 3 ? <span className="text-muted-400 text-2xs">+{tags.length - 3}</span> : null}
+          <Conditional.If condition={tags.length > 3}>
+            <span dir="ltr" className="text-fg-subtle text-2xs tabular-nums">
+              +{tags.length - 3}
+            </span>
+          </Conditional.If>
         </div>
-      ) : null}
+      </Conditional.If>
     </button>
   );
 });
 
 const SidebarPanel = (props: SidebarPanelProps) => {
+  const { t } = useAppTranslation('components');
   const {
     activeCategoryKey,
     hasActiveFilters,
@@ -88,45 +100,48 @@ const SidebarPanel = (props: SidebarPanelProps) => {
   }, []);
 
   return (
-    <Card className="border-primary-100 col-span-12 overflow-hidden border lg:col-span-4">
+    <Card className="col-span-12 overflow-hidden lg:col-span-4">
       <Card.Header className="px-5 pt-5 pb-0">
         <div className="flex items-center justify-between">
           <div>
             <Card.Title className="text-base">{formatCategoryLabel(activeCategoryKey)}</Card.Title>
 
             <Card.Description className="mt-1">
-              {hasActiveFilters ? `${totalFilteredInActiveCategory} of ${totalInActiveCategory}` : `${totalInActiveCategory}`} components
+              <Conditional>
+                <Conditional.If condition={hasActiveFilters}>
+                  {t('gallery.countFiltered', { shown: totalFilteredInActiveCategory, count: totalInActiveCategory })}
+                </Conditional.If>
+
+                <Conditional.Else>{t('gallery.count', { count: totalInActiveCategory })}</Conditional.Else>
+              </Conditional>
             </Card.Description>
           </div>
 
-          {hasActiveFilters ? (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="text-destructive hover:bg-destructive-200 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors"
-            >
-              Clear filters
-            </button>
-          ) : null}
+          <Conditional.If condition={hasActiveFilters}>
+            <Button variant="ghost" tone="danger" size="sm" onClick={clearFilters}>
+              {t('common:clearFilters')}
+            </Button>
+          </Conditional.If>
         </div>
       </Card.Header>
 
       <Card.Content className="space-y-4 px-5 pt-4 pb-4">
         <div className="relative">
-          <Search className="text-muted-foreground pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+          <Search aria-hidden="true" className="text-fg-subtle pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2" />
 
           <Input
-            aria-label="Search components"
-            placeholder="Search components..."
+            type="search"
+            aria-label={t('gallery.search')}
+            placeholder={t('gallery.search')}
             value={searchText}
             onChange={(event) => setSearchText(event.target.value)}
-            className="py-2 ps-10 text-sm"
+            className="ps-9"
           />
         </div>
 
-        {availableTagOptions.length ? (
+        <Conditional.If condition={availableTagOptions.length > 0}>
           <div>
-            <div className="text-muted-400 text-2xs mb-2.5 font-semibold tracking-wider uppercase">Filter by tag</div>
+            <div className="text-fg-muted text-2xs mb-2.5 font-semibold tracking-wider uppercase">{t('gallery.filterByTag')}</div>
 
             <div className="flex flex-wrap gap-1.5">
               {availableTagOptions.slice(0, 15).map(({ tag, count }) => (
@@ -134,33 +149,37 @@ const SidebarPanel = (props: SidebarPanelProps) => {
               ))}
             </div>
 
-            {availableTagOptions.length > 15 ? (
-              <div className="text-muted-400 mt-2 text-xs">Showing {availableTagOptions.length} tags. Use search to narrow further.</div>
-            ) : null}
+            <Conditional.If condition={availableTagOptions.length > 15}>
+              <div className="text-fg-muted mt-2 text-xs">{t('gallery.tagsShown', { count: availableTagOptions.length })}</div>
+            </Conditional.If>
           </div>
-        ) : null}
+        </Conditional.If>
       </Card.Content>
 
       <Divider variant="dashed" />
 
-      <ScrollArea className="h-[calc(100vh-380px)]">
+      <ScrollArea className="h-[calc(100dvh-24rem)]">
         <div className="space-y-1 p-3">
-          {filteredDocsInActiveCategory.length === 0 ? (
-            <div className="text-muted-foreground py-10 text-center text-sm">No components found.</div>
-          ) : (
-            filteredDocsInActiveCategory.map((doc) => {
-              const isActive = doc.id === selectedDocId;
-              return (
-                <DocListItem
-                  key={doc.id}
-                  ref={isActive ? activeItemRef : undefined}
-                  doc={doc}
-                  isActive={isActive}
-                  onSelect={setSelectedDocId}
-                />
-              );
-            })
-          )}
+          <Conditional>
+            <Conditional.If condition={filteredDocsInActiveCategory.length === 0}>
+              <EmptyState size="sm" kind="no-results" title={t('gallery.noResults')} />
+            </Conditional.If>
+
+            <Conditional.Else>
+              {filteredDocsInActiveCategory.map((doc) => {
+                const isActive = doc.id === selectedDocId;
+                return (
+                  <DocListItem
+                    key={doc.id}
+                    ref={isActive ? activeItemRef : undefined}
+                    doc={doc}
+                    isActive={isActive}
+                    onSelect={setSelectedDocId}
+                  />
+                );
+              })}
+            </Conditional.Else>
+          </Conditional>
         </div>
 
         <ScrollArea.Bar />

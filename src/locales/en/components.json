@@ -2,7 +2,15 @@
   "gallery": {
     "title": "Components Gallery",
     "subtitle": "Browse and explore components with live demos and usage examples.",
-    "toggleSidebar": "Toggle sidebar"
+    "toggleSidebar": "Toggle sidebar",
+    "filterByTag": "Filter by tag",
+    "tagsShown": "Showing {{count}} tags. Use search to narrow further.",
+    "noResults": "No components found.",
+    "selectPrompt": "Select a component to view its documentation.",
+    "search": "Search components…",
+    "count_one": "{{count}} component",
+    "count_other": "{{count}} components",
+    "countFiltered": "{{shown}} of {{count}} components"
   },
   "detail": {
     "notFoundTitle": "Component not found",
@@ -11,5 +19,9 @@
     "breadcrumbComponents": "Components",
     "mdxValidationIssues": "MDX docs validation issues",
     "loadingDocumentation": "Loading documentation..."
+  },
+  "code": {
+    "copy": "Copy code",
+    "copied": "Copied"
   }
 }

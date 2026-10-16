@@ -7,19 +7,8 @@
     "legacy-color-ramp": 1,
     "legacy-color-name": 15
   },
-  "src/component-docs/code-block/CodeBlock.tsx": {
-    "legacy-color-name": 9
-  },
   "src/component-docs/forms/FormSelect.mdx": {
     "legacy-color-name": 1
-  },
-  "src/component-docs/gallery/doc-panel/DocPanel.tsx": {
-    "legacy-color-ramp": 5,
-    "legacy-color-name": 1
-  },
-  "src/component-docs/gallery/sidebar-panel/SidebarPanel.tsx": {
-    "legacy-color-ramp": 8,
-    "legacy-color-name": 5
   },
   "src/component-docs/hooks/UseRowEditing.mdx": {
     "legacy-color-name": 2
@@ -81,14 +70,6 @@
   },
   "src/component-docs/ui/ToggleGroup.mdx": {
     "legacy-color-name": 3
-  },
-  "src/pages/components/ComponentDetailPage.tsx": {
-    "legacy-color-ramp": 6,
-    "legacy-color-name": 8
-  },
-  "src/pages/components/ComponentsGalleryPage.tsx": {
-    "legacy-color-ramp": 3,
-    "legacy-color-name": 1
   },
   "src/pages/components/components.data.demos.tsx": {
     "legacy-color-ramp": 43,

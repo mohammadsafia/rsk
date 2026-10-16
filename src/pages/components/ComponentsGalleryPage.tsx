@@ -3,6 +3,8 @@ import { type SetStateAction, useCallback, useMemo, useState } from 'react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 
 import { Button, Tag, Tabs, IconButton } from '@components/ui';
+import { PageHeader } from '@components/shared';
+import { Conditional } from '@components/utils';
 import {
   buildCategoryTabOptions,
   DocPanel,
@@ -133,44 +135,48 @@ const ComponentDocsGalleryPage = () => {
   };
 
   return (
-    <div className="bg-background min-h-screen">
-      <div className="mx-auto w-full max-w-480 px-6 py-8">
-        <header className="mb-8 flex items-start justify-between">
-          <div>
-            <h1 className="text-primary-900 text-2xl font-bold">{t('gallery.title')}</h1>
+    <div className="mx-auto w-full max-w-7xl">
+      <PageHeader title={t('gallery.title')} description={t('gallery.subtitle')}>
+        <PageHeader.Actions>
+          <IconButton size="sm" aria-label={t('gallery.toggleSidebar')} onClick={toggleSidebar}>
+            <Conditional>
+              <Conditional.If condition={sidebarOpen}>
+                <PanelLeftClose aria-hidden="true" className="rtl:-scale-x-100" />
+              </Conditional.If>
 
-            <p className="text-muted-400 mt-1 text-sm">{t('gallery.subtitle')}</p>
-          </div>
-
-          <IconButton size="sm" aria-label={t('gallery.toggleSidebar')} onClick={toggleSidebar} className="mt-1">
-            {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
+              <Conditional.Else>
+                <PanelLeftOpen aria-hidden="true" className="rtl:-scale-x-100" />
+              </Conditional.Else>
+            </Conditional>
           </IconButton>
-        </header>
+        </PageHeader.Actions>
+      </PageHeader>
 
-        <Tabs value={activeCategoryKey} onValueChange={handleCategoryChange} className="mb-6">
-          <Tabs.List variant="contained" fullWidth className="border-primary-100">
-            {categoryTabOptions.map((tab) => {
-              const isActive = tab.key === activeCategoryKey;
-              const count = searchText.trim()
-                ? (docsByCategoryFiltered.get(tab.key) ?? []).length
-                : (docsByCategory.get(tab.key) ?? []).length;
+      <Tabs value={activeCategoryKey} onValueChange={handleCategoryChange} className="mb-6">
+        <Tabs.List variant="contained" fullWidth>
+          {categoryTabOptions.map((tab) => {
+            const isActive = tab.key === activeCategoryKey;
+            const count = searchText.trim()
+              ? (docsByCategoryFiltered.get(tab.key) ?? []).length
+              : (docsByCategory.get(tab.key) ?? []).length;
 
-              return (
-                <Tabs.Trigger key={tab.key} value={tab.key} className="gap-2">
-                  <span>{tab.label}</span>
+            return (
+              <Tabs.Trigger key={tab.key} value={tab.key} className="gap-2">
+                <span>{tab.label}</span>
 
-                  <Tag tone={isActive ? 'accent' : 'neutral'}>{count}</Tag>
-                </Tabs.Trigger>
-              );
-            })}
-          </Tabs.List>
-        </Tabs>
+                <Tag tone={isActive ? 'accent' : 'neutral'}>{count}</Tag>
+              </Tabs.Trigger>
+            );
+          })}
+        </Tabs.List>
+      </Tabs>
 
-        <div className="grid grid-cols-12 gap-6">
-          {sidebarOpen ? <SidebarPanel {...sidebarProps} /> : null}
+      <div className="grid grid-cols-12 gap-6">
+        <Conditional.If condition={sidebarOpen}>
+          <SidebarPanel {...sidebarProps} />
+        </Conditional.If>
 
-          <DocPanel {...docPanelProps} />
-        </div>
+        <DocPanel {...docPanelProps} />
       </div>
     </div>
   );
