@@ -175,6 +175,11 @@ describe('clean primitives', () => {
     expect(template).toMatch(/text-fg-muted|bg-surface/);
     expect(template).not.toMatch(/muted-foreground|primary|bg-background/);
   });
+
+  it('pages contain no forbidden patterns (SP3 Plan C)', () => {
+    const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) => file.startsWith('src/pages/') || file.startsWith('src/views/'));
+    expect(offenders).toEqual([]);
+  });
 });
 
 /** Folders SP2 replaced (addendum §1, §8, §10). None may come back under src/components. */

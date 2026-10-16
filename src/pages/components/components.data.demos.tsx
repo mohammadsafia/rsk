@@ -87,7 +87,7 @@ export function PopoverDemo() {
       <Popover.Content>
         <div className="space-y-2">
           <h4 className="font-medium">Popover Title</h4>
-          <p className="text-muted text-sm">Popover content here.</p>
+          <p className="text-fg-muted text-sm">Popover content here.</p>
         </div>
       </Popover.Content>
     </Popover>
@@ -112,12 +112,12 @@ export function CommandAutocompleteDemo() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
+        <Button variant="outline" role="combobox" aria-expanded={open} className="w-50 justify-between">
           {selectedFramework ? selectedFramework.label : 'Select framework...'}
           <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </Popover.Trigger>
-      <Popover.Content className="w-[200px] p-0">
+      <Popover.Content className="w-50 p-0">
         <Command>
           <Command.Input placeholder="Search framework..." />
           <Command.List>
@@ -318,7 +318,7 @@ export function FormWithValidationDemo() {
           Toggle Disabled
         </Button>
       </div>
-      <p className="text-muted text-xs">Try submitting with invalid data to see validation</p>
+      <p className="text-fg-muted text-xs">Try submitting with invalid data to see validation</p>
     </FormContainer>
   );
 }
@@ -637,7 +637,7 @@ export function ConfirmDialogDemo() {
       {/* Controlled + custom actions */}
       <ConfirmDialog
         tone="warning"
-        className="md:min-w-[450px]"
+        className="md:min-w-112"
         open={open}
         onOpenChange={setOpen}
 
@@ -652,7 +652,7 @@ export function ConfirmDialogDemo() {
       >
         <div className="flex flex-col gap-2">
           <label className="flex cursor-pointer items-center gap-2">
-            <span className="text-foreground leading-none">Exceptional?</span>
+            <span className="text-fg leading-none">Exceptional?</span>
           </label>
         </div>
         <>
@@ -876,10 +876,10 @@ export function CalendarDemo() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Single Date Selection</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Single Date Selection</p>
         <Popover>
           <Popover.Trigger asChild>
-            <Button variant="outline" className="w-[280px] justify-start text-start font-normal">
+            <Button variant="outline" className="w-70 justify-start text-start font-normal">
               <CalendarIcon className="me-2 h-4 w-4" />
               {date ? date.toLocaleDateString() : 'Pick a date'}
             </Button>
@@ -893,10 +893,10 @@ export function CalendarDemo() {
         </Button>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Date Range Selection</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Date Range Selection</p>
         <Popover>
           <Popover.Trigger asChild>
-            <Button variant="outline" className="w-[280px] justify-start text-start font-normal">
+            <Button variant="outline" className="w-70 justify-start text-start font-normal">
               <CalendarIcon className="me-2 h-4 w-4" />
               {dateRange?.from ? (
                 dateRange.to ? (
@@ -954,116 +954,116 @@ export function RadioGroupDemo() {
   return (
     <div className="w-80 space-y-4">
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Default</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Default</p>
         <RadioGroup value={value} onValueChange={setValue}>
           <RadioGroup.Item value="option1">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 1
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
           <RadioGroup.Item value="option2">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 2
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
         </RadioGroup>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Default Row</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Default Row</p>
         <RadioGroup className="grid-cols-2" value={value} onValueChange={setValue}>
           <RadioGroup.Item value="option1">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 1
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
           <RadioGroup.Item value="option2">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 2
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
         </RadioGroup>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Disabled</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Disabled</p>
         <RadioGroup defaultValue="disabled1" disabled>
           <RadioGroup.Item value="disabled1">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 group-disabled/radio-item:text-muted-300 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent group-disabled/radio-item:text-fg-subtle flex flex-1 items-center text-sm font-normal">
               Checked Disabled
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted group-disabled/radio-item:text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
           <RadioGroup.Item value="disabled2">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 group-disabled/radio-item:text-muted-300 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent group-disabled/radio-item:text-fg-subtle flex flex-1 items-center text-sm font-normal">
               Unchecked Disabled
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted group-disabled/radio-item:text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
         </RadioGroup>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Disabled Row</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Disabled Row</p>
         <RadioGroup className="grid-cols-2" defaultValue="disabled1" disabled>
           <RadioGroup.Item value="disabled1">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 group-disabled/radio-item:text-muted-300 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent group-disabled/radio-item:text-fg-subtle flex flex-1 items-center text-sm font-normal">
               Checked Disabled
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted group-disabled/radio-item:text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
           <RadioGroup.Item value="disabled2">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 group-disabled/radio-item:text-muted-300 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent group-disabled/radio-item:text-fg-subtle flex flex-1 items-center text-sm font-normal">
               Unchecked Disabled
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted group-disabled/radio-item:text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
         </RadioGroup>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Custom Icons</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Custom Icons</p>
         <RadioGroup value={value} onValueChange={setValue}>
           <RadioGroup.Item value="option1">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 1
             </span>
             <RadioGroup.Indicator>
               <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/radio-item:block" />
-              <StarOffIcon size={20} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <StarOffIcon size={20} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
           <RadioGroup.Item value="option2">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 2
             </span>
             <RadioGroup.Indicator>
               <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/radio-item:block" />
-              <StarOffIcon size={20} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <StarOffIcon size={20} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
         </RadioGroup>
@@ -1093,7 +1093,7 @@ export function FormRadioGroupDemo() {
         getOptionValue={(o) => o.id}
         disabled={disabled}
       />
-      <p className="text-muted mb-2 text-xs font-medium">Default Row</p>
+      <p className="text-fg-muted mb-2 text-xs font-medium">Default Row</p>
       <FormRadioGroup
         name="plan"
         control={form.control}
@@ -1121,86 +1121,86 @@ export function CheckboxGroupDemo() {
   return (
     <div className="w-80 space-y-4">
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Default</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Default</p>
         <CheckboxGroup>
           <CheckboxGroup.Item checked={checked1} onCheckedChange={(v) => setChecked1(!!v)}>
-            <span className="text-muted group-data-[state=checked]/checkbox-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/checkbox-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 1
             </span>
             <CheckboxGroup.Indicator>
-              <CheckSquareFilled className="text-secondary hidden group-data-[state=checked]/checkbox-item:block" />
+              <CheckSquareFilled className="text-fg-muted hidden group-data-[state=checked]/checkbox-item:block" />
               <Square
                 size={24}
                 strokeWidth={1.5}
-                className="text-muted-300 block rounded group-data-[state=checked]/checkbox-item:hidden"
+                className="text-fg-subtle block rounded group-data-[state=checked]/checkbox-item:hidden"
               />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>
           <CheckboxGroup.Item checked={checked2} onCheckedChange={(v) => setChecked2(!!v)}>
-            <span className="text-muted group-data-[state=checked]/checkbox-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/checkbox-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 2
             </span>
             <CheckboxGroup.Indicator>
-              <CheckSquareFilled className="text-secondary hidden group-data-[state=checked]/checkbox-item:block" />
+              <CheckSquareFilled className="text-fg-muted hidden group-data-[state=checked]/checkbox-item:block" />
               <Square
                 size={24}
                 strokeWidth={1.5}
-                className="text-muted-300 block rounded group-data-[state=checked]/checkbox-item:hidden"
+                className="text-fg-subtle block rounded group-data-[state=checked]/checkbox-item:hidden"
               />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>
         </CheckboxGroup>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Disabled</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Disabled</p>
         <CheckboxGroup>
           <CheckboxGroup.Item checked disabled>
-            <span className="text-muted group-data-[state=checked]/checkbox-item:text-primary-900 group-disabled/checkbox-item:text-muted-300 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/checkbox-item:text-accent group-disabled/checkbox-item:text-fg-subtle flex flex-1 items-center text-sm font-normal">
               Checked Disabled
             </span>
             <CheckboxGroup.Indicator>
-              <CheckSquareFilled className="text-secondary group-disabled/checkbox-item:text-muted-400 hidden group-data-[state=checked]/checkbox-item:block" />
+              <CheckSquareFilled className="text-fg-muted group-disabled/checkbox-item:text-fg-muted hidden group-data-[state=checked]/checkbox-item:block" />
               <Square
                 size={24}
                 strokeWidth={1.5}
-                className="text-muted-300 block rounded group-data-[state=checked]/checkbox-item:hidden"
+                className="text-fg-subtle block rounded group-data-[state=checked]/checkbox-item:hidden"
               />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>
           <CheckboxGroup.Item disabled>
-            <span className="text-muted group-disabled/checkbox-item:text-muted-300 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-disabled/checkbox-item:text-fg-subtle flex flex-1 items-center text-sm font-normal">
               Unchecked Disabled
             </span>
             <CheckboxGroup.Indicator>
-              <CheckSquareFilled className="text-secondary group-disabled/checkbox-item:text-muted-400 hidden group-data-[state=checked]/checkbox-item:block" />
+              <CheckSquareFilled className="text-fg-muted group-disabled/checkbox-item:text-fg-muted hidden group-data-[state=checked]/checkbox-item:block" />
               <Square
                 size={24}
                 strokeWidth={1.5}
-                className="text-muted-300 block rounded group-data-[state=checked]/checkbox-item:hidden"
+                className="text-fg-subtle block rounded group-data-[state=checked]/checkbox-item:hidden"
               />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>
         </CheckboxGroup>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Custom Icons</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Custom Icons</p>
         <CheckboxGroup>
           <CheckboxGroup.Item checked={checked1} onCheckedChange={(v) => setChecked1(!!v)}>
-            <span className="text-muted group-data-[state=checked]/checkbox-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/checkbox-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 1
             </span>
             <CheckboxGroup.Indicator>
               <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/checkbox-item:block" />
-              <Star size={20} className="text-muted-300 block group-data-[state=checked]/checkbox-item:hidden" />
+              <Star size={20} className="text-fg-subtle block group-data-[state=checked]/checkbox-item:hidden" />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>
           <CheckboxGroup.Item checked={checked2} onCheckedChange={(v) => setChecked2(!!v)}>
-            <span className="text-muted group-data-[state=checked]/checkbox-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/checkbox-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 2
             </span>
             <CheckboxGroup.Indicator>
               <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/checkbox-item:block" />
-              <Star size={20} className="text-muted-300 block group-data-[state=checked]/checkbox-item:hidden" />
+              <Star size={20} className="text-fg-subtle block group-data-[state=checked]/checkbox-item:hidden" />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>
         </CheckboxGroup>
