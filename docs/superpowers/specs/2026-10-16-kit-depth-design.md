@@ -62,7 +62,7 @@ Four plans, executed in order. Each ends with tested components and their docs p
 
 - `<Money value currency? compact? negative?="sign" | "parentheses" tone?="auto" | "none" />`.
 - Formats with `Intl.NumberFormat` (`-u-nu-latn`, Western digits) for the app language. The whole value is LTR-isolated, tabular mono.
-- `tone="auto"` colours negative amounts `danger`. `compact` gives "12.4K". `currency` defaults to an app setting (`APP_CONFIG.currency`, added) and accepts any ISO code.
+- `tone="auto"` colours negative amounts `danger`. `compact` gives "12.4K". `currency` defaults to an app setting (`APP_CONFIGURATIONS.CURRENCY`, added in `src/app-config/appConfig.ts`) and accepts any ISO code.
 - A `formatMoney(value, options, language)` util backs it and is reused by charts and StatCard.
 
 ### DataTable bulk selection (`@components/tables`)
