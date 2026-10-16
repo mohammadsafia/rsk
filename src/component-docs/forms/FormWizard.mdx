@@ -1,0 +1,142 @@
+---
+id: form-wizard
+title: FormWizard
+section: Components
+category: Forms
+description: 'Multi-step form: per-step validation, a locked stepper, optional and conditional steps, a review step, session drafts and server errors routed to their step.'
+tags: [forms, wizard, stepper, multi-step]
+---
+
+import { useForm, useWatch } from 'react-hook-form';
+import { z } from 'zod';
+import { demoSource } from '@component-docs/blocks';
+import { FormCheckbox, FormFileUploader, FormInput, FormWizard } from '@components/forms';
+import pageSource from './FormWizard.mdx?raw';
+
+export const IntakeDemo = () => {
+  const form = useForm({
+    defaultValues: { name: '', dob: '', insured: false, phone: '', email: '', insurer: '', policy: '', documents: [] },
+  });
+  const insured = useWatch({ control: form.control, name: 'insured' });
+
+  return (
+    <div className="w-full max-w-xl">
+      <FormWizard form={form} draftKey="docs-intake" onSubmit={() => new Promise((resolve) => setTimeout(resolve, 800))}>
+        <FormWizard.Step
+          id="patient"
+          title="Patient"
+          description="Who the visit is for."
+          schema={z.object({ name: z.string().min(2, 'Enter the full name'), dob: z.string().min(1, 'Enter the date of birth') })}
+          review={[
+            { name: 'name', label: 'Full name' },
+            { name: 'dob', label: 'Date of birth' },
+          ]}
+        >
+          <div className="grid gap-3">
+            <FormInput name="name" label="Full name" required />
+            <FormInput name="dob" label="Date of birth" type="date" required />
+            <FormCheckbox name="insured" control={form.control} label="The patient has insurance" />
+          </div>
+        </FormWizard.Step>
+        <FormWizard.Step
+          id="contact"
+          title="Contact"
+          fields={['phone']}
+          review={[
+            { name: 'phone', label: 'Phone' },
+            { name: 'email', label: 'Email' },
+          ]}
+        >
+          <div className="grid gap-3">
+            <FormInput name="phone" label="Phone" type="tel" required rules={{ required: 'Enter a phone number' }} />
+            <FormInput name="email" label="Email" type="email" />
+          </div>
+        </FormWizard.Step>
+        <FormWizard.Step
+          id="insurance"
+          title="Insurance"
+          optional
+          condition={insured}
+          review={[
+            { name: 'insurer', label: 'Insurer' },
+            { name: 'policy', label: 'Policy number' },
+          ]}
+        >
+          <div className="grid gap-3">
+            <FormInput name="insurer" label="Insurer" />
+            <FormInput name="policy" label="Policy number" />
+          </div>
+        </FormWizard.Step>
+        <FormWizard.Step id="documents" title="Documents" review={(values) => `${values.documents?.length ?? 0} file(s)`}>
+          <FormFileUploader name="documents" control={form.control} label="Referral and ID" multiple listVariant="chips" />
+        </FormWizard.Step>
+        <FormWizard.Review />
+      </FormWizard>
+    </div>
+  );
+};
+
+## Steps and validation
+
+Next validates only the current step: with its `schema`, or by triggering the listed `fields`. Back never validates. Completed steps can be revisited from the stepper; later ones stay locked. Tick "has insurance" to see a conditional step appear.
+
+<Example title="Patient intake" code={demoSource('IntakeDemo', pageSource)}>
+  <IntakeDemo />
+</Example>
+
+## Review
+
+`FormWizard.Review` summarises every earlier step from its `review` rows (or a renderer), each with an Edit link back to it.
+
+## Drafts
+
+With `draftKey`, values are saved to sessionStorage as you type (`rsk:wizard:<key>`; files are never stored). Coming back shows "Draft restored · Discard"; a successful submit clears the draft.
+
+## Server errors
+
+Throw a `FormWizardError` from `onSubmit` and each message lands on its field, with the wizard on the first step that owns one. If that step is hidden, the messages show above the actions instead.
+
+```tsx
+const save = async (values: Intake) => {
+  const response = await api.patients.create(values);
+  if (response.fieldErrors) throw new FormWizardError(response.fieldErrors); // { phone: 'Number already registered' }
+};
+```
+
+## URL sync
+
+`urlSync` keeps `?step=<id>` in the URL so refresh and the browser Back button move between steps. A step that isn't reachable yet opens the first incomplete step instead.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'form', type: 'UseFormReturn<T>', required: true, description: 'One react-hook-form instance for every step.' },
+    { prop: 'onSubmit', type: '(values: T) => void | Promise<void>', required: true, description: 'Called from the last step after final validation; throw FormWizardError for field errors.' },
+    { prop: 'draftKey', type: 'string', description: 'Save a session draft under rsk:wizard:<key>.' },
+    { prop: 'urlSync', type: 'boolean', default: 'false', description: 'Keep ?step=<id> in the URL.' },
+    { prop: 'onCancel', type: '() => void', description: 'Shows Cancel; asks before discarding a dirty form.' },
+  ]}
+/>
+
+### FormWizard.Step
+
+<PropsTable
+  rows={[
+    { prop: 'id · title', type: 'string', required: true, description: 'Step key (also the ?step= value) and heading.' },
+    { prop: 'schema', type: 'ZodType', description: 'Validates this step on Next; its keys are the fields the step owns.' },
+    { prop: 'fields', type: 'string[]', description: 'Fields validated with trigger on Next when there is no schema.' },
+    { prop: 'optional · condition', type: 'boolean', description: 'Show Skip; false condition removes the step.' },
+    { prop: 'review', type: '{ name; label; format? }[] | (values) => ReactNode', description: 'Summary rows for the review step.' },
+    { prop: 'description', type: 'string', description: 'Muted line under the step heading.' },
+  ]}
+/>
+
+## Accessibility
+
+- On every step change focus moves to the step heading and "Step 2 of 4, Contact" is announced politely.
+- The stepper is a list of buttons; the current one has `aria-current="step"` and locked steps are disabled. Next focuses the first invalid field.
+
+## RTL notes
+
+- The stepper runs right to left in Arabic and the Next / Back arrows mirror; the step caption uses Western digits.
