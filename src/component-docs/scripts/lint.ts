@@ -15,6 +15,8 @@ const FrontmatterSchema = z.object({
   category: z.string().min(1),
   description: z.string().min(1),
   tags: z.array(z.string()).optional(),
+  order: z.number().optional(),
+  importFrom: z.string().optional(),
 });
 
 const TEMPLATE_PLACEHOLDER_MARKERS = ['component-id', 'Component Name', 'RealComponentName', 'Replace these placeholders'] as const;

@@ -11,6 +11,7 @@ const doc = (category: string): ComponentDocEntry => ({
   section: 'Components',
   category,
   description: category,
+  headings: [],
   load: async () => ({ default: () => null }),
 });
 

@@ -9,7 +9,12 @@ declare module '*.mdx' {
     category?: string;
     tags?: string[];
     description?: string;
+    order?: number;
+    importFrom?: string;
   };
+
+  /** h2/h3 headings, injected at build time by scripts/docs/remark-docs.ts. */
+  export const headings: ReadonlyArray<{ depth: 2 | 3; text: string; slug: string }>;
 
   const MDXComponent: ComponentType<{ components?: MDXComponents }>;
   export default MDXComponent;
