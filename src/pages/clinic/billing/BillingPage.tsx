@@ -28,6 +28,7 @@ import { INVOICE_TONE } from '../shared/status';
 import { useClinicToday } from '../shared/useClinicToday';
 import { useLocalized } from '../shared/useLocalized';
 import { billingSummary, downloadCsv, type InvoiceRow, invoicesToCsv, toInvoiceRows } from './billing';
+import InvoiceSheet from './InvoiceSheet';
 
 const STATUSES: InvoiceStatus[] = ['draft', 'sent', 'overdue', 'paid', 'void'];
 const ALL = 'all';
@@ -306,6 +307,8 @@ function BillingPage() {
       >
         {null}
       </ConfirmDialog>
+
+      <InvoiceSheet invoiceId={invoiceId} onClose={() => void setInvoiceId(null)} />
     </div>
   );
 }

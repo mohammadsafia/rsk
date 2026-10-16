@@ -28,7 +28,8 @@ export const useLeave = (range: DayRange) =>
   useQuery([CLINIC, VisitsHandler.leave.queryKey, range.from, range.to], () => VisitsHandler.leave.request(range));
 
 export const useInvoices = () => useQuery([CLINIC, InvoicesHandler.list.queryKey], InvoicesHandler.list.request);
-export const useInvoice = (id: string) => useQuery([CLINIC, InvoicesHandler.get.queryKey, id], () => InvoicesHandler.get.request(id));
+export const useInvoice = (id: string, options: { enabled?: boolean } = {}) =>
+  useQuery([CLINIC, InvoicesHandler.get.queryKey, id], () => InvoicesHandler.get.request(id), options);
 
 export const useMetrics = (days: MetricsRange) =>
   useQuery([CLINIC, MetricsHandler.list.queryKey, days], () => MetricsHandler.list.request(days));
