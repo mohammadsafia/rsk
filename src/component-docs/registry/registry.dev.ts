@@ -51,6 +51,8 @@ function buildRegistry(): ReadonlyArray<ComponentDocEntry> {
 
   const { mdxFrontmatter } = getMdxGlobs();
   const registry = Object.keys(mdxFrontmatter)
+    // The docs:new template lives next to the docs but is not one.
+    .filter((path) => !path.includes('/_template/'))
     .map((path) => {
       const fm: Frontmatter = mdxFrontmatter[path] ?? {};
 

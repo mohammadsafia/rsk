@@ -51,13 +51,8 @@
     padding: 0 1rem;
   }
 
-  /* Light mode: show light theme colors, hide dark */
+  /* --code-surface is dark in both themes, so code always uses the dark syntax palette. */
   [data-rehype-pretty-code-figure] code [style*='--shiki-dark'] {
-    color: var(--shiki-light) !important;
-  }
-
-  /* Dark mode: show dark theme colors */
-  .dark [data-rehype-pretty-code-figure] code [style*='--shiki-dark'] {
     color: var(--shiki-dark) !important;
   }
 }

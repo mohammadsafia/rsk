@@ -8,11 +8,12 @@ import mdx from '@mdx-js/rollup';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter';
 import rehypePrettyCode from 'rehype-pretty-code';
+import remarkGfm from 'remark-gfm';
 
 const mdxPlugin = Object.assign(
   mdx({
     providerImportSource: '@mdx-js/react',
-    remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: 'frontmatter', exportType: 'const' }]],
+    remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: 'frontmatter', exportType: 'const' }], remarkGfm],
     rehypePlugins: [
       [
         rehypePrettyCode,

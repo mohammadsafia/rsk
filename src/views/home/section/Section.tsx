@@ -19,7 +19,7 @@ function Section({ id, eyebrow, title, description, className, children }: Secti
   return (
     <section id={id} aria-labelledby={titleId} className="border-border-subtle border-t">
       <div className={cn('mx-auto max-w-6xl px-4 py-14 md:px-6', className)}>
-        <p className="text-fg-muted font-mono text-xs font-medium tracking-wider uppercase">{eyebrow}</p>
+        <p className="text-fg-muted font-mono text-xs font-medium tracking-wider uppercase rtl:font-sans rtl:tracking-normal">{eyebrow}</p>
 
         <h2 id={titleId} className="text-fg mt-2 text-2xl font-semibold tracking-tight rtl:leading-snug">
           {title}

@@ -169,3 +169,10 @@ describe('utility behavior', () => {
     expect(body).not.toContain('outline: none');
   });
 });
+
+describe('code blocks', () => {
+  it('always use the dark syntax palette, because --code-surface is dark in both themes', () => {
+    expect(indexCss).not.toContain('var(--shiki-light)');
+    expect(indexCss).toMatch(/\[data-rehype-pretty-code-figure\] code \[style\*='--shiki-dark'\] \{\s*color: var\(--shiki-dark\)/);
+  });
+});

@@ -1,4 +1,9 @@
+import { type ComponentPropsWithoutRef } from 'react';
+
+import Table from '@components/ui/table/Table';
 import { CodeBlock } from '@component-docs';
+
+import { cn } from '@utils';
 
 import { normalizeCategoryKey } from '@component-docs/registry';
 
@@ -74,4 +79,16 @@ export function countTagsByLabel(docs: ReadonlyArray<Readonly<ComponentDocEntry>
 
 export const mdxComponents: MDXComponents = {
   pre: (props: PreProps) => <CodeBlock {...props} />,
+  // Inline code (block code is wrapped by CodeBlock's LTR <pre>): keep identifiers left-to-right inside Arabic prose.
+  code: ({ className, ...props }: ComponentPropsWithoutRef<'code'>) => <code dir="ltr" className={cn('font-mono', className)} {...props} />,
+  table: (props: ComponentPropsWithoutRef<'table'>) => (
+    <div className="not-prose border-border my-6 overflow-x-auto rounded-lg border">
+      <Table {...props} />
+    </div>
+  ),
+  thead: (props: ComponentPropsWithoutRef<'thead'>) => <Table.Header {...props} />,
+  tbody: (props: ComponentPropsWithoutRef<'tbody'>) => <Table.Body {...props} />,
+  tr: (props: ComponentPropsWithoutRef<'tr'>) => <Table.Row {...props} />,
+  th: (props: ComponentPropsWithoutRef<'th'>) => <Table.Head {...props} />,
+  td: (props: ComponentPropsWithoutRef<'td'>) => <Table.Cell {...props} />,
 };

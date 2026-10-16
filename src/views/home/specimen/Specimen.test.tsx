@@ -37,4 +37,15 @@ describe('Specimen bento', () => {
     expect(document.querySelector('[data-slot="table"] td[data-numeric="true"]')?.textContent).toMatch(/\d/);
     expect(document.querySelector('[aria-invalid="true"]')).not.toBeNull();
   });
+
+  it('does not letter-space Arabic eyebrows', () => {
+    render(
+      <Tooltip.Provider>
+        <Specimen />
+      </Tooltip.Provider>,
+    );
+    const eyebrows = [...document.querySelectorAll('span')].filter((node) => node.className.includes('tracking-wider'));
+    expect(eyebrows.length).toBeGreaterThan(0);
+    eyebrows.forEach((node) => expect(node.className).toContain('rtl:tracking-normal'));
+  });
 });

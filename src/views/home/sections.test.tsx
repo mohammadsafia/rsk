@@ -69,4 +69,11 @@ describe('landing sections', () => {
     await act(async () => screen.getAllByRole('button', { name: /Copy/ })[1].click());
     expect(writes).toEqual(['pnpm install']);
   });
+
+  it('does not letter-space Arabic eyebrows (tracking breaks the joined script)', () => {
+    renderAll();
+    const eyebrows = [...document.querySelectorAll('section p')].filter((node) => node.className.includes('uppercase'));
+    expect(eyebrows.length).toBeGreaterThan(0);
+    eyebrows.forEach((node) => expect(node.className).toContain('rtl:tracking-normal'));
+  });
 });

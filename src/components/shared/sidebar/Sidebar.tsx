@@ -78,7 +78,13 @@ const Group: FC<GroupProps> = ({ label, className, children, ...props }) => {
 
   return (
     <div data-slot="sidebar-group" role="group" aria-labelledby={labelId} className={cn('flex flex-col gap-0.5', className)} {...props}>
-      <p id={labelId} className={cn('text-fg-subtle text-2xs px-3 pb-1 font-medium tracking-wider uppercase', collapsed && 'md:sr-only')}>
+      <p
+        id={labelId}
+        className={cn(
+          'text-fg-subtle text-2xs px-3 pb-1 font-medium tracking-wider uppercase rtl:tracking-normal',
+          collapsed && 'md:sr-only',
+        )}
+      >
         {label}
       </p>
 

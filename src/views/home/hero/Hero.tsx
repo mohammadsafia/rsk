@@ -27,7 +27,9 @@ function Hero() {
       aria-labelledby="landing-hero-title"
       className="mx-auto max-w-6xl px-4 pt-16 text-center md:px-6 md:pt-24"
     >
-      <p className="text-fg-muted font-mono text-xs font-medium tracking-wider uppercase">{t('hero.eyebrow')}</p>
+      <p className="text-fg-muted font-mono text-xs font-medium tracking-wider uppercase rtl:font-sans rtl:tracking-normal">
+        {t('hero.eyebrow')}
+      </p>
 
       <h1
         id="landing-hero-title"

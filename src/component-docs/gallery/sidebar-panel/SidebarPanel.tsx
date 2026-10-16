@@ -141,7 +141,9 @@ const SidebarPanel = (props: SidebarPanelProps) => {
 
         <Conditional.If condition={availableTagOptions.length > 0}>
           <div>
-            <div className="text-fg-muted text-2xs mb-2.5 font-semibold tracking-wider uppercase">{t('gallery.filterByTag')}</div>
+            <div className="text-fg-muted text-2xs mb-2.5 font-semibold tracking-wider uppercase rtl:tracking-normal">
+              {t('gallery.filterByTag')}
+            </div>
 
             <div className="flex flex-wrap gap-1.5">
               {availableTagOptions.slice(0, 15).map(({ tag, count }) => (

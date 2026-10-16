@@ -7,7 +7,7 @@ import { useAppTranslation } from '@hooks/shared';
 import { AlertTriangle, Clock } from 'lucide-react';
 
 const PANEL = 'bg-surface border-border min-w-0 rounded-lg border p-4';
-const EYEBROW = 'text-fg-muted font-mono text-2xs font-medium tracking-wider uppercase';
+const EYEBROW = 'text-fg-muted font-mono text-2xs font-medium tracking-wider uppercase rtl:font-sans rtl:tracking-normal';
 
 function Specimen() {
   const { t } = useAppTranslation('home');
@@ -96,9 +96,7 @@ function Specimen() {
           <div className="flex items-center justify-between">
             <span className={EYEBROW}>{t('specimen.table')}</span>
 
-            <span dir="ltr" className="text-fg-subtle font-mono text-xs tabular-nums">
-              {t('specimen.rows')}
-            </span>
+            <span className="text-fg-subtle font-mono text-xs tabular-nums rtl:font-sans">{t('specimen.rows')}</span>
           </div>
 
           <Table className="mt-2">
