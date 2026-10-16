@@ -8,6 +8,8 @@ tags: [calendar, calendar-grid, schedule, compound, day-view, week-view, month-v
 ---
 
 import { useMemo, useState } from 'react';
+import { demoSource } from '@component-docs/blocks';
+import pageSource from './CalendarGrid.mdx?raw';
 
 import { CalendarEvent, Tag, Divider, Table, IconButton } from '@components/ui';
 import { DescriptionList } from '@components/shared';
@@ -18,7 +20,9 @@ import { cn } from '@utils';
 
 import { CalendarClock, Clock, MapPin, Stethoscope, X } from 'lucide-react';
 
-## Demo
+## Schedule
+
+Day, week and month views with events, availability slots, a legend, a list mode and event popovers. Switch views and click an event.
 
 The demo wires the same calendar to BOTH a calendar mode and a list mode. Use the view toggle (top-right, calendar/list icons) to switch — the calendar views self-guard out, and the consumer-rendered `<Table>` takes over the body.
 
@@ -276,7 +280,9 @@ export const CalendarGridDemo = () => {
   );
 };
 
-<CalendarGridDemo />
+<Example title="Clinic schedule" code={demoSource('CalendarGridDemo', pageSource)}>
+  <CalendarGridDemo />
+</Example>
 
 ## Imports
 
@@ -301,36 +307,24 @@ CalendarGrid.MonthView        — Month grid with overflow popover for >3 events
 (any custom child)            — Renders alongside the views inside the body region. Use this to show alternative content (e.g., a list/table) when the calendar views self-guard out (viewMode === 'list'). See "List mode" example below.
 ```
 
-## Props (root)
+## API
 
-```
-events            TEvent[]                                 Required   Event objects (generic over TEvent)
-eventAccessors    CalendarAccessors<TEvent>                Required   { getId, getStartTime, getEndTime }
-children          ReactNode                                Required   Slot sub-components. Include <CalendarGrid.EventTemplate> when events are provided; <CalendarGrid.PopoverTemplate> for clickable event popovers; plus Header / Legend / DayView / WeekView / MonthView as needed.
+<PropsTable
+  rows={[
+    { prop: 'events', type: 'TEvent[]', required: true, description: 'Event objects; the grid is generic over TEvent.' },
+    { prop: 'eventAccessors', type: 'CalendarAccessors<TEvent>', required: true, description: '{ getId, getStartTime, getEndTime } returning ISO strings.' },
+    { prop: 'initialView · initialDate · initialViewMode', type: "'day' | 'week' | 'month' · Date · 'calendar' | 'list'", default: "'month' · now · 'calendar'", description: 'Uncontrolled starting state.' },
+    { prop: 'view · date · viewMode', type: 'same as above', description: 'Controlled state; pair with onViewChange, onDateChange, onViewModeChange.' },
+    { prop: 'onRangeChange', type: '(range: { startDate, endDate }) => void', description: 'Fires when the visible window changes; drive data fetching from it.' },
+    { prop: 'slots', type: 'Record<string, TimeRange[]> | null', description: 'Availability keyed by ISO date (YYYY-MM-DD).' },
+    { prop: 'startHour · endHour · stepMinutes', type: 'number', default: '8 · 24 · 30', description: 'Time-grid window and row step (15, 30 or 60).' },
+    { prop: 'showStepLabels', type: 'boolean', default: 'false', description: 'Label every step, not only hour marks.' },
+    { prop: 'nowLine', type: "'in-range' | 'always' | 'off'", default: "'in-range'", description: 'Now-indicator on today’s column.' },
+    { prop: 'isLoading', type: 'boolean', default: 'false', description: 'Skeleton until events arrive.' },
+  ]}
+/>
 
-initialView       'day' | 'week' | 'month'                 Optional   Uncontrolled initial view; default 'month'
-initialDate       Date                                     Optional   Uncontrolled initial focused date; default now
-initialViewMode   'calendar' | 'list'                      Optional   Uncontrolled initial mode; default 'calendar'
-
-view              'day' | 'week' | 'month'                 Optional   Controlled view (pair with onViewChange)
-date              Date                                     Optional   Controlled focused date (pair with onDateChange)
-viewMode          'calendar' | 'list'                      Optional   Controlled mode (pair with onViewModeChange)
-onViewChange      (view) => void                           Optional   Fires on user-initiated view change
-onDateChange      (date) => void                           Optional   Fires on user-initiated date navigation
-onViewModeChange  (mode) => void                           Optional   Fires on user-initiated mode toggle
-onRangeChange     (range) => void                          Optional   Fires whenever the visible range changes; { startDate, endDate }
-
-slots             Record<string, TimeRange[]> | null       Optional   Availability slots keyed by ISO date string (YYYY-MM-DD)
-
-startHour         number (default 8)                       Optional   First hour of the time grid (0–23)
-endHour           number (default 24)                      Optional   Last hour of the time grid (1–24, exclusive)
-stepMinutes       number (default 30)                      Optional   Row step in minutes (15 / 30 / 60)
-showStepLabels    boolean (default false)                  Optional   Show labels on every step instead of hour marks only
-nowLine           NowLineMode (default 'in-range')         Optional   Now-indicator visibility on today's column. 'in-range' = show only when current time is between startHour and endHour; 'always' = clamp to top/bottom when out of range; 'off' = never show
-
-isLoading         boolean (default false)                  Optional   Show skeleton; renders calendar once events arrive
-className         string                                   Optional   Forwarded to the root container
-```
+Children are the slot parts listed under Sub-Components; include `EventTemplate` whenever there are events.
 
 ## Types
 
@@ -353,7 +347,7 @@ type TimeRange = { startTime: string; endTime: string }; // 'HH:mm' format
 type CalendarLegendItem = { label: string; colorClass: string }; // colorClass is a Tailwind bg-* utility
 ```
 
-## Code
+## Recipes
 
 ### Basic — minimal compound
 
@@ -749,5 +743,14 @@ The `<CalendarGrid.Header>` container is `flex items-center justify-between`. Pa
 - **Range callback fires on window shifts**: use `onRangeChange` to drive query refetching. The callback dedupes via the start/end date keys (does not fire when the range object is recomputed but the window is the same).
 - **Legend tokens must match cell tokens**: pass the same Tailwind `bg-*` class the renderer uses for the card background. Don't use `var(--color-*)` for tokens that may not exist in the theme — verify with `bg-*` first.
 - **Loading state**: pass `isLoading` from your query. The component renders a skeleton when loading AND no events; once events arrive, the calendar replaces the skeleton even if the query is still pending.
-- **Accessibility**: root has `role="application"` + `aria-roledescription="calendar"`. Today's day-cell carries `aria-current="date"` in month view.
-- **RTL**: uses logical properties throughout (`border-e`, `pe-*`, `inset-x-*`).
+
+## Accessibility
+
+- The root has `role="application"` and `aria-roledescription="calendar"`; today's month cell carries `aria-current="date"`.
+- Event cards and chips are buttons; give `EventTemplate` content a readable label (time and title), since short cards may truncate.
+
+## RTL notes
+
+- Built on logical properties (`border-e`, `pe-*`, `inset-inline-start`), so columns, lanes and navigation mirror in Arabic.
+- Times and dates use Western digits; navigation arrows point along the reading direction.
+

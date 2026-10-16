@@ -7,6 +7,115 @@ description: 'Full-featured data table with toolbar, pagination, filtering, and 
 tags: [tables, data-table, tanstack, pagination, toolbar, filtering]
 ---
 
+import { useMemo } from 'react';
+import {
+  getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
+import { Badge } from '@components/ui';
+import { DataTable } from '@components/tables';
+import { useDataTableFilters } from '@hooks/shared';
+import { containsFilterFn, createFilterMeta, inListFilterFn, numberRangeFilterFn } from '@utils';
+import { demoSource } from '@component-docs/blocks';
+import pageSource from './DataTable.mdx?raw';
+
+export const PATIENTS = ['Layla Haddad', 'Omar Khalil', 'Sara Odeh', 'Yousef Nasser', 'Noor Saleh', 'Khaled Haddad'];
+
+export const STATUSES = [
+  { id: 'paid', name: 'Paid', tone: 'success' },
+  { id: 'pending', name: 'Pending', tone: 'warning' },
+  { id: 'overdue', name: 'Overdue', tone: 'danger' },
+];
+
+export const INVOICES = Array.from({ length: 24 }, (_, index) => ({
+  id: `INV-2026-${String(140 + index).padStart(4, '0')}`,
+  patient: PATIENTS[index % PATIENTS.length],
+  status: STATUSES[index % STATUSES.length].id,
+  amount: 40 + ((index * 73) % 900),
+}));
+
+export const InvoicesDemo = () => {
+  const columns = useMemo(
+    () => [
+      { accessorKey: 'id', header: 'Invoice', meta: { label: 'Invoice' } },
+      {
+        accessorKey: 'patient',
+        header: 'Patient',
+        filterFn: containsFilterFn,
+        meta: { label: 'Patient', filterMeta: createFilterMeta({ variant: 'text', label: 'Patient' }) },
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        filterFn: inListFilterFn,
+        cell: ({ getValue }) => {
+          const status = STATUSES.find((option) => option.id === getValue());
+          return <Badge tone={status.tone}>{status.name}</Badge>;
+        },
+        meta: {
+          label: 'Status',
+          filterMeta: createFilterMeta({
+            variant: 'multiSelect',
+            label: 'Status',
+            options: STATUSES,
+            getOptionLabel: (option) => option.name,
+            getOptionValue: (option) => option.id,
+          }),
+        },
+      },
+      {
+        accessorKey: 'amount',
+        header: 'Amount',
+        filterFn: numberRangeFilterFn,
+        cell: ({ getValue }) => getValue().toFixed(2),
+        meta: { label: 'Amount', numeric: true, filterMeta: createFilterMeta({ variant: 'numberRange', label: 'Amount', min: 0 }) },
+      },
+    ],
+    [],
+  );
+  const filters = useDataTableFilters({ columns });
+
+  const table = useReactTable({
+    data: INVOICES,
+    columns,
+    state: filters.state,
+    onColumnFiltersChange: filters.onColumnFiltersChange,
+    onGlobalFilterChange: filters.onGlobalFilterChange,
+    enableGlobalFilter: true,
+    globalFilterFn: 'includesString',
+    initialState: { pagination: { pageSize: 6 } },
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
+  });
+
+  return (
+    <div className="flex h-120 w-full min-w-0 flex-col">
+      <DataTable table={table} onResetFilters={filters.reset} className="min-h-0 flex-1">
+        <DataTable.Toolbar totalCount={table.getFilteredRowModel().rows.length} totalLabel="Invoices" placeholder="Search invoices…" />
+        <DataTable.Content />
+        <DataTable.Pagination pageSizeOptions={[6, 12, 24]} />
+      </DataTable>
+    </div>
+  );
+};
+
+## Example
+
+Search, filter by patient, status or amount, sort by clicking a header, and page through 24 invoices.
+
+<Example title="Invoices" code={demoSource('InvoicesDemo', pageSource)}>
+  <InvoicesDemo />
+</Example>
+
 ## Overview
 
 DataTable is a compound component that provides a complete table experience: toolbar with search and filters, scrollable content with pinned columns, and pagination.
@@ -366,13 +475,20 @@ When `onRowClick` is set, clickable cells automatically get `cursor-pointer`. Di
 
 For all the above, prefer the action-icon pattern.
 
-## Sub-components
+## API
 
-| Sub-component          | Description                                                                                            |
-| ---------------------- | ------------------------------------------------------------------------------------------------------ |
-| `DataTable.Toolbar`    | Search bar, total count, filter toggle. Accepts `totalCount`, `totalLabel`, `placeholder`.             |
-| `DataTable.Content`    | Scrollable table body with pinned header. Accepts `className`, `emptyState`.                           |
-| `DataTable.Pagination` | Page navigation and rows-per-page selector. Accepts `pageSizeOptions` (default: `[30, 50, 100, 200]`). |
+<PropsTable
+  rows={[
+    { prop: 'table', type: 'Table<TData>', required: true, description: 'A TanStack table instance (useReactTable or useDataTable).' },
+    { prop: 'isLoading', type: 'boolean', default: 'false', description: 'Skeleton rows in the body.' },
+    { prop: 'onRowClick', type: '(row: Row<TData>) => void', description: 'Make rows clickable; see Row Click Navigation.' },
+    { prop: 'getRowClassName', type: '(row: Row<TData>) => string', description: 'Per-row classes.' },
+    { prop: 'onResetFilters', type: '() => void', description: 'Called by "Clear filters"; pass useDataTableFilters().reset.' },
+    { prop: 'Toolbar · totalCount · totalLabel · placeholder', type: 'number · string · string', description: 'Search box, filter pills and the result count.' },
+    { prop: 'Content · emptyState', type: '{ title, description }', description: 'Scrollable body with a pinned header; message when no rows match.' },
+    { prop: 'Pagination · pageSizeOptions', type: 'number[]', default: '[30, 50, 100, 200]', description: 'Page navigation and rows-per-page selector.' },
+  ]}
+/>
 
 > **Note on `onRowClick` and `getRowClassName`:** these live on the `<DataTable>` root, not on `<DataTable.Content>`. They take generic `Row<TData>` parameters, and TypeScript generics don't propagate through React Context — only the root has the `table` prop from which `TData` is inferred. See [Row Click Navigation](#row-click-navigation) for the API.
 
@@ -396,3 +512,14 @@ flex h-full min-h-0 w-full flex-col gap-3
 - **`flex-col gap-3`** -- Stacks sub-components vertically. `DataTable.Content` uses `flex-1 min-h-0` to fill remaining space with a scrollable area.
 
 The key rule: **every ancestor between the page container and DataTable must have an explicit height** (`h-full`, `flex-1`, etc.). A single `height: auto` div in the chain breaks `h-full` resolution and the table loses its fixed height.
+
+## Accessibility
+
+- Native table semantics with a sticky header; a sorted column's header carries `aria-sort`.
+- Sorting is triggered by clicking the header cell, which is not keyboard-focusable today; if keyboard sorting matters, offer a sort control in the toolbar.
+- Row click is mouse-only, so always offer an explicit action button for keyboard users (see Row Click Navigation).
+
+## RTL notes
+
+- Columns run right to left in Arabic; numeric columns stay end-aligned and LTR-isolated, and pagination arrows mirror.
+

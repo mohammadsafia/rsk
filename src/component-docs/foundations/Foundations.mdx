@@ -13,16 +13,22 @@ import { ColorRoles, FoundationScales, TypeScale } from '@component-docs/foundat
 
 Components use **only** these semantic tokens (`bg-canvas`, `text-fg-muted`, `border-border-strong`, …). Each role is tuned per mode and contrast-tested (text ≥ 4.5:1, controls and focus ≥ 3:1). Oxblood is the single accent; errors use vermilion so they never read as the brand.
 
-<ColorRoles />
+<Example title="Color roles in light and dark" code={'<ColorRoles />'}>
+  <ColorRoles />
+</Example>
 
 ## Typography
 
 Schibsted Grotesk for UI, Noto Kufi Arabic for Arabic (per-glyph fallback, so digits stay Western and consistent), Spline Sans Mono for IDs, amounts and shortcuts. Body text is `text-base` (14px). Arabic gets extra line height automatically under `dir="rtl"`.
 
-<TypeScale />
+<Example title="Type scale" code={'<TypeScale />'}>
+  <TypeScale />
+</Example>
 
 ## Shape, elevation, motion and states
 
 Resting surfaces use borders, never shadows; only floating layers are elevated. Motion animates `transform` and `opacity` only, and drops movement under `prefers-reduced-motion`.
 
-<FoundationScales />
+<Example title="Radius, elevation, motion and states" code={'<FoundationScales />'}>
+  <FoundationScales />
+</Example>
