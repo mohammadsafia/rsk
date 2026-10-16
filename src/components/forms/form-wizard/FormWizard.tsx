@@ -268,7 +268,8 @@ function FormWizard<TValues extends FieldValues>({
               );
             })}
           </ol>
-          <p className="text-fg-muted hidden text-xs sm:block">{t('wizard.stepOf', { current: wizard.index + 1, total: steps.length })}</p>
+          {/* The stepper shows position visually; keep the count for screen readers. */}
+          <p className="sr-only">{t('wizard.stepOf', { current: wizard.index + 1, total: steps.length })}</p>
         </nav>
 
         <Conditional.If condition={urlSync}>
