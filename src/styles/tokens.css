@@ -44,6 +44,14 @@
   --info-subtle: oklch(0.957 0.005 258.3);
   --info-fg: oklch(1 0 0);
 
+  /* Categorical chart palette: accent first, then distinct hues; each ≥3:1 on surface. */
+  --chart-1: var(--accent);
+  --chart-2: oklch(0.45 0.02 264);
+  --chart-3: oklch(0.52 0.09 200);
+  --chart-4: oklch(0.58 0.12 70);
+  --chart-5: oklch(0.5 0.1 290);
+  --chart-6: oklch(0.52 0.11 150);
+
   --hover: oklch(0.205 0.006 271.1 / 4%);
   --pressed: oklch(0.205 0.006 271.1 / 8%);
 
@@ -100,6 +108,13 @@
   --info: oklch(0.715 0.023 256.8);
   --info-subtle: oklch(0.715 0.023 256.8 / 12%);
   --info-fg: oklch(0.173 0.004 264.5);
+
+  --chart-1: var(--accent);
+  --chart-2: oklch(0.8 0.01 264);
+  --chart-3: oklch(0.74 0.09 200);
+  --chart-4: oklch(0.8 0.12 75);
+  --chart-5: oklch(0.72 0.1 290);
+  --chart-6: oklch(0.75 0.12 155);
 
   --hover: oklch(0.928 0.003 264.5 / 5%);
   --pressed: oklch(0.928 0.003 264.5 / 9%);
