@@ -4,39 +4,84 @@ title: FormSelect
 section: Components
 category: Forms
 description: 'Controlled select dropdown with option mapping and clear button.'
-tags: [forms, select, dropdown]
+tags: [forms, select]
 ---
 
-## Demo
-
-<p className="text-fg-muted text-sm">FormSelect requires a form context. See the code example below for usage.</p>
-
-## Imports
-
-```tsx
-import { FormContainer, FormSelect } from '@components/forms';
 import { useForm } from 'react-hook-form';
-```
+import { FormContainer, FormSelect } from '@components/forms';
 
-## Code
-
-```tsx
-const form = useForm({ defaultValues: { role: '' } });
-
-const options = [
-  { id: '1', name: 'Admin' },
-  { id: '2', name: 'Editor' },
-  { id: '3', name: 'Viewer' },
+export const ROLES = [
+  { id: 'admin', name: 'Admin' },
+  { id: 'doctor', name: 'Doctor' },
+  { id: 'reception', name: 'Reception' },
 ];
 
-<FormContainer formContext={form} onSuccess={console.log}>
-  <FormSelect
-    name="role"
-    label="Role"
-    options={options}
-    getOptionLabel={(o) => o.name}
-    getOptionValue={(o) => o.id}
-    placeholder="Select a role"
-  />
-</FormContainer>;
-```
+export const SelectDemo = () => {
+  const form = useForm({ defaultValues: { role: 'doctor' } });
+  return (
+    <FormContainer formContext={form} onSuccess={() => {}} className="grid w-96 gap-3">
+      <FormSelect
+        name="role"
+        label="Role"
+        control={form.control}
+        options={ROLES}
+        getOptionLabel={(option) => option.name}
+        getOptionValue={(option) => option.id}
+        placeholder="Select a role"
+        required
+      />
+    </FormContainer>
+  );
+};
+
+## Options
+
+Options can be strings or objects; `getOptionLabel` and `getOptionValue` read them. A ✕ in the trigger empties the field unless `clearable={false}`.
+
+<Example
+  title="Role"
+  code={`const ROLES = [
+  { id: 'admin', name: 'Admin' },
+  { id: 'doctor', name: 'Doctor' },
+  { id: 'reception', name: 'Reception' },
+];
+
+<FormSelect
+  name="role"
+  label="Role"
+  control={form.control}
+  options={ROLES}
+  getOptionLabel={(option) => option.name}
+  getOptionValue={(option) => option.id}
+  placeholder="Select a role"
+  required
+/>`}
+>
+  <SelectDemo />
+</Example>
+
+For long or searchable lists use [FormCombobox](/docs/components/form-combobox).
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'name · control', type: 'Path · Control', required: true, description: 'Field path and form.control.' },
+    { prop: 'options', type: 'TOption[]', required: true, description: 'The choices.' },
+    { prop: 'getOptionLabel · getOptionValue', type: '(option) => string', required: true, description: 'How to read each option.' },
+    { prop: 'valueType', type: "'flat' | 'contain'", default: "'flat'", description: 'Store the option value, or the whole option object.' },
+    { prop: 'clearable', type: 'boolean', default: 'true', description: 'Show a clear ✕ in the trigger when a value is set.' },
+    { prop: 'placeholder · noOptionsText', type: 'string', description: 'Empty-field text and empty-list text.' },
+  ]}
+/>
+
+Plus the [shared field props](/docs/components/form-field#shared-by-every-form-field).
+
+## Accessibility
+
+- The trigger is a labelled `combobox` that opens a `listbox`.
+- The clear ✕ is a pointer shortcut inside the trigger and is not keyboard-focusable; use `clearable={false}` with an explicit empty option if keyboard clearing matters.
+
+## RTL notes
+
+- The chevron and clear ✕ sit at the end of the field, on the left in Arabic.

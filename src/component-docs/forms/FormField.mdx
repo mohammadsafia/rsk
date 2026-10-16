@@ -7,38 +7,67 @@ description: 'The anatomy every Form* field shares: label row, control, and one 
 tags: [forms, field, label, error, description]
 ---
 
+import { demoSource } from '@component-docs/blocks';
 import { FormWithValidationDemo } from '@pages/components/components.data.demos';
 
-## Demo
+## In a form
 
-<FormWithValidationDemo />
+Every `Form*` field renders through `FormField`, so labels, help text, required marks and errors look and behave the same. Submit the form empty to see the errors.
+
+<Example title="Validated fields" code={demoSource('FormWithValidationDemo')}>
+  <FormWithValidationDemo />
+</Example>
 
 ## Anatomy
 
 | Part | data-slot | Notes |
 |---|---|---|
 | Root | `form-field` | `data-invalid` while the field has an error |
-| Label row | `form-field-label` | Label + required `*` + optional ⓘ tooltip button **beside** the label (kept out of the field's name) |
+| Label row | `form-field-label` | Label, required `*` and an optional ⓘ tooltip button beside the label (kept out of the field's name) |
 | Control | `form-field-control` | Receives `id`, `invalid`, `aria-labelledby`, `aria-describedby`, `aria-required` |
-| Message | `form-field-message` | Shows the error (danger) or else the `description` (muted); referenced by `aria-describedby` |
-
-## Field props (every `Form*`)
-
-| Prop | Notes |
-|---|---|
-| `name` | react-hook-form path |
-| `label` | Visible label |
-| `description` | Help text under the field while valid |
-| `tooltip` | Extra context behind an ⓘ button |
-| `required` | Red `*` + `aria-required` |
-| `disabled` | Disables the control |
-| `className` | Applied to the control; style the rest via `data-slot` |
-| `rules` | react-hook-form rules when not using a schema |
+| Message | `form-field-message` | The error (danger) or else the `description` (muted); referenced by `aria-describedby` |
 
 ## Building a custom field
+
+Wrap any control in `FormField` and spread the render prop onto it.
 
 ```tsx
 <FormField id={id} label="Licence number" description="As printed on the card" error={error}>
   {(control) => <Input {...control} {...register('licence')} />}
 </FormField>
 ```
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'label', type: 'ReactNode', description: 'Visible label, linked to the control.' },
+    { prop: 'description', type: 'ReactNode', description: 'Help text shown while the field is valid.' },
+    { prop: 'tooltip', type: 'ReactNode', description: 'Extra context behind an ⓘ button beside the label.' },
+    { prop: 'required', type: 'boolean', default: 'false', description: 'Red * and aria-required.' },
+    { prop: 'error', type: 'FieldError', description: 'react-hook-form error; replaces the description.' },
+    { prop: 'id', type: 'string', description: 'Control id; generated when omitted, so ids are always unique.' },
+    { prop: 'children', type: '(control) => ReactNode', required: true, description: 'Receives id, invalid and the aria props to spread on the control.' },
+  ]}
+/>
+
+### Shared by every Form* field
+
+<PropsTable
+  rows={[
+    { prop: 'name', type: 'string', required: true, description: 'react-hook-form field path.' },
+    { prop: 'label · description · tooltip · required', type: '—', description: 'Passed to FormField, as above.' },
+    { prop: 'disabled', type: 'boolean', default: 'false', description: 'Disables the control.' },
+    { prop: 'className', type: 'string', description: 'Applied to the control; style other parts via data-slot.' },
+    { prop: 'rules', type: 'RegisterOptions', description: 'react-hook-form rules when not using a schema resolver.' },
+  ]}
+/>
+
+## Accessibility
+
+- The label is a real `<label>` tied to the control; the message line is wired with `aria-describedby`, and errors set `aria-invalid`.
+- The ⓘ tooltip button sits outside the label, so it is not read as part of the field's name.
+
+## RTL notes
+
+- The label, required mark and tooltip button follow the reading direction; the message line aligns to the start.

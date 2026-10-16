@@ -1,32 +1,42 @@
 ---
 id: form-number-textarea
-title: FormNumber & FormTextarea
+title: FormNumber
 section: Components
 category: Forms
-description: Numeric and multi-line text fields.
+description: 'Formatted number field bound to react-hook-form, with step buttons and a min/max range.'
 tags: [forms, number, textarea]
 ---
 
+import { demoSource } from '@component-docs/blocks';
 import { FormNumberTextareaDemo } from '@pages/components/components.data.demos';
 
-## Demo
+## Numbers
 
-<FormNumberTextareaDemo />
+`FormNumber` wraps [FormattedNumber](/docs/components/formatted-number) and stores a `number` (or `null`), not a string. It is a controlled field, so pass `control`.
 
-## Imports
+<Example title="Quantity, signed range, notes" code={demoSource('FormNumberTextareaDemo')}>
+  <FormNumberTextareaDemo />
+</Example>
 
-```tsx
-import { FormContainer, FormNumber, FormTextarea } from '@components/forms';
-import { useForm } from 'react-hook-form';
-```
+`min` defaults to `0`. The second field passes `min={-10}` to allow negative values.
 
-## Code
+## API
 
-```tsx
-const form = useForm();
+<PropsTable
+  rows={[
+    { prop: 'name', type: 'Path<TFieldValues>', required: true, description: 'Field path in the form values.' },
+    { prop: 'control', type: 'Control<TFieldValues>', required: true, description: 'form.control from useForm.' },
+    { prop: 'min · max · stepper · showStepButtons', type: 'number · boolean', description: 'Range and stepping, as on FormattedNumber.' },
+    { prop: 'prefix · suffix · thousandSeparator · decimalScale', type: 'string · number', description: 'Formatting, as on FormattedNumber.' },
+  ]}
+/>
 
-<FormContainer formContext={form} onSuccess={console.log}>
-  <FormNumber name="qty" control={form.control} label="Quantity" />
-  <FormTextarea name="notes" label="Notes" />
-</FormContainer>;
-```
+Plus the [shared field props](/docs/components/form-field#shared-by-every-form-field).
+
+## Accessibility
+
+- The label is linked to the number input; the step buttons have translated labels.
+
+## RTL notes
+
+- The field follows the page direction while the number keeps its left-to-right order (`-1,250.50`), with Western digits.

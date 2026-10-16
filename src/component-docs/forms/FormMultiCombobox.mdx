@@ -3,41 +3,43 @@ id: form-multi-combobox
 title: FormMultiCombobox (Multi-select)
 section: Components
 category: Forms
-description: Multiple selection with badges and search.
-tags: [forms, multi-select, combobox]
+description: Searchable multi-select bound to react-hook-form; selections show as badges in the field.
+tags: [forms, combobox, multi-select]
 ---
 
+import { demoSource } from '@component-docs/blocks';
 import { FormMultiComboboxDemo } from '@pages/components/components.data.demos';
 
-## Demo
+## Multiple values
 
-<FormMultiComboboxDemo />
+The value is an array. Each selection shows as a badge in the field; the list stays open so you can pick several.
 
-## Imports
+<Example title="Skills" code={demoSource('FormMultiComboboxDemo')}>
+  <FormMultiComboboxDemo />
+</Example>
 
-```tsx
-import { FormContainer, FormMultiCombobox } from '@components/forms';
-import { useForm } from 'react-hook-form';
-```
+For options from an API see [FormMultiCombobox (async)](/docs/components/form-multi-combobox-async).
 
-## Code
+## API
 
-```tsx
-const form = useForm({ defaultValues: { skills: [] } });
-const skills = [
-  { id: 'js', name: 'JavaScript' },
-  { id: 'ts', name: 'TypeScript' },
-];
+<PropsTable
+  rows={[
+    { prop: 'name · control', type: 'Path · Control', required: true, description: 'Field path (an array) and form.control.' },
+    { prop: 'options', type: 'TOption[] | AsyncOptionsFn', required: true, description: 'An array, or a fetcher for async options.' },
+    { prop: 'getOptionLabel · getOptionValue', type: '(option) => string', required: true, description: 'How to read each option.' },
+    { prop: 'valueType', type: "'flat' | 'contain'", default: "'flat'", description: 'Store option values, or whole option objects.' },
+    { prop: 'onOptionChange', type: '(options: TOption[]) => void', description: 'Called with the selected option objects.' },
+    { prop: 'getOptionDisabled · placeholder · noOptionsText', type: '—', description: 'As on FormCombobox.' },
+  ]}
+/>
 
-<FormContainer formContext={form} onSuccess={console.log}>
-  <FormMultiCombobox
-    name="skills"
-    control={form.control}
-    label="Skills"
-    options={skills}
-    getOptionLabel={(o) => o.name}
-    getOptionValue={(o) => o.id}
-    placeholder="Select skills..."
-  />
-</FormContainer>;
-```
+Plus the [shared field props](/docs/components/form-field#shared-by-every-form-field).
+
+## Accessibility
+
+- Keyboard users add and remove values from the open list: Enter on a checked option unchecks it.
+- The small ✕ on each badge is a pointer shortcut only; it is not keyboard-focusable.
+
+## RTL notes
+
+- Badges run in reading order; the chevron sits at the end of the field.

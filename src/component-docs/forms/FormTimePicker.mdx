@@ -3,29 +3,53 @@ id: form-time-picker
 title: FormTimePicker
 section: Components
 category: Forms
-description: 'Time picker field.'
+description: 'Time field bound to react-hook-form; can store the value in a different format than it shows.'
 tags: [forms, time, picker]
 ---
 
-import { FormTimePickerDemo } from '@pages/components/components.data.demos';
-
-## Demo
-
-<FormTimePickerDemo />
-
-## Imports
-
-```tsx
-import { FormContainer, FormTimePicker } from '@components/forms';
 import { useForm } from 'react-hook-form';
-```
+import { FormContainer, FormTimePicker } from '@components/forms';
 
-## Code
+export const TimeDemo = () => {
+  const form = useForm({ defaultValues: { start: '09:30:00', reminder: '' } });
+  return (
+    <FormContainer formContext={form} onSuccess={() => {}} className="grid w-96 gap-3">
+      <FormTimePicker name="start" control={form.control} label="Start time" step={15} valueFormat="HH:mm:ss" description="Stored as 09:30:00" />
+      <FormTimePicker name="reminder" control={form.control} label="Reminder" use24hFormat min="08:00" max="18:00" step={30} />
+    </FormContainer>
+  );
+};
 
-```tsx
-const form = useForm();
+## Display and stored formats
 
-<FormContainer formContext={form} onSuccess={console.log}>
-  <FormTimePicker name="time" control={form.control} label="Time" />
-</FormContainer>;
-```
+The field shows `9:30 AM` (or `09:30` with `use24hFormat`). `valueFormat` makes the form store the API's format instead, here `HH:mm:ss`.
+
+<Example
+  title="12-hour shown, 24-hour stored"
+  code={`const form = useForm({ defaultValues: { start: '09:30:00', reminder: '' } });
+
+<FormTimePicker name="start" control={form.control} label="Start time" step={15} valueFormat="HH:mm:ss" />
+<FormTimePicker name="reminder" control={form.control} label="Reminder" use24hFormat min="08:00" max="18:00" step={30} />`}
+>
+  <TimeDemo />
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'name · control', type: 'Path · Control', required: true, description: 'Field path (a string) and form.control.' },
+    { prop: 'valueFormat', type: "'HH:mm' | 'HH:mm:ss' | 'h:mm a' | …", description: 'Format stored in the form; defaults to the display format.' },
+    { prop: 'use24hFormat · min · max · step · startAt', type: '—', description: 'As on TimePicker.' },
+  ]}
+/>
+
+Plus the [shared field props](/docs/components/form-field#shared-by-every-form-field). The control is a [TimePicker](/docs/components/time-picker).
+
+## Accessibility
+
+- The trigger is labelled by the field label; hour, minute and AM/PM are keyboard-reachable listboxes.
+
+## RTL notes
+
+- The time itself stays left to right with Western digits in both languages.

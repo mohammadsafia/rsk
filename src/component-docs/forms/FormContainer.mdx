@@ -3,49 +3,77 @@ id: form-container
 title: FormContainer
 section: Components
 category: Forms
-description: 'React Hook Form wrapper that provides form context and handles submission.'
+description: 'React Hook Form wrapper that provides form context, handles submission, and renders the Save / Cancel row.'
 tags: [forms, container, provider]
 ---
 
-import { FormBasicDemo } from '@pages/components/components.data.demos';
-
-## Demo
-
-<FormBasicDemo />
-
-## Imports
-
-```tsx
-import { FormContainer } from '@components/forms';
+import { demoSource } from '@component-docs/blocks';
 import { useForm } from 'react-hook-form';
-```
+import { FormBasicDemo } from '@pages/components/components.data.demos';
+import { FormContainer, FormInput } from '@components/forms';
 
-## Code
+export const ActionsDemo = () => {
+  const form = useForm({ defaultValues: { name: 'Layla Haddad' } });
+  return (
+    <FormContainer formContext={form} onSuccess={() => new Promise((resolve) => setTimeout(resolve, 800))} className="grid w-96 gap-3">
+      <FormInput name="name" label="Name" />
+      <FormContainer.Actions confirmOnCancel onCancel={() => form.reset()} />
+    </FormContainer>
+  );
+};
 
-```tsx
-const form = useForm({ defaultValues: { name: '' } });
+## Basic
 
-<FormContainer formContext={form} onSuccess={(data) => console.log(data)}>
-  {/* Form fields go here */}
-</FormContainer>;
-```
+Pass a `useForm` result as `formContext`; `onSuccess` runs with the values after validation passes.
+
+<Example title="Fields in a container" code={demoSource('FormBasicDemo')}>
+  <FormBasicDemo />
+</Example>
 
 ## Actions
 
-`FormContainer.Actions` renders the footer row: extra actions (children), then **Cancel** and **Save**. Save shows `loading` while the submit handler runs.
+`FormContainer.Actions` renders the footer row: your extra actions, then Cancel and Save. Save shows a spinner while `onSuccess` runs. Edit the name, then press Cancel to see the confirmation.
 
-```tsx
-<FormContainer formContext={form} onSuccess={handleSave}>
+<Example
+  title="Save, cancel with confirmation"
+  code={`const form = useForm({ defaultValues: { name: 'Layla Haddad' } });
+
+<FormContainer formContext={form} onSuccess={save}>
   <FormInput name="name" label="Name" />
-  <FormContainer.Actions confirmOnCancel sticky />
-</FormContainer>
-```
+  <FormContainer.Actions confirmOnCancel onCancel={() => form.reset()} />
+</FormContainer>`}
+>
+  <ActionsDemo />
+</Example>
 
-| Prop | Default | Notes |
-|---|---|---|
-| `submitLabel` | `t('save')` | Submit button text |
-| `cancelLabel` | `t('cancel')` | Cancel button text |
-| `onCancel` | `navigate(-1)` | Called on cancel (after confirmation when asked) |
-| `confirmOnCancel` | `false` | Ask before discarding — only when the form has unsaved changes |
-| `hideCancel` | `false` | Submit only |
-| `sticky` | `false` | Pin the row to the bottom of a scrolling form |
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'formContext', type: 'UseFormReturn', required: true, description: 'The useForm() result; provided to every field.' },
+    { prop: 'onSuccess', type: 'SubmitHandler', required: true, description: 'Called with valid values; may return a promise.' },
+  ]}
+/>
+
+Other `<form>` attributes pass through (`className`, `id`, …).
+
+### FormContainer.Actions
+
+<PropsTable
+  rows={[
+    { prop: 'submitLabel · cancelLabel', type: 'ReactNode', default: '"Save" · "Cancel"', description: 'Button text (translated by default).' },
+    { prop: 'onCancel', type: '() => void', default: 'navigate(-1)', description: 'Called on cancel, after confirmation when asked.' },
+    { prop: 'confirmOnCancel', type: 'boolean', default: 'false', description: 'Ask before discarding, only when the form has unsaved changes.' },
+    { prop: 'hideCancel', type: 'boolean', default: 'false', description: 'Submit only.' },
+    { prop: 'sticky', type: 'boolean', default: 'false', description: 'Pin the row to the bottom of a scrolling form.' },
+  ]}
+/>
+
+## Accessibility
+
+- A native `<form>`: Enter in a field submits, and Save is a `type="submit"` button with `aria-busy` while saving.
+- On a failed submit, react-hook-form moves focus to the first invalid field (its default `shouldFocusError`).
+
+## RTL notes
+
+- The actions row aligns to the end, so Save sits on the left in Arabic, with Cancel before it.

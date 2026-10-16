@@ -7,39 +7,37 @@ description: Form with schema validation using Zod.
 tags: [forms, validation, zod]
 ---
 
+import { demoSource } from '@component-docs/blocks';
 import { FormWithValidationDemo } from '@pages/components/components.data.demos';
 
-## Demo
+## Example
 
-<FormWithValidationDemo />
+Describe the rules once in a zod schema and pass `zodResolver(schema)` to `useForm`. Submit with an incomplete email or a short password to see the messages.
 
-## Imports
+<Example title="Schema validation" code={demoSource('FormWithValidationDemo')}>
+  <FormWithValidationDemo />
+</Example>
 
-```tsx
-import { FormContainer, FormInput, FormNumber, Button } from '@components/forms';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-```
+## Writing messages
 
-## Code
+- Say what to do, not what went wrong: "Enter a complete email address", not "Invalid email".
+- Put the messages in the locale files and build the schema inside the component with `t()`, so they translate.
+- Use `z.coerce.number()` for number fields, since inputs report strings.
 
-```tsx
-const schema = z.object({
-  email: z.string().email('Invalid email'),
-  password: z.string().min(8, 'Min 8 chars'),
-  age: z.number().min(18, 'Must be 18+'),
-});
+## API
 
-type FormData = z.infer<typeof schema>;
+<PropsTable
+  rows={[
+    { prop: 'resolver', type: 'zodResolver(schema)', description: 'On useForm: validates with the schema and maps messages to fields.' },
+    { prop: 'defaultValues', type: 'z.infer<typeof schema>', description: 'On useForm: give every field a starting value.' },
+    { prop: 'mode', type: "'onSubmit' | 'onBlur' | 'onChange'", default: "'onSubmit'", description: 'On useForm: when to validate first.' },
+  ]}
+/>
 
-const form = useForm<FormData>({
-  defaultValues: { email: '', password: '', age: 18 },
-});
+## Accessibility
 
-<FormContainer formContext={form} onSuccess={console.log}>
-  <FormInput name="email" label="Email" required />
-  <FormInput name="password" type="password" label="Password" required />
-  <FormNumber name="age" control={form.control} label="Age" />
-  <Button type="submit">Submit</Button>
-</FormContainer>;
-```
+- Errors appear under each field, set `aria-invalid`, and are linked with `aria-describedby`; focus moves to the first invalid field on submit.
+
+## RTL notes
+
+- Messages align to the start of the field; translated messages read right to left in Arabic.
