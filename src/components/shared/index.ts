@@ -1,4 +1,4 @@
-export * from './blank-slate';
+export { EmptyState, type EmptyStateProps } from '@components/ui/empty-state';
 export * from './theme-switcher';
 export * from './language-switcher';
 export * from './toaster';

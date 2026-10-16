@@ -29,6 +29,7 @@ export * from './textarea';
 export * from './select';
 export * from './skeleton';
 export * from './spinner';
+export * from './empty-state';
 export * from './switch';
 export * from './toggle-group';
 export * from './time-picker';

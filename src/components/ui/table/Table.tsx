@@ -2,13 +2,12 @@ import { type ComponentPropsWithoutRef, type FC, type ReactNode } from 'react';
 
 import { Skeleton } from '@components/ui';
 import { Conditional } from '@components/utils';
+import EmptyState from '@components/ui/empty-state/EmptyState';
 import Spinner from '@components/ui/spinner/Spinner';
 
 import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
-
-import { Search } from 'lucide-react';
 
 type TableProps = ComponentPropsWithoutRef<'table'> & {
   isLoading?: boolean;
@@ -116,14 +115,13 @@ const Empty: FC<TableEmptyProps> = ({ className, colSpan = 1, title, description
 
   return (
     <tr data-slot="table-empty" className={cn('h-full hover:bg-transparent', className)} {...props}>
-      <td colSpan={colSpan} className="py-12 text-center">
-        <div className="inline-flex flex-col items-center gap-2">
-          <Search aria-hidden="true" strokeWidth={1.5} className="text-fg-subtle size-8" />
-
-          <span className="text-fg text-md font-medium">{title ?? t('table.emptyTitle')}</span>
-
-          <span className="text-fg-muted text-sm">{description ?? t('table.emptyDescription')}</span>
-        </div>
+      <td colSpan={colSpan}>
+        <EmptyState
+          size="sm"
+          kind="no-results"
+          title={title ?? t('table.emptyTitle')}
+          description={description ?? t('table.emptyDescription')}
+        />
       </td>
     </tr>
   );

@@ -36,9 +36,6 @@
   "src/component-docs/hooks/UseRowEditing.mdx": {
     "legacy-color-name": 2
   },
-  "src/component-docs/shared/BlankSlate.mdx": {
-    "legacy-color-ramp": 11
-  },
   "src/component-docs/shared/Conditional.mdx": {
     "legacy-color-name": 1
   },
@@ -102,9 +99,6 @@
   },
   "src/components/shared/action-panel/ActionPanel.tsx": {
     "legacy-color-name": 1
-  },
-  "src/components/shared/blank-slate/BlankSlate.tsx": {
-    "legacy-color-ramp": 3
   },
   "src/components/shared/breadcrumb/Breadcrumb.tsx": {
     "legacy-color-ramp": 1,

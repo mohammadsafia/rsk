@@ -86,5 +86,19 @@
   },
   "card": {
     "toggle": "Show or hide content"
+  },
+  "emptyState": {
+    "firstUse": {
+      "title": "Nothing here yet",
+      "description": "When you add items, they will show up here."
+    },
+    "noResults": {
+      "title": "No results",
+      "description": "Try different keywords or clear the filters."
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "We couldn't load this. Please try again."
+    }
   }
 }

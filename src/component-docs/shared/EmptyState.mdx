@@ -1,0 +1,63 @@
+---
+id: empty-state
+title: EmptyState
+section: Components
+category: Shared
+description: 'Explains an empty view — first use, no results or a failed load — with a default icon and copy per kind and an optional action row.'
+tags: [shared, empty-state, error, no-results]
+---
+
+import { Button } from '@components/ui';
+import { EmptyState } from '@components/shared';
+
+## Demo
+
+<div className="grid w-full gap-4 md:grid-cols-3">
+  <div className="border-border rounded-lg border">
+    <EmptyState size="sm" kind="first-use" title="No patients yet" description="Patients you register will appear here." />
+  </div>
+  <div className="border-border rounded-lg border">
+    <EmptyState size="sm" kind="no-results" />
+  </div>
+  <div className="border-border rounded-lg border">
+    <EmptyState size="sm" kind="error" title="Couldn't load visits">
+      <EmptyState.Actions>
+        <Button size="sm" variant="outline">Try again</Button>
+      </EmptyState.Actions>
+    </EmptyState>
+  </div>
+</div>
+
+## Imports
+
+```tsx
+import { EmptyState } from '@components/shared';
+```
+
+## Code
+
+```tsx
+<EmptyState kind="first-use" title="No patients yet" description="Patients you register will appear here." />
+
+<EmptyState kind="no-results" />
+
+<EmptyState kind="error" title="Couldn't load visits">
+  <EmptyState.Actions>
+    <Button variant="outline">Try again</Button>
+  </EmptyState.Actions>
+</EmptyState>
+
+// Full-page states use a level-1 heading
+<EmptyState kind="error" titleAs="h1" />
+```
+
+## API
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `kind` | `'first-use' \| 'no-results' \| 'error'` | `'first-use'` | Picks the icon and the default copy. `error` sets `role="alert"`. |
+| `title` / `description` | `ReactNode` | i18n per kind | `common.emptyState.<kind>.*`. |
+| `icon` | `ReactNode` | per kind | Replaces the default icon. |
+| `size` | `'sm' \| 'md'` | `'md'` | `sm` is used inside tables (`Table.Empty`). |
+| `titleAs` | `'h1' \| 'h2' \| 'h3'` | `'h3'` | Heading level of the title. |
+| `EmptyState.Actions` | `div` | — | Centered, wrapping row of buttons. |
