@@ -1,8 +1,8 @@
-import { Children, Fragment, isValidElement, type ReactElement, type ReactNode, useEffect, useRef } from 'react';
-import { type FieldValues, FormProvider, type Path, type UseFormReturn } from 'react-hook-form';
+import { Children, Fragment, isValidElement, type ReactElement, type ReactNode, useEffect, useRef, useState } from 'react';
+import { type FieldErrors, type FieldValues, FormProvider, type Path, type UseFormReturn } from 'react-hook-form';
 
 import { Alert, Badge, Button, Divider } from '@components/ui';
-import { DescriptionList, Stepper } from '@components/shared';
+import { ConfirmDialog, DescriptionList, Stepper } from '@components/shared';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -12,6 +12,7 @@ import { cn } from '@utils';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 import { FormWizardReview, type FormWizardReviewProps, FormWizardStep, type FormWizardStepProps, type ReviewRows } from './parts';
+import { FormWizardError } from './FormWizardError';
 import { useWizardDraft } from './useWizardDraft';
 import { useWizardSteps } from './useWizardSteps';
 
@@ -90,13 +91,31 @@ function ReviewPanel({ steps, values, onEdit }: { steps: WizardStep[]; values: R
   );
 }
 
-function FormWizard<TValues extends FieldValues>({ form, onSubmit, draftKey, className, children }: FormWizardProps<TValues>) {
+function FormWizard<TValues extends FieldValues>({ form, onSubmit, draftKey, onCancel, className, children }: FormWizardProps<TValues>) {
   const { t } = useAppTranslation('common');
   const steps = readSteps(children, t('wizard.review'));
   const ids = steps.map((step) => step.id);
   const wizard = useWizardSteps(ids);
   const current = steps[wizard.index];
   const draft = useWizardDraft(draftKey, form, wizard.index, wizard.goTo);
+  const [formError, setFormError] = useState<string[] | null>(null);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  // Read during render so react-hook-form tracks dirtiness (formState is a subscription proxy).
+  const isDirty = form.formState.isDirty;
+
+  /** Sends field errors to the first visible step that owns one; otherwise shows them as a form-level alert. */
+  const routeErrors = (messages: Record<string, string>) => {
+    const fields = Object.keys(messages);
+    const owners = steps
+      .map((step, index) => ({ step, index }))
+      .filter(({ step }) => stepFields(step).some((name) => fields.includes(name)));
+    if (owners.length === 0) {
+      setFormError(Object.values(messages));
+      return;
+    }
+    wizard.markErrored(owners.map(({ step }) => step.id));
+    wizard.goTo(owners[0].index);
+  };
   const isLast = wizard.index === steps.length - 1;
   const headingRef = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
@@ -127,10 +146,24 @@ function FormWizard<TValues extends FieldValues>({ form, onSubmit, draftKey, cla
     wizard.goTo(wizard.index + 1);
   };
 
-  const submit = form.handleSubmit(async (values) => {
-    await onSubmit(values);
-    draft.clear();
-  });
+  const submit = form.handleSubmit(
+    async (values) => {
+      setFormError(null);
+      try {
+        await onSubmit(values);
+        draft.clear();
+      } catch (error) {
+        if (!(error instanceof FormWizardError)) throw error;
+        for (const [name, message] of Object.entries(error.fieldErrors)) form.setError(name as Path<TValues>, { type: 'server', message });
+        routeErrors(error.fieldErrors);
+      }
+    },
+    (errors: FieldErrors<TValues>) => {
+      routeErrors(
+        Object.fromEntries(Object.entries(errors).map(([name, error]) => [name, String((error as { message?: unknown })?.message ?? '')])),
+      );
+    },
+  );
 
   return (
     <FormProvider {...form}>
@@ -152,14 +185,14 @@ function FormWizard<TValues extends FieldValues>({ form, onSubmit, draftKey, cla
           {/* An <ol> of steps (Stepper's root is a div, so its parts are composed into list items here). */}
           <ol aria-label={t('wizard.steps')} className="hidden w-full items-start gap-3 sm:flex">
             {steps.map((step, index) => {
-              const status =
-                index === wizard.index
+              // An errored step keeps its error icon while current, until Next passes it again.
+              const status = wizard.errored.has(step.id)
+                ? 'error'
+                : index === wizard.index
                   ? 'current'
-                  : wizard.errored.has(step.id)
-                    ? 'error'
-                    : wizard.completed.has(step.id)
-                      ? 'done'
-                      : 'next';
+                  : wizard.completed.has(step.id)
+                    ? 'done'
+                    : 'next';
               return (
                 <li key={step.id} className="flex flex-1 items-start gap-3 last:flex-none">
                   <Stepper.Step>
@@ -228,7 +261,20 @@ function FormWizard<TValues extends FieldValues>({ form, onSubmit, draftKey, cla
           </Fragment>
         </section>
 
+        <Conditional.If condition={!!formError}>
+          <Alert tone="danger">
+            <Alert.Title>{t('wizard.submitFailed')}</Alert.Title>
+            <Alert.Description>{formError?.join(' ')}</Alert.Description>
+          </Alert>
+        </Conditional.If>
+
         <div data-slot="form-wizard-actions" className="border-border-subtle flex items-center gap-2 border-t pt-4">
+          <Conditional.If condition={!!onCancel}>
+            <Button type="button" variant="ghost" onClick={() => (isDirty ? setConfirmCancel(true) : onCancel?.())}>
+              {t('cancel')}
+            </Button>
+          </Conditional.If>
+
           <Conditional.If condition={wizard.index > 0}>
             <Button type="button" variant="outline" onClick={() => wizard.goTo(wizard.index - 1)}>
               <ArrowLeft aria-hidden="true" className="size-4 rtl:-scale-x-100" />
@@ -258,6 +304,19 @@ function FormWizard<TValues extends FieldValues>({ form, onSubmit, draftKey, cla
           </div>
         </div>
       </form>
+
+      <ConfirmDialog
+        open={confirmCancel}
+        onOpenChange={setConfirmCancel}
+        tone="warning"
+        title={t('form.discardTitle')}
+        description={t('form.discardDescription')}
+        confirmLabel={t('form.discardConfirm')}
+        cancelLabel={t('form.keepEditing')}
+        onConfirm={() => onCancel?.()}
+      >
+        {null}
+      </ConfirmDialog>
     </FormProvider>
   );
 }
