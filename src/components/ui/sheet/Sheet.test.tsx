@@ -25,7 +25,7 @@ const Example = ({ dismissible, side }: { dismissible?: boolean; side?: 'end' | 
 );
 
 describe('Sheet', () => {
-  it('has its own parts and never replaces Dialog\'s (both wrap the same Radix root)', () => {
+  it("has its own parts and never replaces Dialog's (both wrap the same Radix root)", () => {
     expect(Sheet).not.toBe(Dialog);
     expect(Sheet.Content).not.toBe(Dialog.Content);
     expect(Dialog.Content.displayName).toBe('DialogContent');
@@ -37,6 +37,8 @@ describe('Sheet', () => {
     const sheet = screen.getByRole('dialog', { name: 'New appointment' });
     expect(sheet.querySelector('[data-slot="sheet-footer"]')?.textContent).toContain('Save');
     expect(sheet.querySelector('[data-slot="sheet-body"]')?.className).toContain('overflow-y-auto');
+    // A grid or flex body must pack its content to the top instead of stretching rows to fill the height.
+    expect(sheet.querySelector('[data-slot="sheet-body"]')?.className).toContain('content-start');
   });
 
   it('places side="end" with logical insets, so it opens on the left in Arabic', () => {

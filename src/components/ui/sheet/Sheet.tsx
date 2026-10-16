@@ -131,7 +131,7 @@ const SheetContent: FC<SheetContentProps> = ({
 };
 
 const SheetBody: FC<SheetSectionProps> = ({ className, ...props }) => (
-  <div data-slot="sheet-body" className={cn('min-h-0 flex-1 overflow-y-auto px-5 py-4', className)} {...props} />
+  <div data-slot="sheet-body" className={cn('min-h-0 flex-1 content-start overflow-y-auto px-5 py-4', className)} {...props} />
 );
 
 const SheetFooter: FC<SheetSectionProps> = ({ className, ...props }) => (
