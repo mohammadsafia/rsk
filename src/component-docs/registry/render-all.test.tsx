@@ -10,7 +10,7 @@ import { Tooltip } from '@components/ui';
 import { ThemeProvider } from '@contexts';
 
 import { getComponentDocsRegistry } from '@component-docs/registry';
-import { mdxComponents } from '@component-docs/gallery/utils';
+import { mdxComponents } from '@component-docs/mdx-components';
 
 import '../../i18n';
 

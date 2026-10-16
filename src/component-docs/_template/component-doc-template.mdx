@@ -7,18 +7,26 @@ description: One sentence describing what this component is for.
 tags: [ui, component-id]
 ---
 
-## Examples
+## Basic
 
 Replace these placeholders with the real component imports and examples.
 
-## Imports
-
-```tsx
-import { RealComponentName } from '@components/ui';
-```
+<Example title="Basic">
+  <RealComponentName />
+</Example>
 
 ## API
 
-| Prop | Type | Default | Notes |
-|---|---|---|---|
-| `className` | `string` | — | Merged with `cn`; style with semantic tokens (`bg-surface`, `text-fg-muted`). |
+<PropsTable
+  rows={[
+    { prop: 'className', type: 'string', description: 'Merged with cn; style with semantic tokens (bg-surface, text-fg-muted).' },
+  ]}
+/>
+
+## Accessibility
+
+- Role, keyboard support and labelling.
+
+## RTL notes
+
+- Mirrored icons, logical spacing, LTR-isolated values.

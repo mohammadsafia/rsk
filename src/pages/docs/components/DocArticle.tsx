@@ -6,7 +6,7 @@ import { MDXProvider } from '@mdx-js/react';
 import { Spinner } from '@components/ui';
 import { DocsProse } from '@component-docs';
 import type { ComponentDocEntry, DocComponent } from '@component-docs/registry';
-import { mdxComponents } from '@component-docs/gallery/utils';
+import { mdxComponents } from '@component-docs/mdx-components';
 
 import DocHeader from './DocHeader';
 import OnThisPage from './OnThisPage';

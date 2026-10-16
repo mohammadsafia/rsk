@@ -4,7 +4,8 @@ import path from 'node:path';
 import matter from 'gray-matter';
 import { z } from 'zod';
 
-const DOCS_ROOT = path.resolve(process.cwd(), 'src/component-docs');
+// DOCS_LINT_ROOT lets tests lint a throwaway folder instead of the real docs.
+const DOCS_ROOT = path.resolve(process.cwd(), process.env.DOCS_LINT_ROOT ?? 'src/component-docs');
 
 const REQUIRED_FRONTMATTER_KEYS = ['id', 'title', 'section', 'category', 'description'] as const;
 
@@ -82,6 +83,21 @@ function pushMissingRequiredErrors(errors: string[], relativePath: string, front
   return hasMissing;
 }
 
+// Page anatomy (component pages only): titled Examples, no hand-copied Code section, PropsTable for
+// the API, and closing API / Accessibility / RTL notes sections. Guides and foundations are prose pages.
+const NON_COMPONENT_FOLDERS = new Set(['GUIDES', 'DOCS']);
+
+function pushAnatomyErrors(errors: string[], relativePath: string, folderCategory: string, body: string) {
+  if (/<Example(?![^>]*\btitle=)[\s>]/.test(body)) errors.push(`${relativePath} has an Example without a title`);
+  if (NON_COMPONENT_FOLDERS.has(folderCategory)) return;
+
+  if (/^##\s+Code\s*$/m.test(body)) errors.push(`${relativePath} has a duplicated "Code" section (the Example's Code tab shows it)`);
+  if (/^\|\s*Prop\s*\|/m.test(body)) errors.push(`${relativePath} has a markdown props table, use <PropsTable>`);
+
+  const hasAnatomy = ['API', 'Accessibility', 'RTL notes'].every((heading) => new RegExp(`^##\\s+${heading}\\s*$`, 'm').test(body));
+  if (folderCategory !== 'FOUNDATIONS' && !hasAnatomy) errors.push(`${relativePath} is missing API / Accessibility / RTL notes section`);
+}
+
 function hasTemplatePlaceholders(raw: string): boolean {
   return TEMPLATE_PLACEHOLDER_MARKERS.some((marker) => raw.includes(marker));
 }
@@ -118,6 +134,8 @@ async function main(): Promise<void> {
     }
 
     checkDuplicateId(frontmatter.id, relativePath, firstPathById, errors);
+
+    pushAnatomyErrors(errors, relativePath, folderCategory, parsed.content);
 
     if (hasTemplatePlaceholders(raw)) {
       errors.push(`${relativePath} still contains template placeholder text`);

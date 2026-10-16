@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from 'vite-plus/test';
 import { Tooltip } from '@components/ui';
 
 import { getComponentDocsRegistry } from '@component-docs/registry';
-import { mdxComponents } from '@component-docs/gallery/utils';
+import { mdxComponents } from '@component-docs/mdx-components';
 import { MDXProvider } from '@mdx-js/react';
 
 import '../../i18n';

@@ -9,30 +9,32 @@ tags: [{{tagsInline}}]
 
 import { {{componentName}} } from '{{importPath}}';
 
-## Demo
+## Basic
 
-<div className="flex w-full flex-col gap-6">
+One sentence on when to use it. The Example's Code tab shows its own source, so there is no separate Code section.
+
+<Example title="Basic">
   <{{componentName}} />
-</div>
+</Example>
 
-## Imports
+## Variants
 
-```tsx
-import { {{componentName}} } from '{{importPath}}';
-```
-
-## Code
-
-```tsx
-<{{componentName}} />
-```
+<Example title="Variants">
+  <{{componentName}} />
+</Example>
 
 ## API
 
-| Prop | Type | Default | Notes |
-|---|---|---|---|
-| `className` | `string` | — | Merged with `cn`; style with semantic tokens (`bg-surface`, `text-fg-muted`), never palette or legacy names. |
+<PropsTable
+  rows={[
+    { prop: 'className', type: 'string', description: 'Merged with cn; style with semantic tokens (bg-surface, text-fg-muted), never palette or legacy names.' },
+  ]}
+/>
 
-## Conventions
+## Accessibility
 
-- Every part sets `data-slot`; JSX branches use `Conditional`; copy comes from i18n (EN and AR).
+- Role, keyboard support and labelling, as implemented in the source.
+
+## RTL notes
+
+- Mirrored icons, logical spacing, LTR-isolated values, or "No direction-specific behaviour".
