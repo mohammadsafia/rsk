@@ -2,7 +2,7 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vite-plus/test';
 
-import { AreaChart, LineChart } from '@components/charts';
+import { AreaChart, BarChart, LineChart } from '@components/charts';
 
 import i18n from '../../i18n';
 
@@ -15,8 +15,24 @@ beforeAll(() => {
     return { x: 0, y: 0, top: 0, left: 0, right: 640, bottom: 280, width: 640, height: 280, toJSON: () => ({}) };
   };
 });
+// Reduced motion: recharts animates bars and slices in from zero size, and happy-dom never advances frames.
+const originalMatchMedia = window.matchMedia;
+beforeAll(() => {
+  window.matchMedia = ((query: string) => ({
+    matches: query.includes('reduce'),
+    media: query,
+    onchange: null,
+    addListener() {},
+    removeListener() {},
+    addEventListener() {},
+    removeEventListener() {},
+    dispatchEvent: () => false,
+  })) as typeof window.matchMedia;
+});
+
 afterAll(() => {
   HTMLElement.prototype.getBoundingClientRect = originalRect;
+  window.matchMedia = originalMatchMedia;
 });
 
 afterEach(async () => {
@@ -70,5 +86,15 @@ describe('AreaChart', () => {
     const areas = [...document.querySelectorAll('.recharts-area-area')];
     expect(areas).toHaveLength(2);
     expect(areas[0].getAttribute('fill')).toBe('var(--chart-1)');
+  });
+});
+
+describe('BarChart', () => {
+  it('draws a bar per datum and series, horizontally on request', () => {
+    const { rerender } = render(<BarChart aria-label="Revenue by clinic" data={data} series={series} x={{ key: 'day' }} />);
+    expect(document.querySelectorAll('.recharts-bar-rectangle')).toHaveLength(6);
+
+    rerender(<BarChart aria-label="Revenue by clinic" data={data} series={series} x={{ key: 'day' }} orientation="horizontal" stacked />);
+    expect(document.querySelector('.recharts-bar-rectangle path')?.getAttribute('fill')).toBe('var(--chart-1)');
   });
 });

@@ -5,3 +5,4 @@ export { ChartFrame, type ChartFrameProps } from './ChartFrame';
 export { ChartTooltip } from './ChartTooltip';
 export { LineChart, type LineChartProps } from './LineChart';
 export { AreaChart, type AreaChartProps } from './AreaChart';
+export { BarChart, type BarChartProps } from './BarChart';
