@@ -28,11 +28,15 @@ const isTime = (value: unknown): value is string => {
   return minutes < 60 && (match[3] ? hours >= 1 && hours <= 12 : hours < 24);
 };
 
+// Only the list separator (and the escape char itself) is escaped: the same string is sent to servers as a plain
+// value, so URL encoding is left to nuqs / the HTTP client. Unescaping is manual, so a stray `%` can never throw.
+const escapeItem = (item: string) => item.replace(/%/g, '%25').replace(/,/g, '%2C');
+const unescapeItem = (item: string) => item.replace(/%2C/gi, ',').replace(/%25/g, '%');
+
 const listCodec: FilterCodec = {
-  serialize: (value) =>
-    Array.isArray(value) && value.length > 0 ? value.map((item) => encodeURIComponent(String(item))).join(',') : undefined,
+  serialize: (value) => (Array.isArray(value) && value.length > 0 ? value.map((item) => escapeItem(String(item))).join(',') : undefined),
   parse: (raw) => {
-    const values = raw.split(',').filter(Boolean).map(decodeURIComponent);
+    const values = raw.split(',').filter(Boolean).map(unescapeItem);
     return values.length > 0 ? values : undefined;
   },
 };

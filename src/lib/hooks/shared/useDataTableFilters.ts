@@ -17,7 +17,16 @@ type Options<TData> = {
 
 type Stored = { filters: Record<string, string>; q?: string };
 
-const columnIdOf = (column: ColumnDef<any, any>) => column.id ?? ('accessorKey' in column ? String(column.accessorKey) : undefined);
+/** TanStack's own id rule: explicit id, else accessorKey with dots as underscores, else a string header. */
+const columnIdOf = (column: ColumnDef<any, any>): string | undefined => {
+  if (column.id) return column.id;
+  if ('accessorKey' in column && column.accessorKey !== undefined) return String(column.accessorKey).replaceAll('.', '_');
+  return typeof column.header === 'string' ? column.header : undefined;
+};
+
+/** Leaf columns, descending into header groups. */
+const leafColumnsOf = <TData>(columns: ColumnDef<TData, any>[]): ColumnDef<TData, any>[] =>
+  columns.flatMap((column) => ('columns' in column && Array.isArray(column.columns) ? leafColumnsOf(column.columns) : [column]));
 
 const readSession = (key: string | undefined): Stored | undefined => {
   if (!key) return undefined;
@@ -45,7 +54,7 @@ export const useDataTableFilters = <TData>({ columns, urlSync = false, storageKe
 
   const filterable = useMemo(
     () =>
-      columns.flatMap((column) => {
+      leafColumnsOf(columns).flatMap((column) => {
         const id = columnIdOf(column);
         const meta = column.meta?.filterMeta as DataTableFilterMeta | undefined;
         return id && meta ? [{ id, codec: filterCodecFor(meta) }] : [];

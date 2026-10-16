@@ -113,7 +113,8 @@ describe('useDataTableFilters', () => {
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
     });
-    expect(updates.at(-1) ?? '').not.toContain('amount=');
+    expect(updates.length).toBeGreaterThan(0);
+    expect(updates.at(-1)).not.toContain('amount=');
   });
 
   it('reset clears filters, search, URL and session, and a remount stays clean', async () => {
@@ -140,4 +141,59 @@ describe('useDataTableFilters', () => {
     mount({ storageKey: 'members' });
     expect(names()).toBe('Sara,Omar');
   });
+
+  it('opens a link with a stray percent sign instead of crashing', () => {
+    mount({ urlSync: true }, '?role=%25');
+    expect(names()).toBe('');
+  });
+
+  it("persists columns with nested accessor keys under TanStack's column id", () => {
+    sessionStorage.setItem('rsk:table:clinics', JSON.stringify({ filters: { clinic_city: 'irbid' } }));
+    render(
+      <NuqsTestingAdapter>
+        <NestedPage />
+      </NuqsTestingAdapter>,
+    );
+    expect(screen.getByTestId('nested').textContent).toBe('Irbid');
+  });
 });
+
+type Clinic = { name: string; clinic: { city: string } };
+const nestedColumns: ColumnDef<Clinic>[] = [
+  {
+    accessorKey: 'clinic.city',
+    filterFn: inListFilterFn,
+    meta: {
+      filterMeta: createFilterMeta({
+        variant: 'multiSelect',
+        label: 'City',
+        options: [{ id: 'irbid' }],
+        getOptionLabel: (o: { id: string }) => o.id,
+        getOptionValue: (o: { id: string }) => o.id,
+      }),
+    },
+  },
+];
+
+function NestedPage() {
+  const filters = useDataTableFilters({ columns: nestedColumns, storageKey: 'clinics' });
+  const table = useReactTable({
+    data: [
+      { name: 'Irbid', clinic: { city: 'irbid' } },
+      { name: 'Amman', clinic: { city: 'amman' } },
+    ],
+    columns: nestedColumns,
+    state: filters.state,
+    onColumnFiltersChange: filters.onColumnFiltersChange,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+  });
+  return (
+    <p data-testid="nested">
+      {table
+        .getFilteredRowModel()
+        .rows.map((row) => row.original.name)
+        .join(',')}
+    </p>
+  );
+}

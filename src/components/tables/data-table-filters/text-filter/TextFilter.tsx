@@ -1,31 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { Column } from '@tanstack/react-table';
 
 import { Input, Popover } from '@components/ui';
 import { FilterPill } from '@components/tables/data-table-filters/filter-pill';
 
-import { useAppTranslation, useDebounce } from '@hooks/shared';
+import { useAppTranslation } from '@hooks/shared';
 
 import type { TextFilterMeta } from '@app-types';
 
 type TextFilterProps<TData> = { column: Column<TData>; filterMeta: TextFilterMeta };
 
+const COMMIT_DELAY = 300;
+
 function TextFilter<TData>({ column, filterMeta }: TextFilterProps<TData>) {
   const { t, direction } = useAppTranslation('common');
   const value = (column.getFilterValue() as string | undefined) ?? '';
   const [draft, setDraft] = useState(value);
-  const debounced = useDebounce(draft, 300);
+  const timer = useRef<ReturnType<typeof setTimeout>>();
 
-  useEffect(() => {
-    if (debounced.trim() === value) return;
-    column.setFilterValue(debounced.trim() || undefined);
-  }, [debounced, value, column]);
+  // Only typing commits, after a short pause, so an outside clear can never be undone by a stale debounce.
+  const onChange = (text: string) => {
+    setDraft(text);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => column.setFilterValue(text.trim() || undefined), COMMIT_DELAY);
+  };
 
-  // A reset from outside (✕, Clear filters) empties the box too.
+  // A clear from outside (✕, Clear filters) cancels any pending commit and empties the box.
   useEffect(() => {
-    if (!value) setDraft('');
+    if (value) return;
+    clearTimeout(timer.current);
+    setDraft('');
   }, [value]);
+
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   return (
     <Popover>
@@ -38,7 +46,7 @@ function TextFilter<TData>({ column, filterMeta }: TextFilterProps<TData>) {
           aria-label={filterMeta.label}
           placeholder={filterMeta.placeholder ?? t('filterBar.textPlaceholder')}
           value={draft}
-          onChange={(event) => setDraft(event.target.value)}
+          onChange={(event) => onChange(event.target.value)}
           autoFocus
         />
       </Popover.Content>

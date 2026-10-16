@@ -37,6 +37,16 @@ describe('filter codecs', () => {
     });
   }
 
+  it('round-trips awkward option values and never throws on a stray percent sign', () => {
+    const codec = filterCodecFor(select);
+    const values = ['In progress', 'a,b', 'محمد', '100%'];
+    expect(codec.parse(codec.serialize(values)!)).toEqual(values);
+    expect(codec.serialize(['In progress', 'محمد'])).toBe('In progress,محمد');
+    expect(() => codec.parse('%')).not.toThrow();
+    expect(codec.parse('%')).toEqual(['%']);
+    expect(() => codec.parse('%E0%A4%A')).not.toThrow();
+  });
+
   it('omits empty values and ignores malformed input', () => {
     expect(filterCodecFor(select).serialize([])).toBeUndefined();
     expect(filterCodecFor(meta('text')).serialize('')).toBeUndefined();
@@ -97,7 +107,7 @@ describe('getFilterQueryParams', () => {
       getFilteredRowModel: getFilteredRowModel(),
       state: {
         columnFilters: [
-          { id: 'role', value: ['admin'] },
+          { id: 'role', value: ['admin', 'In progress'] },
           { id: 'amount', value: { min: 10 } },
         ],
         globalFilter: 'sara',
@@ -105,6 +115,6 @@ describe('getFilterQueryParams', () => {
       onStateChange: () => {},
       renderFallbackValue: null,
     });
-    expect(getFilterQueryParams(table)).toEqual({ role: 'admin', amount: '10..', q: 'sara' });
+    expect(getFilterQueryParams(table)).toEqual({ role: 'admin,In progress', amount: '10..', q: 'sara' });
   });
 });

@@ -83,6 +83,18 @@ describe('text filter', () => {
   });
 });
 
+describe('text filter clearing', () => {
+  it('clears at once when its ✕ is clicked and does not come back after the debounce', async () => {
+    renderBar([{ id: 'patient', value: 'sa' }]);
+    fireEvent.click(screen.getByRole('button', { name: 'Remove Patient filter' }));
+    expect(pill('Patient').hasAttribute('data-active')).toBe(false);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 450));
+    });
+    expect(pill('Patient').hasAttribute('data-active')).toBe(false);
+  });
+});
+
 describe('number range filter', () => {
   it('summarises open and closed ranges with Western, LTR numbers', () => {
     renderBar([{ id: 'amount', value: { min: 0 } }]);
