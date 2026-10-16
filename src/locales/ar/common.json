@@ -112,7 +112,9 @@
     "cancelled": "أُلغي التغيير",
     "changeFailed": "تعذّر حفظ التغيير",
     "changeFailedHint": "أُعيد الحدث إلى مكانه.",
-    "unavailable": "غير متاح"
+    "unavailable": "غير متاح",
+    "moving": "نقل الحدث. تغيّر الأسهم الوقت واليوم، Enter للحفظ وEscape للإلغاء.",
+    "resizing": "تغيير المدة. تغيّر الأسهم وقت الانتهاء، Enter للحفظ وEscape للإلغاء."
   },
   "timePicker": {
     "placeholder": "اختر الوقت",

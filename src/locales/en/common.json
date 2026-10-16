@@ -96,7 +96,9 @@
     "cancelled": "Change cancelled",
     "changeFailed": "Couldn't save the change",
     "changeFailedHint": "The event is back where it was.",
-    "unavailable": "unavailable"
+    "unavailable": "unavailable",
+    "moving": "Moving. Arrow keys change the time and day, Enter saves, Escape cancels.",
+    "resizing": "Resizing. Arrow keys change the end time, Enter saves, Escape cancels."
   },
   "timePicker": {
     "placeholder": "Select time",

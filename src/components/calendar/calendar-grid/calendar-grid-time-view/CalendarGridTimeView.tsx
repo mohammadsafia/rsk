@@ -4,7 +4,7 @@ import { Conditional } from '@components/utils';
 import { Avatar, CalendarTimeGrid, type CalendarTimeGridAxisRow, Popover } from '@components/ui';
 import { type CalendarResource, useCalendarGridContext } from '@components/calendar';
 
-import { type DateInput, useDate } from '@hooks/shared';
+import { type DateInput, useAppTranslation, useDate } from '@hooks/shared';
 
 import { cn } from '@utils';
 
@@ -82,7 +82,10 @@ const EventSlot: FC<EventSlotProps> = ({ placement, columnIndex }) => {
       width={placement.width}
       data-event-id={id}
       className={cn(editable && 'touch-none', dragging && 'opacity-50')}
+      aria-keyshortcuts={editable ? 'M R' : undefined}
       onPointerDown={(event) => gestures.onEventPointerDown(event, placement.event, columnIndex)}
+      onKeyDown={(event) => gestures.onEventKeyDown(event, placement.event, columnIndex)}
+      onBlur={() => gestures.onEventBlur(placement.event)}
       onClick={(event) => {
         // The click that ends a drag must not open the popover (preventDefault also stops Radix's trigger).
         if (gestures.shouldSuppressClick()) {
@@ -177,6 +180,7 @@ const ResourceHeader: FC<{ resource: CalendarResource }> = ({ resource }) => (
 );
 
 const DayColumn: FC<{ column: GridColumn; index: number; wide: boolean }> = ({ column, index, wide }) => {
+  const { t } = useAppTranslation('common');
   const { events, eventAccessors, slots, startHour, endHour, stepMinutes, onSlotSelect } = useCalendarGridContext();
   const gestures = useTimeGridGestureContext();
   const { toDate, toDateUnits, isBefore, isAfter } = useDate();
@@ -238,9 +242,31 @@ const DayColumn: FC<{ column: GridColumn; index: number; wide: boolean }> = ({ c
 
       <DraftGhost columnIndex={index} />
 
-      {cells.map((cell, idx) => (
-        <CalendarTimeGrid.Cell key={idx} available={cell.isAvailable} />
-      ))}
+      {cells.map((cell, idx) => {
+        if (!onSlotSelect) return <CalendarTimeGrid.Cell key={idx} available={cell.isAvailable} />;
+
+        // Selectable cells: a roving tab stop, arrow keys between cells, Enter selects one step.
+        const start = startHour * 60 + idx * stepMinutes;
+        const allowed = gestures.isAllowed(index, start, start + stepMinutes);
+        const stop = gestures.tabStop();
+        const label = gestures.describe(index, start);
+
+        return (
+          <CalendarTimeGrid.Cell
+            key={idx}
+            available={cell.isAvailable}
+            aria-hidden={undefined}
+            role="button"
+            data-cell-row={idx}
+            tabIndex={stop.column === index && stop.row === idx ? 0 : -1}
+            aria-label={allowed ? label : `${label}, ${t('calendar.unavailable')}`}
+            aria-disabled={allowed ? undefined : true}
+            className="focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
+            onFocus={() => gestures.setFocusedCell({ column: index, row: idx })}
+            onKeyDown={(event) => gestures.onCellKeyDown(event, index, idx)}
+          />
+        );
+      })}
     </CalendarTimeGrid.Column>
   );
 };

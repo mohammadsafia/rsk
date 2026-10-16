@@ -1,10 +1,21 @@
-import { createContext, type PointerEvent as ReactPointerEvent, type RefObject, useContext, useEffect, useRef, useState } from 'react';
+import {
+  createContext,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+  type RefObject,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { useCalendarGridContext } from '@components/calendar';
 
 import { useAppTranslation, useDate } from '@hooks/shared';
 
 import {
+  clamp,
   columnAt,
   createRange,
   dayKeyOf,
@@ -39,6 +50,11 @@ type Session =
 const EDGE_PX = 32;
 const SCROLL_STEP_PX = 12;
 
+/** Arrow keys follow the visual direction: in RTL, ArrowLeft goes to the next column. */
+const isRtl = (element: Element) => element.closest('[dir]')?.getAttribute('dir') === 'rtl';
+
+type Cell = { column: number; row: number };
+
 export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObject<HTMLDivElement | null>) {
   const { t } = useAppTranslation('common');
   const { toDate, constants } = useDate();
@@ -58,11 +74,26 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
   const [draft, setDraft] = useState<Draft | null>(null);
   const suppressClick = useRef(false);
   const stopSession = useRef<(() => void) | null>(null);
+  const pendingFocus = useRef<string | null>(null);
+  const [focusedCell, setFocusedCell] = useState<Cell | null>(null);
 
   useEffect(() => () => stopSession.current?.(), []);
 
+  // A committed keyboard move remounts the card in its new column; give it focus back there.
+  useLayoutEffect(() => {
+    const id = pendingFocus.current;
+    if (!id) return;
+    const card = [...(scrollerRef.current?.querySelectorAll<HTMLElement>('[data-event-id]') ?? [])].find(
+      (element) => element.dataset.eventId === id,
+    );
+    if (!card) return;
+    pendingFocus.current = null;
+    card.focus();
+  });
+
   const min = startHour * 60;
   const max = endHour * 60;
+  const rowCount = Math.max(Math.floor((max - min) / stepMinutes), 1);
 
   /** No availability data counts as open; otherwise every step cell must overlap a slot. */
   const isAllowed = (columnIndex: number, start: number, end: number) => {
@@ -283,9 +314,115 @@ export function useTimeGridGestures(columns: GridColumn[], scrollerRef: RefObjec
     startSession(pressEvent, { kind: 'move', event, columnIndex, grab: hit.minute - start, duration: Math.max(end - start, stepMinutes) });
   };
 
+  /** M / R start a keyboard move or resize; arrows adjust, Enter saves, Escape cancels. */
+  const onEventKeyDown = (keyEvent: ReactKeyboardEvent<HTMLElement>, event: unknown, columnIndex: number) => {
+    const id = eventAccessors.getId(event);
+    const active = draft && draft.via === 'keyboard' && draft.eventId === id ? draft : null;
+
+    if (!active) {
+      if (!isEditable(event)) return;
+      const key = keyEvent.key.toLowerCase();
+      const kind = key === 'm' || keyEvent.code === 'KeyM' ? 'move' : key === 'r' || keyEvent.code === 'KeyR' ? 'resize' : null;
+      if (!kind) return;
+      keyEvent.preventDefault();
+      stopSession.current?.();
+      const start = minuteOfDay(eventAccessors.getStartTime(event));
+      const end = Math.max(minuteOfDay(eventAccessors.getEndTime(event)), start + stepMinutes);
+      setDraft({ kind, columnIndex, start, end, eventId: id, via: 'keyboard', allowed: true });
+      announce(t(kind === 'move' ? 'calendar.moving' : 'calendar.resizing'));
+      return;
+    }
+
+    let next: Draft;
+    switch (keyEvent.key) {
+      case 'ArrowUp':
+      case 'ArrowDown': {
+        const delta = keyEvent.key === 'ArrowUp' ? -stepMinutes : stepMinutes;
+        if (active.kind === 'move') {
+          const duration = active.end - active.start;
+          const start = clamp(active.start + delta, min, Math.max(min, max - duration));
+          next = { ...active, start, end: start + duration };
+        } else next = { ...active, end: clamp(active.end + delta, active.start + stepMinutes, Math.max(active.start + stepMinutes, max)) };
+        break;
+      }
+      case 'ArrowLeft':
+      case 'ArrowRight': {
+        keyEvent.preventDefault();
+        if (active.kind !== 'move') return;
+        const forward = (keyEvent.key === 'ArrowRight') !== isRtl(keyEvent.currentTarget);
+        next = { ...active, columnIndex: clamp(active.columnIndex + (forward ? 1 : -1), 0, columns.length - 1) };
+        break;
+      }
+      case 'Enter':
+        keyEvent.preventDefault();
+        setDraft(null);
+        pendingFocus.current = id;
+        apply(active, event);
+        return;
+      case 'Escape':
+        keyEvent.preventDefault();
+        setDraft(null);
+        announce(t('calendar.cancelled'));
+        return;
+      default:
+        return;
+    }
+
+    keyEvent.preventDefault();
+    setDraft(next);
+    announce(describe(next.columnIndex, next.start, next.end));
+  };
+
+  /** Leaving the card abandons an unsaved keyboard change. */
+  const onEventBlur = (event: unknown) => {
+    if (draft?.via === 'keyboard' && draft.eventId === eventAccessors.getId(event)) setDraft(null);
+  };
+
+  /** The single tab stop among the cells: the last focused one, else the first open cell of the first column. */
+  const tabStop = (): Cell => {
+    if (focusedCell) return focusedCell;
+    for (let row = 0; row < rowCount; row += 1) {
+      const start = min + row * stepMinutes;
+      if (isAllowed(0, start, start + stepMinutes)) return { column: 0, row };
+    }
+    return { column: 0, row: 0 };
+  };
+
+  const focusCell = (cell: Cell) => {
+    setFocusedCell(cell);
+    scrollerRef.current?.querySelector<HTMLElement>(`[data-column-index="${cell.column}"] [data-cell-row="${cell.row}"]`)?.focus();
+  };
+
+  const onCellKeyDown = (keyEvent: ReactKeyboardEvent<HTMLElement>, column: number, row: number) => {
+    const forward = !isRtl(keyEvent.currentTarget);
+    const moves: Record<string, Cell> = {
+      ArrowUp: { column, row: row - 1 },
+      ArrowDown: { column, row: row + 1 },
+      ArrowLeft: { column: column + (forward ? -1 : 1), row },
+      ArrowRight: { column: column + (forward ? 1 : -1), row },
+    };
+    const target = moves[keyEvent.key];
+    if (target) {
+      keyEvent.preventDefault();
+      focusCell({ column: clamp(target.column, 0, columns.length - 1), row: clamp(target.row, 0, rowCount - 1) });
+      return;
+    }
+    if (keyEvent.key !== 'Enter' && keyEvent.key !== ' ') return;
+    keyEvent.preventDefault();
+    const start = min + row * stepMinutes;
+    if (isAllowed(column, start, start + stepMinutes)) {
+      apply({ kind: 'create', columnIndex: column, start, end: start + stepMinutes, via: 'keyboard', allowed: true }, undefined);
+    }
+  };
+
   return {
     draft,
     setDraft,
+    onEventKeyDown,
+    onEventBlur,
+    onCellKeyDown,
+    tabStop,
+    setFocusedCell,
     isAllowed,
     label,
     describe,
