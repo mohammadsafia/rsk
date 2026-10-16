@@ -30,6 +30,10 @@ export type ChartFrameProps<T> = {
   children: (context: FrameContext) => ReactNode;
 };
 
+/** Table cells match the chart: missing values are a gap there, an em dash here. */
+export const formatCell = (raw: unknown, formatValue: (value: number) => string) =>
+  raw === null || raw === undefined || raw === '' || !Number.isFinite(Number(raw)) ? '—' : formatValue(Number(raw));
+
 const prefersReducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 export function ChartFrame<T>({
@@ -53,7 +57,10 @@ export function ChartFrame<T>({
   const [animate] = useState(() => !prefersReducedMotion());
 
   const colored: VisibleSeries[] = series.map((item, index) => ({ ...item, color: toneColor(item.tone, index) }));
-  const visible = colored.filter((item) => !hidden.has(item.key));
+  // Hidden keys are reconciled with the current series: stale keys are ignored, and the plot never goes blank.
+  const activeHidden = colored.filter((item) => hidden.has(item.key)).length;
+  const shown = colored.filter((item) => !hidden.has(item.key));
+  const visible = shown.length > 0 ? shown : colored;
   const showLegend = legend ?? series.length > 1;
   const isEmpty = !loading && data.length === 0;
 
@@ -61,7 +68,7 @@ export function ChartFrame<T>({
     setHidden((current) => {
       const next = new Set(current);
       if (next.has(key)) next.delete(key);
-      else if (colored.length - next.size > 1) next.add(key);
+      else if (colored.length - activeHidden > 1) next.add(key);
       return next;
     });
 
@@ -71,7 +78,7 @@ export function ChartFrame<T>({
       const record = datum as Record<string, unknown>;
       return {
         key: String(record[xKey] ?? index),
-        cells: [formatX(record[xKey]), ...colored.map((item) => formatValue(Number(record[item.key])))],
+        cells: [formatX(record[xKey]), ...colored.map((item) => formatCell(record[item.key], formatValue))],
       };
     }),
   };

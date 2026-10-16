@@ -46,7 +46,7 @@ export const VISITS = [
     { prop: 'aria-label', type: 'string', required: true, description: 'One-line summary of what the chart shows.' },
     { prop: 'data · series', type: 'T[] · { key; label; tone? }[]', required: true, description: 'Rows, and which keys to draw.' },
     { prop: 'x', type: '{ key; format? }', required: true, description: 'The category key and its label formatter.' },
-    { prop: 'valueFormat · currency', type: "'number' | 'percent' | 'money' | (v) => string · string", default: "'number'", description: 'How values read on the axis, tooltip and table.' },
+    { prop: 'valueFormat · currency', type: "'number' | 'percent' | 'money' | (v) => string · string", default: "'number'", description: 'How values read on the axis, tooltip and table. percent expects fractions (0.12 → 12%).' },
     { prop: 'height', type: 'number', default: '280', description: 'Plot height in px.' },
     { prop: 'loading · empty', type: 'boolean · ReactNode', description: 'Skeleton, or content when there is no data.' },
     { prop: 'stacked', type: 'boolean', default: 'false', description: 'Stack the series on top of each other.' },

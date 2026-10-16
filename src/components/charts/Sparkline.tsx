@@ -24,7 +24,8 @@ export function Sparkline<T>({ data, valueKey, tone = 'accent', height = 32, cla
     <div role="img" aria-label={rest['aria-label']} data-slot="sparkline" className={cn('w-full', className)} style={{ height }}>
       {data.length >= 2 && (
         <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 120, height }}>
-          <LineChart data={data} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
+          {/* No accessibility layer: it would add a focusable role="application" inside role="img". */}
+          <LineChart data={data} accessibilityLayer={false} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
             <XAxis hide reversed={isRTL} />
             <YAxis hide domain={['dataMin', 'dataMax']} />
             <Line dataKey={valueKey} type="monotone" stroke={toneColor(tone, 0)} strokeWidth={1.5} dot={false} isAnimationActive={false} />

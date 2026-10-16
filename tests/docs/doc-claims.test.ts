@@ -20,4 +20,12 @@ describe('docs claims match the components', () => {
   it('Select: the check mark sits at the end of each item', () => {
     expect(page('ui/Select.mdx')).not.toMatch(/check mark at the start/);
   });
+
+  it("DonutChart: slices start at 3 o'clock (recharts default), not at the top", () => {
+    expect(page('charts/DonutChart.mdx')).not.toMatch(/Slices start at the top/);
+  });
+
+  it('chart pages say percent expects fractions', () => {
+    for (const name of ['LineChart', 'AreaChart', 'BarChart']) expect(page(`charts/${name}.mdx`)).toMatch(/percent.*fraction/i);
+  });
 });

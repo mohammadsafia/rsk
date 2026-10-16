@@ -2,7 +2,7 @@ import { type ReactNode } from 'react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 import { toneColor } from './chart-theme';
-import { ChartFrame } from './ChartFrame';
+import { ChartFrame, formatCell } from './ChartFrame';
 import { ChartTooltip } from './ChartTooltip';
 import type { ValueFormat } from './types';
 import { useChartFormat } from './useChartFormat';
@@ -57,7 +57,7 @@ export function DonutChart<T>({
         columns: ['', ''],
         rows: data.map((datum) => ({
           key: String(record(datum)[nameKey]),
-          cells: [String(record(datum)[nameKey]), formatValue(Number(record(datum)[valueKey]))],
+          cells: [String(record(datum)[nameKey]), formatCell(record(datum)[valueKey], formatValue)],
         })),
       }}
     >

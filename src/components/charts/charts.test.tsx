@@ -149,6 +149,13 @@ describe('Sparkline', () => {
     expect(image.querySelector('.recharts-line-curve')?.getAttribute('stroke')).toBe('var(--accent)');
   });
 
+  it('adds no keyboard tab stop inside its img role', () => {
+    render(<Sparkline aria-label="Visits, last 7 days" data={data} valueKey="visits" />);
+    const image = screen.getByRole('img', { name: 'Visits, last 7 days' });
+    expect(image.querySelector('[tabindex="0"]')).toBeNull();
+    expect(image.querySelector('[role="application"]')).toBeNull();
+  });
+
   it('renders an empty labelled box with fewer than two points', () => {
     render(<Sparkline aria-label="Visits, last 7 days" data={[{ visits: 4 }]} valueKey="visits" />);
     const image = screen.getByRole('img', { name: 'Visits, last 7 days' });

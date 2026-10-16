@@ -65,6 +65,27 @@ describe('ChartFrame', () => {
     expect(screen.getByRole('button', { name: 'View as chart' }).getAttribute('aria-pressed')).toBe('true');
   });
 
+  it('shows an em dash in the table for null or missing values, matching the gap in the chart', () => {
+    render(
+      <Frame
+        data={[
+          { month: 'Jan', visits: 120, revenue: 0.12 },
+          { month: 'Feb', visits: null as unknown as number, revenue: undefined as unknown as number },
+        ]}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'View as table' }));
+    const febRow = screen.getByText('Feb').closest('tr')!;
+    expect([...febRow.querySelectorAll('td')].slice(1).map((cell) => cell.textContent)).toEqual(['—', '—']);
+  });
+
+  it('forgets hidden series that no longer exist, so the plot never goes blank', () => {
+    const { rerender } = render(<Frame />);
+    fireEvent.click(screen.getByRole('button', { name: 'Visits' }));
+    rerender(<Frame series={[{ key: 'visits', label: 'Visits' }]} />);
+    expect(screen.getByTestId('plot').textContent).toBe('visits:var(--chart-1)');
+  });
+
   it('shows a skeleton while loading and the empty state with no data', () => {
     const { rerender } = render(<Frame loading />);
     expect(screen.queryByTestId('plot')).toBeNull();
