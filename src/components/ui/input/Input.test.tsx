@@ -20,4 +20,15 @@ describe('Input', () => {
   it('hover never overrides the invalid border', () => {
     expect(fieldVariants()).toContain('hover:not-disabled:not-aria-invalid:border-fg-muted');
   });
+
+  it('lets the browser pick the direction of mixed values unless dir is given', () => {
+    render(
+      <>
+        <Input data-testid="auto" />
+        <Input data-testid="ltr" dir="ltr" />
+      </>,
+    );
+    expect(screen.getByTestId('auto').getAttribute('dir')).toBe('auto');
+    expect(screen.getByTestId('ltr').getAttribute('dir')).toBe('ltr');
+  });
 });

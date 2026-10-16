@@ -49,4 +49,12 @@ describe('Calendar', () => {
     expect(screen.getByRole('combobox', { name: /month/i })).toBeTruthy();
     expect(screen.getByRole('combobox', { name: /year/i })).toBeTruthy();
   });
+
+  it('shows clickable outside days in fg-muted and keeps fg-subtle for disabled days', () => {
+    render(<Calendar mode="single" defaultMonth={OCTOBER_2026} showOutsideDays />);
+    const outside = screen.getAllByRole('button').find((button) => button.dataset.outside === 'true')!;
+    expect(outside.className).toContain('data-[outside=true]:text-fg-muted');
+    expect(outside.className).toContain('data-[disabled=true]:text-fg-subtle');
+    expect(outside.closest('td')?.className).toContain('text-fg-muted');
+  });
 });

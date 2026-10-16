@@ -153,7 +153,7 @@ function CalendarGridRoot<TEvent>({
   initialViewMode = 'calendar',
   viewMode: controlledViewMode,
   onViewModeChange,
-  events,
+  events: rawEvents,
   eventAccessors,
   slots,
   startHour = DEFAULT_START_HOUR,
@@ -166,6 +166,16 @@ function CalendarGridRoot<TEvent>({
   children,
   ...divProps
 }: CalendarGridProps<TEvent>) {
+  // An unparseable start/end would throw inside the date grouping; skip such events instead of blanking the calendar.
+  const events = useMemo(
+    () =>
+      rawEvents.filter(
+        (event) =>
+          !Number.isNaN(Date.parse(eventAccessors.getStartTime(event))) && !Number.isNaN(Date.parse(eventAccessors.getEndTime(event))),
+      ),
+    [rawEvents, eventAccessors],
+  );
+
   const childArray = Children.toArray(children);
   const eventTemplateEl = childArray.find((c) => isValidElement(c) && c.type === EventTemplate);
   const popoverTemplateEl = childArray.find((c) => isValidElement(c) && c.type === PopoverTemplate);

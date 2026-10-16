@@ -90,15 +90,18 @@ const Group: FC<GroupProps> = ({ label, className, children, ...props }) => {
 const Item: FC<ItemProps> = ({ href, icon: Icon, active = false, badge, className, children, onClick, ...props }) => {
   const collapsed = useCollapsed();
   const { direction } = useAppTranslation();
-  const { mobileOpen, closeMobile } = useAppShell();
+  const { mobileOpen, closeMobile, contentId } = useAppShell();
 
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     onClick?.(event);
-    if (mobileOpen) closeMobile(false);
+    if (!mobileOpen) return;
+    closeMobile(false);
+    // The link is about to be hidden with the drawer; hand focus to the page it opens.
+    document.getElementById(contentId)?.focus();
   };
 
   return (
-    <Tooltip content={children} side={direction === 'rtl' ? 'left' : 'right'} disabled={!collapsed}>
+    <Tooltip content={children} side={direction === 'rtl' ? 'left' : 'right'} disabled={!collapsed || mobileOpen}>
       <Link
         to={href}
         data-slot="sidebar-item"
@@ -132,12 +135,15 @@ const Item: FC<ItemProps> = ({ href, icon: Icon, active = false, badge, classNam
 
 const SubMenu: FC<SubMenuProps> = ({ icon: Icon, label, active = false, children }) => {
   const collapsed = useCollapsed();
-  const { setCollapsed } = useAppShell();
+  const { direction } = useAppTranslation();
+  const { setCollapsed, mobileOpen } = useAppShell();
   const [open, setOpen] = useState(active);
   const panelId = useId();
+  // Collapsing is a desktop (md+) state; the mobile drawer always shows the full sidebar.
+  const iconOnly = collapsed && !mobileOpen;
 
   const handleClick = () => {
-    if (collapsed) {
+    if (iconOnly) {
       setCollapsed(false);
       setOpen(true);
       return;
@@ -147,25 +153,27 @@ const SubMenu: FC<SubMenuProps> = ({ icon: Icon, label, active = false, children
 
   return (
     <div data-slot="sidebar-submenu" className="flex flex-col gap-0.5">
-      <button
-        type="button"
-        aria-expanded={open && !collapsed}
-        aria-controls={panelId}
-        data-active={active || undefined}
-        className={cn(ROW, 'data-[active]:text-fg', collapsed && 'md:justify-center md:px-0')}
-        onClick={handleClick}
-      >
-        <Icon aria-hidden="true" />
+      <Tooltip content={label} side={direction === 'rtl' ? 'left' : 'right'} disabled={!iconOnly}>
+        <button
+          type="button"
+          aria-expanded={open && !iconOnly}
+          aria-controls={panelId}
+          data-active={active || undefined}
+          className={cn(ROW, 'data-[active]:text-fg', collapsed && 'md:justify-center md:px-0')}
+          onClick={handleClick}
+        >
+          <Icon aria-hidden="true" />
 
-        <span className={cn('flex-1 truncate text-start', collapsed && 'md:sr-only')}>{label}</span>
+          <span className={cn('flex-1 truncate text-start', collapsed && 'md:sr-only')}>{label}</span>
 
-        <ChevronDown
-          aria-hidden="true"
-          className={cn('transition-transform motion-reduce:transition-none', open && 'rotate-180', collapsed && 'md:hidden')}
-        />
-      </button>
+          <ChevronDown
+            aria-hidden="true"
+            className={cn('transition-transform motion-reduce:transition-none', open && 'rotate-180', collapsed && 'md:hidden')}
+          />
+        </button>
+      </Tooltip>
 
-      <Conditional.If condition={open && !collapsed}>
+      <Conditional.If condition={open && !iconOnly}>
         <div id={panelId} className="flex flex-col gap-0.5 ps-7">
           {children}
         </div>

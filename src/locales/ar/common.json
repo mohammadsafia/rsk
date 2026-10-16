@@ -134,9 +134,9 @@
     "noOptions": "لا توجد خيارات",
     "unassigned": "غير مُسند",
     "noAssignees": "لا يوجد مُسند إليهم",
-    "documents_zero": "مستندات",
+    "documents_zero": "مستند",
     "documents_one": "مستند",
-    "documents_two": "مستندان",
+    "documents_two": "مستند",
     "documents_few": "مستندات",
     "documents_many": "مستندًا",
     "documents_other": "مستند"

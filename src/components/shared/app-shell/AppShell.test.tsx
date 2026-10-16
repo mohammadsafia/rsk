@@ -122,6 +122,36 @@ describe('AppShell', () => {
     expect(sentinel.className).toMatch(/(^|\s)absolute(\s|$)/);
   });
 
+  it('stops the sidebar width transition under reduced motion', () => {
+    renderShell();
+    expect(aside().className).toContain('md:motion-reduce:transition-none');
+  });
+
+  it('moves focus to the page after choosing a drawer item', () => {
+    renderShell();
+    fireEvent.click(menuButton());
+    fireEvent.click(screen.getByRole('link', { name: 'Members' }));
+    expect(document.activeElement).toBe(screen.getByRole('main'));
+  });
+
+  it('closes the drawer when the viewport widens to desktop', () => {
+    const listeners: Array<(event: { matches: boolean }) => void> = [];
+    vi.spyOn(window, 'matchMedia').mockImplementation(
+      (query: string) =>
+        ({
+          matches: false,
+          media: query,
+          addEventListener: (_: string, listener: (event: { matches: boolean }) => void) => listeners.push(listener),
+          removeEventListener: () => {},
+        }) as unknown as MediaQueryList,
+    );
+    renderShell();
+    fireEvent.click(menuButton());
+    expect(aside().getAttribute('data-open')).toBe('true');
+    act(() => listeners.forEach((listener) => listener({ matches: true })));
+    expect(aside().getAttribute('data-open')).toBe('false');
+  });
+
   it('offers a skip link to the main content', () => {
     renderShell();
     const skip = screen.getByRole('link', { name: 'Skip to content' });

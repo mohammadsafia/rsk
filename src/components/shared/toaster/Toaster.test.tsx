@@ -32,4 +32,20 @@ describe('Toaster', () => {
     expect(screen.getByRole('region', { name: /الإشعارات/ })).toBeTruthy();
     await act(() => i18n.changeLanguage('en'));
   });
+
+  it('swipes toward the inline-end edge in both directions', async () => {
+    await act(() => i18n.changeLanguage('ar'));
+    render(<Toaster />);
+    act(() => {
+      toast({ title: 'تم الحفظ' });
+    });
+    expect((await screen.findByText('تم الحفظ')).closest('[data-slot="toast"]')?.getAttribute('data-swipe-direction')).toBe('left');
+    cleanup();
+    await act(() => i18n.changeLanguage('en'));
+    render(<Toaster />);
+    act(() => {
+      toast({ title: 'Saved' });
+    });
+    expect((await screen.findByText('Saved')).closest('[data-slot="toast"]')?.getAttribute('data-swipe-direction')).toBe('right');
+  });
 });

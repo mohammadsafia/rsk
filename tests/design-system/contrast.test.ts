@@ -123,3 +123,21 @@ describe('status text on its own tint (WCAG AA text)', () => {
     }
   }
 });
+
+/** Body text on every tint (selected rows use accent-subtle; calendar events use each status tint). SP2 deferred, owned by SP3 Plan C. */
+describe('fg and fg-muted on tints (WCAG AA text)', () => {
+  for (const mode of ['.light', '.dark'] as const) {
+    const vars = extractBlock(tokensCss, mode);
+    const surface = oklchToSrgb(parseOklch(resolveToken(vars, 'surface')));
+
+    for (const tint of ['accent', 'success', 'warning', 'danger', 'info'] as const) {
+      for (const text of ['fg', 'fg-muted'] as const) {
+        it(`${mode} ${text} on ${tint}-subtle ≥ ${TEXT}:1`, () => {
+          const foreground = oklchToSrgb(parseOklch(resolveToken(vars, text)));
+          const background = compositeOver(parseOklch(resolveToken(vars, `${tint}-subtle`)), surface);
+          expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(TEXT);
+        });
+      }
+    }
+  }
+});

@@ -12,7 +12,7 @@
   --overlay: oklch(0.205 0.006 271.1 / 40%);
 
   --fg: oklch(0.205 0.006 271.1);
-  --fg-muted: oklch(0.544 0.015 262.3);
+  --fg-muted: oklch(0.53 0.015 262.3);
   --fg-subtle: oklch(0.656 0.012 264.5);
   --fg-inverse: oklch(1 0 0);
 

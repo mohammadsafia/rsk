@@ -21,7 +21,7 @@ const CollapsibleContent: FC<CollapsibleContentProps> = ({ className, ...props }
   <CollapsiblePrimitive.Content
     data-slot="collapsible-content"
     className={cn(
-      'data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down overflow-hidden transition-all',
+      'data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down overflow-hidden transition-all motion-reduce:animate-none motion-reduce:transition-none',
       className,
     )}
     {...props}

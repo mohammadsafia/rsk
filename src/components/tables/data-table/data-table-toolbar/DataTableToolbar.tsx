@@ -109,8 +109,7 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
         <div className="overflow-hidden">
           <div
             id={filtersId}
-            role="toolbar"
-            aria-orientation="horizontal"
+            role="group"
             aria-label={t('filters')}
             className="border-border-subtle flex items-center gap-3 border-t px-4 py-2"
           >

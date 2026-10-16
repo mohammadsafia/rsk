@@ -19,7 +19,7 @@ describe('FileCard parts', () => {
 
     await act(() => i18n.changeLanguage('ar'));
     render(<FileCard.FolderShape count={2} />);
-    expect(screen.getByText('مستندان')).toBeTruthy();
+    expect(screen.getByText('مستند')).toBeTruthy();
   });
 
   it('translates the default approve and reject labels', async () => {

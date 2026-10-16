@@ -4,10 +4,10 @@ import { useAppTranslation, useToast } from '@hooks/shared';
 
 function Toaster() {
   const { toasts } = useToast();
-  const { t } = useAppTranslation('common');
+  const { t, direction } = useAppTranslation('common');
 
   return (
-    <Toast.Provider duration={5000} label={t('toast.label')}>
+    <Toast.Provider duration={5000} label={t('toast.label')} swipeDirection={direction === 'rtl' ? 'left' : 'right'}>
       {toasts.map(({ id, title, description, action, ...props }) => (
         <Toast key={id} {...props}>
           <Toast.Icon />

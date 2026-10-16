@@ -52,7 +52,7 @@ describe('CalendarGrid localisation', () => {
     await act(() => i18n.changeLanguage('ar'));
     renderGrid('month');
     expect(screen.queryByText('Sun')).toBeNull();
-    expect(screen.queryByText('SUN')).toBeNull();
+    expect(screen.getByText('أحد')).toBeTruthy();
   });
 
   it('labels the time axis by hour in Arabic with Western digits', async () => {
@@ -72,5 +72,19 @@ describe('CalendarGrid localisation', () => {
     renderGrid('day');
     const cardDate = screen.getByText('Sara Haddad').parentElement?.querySelector('.sr-only');
     expect(cardDate?.textContent).toContain('October 16, 2026');
+  });
+
+  it('skips an event with an unparseable date instead of crashing the grid', () => {
+    const broken: Visit[] = [{ id: 'x', start: 'not-a-date', end: 'not-a-date', patient: 'Broken' }];
+    render(
+      <Tooltip.Provider>
+        <CalendarGrid initialView="month" initialDate="2026-10-16" events={[...visits, ...broken]} eventAccessors={accessors}>
+          <CalendarGrid.EventTemplate<Visit>>{(visit) => visit.patient}</CalendarGrid.EventTemplate>
+          <CalendarGrid.MonthView />
+        </CalendarGrid>
+      </Tooltip.Provider>,
+    );
+    expect(screen.getByText('Sara Haddad')).toBeTruthy();
+    expect(screen.queryByText('Broken')).toBeNull();
   });
 });

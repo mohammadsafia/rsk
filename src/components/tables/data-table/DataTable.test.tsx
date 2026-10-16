@@ -81,4 +81,9 @@ describe('DataTable', () => {
     const html = document.querySelector('[data-slot="data-table"]')?.innerHTML ?? '';
     expect(html).not.toMatch(/bg-background|text-muted-400|bg-primary-25|muted-200|bg-muted-50|fill-primary|(^|\s)shadow(\s|")/);
   });
+
+  it('labels the filter row as a group, not an arrow-key toolbar', () => {
+    render(<Harness total={2} />);
+    expect(document.querySelector('[aria-label="Filters"]')?.getAttribute('role')).toBe('group');
+  });
 });
