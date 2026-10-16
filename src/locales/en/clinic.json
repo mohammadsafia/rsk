@@ -13,7 +13,8 @@
       "doctor": "Primary doctor",
       "insurer": "Insurer",
       "lastVisit": "Last visit",
-      "balance": "Balance"
+      "balance": "Balance",
+      "registered": "Registered"
     },
     "empty": {
       "title": "No patients yet",

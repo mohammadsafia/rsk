@@ -111,4 +111,12 @@ describe('PatientsPage', () => {
     fireEvent.click(within(screen.getByRole('columnheader', { name: /الطبيب المعالج/ })).getByText('الطبيب المعالج'));
     await waitFor(() => expect(screen.getAllByRole('row')[1].textContent).toContain('د. رانيا ناصر'));
   });
+
+  it('sorts newest registrations first with ?sort=created', async () => {
+    renderClinic(<PatientsPage />, { route: '/patients?sort=created', path: '/patients' });
+    const newest = [...clinicStore.read().patients].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))[0];
+    await screen.findByText(newest.name.en);
+    expect(screen.getAllByRole('row')[1].textContent).toContain(newest.name.en);
+    expect(screen.getByRole('columnheader', { name: /Registered/ })).toBeTruthy();
+  });
 });

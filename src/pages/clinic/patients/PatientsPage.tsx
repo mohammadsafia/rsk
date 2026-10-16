@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import {
   type ColumnDef,
@@ -153,6 +153,15 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }:
       },
     },
     {
+      id: 'createdAt',
+      accessorFn: (patient) => patient.createdAt.slice(0, 10),
+      header: t('patients.columns.registered'),
+      enableSorting: true,
+      sortDescFirst: true,
+      cell: ({ row }) => <bdi className="text-fg-muted tabular-nums">{formatVisit(row.original.createdAt)}</bdi>,
+      meta: { label: t('patients.columns.registered') },
+    },
+    {
       accessorKey: 'balance',
       header: t('patients.columns.balance'),
       enableSorting: true,
@@ -167,6 +176,9 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }:
 function PatientsPage() {
   const { t, i18n } = useAppTranslation('clinic');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // `?sort=created` (from the dashboard's New patients card) lists the newest registrations first.
+  const initialSorting = searchParams.get('sort') === 'created' ? [{ id: 'createdAt', desc: true }] : [{ id: 'name', desc: false }];
   const localize = useLocalized();
   const { formatNullableDate, constants } = useDate();
   const patients = usePatients();
@@ -192,7 +204,7 @@ function PatientsPage() {
     globalFilterFn: searchPatients,
     getColumnCanGlobalFilter: (column) => SEARCHABLE.has(column.id),
     enableSortingRemoval: true,
-    initialState: { pagination: { pageSize: 10 }, sorting: [{ id: 'name', desc: false }] },
+    initialState: { pagination: { pageSize: 10 }, sorting: initialSorting },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
