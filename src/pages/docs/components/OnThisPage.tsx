@@ -6,22 +6,29 @@ import { cn } from '@utils';
 
 type Heading = { depth: number; text: string; slug: string };
 
+/** Distance from the top of the viewport, below the sticky top bar, at which a heading becomes current. */
+const READING_LINE = 120;
+
 export default function OnThisPage({ headings }: { headings: ReadonlyArray<Heading> }) {
   const { t } = useAppTranslation('docs');
   const [active, setActive] = useState(headings[0]?.slug);
 
+  // The active section is the last heading above the reading line. Headings are looked up on every scroll,
+  // not once on mount, because the MDX body loads lazily and usually mounts after this outline. Scroll
+  // events don't bubble, so listen in the capture phase to hear the docs content scroller.
   useEffect(() => {
-    if (typeof IntersectionObserver === 'undefined') return;
-    const targets = headings.map((heading) => document.getElementById(heading.slug)).filter((node): node is HTMLElement => !!node);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.find((entry) => entry.isIntersecting);
-        if (visible) setActive(visible.target.id);
-      },
-      { rootMargin: '0px 0px -70% 0px' },
-    );
-    targets.forEach((target) => observer.observe(target));
-    return () => observer.disconnect();
+    const update = () => {
+      let current = headings[0]?.slug;
+      for (const heading of headings) {
+        const node = document.getElementById(heading.slug);
+        if (node && node.getBoundingClientRect().top <= READING_LINE) current = heading.slug;
+      }
+      setActive(current);
+    };
+
+    update();
+    document.addEventListener('scroll', update, { capture: true, passive: true });
+    return () => document.removeEventListener('scroll', update, { capture: true });
   }, [headings]);
 
   if (headings.length === 0) return null;

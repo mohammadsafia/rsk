@@ -14,8 +14,10 @@ export type ExampleProps = { title: string; description?: ReactNode; code?: stri
 
 /** A framed live example with Preview · Code. `code` is injected at build time by scripts/docs/remark-docs.ts. */
 export function Example({ title, description, code = '', className, children }: ExampleProps) {
-  const { t } = useAppTranslation('docs');
-  const [rtl, setRtl] = useState(false);
+  const { t, isRTL } = useAppTranslation('docs');
+  // null = follow the app direction until the reader flips it.
+  const [rtlOverride, setRtlOverride] = useState<boolean | null>(null);
+  const rtl = rtlOverride ?? isRTL;
   const [dark, setDark] = useState<boolean | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -40,7 +42,7 @@ export function Example({ title, description, code = '', className, children }: 
             <Tabs.Trigger value="code">{t('example.code')}</Tabs.Trigger>
           </Tabs.List>
 
-          <Button size="sm" variant="ghost" aria-pressed={rtl} onClick={() => setRtl((value) => !value)}>
+          <Button size="sm" variant="ghost" aria-pressed={rtl} onClick={() => setRtlOverride(!rtl)}>
             {t('example.rtl')}
           </Button>
 

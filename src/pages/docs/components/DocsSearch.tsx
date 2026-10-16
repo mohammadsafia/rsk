@@ -66,8 +66,13 @@ export default function DocsSearch() {
                     }}
                   >
                     <span className="flex min-w-0 flex-col">
-                      <span className="text-fg truncate">{item.title}</span>
-                      <span className="text-fg-muted truncate text-xs">{item.subtitle}</span>
+                      {/* Docs content is English: dir="auto" keeps it LTR (and truncating at its end) in Arabic. */}
+                      <span dir="auto" className="text-fg truncate">
+                        {item.title}
+                      </span>
+                      <span dir="auto" className="text-fg-muted truncate text-xs">
+                        {item.subtitle}
+                      </span>
                     </span>
                   </Command.Item>
                 ))}

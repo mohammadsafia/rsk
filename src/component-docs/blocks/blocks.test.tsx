@@ -47,6 +47,19 @@ describe('Example', () => {
     expect(document.documentElement.getAttribute('dir')).not.toBe('rtl');
   });
 
+  it('previews in the app direction by default, so Arabic readers see components right to left', async () => {
+    await act(() => i18n.changeLanguage('ar'));
+    renderExample();
+    const [first] = document.querySelectorAll('[data-slot="docs-example-preview"]');
+    const [rtlToggle] = screen.getAllByRole('button', { name: 'من اليمين' });
+
+    expect(first.getAttribute('dir')).toBe('rtl');
+    expect(rtlToggle.getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(rtlToggle);
+    expect(first.getAttribute('dir')).toBe('ltr');
+  });
+
   it('copies the code', async () => {
     const writes: string[] = [];
     Object.defineProperty(navigator, 'clipboard', {

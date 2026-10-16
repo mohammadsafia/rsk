@@ -9,7 +9,7 @@ import { Tooltip } from '@components/ui';
 import { ThemeProvider } from '@contexts';
 import { docsRoutes } from '@routes';
 
-import '../../i18n';
+import i18n from '../../i18n';
 
 afterEach(cleanup);
 
@@ -44,6 +44,29 @@ describe('docs shell and routes', () => {
     at('/docs/components/toast');
     await screen.findByRole('heading', { level: 1, name: 'Toast' });
     expect(document.querySelector('[data-slot="toast-viewport"]')).not.toBeNull();
+  });
+
+  it('has one main landmark, with the article prose flush with its header and real heading/list styles', async () => {
+    at('/docs');
+    await screen.findByRole('heading', { level: 1, name: 'Introduction' });
+
+    expect(screen.getAllByRole('main')).toHaveLength(1);
+    const prose = document.querySelector('[data-slot="docs-prose"]')!;
+    expect(prose.className).not.toMatch(/(^|\s)px-/);
+    expect(prose.className).toMatch(/\[&>h2\]:/);
+    expect(prose.className).toMatch(/\[&>ul\]:list-disc/);
+  });
+
+  it('in Arabic keeps the English article left to right, while examples preview right to left', async () => {
+    await act(() => i18n.changeLanguage('ar'));
+    at('/docs/components/button');
+    await screen.findByRole('heading', { level: 1, name: 'Button' });
+
+    const article = document.querySelector('article')!;
+    expect(article.getAttribute('lang')).toBe('en');
+    expect(article.getAttribute('dir')).toBe('ltr');
+    expect(article.querySelector('[data-slot="docs-example-preview"]')?.getAttribute('dir')).toBe('rtl');
+    await act(() => i18n.changeLanguage('en'));
   });
 
   it('redirects the old gallery links', async () => {

@@ -44,6 +44,18 @@ describe('docs search', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/docs/components/button'));
   });
 
+  it('lets each result take its own text direction, so English results read and truncate correctly in Arabic', async () => {
+    mount();
+    fireEvent.keyDown(document, { key: 'k', metaKey: true });
+    const input = await screen.findByRole('combobox');
+    fireEvent.change(input, { target: { value: 'button' } });
+
+    const option = (await screen.findAllByRole('option'))[0];
+    const lines = option.querySelectorAll('span > span');
+    expect(lines.length).toBeGreaterThan(0);
+    lines.forEach((line) => expect(line.getAttribute('dir')).toBe('auto'));
+  });
+
   it('ignores Arabic diacritics', () => {
     const index = buildSearchIndex([
       {

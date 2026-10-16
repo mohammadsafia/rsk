@@ -47,7 +47,9 @@ export default function DocArticle({ entry }: { entry: ComponentDocEntry }) {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl gap-10 px-6 py-10">
-      <article className="min-w-0 flex-1">
+      {/* Docs prose is English in v1 (spec): keep it left to right inside the Arabic chrome. Examples still
+          preview in the app direction. */}
+      <article lang="en" dir="ltr" className="min-w-0 flex-1">
         <DocHeader entry={entry} />
 
         <Suspense
@@ -58,7 +60,7 @@ export default function DocArticle({ entry }: { entry: ComponentDocEntry }) {
           }
         >
           <MDXProvider components={mdxComponents}>
-            <DocsProse variant="panel">
+            <DocsProse>
               <Doc />
             </DocsProse>
           </MDXProvider>

@@ -126,7 +126,7 @@ export const CalendarGridDemo = () => {
   }, [range, hasSlots, hasEvents, events, slots]);
 
   return (
-    <div className="flex h-190 flex-col">
+    <div className="flex h-190 w-full min-w-0 flex-col">
       <CalendarGrid
         initialView="week"
         viewMode={viewMode}

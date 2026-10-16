@@ -16,7 +16,9 @@ export const mdxComponents: MDXComponents = {
   DoDont,
   pre: (props: ComponentPropsWithoutRef<'pre'>) => <CodeBlock {...props} />,
   // Inline code (block code is wrapped by CodeBlock's LTR <pre>): keep identifiers left-to-right inside Arabic prose.
-  code: ({ className, ...props }: ComponentPropsWithoutRef<'code'>) => <code dir="ltr" className={cn('font-mono', className)} {...props} />,
+  code: ({ className, ...props }: ComponentPropsWithoutRef<'code'>) => (
+    <code dir="ltr" className={cn('font-mono text-sm', className)} {...props} />
+  ),
   table: (props: ComponentPropsWithoutRef<'table'>) => (
     <div className="not-prose border-border my-6 overflow-x-auto rounded-lg border">
       <Table {...props} />
