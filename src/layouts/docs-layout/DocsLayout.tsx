@@ -2,7 +2,7 @@ import { Suspense, useMemo } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 
 import { Spinner } from '@components/ui';
-import { AppShell, LanguageSwitcher, Logo, Sidebar, ThemeSwitcher } from '@components/shared';
+import { AppShell, LanguageSwitcher, Logo, Sidebar, ThemeSwitcher, Toaster } from '@components/shared';
 import { getComponentDocsRegistry } from '@component-docs/registry';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -76,6 +76,8 @@ function DocsLayout() {
           <Outlet />
         </Suspense>
       </AppShell.Content>
+
+      <Toaster />
     </AppShell>
   );
 }

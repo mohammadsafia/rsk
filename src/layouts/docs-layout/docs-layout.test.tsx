@@ -40,6 +40,12 @@ describe('docs shell and routes', () => {
     expect(screen.getByRole('link', { name: 'Button' }).getAttribute('aria-current')).toBe('page');
   });
 
+  it('mounts a toaster so the toast demos on docs pages can show', async () => {
+    at('/docs/components/toast');
+    await screen.findByRole('heading', { level: 1, name: 'Toast' });
+    expect(document.querySelector('[data-slot="toast-viewport"]')).not.toBeNull();
+  });
+
   it('redirects the old gallery links', async () => {
     const router = at('/components/button');
     await screen.findByRole('heading', { level: 1, name: 'Button' });
