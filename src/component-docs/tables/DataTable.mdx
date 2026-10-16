@@ -511,7 +511,7 @@ For all the above, prefer the action-icon pattern.
     { prop: 'onResetFilters', type: '() => void', description: 'Called by "Clear filters"; pass useDataTableFilters().reset.' },
     { prop: 'Toolbar · totalCount · totalLabel · placeholder', type: 'number · string · string', description: 'Search box, filter pills and the result count.' },
     { prop: 'Content · emptyState', type: '{ title, description }', description: 'Scrollable body with a pinned header; message when no rows match.' },
-    { prop: 'BulkActions · children', type: '(rows: Row<TData>[]) => ReactNode', description: 'Action buttons shown while rows are selected.' },
+    { prop: 'BulkActions · children', type: '(rows: Row<TData>[], ids: string[]) => ReactNode', description: 'Action buttons; rows are the loaded selected rows, ids every selected id (including other server-side pages).' },
     { prop: 'createSelectionColumn · getRowLabel', type: '(row: TData) => string', description: 'Names each row checkbox ("Select INV-0142").' },
     { prop: 'Pagination · pageSizeOptions', type: 'number[]', default: '[30, 50, 100, 200]', description: 'Page navigation and rows-per-page selector.' },
   ]}

@@ -53,6 +53,18 @@ describe('Timeline', () => {
     expect(onLoadMore).toHaveBeenCalledOnce();
   });
 
+  it('shows the empty state for an empty mapped list', () => {
+    const events: string[] = [];
+    wrap(
+      <Timeline>
+        {events.map((event) => (
+          <Timeline.Item key={event} title={event} />
+        ))}
+      </Timeline>,
+    );
+    expect(screen.getByText('No activity yet')).toBeTruthy();
+  });
+
   it('groups items by local day, newest first, labelling today and yesterday', () => {
     const now = new Date();
     const earlier = new Date(now.getTime() - 60_000);

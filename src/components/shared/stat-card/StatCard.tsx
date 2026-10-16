@@ -71,12 +71,14 @@ const StatCard: FC<StatCardProps> = ({ label, value, trend, caption, sparkline, 
       <div className="flex items-end justify-between gap-3">
         <Conditional.If condition={!!trend && !loading}>
           <span
-            aria-label={trendLabel}
+            data-slot="stat-card-trend"
             className={cn(
               'inline-flex items-center gap-1 text-xs font-medium',
               direction === 'flat' ? 'text-fg-muted' : good ? 'text-success' : 'text-danger',
             )}
           >
+            {/* Real text: an aria-label on a generic span is ignored by many screen readers. */}
+            <span className="sr-only">{trendLabel}</span>
             <TrendIcon aria-hidden="true" className="size-3.5 rtl:-scale-x-100" />
             <span aria-hidden="true" dir="ltr" className="tabular-nums">
               {percent}

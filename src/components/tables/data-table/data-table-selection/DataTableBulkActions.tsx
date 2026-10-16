@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import type { Row } from '@tanstack/react-table';
 
@@ -12,8 +12,11 @@ import { cn } from '@utils';
 import { useDataTableContext } from '../DataTableContext';
 
 type DataTableBulkActionsProps<TData> = {
-  /** Receives the selected rows; render your action buttons. */
-  children?: (rows: Row<TData>[]) => ReactNode;
+  /**
+   * Receives the selected rows that are loaded, and every selected id. With server-side paging,
+   * rows selected on other pages appear only in `ids`.
+   */
+  children?: (rows: Row<TData>[], ids: string[]) => ReactNode;
   className?: string;
 };
 
@@ -27,20 +30,43 @@ function DataTableBulkActions<TData>({ children, className }: DataTableBulkActio
     return () => setBulkActionsMounted(false);
   }, [setBulkActionsMounted]);
 
+  const barRef = useRef<HTMLDivElement>(null);
+  const [cleared, setCleared] = useState(false);
+
+  // Count from the selection state, not the row model: the row model only holds loaded rows.
+  const rowSelection = table.getState().rowSelection;
+  const ids = Object.keys(rowSelection).filter((id) => rowSelection[id]);
+  const count = ids.length;
   const selected = table.getSelectedRowModel().rows;
-  const count = selected.length;
   const total = table.getFilteredRowModel().rows.length;
   const canSelectAll =
     !table.options.manualPagination && table.getIsAllPageRowsSelected() && !table.getIsAllRowsSelected() && total > count;
 
+  useEffect(() => {
+    if (count > 0) setCleared(false);
+  }, [count]);
+
+  const clear = () => {
+    const root = barRef.current?.closest('[data-slot="data-table"]');
+    table.resetRowSelection();
+    setCleared(true);
+    // The bar unmounts with the focused button, so hand focus to the page checkbox (or the search box).
+    setTimeout(() => {
+      const target =
+        root?.querySelector<HTMLElement>('thead [role="checkbox"]') ?? root?.querySelector<HTMLElement>('input[type="search"]');
+      target?.focus();
+    }, 0);
+  };
+
   return (
     <>
       <span aria-live="polite" className="sr-only">
-        {count > 0 ? t('table.selected', { count }) : ''}
+        {count > 0 ? t('table.selected', { count }) : cleared ? t('table.selectionCleared') : ''}
       </span>
 
       <Conditional.If condition={count > 0}>
         <div
+          ref={barRef}
           data-slot="data-table-bulk-actions"
           role="toolbar"
           aria-label={t('table.bulkActions')}
@@ -55,8 +81,8 @@ function DataTableBulkActions<TData>({ children, className }: DataTableBulkActio
           </Conditional.If>
 
           <div className="ms-auto flex flex-wrap items-center gap-2">
-            {children?.(selected)}
-            <Button variant="ghost" size="sm" onClick={() => table.resetRowSelection()}>
+            {children?.(selected, ids)}
+            <Button variant="ghost" size="sm" onClick={clear}>
               {t('table.clearSelection')}
             </Button>
           </div>

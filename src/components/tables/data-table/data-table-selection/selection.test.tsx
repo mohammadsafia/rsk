@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { type ColumnDef, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table';
+import { useState } from 'react';
+import { type ColumnDef, getCoreRowModel, getPaginationRowModel, type PaginationState, useReactTable } from '@tanstack/react-table';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { Button } from '@components/ui';
@@ -33,6 +34,30 @@ function Harness({ manualPagination = false }: { manualPagination?: boolean }) {
     <DataTable table={table}>
       <DataTable.Toolbar totalCount={rows.length} />
       <DataTable.BulkActions>{(selected) => <Button size="sm">Export {selected.length}</Button>}</DataTable.BulkActions>
+      <DataTable.Content />
+      <DataTable.Pagination />
+    </DataTable>
+  );
+}
+
+// Server-side paging: only the current page is in `data`, like useDataTable with manualPagination.
+function ServerHarness() {
+  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 2 });
+  const page = rows.slice(pagination.pageIndex * 2, pagination.pageIndex * 2 + 2);
+  const table = useReactTable({
+    data: page,
+    columns,
+    getRowId: (row) => row.id,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    pageCount: 3,
+    state: { pagination },
+    onPaginationChange: setPagination,
+  });
+
+  return (
+    <DataTable table={table}>
+      <DataTable.BulkActions>{(selected, ids) => <Button size="sm">Export {ids.length}</Button>}</DataTable.BulkActions>
       <DataTable.Content />
       <DataTable.Pagination />
     </DataTable>
@@ -84,5 +109,36 @@ describe('DataTable selection', () => {
     fireEvent.click(screen.getByRole('checkbox', { name: 'Select INV-2' }));
     fireEvent.keyDown(screen.getByRole('checkbox', { name: 'Select INV-2' }), { key: 'Escape' });
     expect(screen.queryByRole('toolbar')).toBeNull();
+  });
+
+  it('keeps counting rows selected on other server-side pages', () => {
+    render(<ServerHarness />);
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select INV-1' }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select INV-2' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Go to next page' }));
+
+    expect(screen.getByRole('toolbar').textContent).toContain('2 selected');
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select INV-3' }));
+    expect(screen.getByRole('toolbar').textContent).toContain('3 selected');
+    expect(screen.getByRole('button', { name: 'Export 3' })).toBeTruthy();
+  });
+
+  it('leaves the selection alone when something inside the table already handled Escape', () => {
+    render(<Harness />);
+    const box = screen.getByRole('checkbox', { name: 'Select INV-1' });
+    fireEvent.click(box);
+    box.addEventListener('keydown', (event) => event.preventDefault());
+    fireEvent.keyDown(box, { key: 'Escape' });
+    expect(screen.getByRole('toolbar').textContent).toContain('1 selected');
+  });
+
+  it('keeps keyboard focus and announces it after Clear selection', async () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select INV-1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Clear selection' }));
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(document.activeElement).toBe(screen.getByRole('checkbox', { name: 'Select all rows on this page' }));
+    expect(document.querySelector('[aria-live="polite"]')?.textContent).toBe('Selection cleared');
   });
 });

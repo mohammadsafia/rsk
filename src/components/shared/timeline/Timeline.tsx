@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef, type FC, type ReactNode } from 'react';
+import { Children, type ComponentPropsWithoutRef, type FC, type ReactNode } from 'react';
 
 import { Button, Skeleton, Tooltip } from '@components/ui';
 import { EmptyState } from '@components/ui';
@@ -113,7 +113,8 @@ const Timeline: TimelineComponent = ({
   ...props
 }) => {
   const { t } = useAppTranslation('common');
-  const isEmpty = !loading && !children;
+  // A mapped empty list (`[]`) is truthy, so count the rendered children.
+  const isEmpty = !loading && Children.toArray(children).length === 0;
 
   return (
     <div data-slot="timeline" className={cn('flex flex-col gap-4', className)}>

@@ -25,7 +25,7 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
   const { t, direction } = useAppTranslation('common');
   const { table, onResetFilters, bulkActionsMounted } = useDataTableContext();
   // While bulk actions show, the toolbar stays mounted (typed search survives) but hidden.
-  const hasSelection = bulkActionsMounted && table.getSelectedRowModel().rows.length > 0;
+  const hasSelection = bulkActionsMounted && Object.values(table.getState().rowSelection).some(Boolean);
 
   const [search, setSearch] = useState(table.getState().globalFilter ?? '');
   const debouncedSearch = useDebounce(search, 500);

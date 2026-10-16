@@ -71,7 +71,8 @@
     "selectAllResults_many": "تحديد كل النتائج ({{count}})",
     "selectAllResults_other": "تحديد كل النتائج ({{count}})",
     "clearSelection": "إلغاء التحديد",
-    "bulkActions": "إجراءات الصفوف المحددة"
+    "bulkActions": "إجراءات الصفوف المحددة",
+    "selectionCleared": "تم إلغاء التحديد"
   },
   "pagination": {
     "label": "التنقل بين الصفحات",

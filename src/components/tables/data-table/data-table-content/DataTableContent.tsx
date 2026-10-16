@@ -36,6 +36,8 @@ function DataTableContent<TData>({ className, emptyState }: ContentProps) {
       className={cn('bg-surface border-border min-h-0 flex-1 rounded-lg border', className)}
       viewportClassName="[&>div]:h-full"
       onKeyDown={(event) => {
+        // A menu, popover or dialog that already handled Escape (Radix prevents default) keeps the selection.
+        if (event.defaultPrevented) return;
         if (event.key === 'Escape' && Object.keys(table.getState().rowSelection).length > 0) table.resetRowSelection();
       }}
     >

@@ -41,6 +41,16 @@ describe('Money', () => {
     expect(screen.getByText('-$5.00').className).not.toContain('text-danger');
   });
 
+  it('keeps the compact decimal when rendered as a component', () => {
+    render(<Money value={12400} currency="USD" compact />);
+    expect(screen.getByText('$12.4K')).toBeTruthy();
+  });
+
+  it('shows an em dash instead of crashing on an unknown currency code', () => {
+    render(<Money value={5} currency="NOPE" data-testid="bad" />);
+    expect(screen.getByTestId('bad').textContent).toBe('—');
+  });
+
   it('shows an em dash for missing or invalid values', () => {
     render(
       <>

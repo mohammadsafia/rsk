@@ -21,16 +21,25 @@ const Money: FC<MoneyProps> = ({
   ...props
 }) => {
   const format = useMoneyFormat();
-  const valid = typeof value === 'number' && Number.isFinite(value);
+  let text: string | null = null;
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    try {
+      text = format(value, { currency, compact, negative, minimumFractionDigits, maximumFractionDigits });
+    } catch {
+      // An unknown currency code (e.g. from API data) shows the empty value instead of crashing the page.
+      text = null;
+    }
+  }
+  const valid = text !== null;
 
   return (
     <span
       data-slot="money"
       dir="ltr"
-      className={cn('font-mono tabular-nums', tone === 'auto' && valid && value < 0 && 'text-danger', className)}
+      className={cn('font-mono tabular-nums', tone === 'auto' && valid && (value as number) < 0 && 'text-danger', className)}
       {...props}
     >
-      {valid ? format(value, { currency, compact, negative, minimumFractionDigits, maximumFractionDigits }) : '—'}
+      {text ?? '—'}
     </span>
   );
 };

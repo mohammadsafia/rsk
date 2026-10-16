@@ -55,7 +55,8 @@
     "selectAllResults_one": "Select {{count}} result",
     "selectAllResults_other": "Select all {{count}} results",
     "clearSelection": "Clear selection",
-    "bulkActions": "Actions for selected rows"
+    "bulkActions": "Actions for selected rows",
+    "selectionCleared": "Selection cleared"
   },
   "pagination": {
     "label": "Pagination",

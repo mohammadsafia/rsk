@@ -25,7 +25,8 @@ export const formatMoney = (value: number, language: string, options: FormatMone
     notation: compact ? 'compact' : 'standard',
     currencySign: negative === 'parentheses' ? 'accounting' : 'standard',
     ...(compact ? { maximumFractionDigits: 1 } : {}),
-    ...digits,
+    // Explicit `undefined` (e.g. from <Money> passing every prop through) must not override the compact default.
+    ...Object.fromEntries(Object.entries(digits).filter(([, digit]) => digit !== undefined)),
   }).format(value);
 };
 
