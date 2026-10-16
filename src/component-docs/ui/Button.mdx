@@ -105,7 +105,7 @@ All native `<button>` attributes pass through. The default `type` is the browser
 ## Accessibility
 
 - A native `<button>`: Enter and Space activate it, and the focus ring uses the shared `focus-ring` token.
-- While `loading`, the label stays readable by screen readers and the button reports `aria-busy`.
+- While `loading`, the button reports `aria-busy` and its label is visually hidden (kept for width), so screen readers announce the spinner's "Loading" instead of the label. Keep the surrounding context clear about which action is running.
 
 ## RTL notes
 

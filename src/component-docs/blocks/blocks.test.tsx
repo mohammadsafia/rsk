@@ -3,6 +3,8 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { Tooltip } from '@components/ui';
+import { ThemeProvider } from '@contexts';
+import { useDirection } from '@radix-ui/react-direction';
 
 import { DoDont, Example, PropsTable } from '@component-docs/blocks';
 
@@ -42,8 +44,10 @@ describe('Example', () => {
     fireEvent.click(screen.getAllByRole('button', { name: 'RTL' })[0]);
     fireEvent.click(screen.getAllByRole('button', { name: 'Dark' })[0]);
     expect(first.getAttribute('dir')).toBe('rtl');
-    expect(first.className).toMatch(/(^|\s)dark(\s|$)/);
+    // The app defaults to dark, so the first click flips this preview to light.
+    expect(first.className).toMatch(/(^|\s)light(\s|$)/);
     expect(second.getAttribute('dir')).toBe('ltr');
+    expect(second.className).not.toMatch(/(^|\s)(dark|light)(\s|$)/);
     expect(document.documentElement.getAttribute('dir')).not.toBe('rtl');
   });
 
@@ -58,6 +62,41 @@ describe('Example', () => {
 
     fireEvent.click(rtlToggle);
     expect(first.getAttribute('dir')).toBe('ltr');
+  });
+
+  it('reports the app theme on the Dark toggle and flips away from it on the first click', () => {
+    document.documentElement.classList.add('dark');
+    render(
+      <ThemeProvider defaultTheme="dark" storageKey="docs-example-test-theme">
+        <Tooltip.Provider>
+          <Example title="Themed" code="<b />">
+            <b>x</b>
+          </Example>
+        </Tooltip.Provider>
+      </ThemeProvider>,
+    );
+    const toggle = screen.getByRole('button', { name: 'Dark' });
+    const preview = document.querySelector('[data-slot="docs-example-preview"]')!;
+
+    expect(toggle.getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(toggle);
+    expect(preview.classList.contains('light')).toBe(true);
+    expect(toggle.getAttribute('aria-pressed')).toBe('false');
+    document.documentElement.classList.remove('dark');
+  });
+
+  it('gives the preview its own Radix direction, so keyboard order follows the RTL toggle', () => {
+    const Probe = () => <span data-testid="probe">{useDirection()}</span>;
+    render(
+      <Tooltip.Provider>
+        <Example title="Direction" code="<Probe />">
+          <Probe />
+        </Example>
+      </Tooltip.Provider>,
+    );
+    expect(screen.getByTestId('probe').textContent).toBe('ltr');
+    fireEvent.click(screen.getByRole('button', { name: 'RTL' }));
+    expect(screen.getByTestId('probe').textContent).toBe('rtl');
   });
 
   it('copies the code', async () => {

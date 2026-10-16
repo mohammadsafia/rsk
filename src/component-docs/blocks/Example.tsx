@@ -6,6 +6,9 @@ import { Button, IconButton, Tabs } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { CodeBlock } from '@component-docs/code-block';
 
+import { DirectionProvider } from '@radix-ui/react-direction';
+
+import { THEME_TYPES, useTheme } from '@contexts';
 import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
@@ -18,7 +21,10 @@ export function Example({ title, description, code = '', className, children }: 
   // null = follow the app direction until the reader flips it.
   const [rtlOverride, setRtlOverride] = useState<boolean | null>(null);
   const rtl = rtlOverride ?? isRTL;
-  const [dark, setDark] = useState<boolean | null>(null);
+  // Same for the theme: follow the app until the reader flips it.
+  const { theme } = useTheme();
+  const [darkOverride, setDarkOverride] = useState<boolean | null>(null);
+  const dark = darkOverride ?? theme === THEME_TYPES.DARK;
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
@@ -46,7 +52,7 @@ export function Example({ title, description, code = '', className, children }: 
             {t('example.rtl')}
           </Button>
 
-          <Button size="sm" variant="ghost" aria-pressed={dark === true} onClick={() => setDark((value) => !value)}>
+          <Button size="sm" variant="ghost" aria-pressed={dark} onClick={() => setDarkOverride(!dark)}>
             {t('example.dark')}
           </Button>
 
@@ -74,11 +80,11 @@ export function Example({ title, description, code = '', className, children }: 
             className={cn(
               'bg-surface-sunken text-fg flex min-h-40 flex-wrap items-center justify-center gap-3 p-8',
               '[background-image:radial-gradient(var(--border-subtle)_1px,transparent_1px)] [background-size:12px_12px]',
-              dark === true && 'dark',
-              dark === false && 'light',
+              darkOverride !== null && (dark ? 'dark' : 'light'),
             )}
           >
-            {children}
+            {/* Radix reads direction from context (keyboard order, submenu sides, portaled content). */}
+            <DirectionProvider dir={rtl ? 'rtl' : 'ltr'}>{children}</DirectionProvider>
           </div>
         </Tabs.Content>
 
