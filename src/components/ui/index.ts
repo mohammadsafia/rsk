@@ -23,6 +23,7 @@ export * from './command';
 export * from './progress';
 export * from './scroll-area';
 export * from './formatted-number';
+export * from './money';
 export * from './input';
 export * from './textarea';
 export * from './select';

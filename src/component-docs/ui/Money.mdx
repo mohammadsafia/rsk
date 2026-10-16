@@ -1,0 +1,60 @@
+---
+id: money
+title: Money
+section: Components
+category: UI
+description: 'Display-only amount: currency, compact and accounting formats with Western digits, isolated left to right.'
+tags: [ui, money, currency, number]
+---
+
+import { Money } from '@components/ui';
+
+## Amounts
+
+<Example title="Currency">
+  <Money value={1240.5} />
+  <Money value={1240.5} currency="EUR" />
+  <Money value={1240.5} currency="JOD" />
+</Example>
+
+## Negative and compact
+
+`tone="auto"` colours negative amounts danger; `negative="parentheses"` uses accounting style. `compact` shortens large values.
+
+<Example title="Negatives and compact">
+  <Money value={-80} />
+  <Money value={-80} negative="parentheses" />
+  <Money value={-80} tone="none" />
+  <Money value={12400} compact />
+</Example>
+
+## Missing values
+
+`null`, `undefined` and `NaN` render an em dash.
+
+<Example title="Empty">
+  <Money value={null} />
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'value', type: 'number | null | undefined', required: true, description: 'The amount; invalid values show —.' },
+    { prop: 'currency', type: 'string (ISO 4217)', default: 'APP_CONFIGURATIONS.CURRENCY', description: 'Currency code.' },
+    { prop: 'compact', type: 'boolean', default: 'false', description: '"12.4K" style.' },
+    { prop: 'negative', type: "'sign' | 'parentheses'", default: "'sign'", description: 'How negatives are written.' },
+    { prop: 'tone', type: "'auto' | 'none'", default: "'auto'", description: 'auto colours negatives danger.' },
+    { prop: 'minimumFractionDigits · maximumFractionDigits', type: 'number', description: 'Override the currency’s decimals.' },
+  ]}
+/>
+
+`formatMoney(value, language, options)` and `useMoneyFormat()` (from `@utils`) give the same string for charts, exports and aria labels.
+
+## Accessibility
+
+- Plain text in a `<span>`, read as written; a negative amount is still announced with its minus sign or parentheses, never by colour alone.
+
+## RTL notes
+
+- The amount is wrapped in `dir="ltr"` so the sign, symbol and digits keep their order in Arabic; digits are always Western.
