@@ -20,7 +20,7 @@ import {
   FormTextarea,
   FormTimePicker,
 } from '@components/forms';
-import { ConfirmDialog, DateNavigation, FacetedFilter } from '@components/shared';
+import { ConfirmDialog, DateNavigation } from '@components/shared';
 
 import { useToast } from '@hooks/shared';
 import { LookupHandler as LookupService } from '@api/handlers';
@@ -733,40 +733,6 @@ export function DateNavigationDemo() {
     setCurrentDate(date.toISOString().split('T')[0]);
   };
   return <DateNavigation date={currentDate} onSetDate={setCurrentDate} handlePrevious={handlePrevious} handleNext={handleNext} />;
-}
-
-export function FacetedFilterDemo() {
-  const form = useForm({ defaultValues: { status: [], search: '', date: null, dateRange: null } });
-  return (
-    <FormContainer formContext={form} onSuccess={() => {}}>
-      <div className="space-y-4">
-        <FacetedFilter name="search" title="Text Search" control={form.control} filterVariant="text" />
-        <FacetedFilter
-          name="status"
-          title="Select"
-          control={form.control}
-          filterVariant="select"
-          filterOptions={[
-            { label: 'Active', value: 'active' },
-            { label: 'Inactive', value: 'inactive' },
-          ]}
-        />
-        <FacetedFilter
-          name="status"
-          title="Multi-Select"
-          control={form.control}
-          filterVariant="multi-select"
-          filterOptions={[
-            { label: 'Active', value: 'active' },
-            { label: 'Inactive', value: 'inactive' },
-            { label: 'Pending', value: 'pending' },
-          ]}
-        />
-        <FacetedFilter name="date" title="Date" control={form.control} filterVariant="date" />
-        <FacetedFilter name="dateRange" title="Date Range" control={form.control} filterVariant="date-range" />
-      </div>
-    </FormContainer>
-  );
 }
 
 export function ToastDemo() {

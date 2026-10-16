@@ -5,7 +5,6 @@ export * from './toaster';
 export * from './description-list';
 export * from './count-tooltip';
 export * from './confirm-dialog';
-export * from './faceted-filter';
 export * from './file-icon';
 export * from './file-uploader';
 export * from './date-navigation';

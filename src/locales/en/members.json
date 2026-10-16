@@ -11,7 +11,9 @@
     "status": "Status",
     "joined": "Joined",
     "lastSeen": "Last seen",
-    "shiftStart": "Shift start"
+    "shiftStart": "Shift start",
+    "twoFactor": "Two-factor",
+    "sessions": "Sessions"
   },
   "roles": {
     "Admin": "Admin",
@@ -26,5 +28,9 @@
   "emptyState": {
     "title": "No members found",
     "description": "No members match your search. Try adjusting your filters or keywords."
+  },
+  "twoFactor": {
+    "on": "On",
+    "off": "Off"
   }
 }

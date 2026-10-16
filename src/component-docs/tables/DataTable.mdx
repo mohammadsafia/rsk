@@ -42,6 +42,60 @@ Put the page's `PageHeader` above the table and give both a flex column with **`
 
 **Why no page scroll:** DataTable has `min-h-0`, which allows it to shrink below its content size in a flex container. The page header takes its natural height and DataTable takes the rest, without pushing the total beyond 100%.
 
+## Filters
+
+Every filterable column sets `meta.filterMeta` (via `createFilterMeta`) and a matching `filterFn`. The bar shows every filter as a pill: dashed `+ Label` when empty, `Label · value` with a remove button when applied — pills never move.
+
+| Variant | Popover | Column value | URL / API form | Client `filterFn` |
+|---|---|---|---|---|
+| `select` · `multiSelect` | Searchable list (radio / checkbox); async when `options` is a function | `string[]` | `role=admin,editor` | `inListFilterFn` |
+| `date` | Calendar | `yyyy-MM-dd` | `joined=2026-01-01` | `dateFilterFn` |
+| `dateRange` | Two-month range calendar | `{ from?, to? }` | `joined=2026-01-01..2026-03-31` | `dateRangeFilterFn` |
+| `time` | Time picker | `08:00 AM` | `shift=08:00 AM` | `timeFilterFn` |
+| `boolean` | Two choices (custom labels) | `boolean` | `insured=false` | `booleanFilterFn` |
+| `text` | "Contains" input (case- and tashkeel-insensitive) | `string` | `name=sara` | `containsFilterFn` |
+| `numberRange` | Min / max fields; min > max is swapped | `{ min?, max? }` | `amount=10..250`, `amount=10..` | `numberRangeFilterFn` |
+
+```tsx
+{ accessorKey: 'insured', filterFn: booleanFilterFn,
+  meta: { filterMeta: createFilterMeta({ variant: 'boolean', label: 'Insurance', trueLabel: 'Insured', falseLabel: 'Self-pay' }) } },
+{ accessorKey: 'patient', filterFn: containsFilterFn,
+  meta: { filterMeta: createFilterMeta({ variant: 'text', label: 'Patient' }) } },
+{ accessorKey: 'amount', filterFn: numberRangeFilterFn,
+  meta: { numeric: true, filterMeta: createFilterMeta({ variant: 'numberRange', label: 'Amount', format: 'currency' }) } },
+```
+
+### Keeping filters (session and URL)
+
+`useDataTableFilters` makes filters and search survive navigating away and back (sessionStorage), and — opt-in — mirrors them in the URL so a filtered view can be bookmarked or shared. "Clear filters" clears the state, the URL and the stored copy.
+
+```tsx
+const filters = useDataTableFilters({ columns, urlSync: true, storageKey: 'patients' });
+
+const table = useReactTable({
+  data,
+  columns,
+  state: filters.state,
+  onColumnFiltersChange: filters.onColumnFiltersChange,
+  onGlobalFilterChange: filters.onGlobalFilterChange,
+  getCoreRowModel: getCoreRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
+});
+
+<DataTable table={table} onResetFilters={filters.reset}>…</DataTable>
+```
+
+Malformed or unknown URL values are ignored, so a stale link still opens the table. Two tables on one page pass `urlSync: { prefix: 'visits.' }` to keep their params apart.
+
+### Server-side filtering
+
+```tsx
+const params = getFilterQueryParams(table); // { role: 'admin,editor', amount: '10..250', q: 'sara' }
+
+useQuery({ queryKey: ['patients', params, pagination], queryFn: () => api.patients.list({ ...params, page }) });
+// useReactTable({ manualFiltering: true, … })
+```
+
 ## Column Sizing
 
 DataTable uses `table-auto` with `max-w-0` on non-pinned body cells. The `size` property on columns is an **exact width hint**, not a proportional weight. Columns without `size` fit their header text.
