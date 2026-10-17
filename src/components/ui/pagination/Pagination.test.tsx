@@ -42,7 +42,7 @@ describe('Pagination', () => {
     expect(screen.getByText('More pages').className).toContain('sr-only');
   });
 
-  it('marks the current page solid with aria-current and the others ghost', () => {
+  it('marks the current page with aria-current and the ink bar; the others stay unmarked ghosts', () => {
     renderPagination();
     const current = screen.getByRole('button', { name: '01' });
     const other = screen.getByRole('button', { name: '02' });
@@ -51,5 +51,7 @@ describe('Pagination', () => {
     expect(current.className).toContain('aria-[current=page]:ink-block');
     expect(other.getAttribute('aria-current')).toBeNull();
     expect(other.dataset.variant).toBe('ghost');
+    // Only the current page carries a mark (the ink bar); the ghost hairline underline would make every number look like a link.
+    expect(other.className).toContain('no-underline');
   });
 });

@@ -38,7 +38,10 @@ const NavButton: FC<PaginationNavButtonProps> = ({ className, isActive = false, 
     aria-current={isActive ? 'page' : undefined}
     variant="ghost"
     size="sm"
-    className={cn('min-w-control-sm px-1.5 font-mono tabular-nums aria-[current=page]:text-fg aria-[current=page]:ink-block', className)}
+    className={cn(
+      'min-w-control-sm px-1.5 font-mono tabular-nums no-underline aria-[current=page]:text-fg aria-[current=page]:ink-block',
+      className,
+    )}
     {...props}
   />
 );
