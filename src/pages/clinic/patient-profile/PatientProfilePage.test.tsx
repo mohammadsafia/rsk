@@ -93,4 +93,12 @@ describe('PatientProfilePage', () => {
     expect(await within(sheet).findByText('That phone number is already registered')).toBeTruthy();
     expect(clinicStore.read().patients.find((p) => p.id === patient.id)!.phone).toBe(patient.phone);
   });
+
+  it('names the primary doctor on the overview', async () => {
+    const patient = richPatient();
+    const doctor = clinicStore.read().doctors.find((d) => d.id === patient.primaryDoctorId)!;
+    renderProfile(patient.id);
+    await screen.findByRole('heading', { level: 1, name: patient.name.en });
+    expect(await screen.findByText(doctor.name.en)).toBeTruthy();
+  });
 });
