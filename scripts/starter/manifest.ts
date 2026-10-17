@@ -30,6 +30,8 @@ export const DROP = [
   'src/locales/ar/components.json',
   // This repository's own tooling, plans and editor state
   'scripts/starter/',
+  'tests/starter/',
+  '.github/workflows/starter-sync.yml',
   'docs/',
   '.superpowers/',
   '.claude/',

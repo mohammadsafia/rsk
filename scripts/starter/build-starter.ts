@@ -9,6 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { lockfileArgs } from './install';
 import { DOCS_ONLY_DEV_DEPENDENCIES, DOCS_ONLY_SCRIPTS, DROP, SHOWCASE_NAV_KEYS } from './manifest';
 
 const ROOT = path.resolve(import.meta.dirname, '../..');
@@ -89,6 +90,17 @@ export function buildStarter(outDir: string) {
   edit('src/lib/hooks/shared/useAuth.ts', /name: '[^']*'/, "name: 'Demo User'", out);
   edit('src/lib/hooks/shared/useAuth.ts', /email: '[^']*'/, "email: 'demo@example.com'", out);
 
+  // The DTO generator's sample sources point at a client's API; the starter names a placeholder.
+  edit('scripts/cli/config/defaults.ts', /https:\/\/dev-api\.qlinica\.app\/med-legal/g, 'https://api.example.com', out);
+  edit('scripts/cli/README.md', /https:\/\/dev-api\.qlinica\.app\/med-legal/g, 'https://api.example.com', out);
+
+  // An app keeps its real settings in .env (this repo tracks an empty one instead).
+  const gitignore = path.join(out, '.gitignore');
+  writeFileSync(
+    gitignore,
+    `${readFileSync(gitignore, 'utf8').trimEnd()}\n\n# Local settings: copy .env.example to .env\n.env\n!.env.example\n`,
+  );
+
   // Menu labels of the showcase pages; the starter's menu is Dashboard and Settings.
   for (const locale of ['en', 'ar']) {
     const navFile = path.join(out, `src/locales/${locale}/nav.json`);
@@ -121,7 +133,13 @@ export function buildStarter(outDir: string) {
   return out;
 }
 
+/** Rewrites the starter's pnpm-lock.yaml for its trimmed package.json, so apps can install with a frozen lockfile. */
+export function refreshLockfile(out: string) {
+  execFileSync('corepack', ['pnpm@10.34.7', ...lockfileArgs()], { cwd: out, stdio: 'inherit' });
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   const out = buildStarter(process.argv[2] ?? '.starter');
+  refreshLockfile(out);
   console.log(`Starter written to ${out}`);
 }

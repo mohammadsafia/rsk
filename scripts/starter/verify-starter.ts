@@ -9,7 +9,7 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:f
 import os from 'node:os';
 import path from 'node:path';
 
-import { buildStarter } from './build-starter';
+import { buildStarter, refreshLockfile } from './build-starter';
 import { installArgs } from './install';
 import { LEFTOVER_PATTERNS } from './manifest';
 
@@ -34,6 +34,7 @@ try {
   });
   if (leftovers.length) throw new Error(`Showcase leftovers in the starter:\n${leftovers.join('\n')}`);
 
+  refreshLockfile(out);
   run(out, 'corepack', [...pnpm, ...installArgs()]);
   run(out, 'corepack', [...pnpm, 'exec', 'tsc', '-b']);
   run(out, 'corepack', [...pnpm, 'exec', 'vp', 'check']);
