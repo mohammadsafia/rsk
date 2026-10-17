@@ -2,6 +2,7 @@
 export * from './handlers';
 export * from './types';
 export { invoiceBalance, invoicePaid, invoiceTotal } from './calc';
+export { dayKey, isFriday, shiftDay, wallTime } from './time';
 export {
   ClinicError,
   type BulkResult,
