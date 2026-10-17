@@ -13,6 +13,8 @@ A React 18 + TypeScript app on [Vite+](https://viteplus.dev), started from the R
 ## Getting started
 
 ```bash
+vp create github:<owner>/rsk-starter -- my-app   # or clone this repository
+cd my-app
 cp .env.example .env    # fill in your API and auth settings
 vp install
 vp dev

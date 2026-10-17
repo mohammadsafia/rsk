@@ -298,6 +298,25 @@ Opens on http://localhost:3000.
 
 ---
 
+## App Starter
+
+This repository is the kit's development home: the component docs, the docs site and the clinic example pages live here. New apps start from a generated starter that has the kit and the app shell, but none of the showcase.
+
+```bash
+pnpm starter:build [outDir]   # write the starter (default: .starter)
+pnpm starter:verify           # build it in a temp folder, install offline, run tsc, vp check, vp test and vp build
+```
+
+`vp create` takes GitHub repositories and npm packages, not local folders. To publish, push the generated folder as its own repository (`rsk-starter`), and apps start with:
+
+```bash
+vp create github:<owner>/rsk-starter -- my-app
+```
+
+The `-- my-app` names the folder. Without it, `vp create` names it after the repository. For a private registry, the starter can instead be bundled under `templates/` in an `@org/create` package, and apps start with `vp create @org:web`. Rename `.gitignore` to `_gitignore` there, because `npm publish` drops `.gitignore` files.
+
+---
+
 ## CLI Tools
 
 ### DTO Generator
