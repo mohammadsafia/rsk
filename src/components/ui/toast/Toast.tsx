@@ -3,6 +3,8 @@ import * as ToastPrimitives from '@radix-ui/react-toast';
 
 // !Direct import: toastVariants reads this at module load, before the ui barrel reaches ./popover
 import { floatingSurfaceClassName } from '@components/ui/popover/Popover';
+// !Direct import, like Popover above: the ui barrel may not have reached ./sections when this module loads
+import { SectionMarker } from '@components/ui/sections/Sections';
 
 import { useAppTranslation } from '@hooks/shared';
 
@@ -32,7 +34,7 @@ const viewportVariants = cva('fixed z-100 flex w-full flex-col gap-2 p-3 md:max-
 const toastVariants = cva(
   [
     floatingSurfaceClassName,
-    'group pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden p-3 pe-10 md:w-96',
+    'group pointer-events-auto relative rule-top flex w-full items-start gap-3 overflow-hidden p-3 pe-10 md:w-96',
     'data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-(--radix-toast-swipe-end-x) data-[swipe=move]:translate-x-(--radix-toast-swipe-move-x)',
     'data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out',
     'duration-base data-[state=closed]:fade-out-0 motion-reduce:data-[state=open]:slide-in-from-top-0 motion-reduce:data-[state=open]:slide-in-from-bottom-0',
@@ -62,7 +64,7 @@ export type ToastProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
 };
 
 type ToastViewportProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport> & VariantProps<typeof viewportVariants>;
-type ToastTitleProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Title>;
+type ToastTitleProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Title> & { marker?: '§' | false };
 type ToastDescriptionProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Description>;
 type ToastCloseProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Close>;
 type ToastIconProps = { tone?: ToastTone };
@@ -92,8 +94,11 @@ const ToastViewport: FC<ToastViewportProps> = ({ className, position, ...props }
   <ToastPrimitives.Viewport data-slot="toast-viewport" className={cn(viewportVariants({ position }), className)} {...props} />
 );
 
-const ToastTitle: FC<ToastTitleProps> = ({ className, ...props }) => (
-  <ToastPrimitives.Title data-slot="toast-title" className={cn('text-fg text-sm font-semibold', className)} {...props} />
+const ToastTitle: FC<ToastTitleProps> = ({ className, children, marker = '§', ...props }) => (
+  <ToastPrimitives.Title data-slot="toast-title" className={cn('text-fg text-sm font-semibold', className)} {...props}>
+    <SectionMarker marker={marker} />
+    {children}
+  </ToastPrimitives.Title>
 );
 
 const ToastDescription: FC<ToastDescriptionProps> = ({ className, ...props }) => (

@@ -2,7 +2,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
-import { Card, Tooltip } from '@components/ui';
+import { Card, Sections, Tooltip } from '@components/ui';
 
 import '../../../i18n';
 
@@ -101,5 +101,24 @@ describe('Card collapsible header layout', () => {
     );
     expect(screen.getByRole('heading', { name: 'Billable lines' }).className).toContain('col-start-1');
     expect(screen.getByText('Draft').className).toContain('col-start-1');
+  });
+
+  it('tops a card that has a header with the heavy rule and marks the title', () => {
+    render(<Card title="Today's visits">Body</Card>);
+    const card = document.querySelector<HTMLElement>('article')!;
+    expect(card.className).toContain('has-data-[slot=card-header]:rule-top');
+    expect(card.className).toContain('relative');
+    expect(screen.getByRole('heading', { name: "Today's visits" }).querySelector('[data-slot="section-marker"]')).not.toBeNull();
+  });
+
+  it('numbers card titles inside Sections', () => {
+    render(
+      <Sections>
+        <Card title="Visits">a</Card>
+        <Card title="Revenue">b</Card>
+      </Sections>,
+    );
+    const kinds = Array.from(document.querySelectorAll<HTMLElement>('[data-slot="section-marker"]')).map((marker) => marker.dataset.kind);
+    expect(kinds).toEqual(['number', 'number']);
   });
 });

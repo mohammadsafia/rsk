@@ -1,7 +1,7 @@
 import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
-import { floatingMotionClassName, IconButton } from '@components/ui';
+import { floatingMotionClassName, IconButton, SectionMarker, type SectionMarkerValue, SectionsReset } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -13,7 +13,7 @@ import { XIcon } from 'lucide-react';
 
 const dialogContentVariants = cva(
   [
-    'bg-surface-raised text-fg shadow-overlay fixed inset-x-4 top-1/2 z-50 mx-auto flex max-h-[85dvh] -translate-y-1/2 flex-col gap-4',
+    'bg-surface-raised text-fg shadow-overlay rule-top rule-top-section fixed inset-x-4 top-1/2 z-50 mx-auto flex max-h-[85dvh] -translate-y-1/2 flex-col gap-4',
     'overflow-y-auto rounded-lg p-5 outline-none',
   ],
   {
@@ -43,6 +43,8 @@ export type DialogContentProps = Omit<ComponentProps<typeof DialogPrimitive.Cont
     description?: ReactNode;
     /** When false: no close button, Escape and outside interaction are ignored. */
     dismissible?: boolean;
+    /** Ledger mark before the title: § by default; false removes it. */
+    marker?: SectionMarkerValue;
   };
 
 type DialogComponent = FC<DialogProps> & {
@@ -69,6 +71,7 @@ const DialogContent: FC<DialogContentProps> = ({
   hideTitle = false,
   description,
   dismissible = true,
+  marker = 'auto',
   onEscapeKeyDown,
   onInteractOutside,
   children,
@@ -91,46 +94,49 @@ const DialogContent: FC<DialogContentProps> = ({
 
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay
-        data-slot="dialog-overlay"
-        className={cn(
-          'bg-overlay fixed inset-0 z-50 duration-slow',
-          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
-        )}
-      />
+      <SectionsReset>
+        <DialogPrimitive.Overlay
+          data-slot="dialog-overlay"
+          className={cn(
+            'bg-overlay fixed inset-0 z-50 duration-slow',
+            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
+          )}
+        />
 
-      <DialogPrimitive.Content
-        ref={ref}
-        data-slot="dialog-content"
-        data-size={size ?? 'md'}
-        className={cn(dialogContentVariants({ size }), floatingMotionClassName, 'duration-slow', className)}
-        onEscapeKeyDown={handleEscapeKeyDown}
-        onInteractOutside={handleInteractOutside}
-        {...describedBy}
-        {...props}
-      >
-        <header data-slot="dialog-header" className={cn('flex flex-col gap-1 pe-8', hideTitle && !description && 'sr-only')}>
-          <DialogPrimitive.Title data-slot="dialog-title" className={cn('text-fg text-md font-semibold', hideTitle && 'sr-only')}>
-            {title}
-          </DialogPrimitive.Title>
+        <DialogPrimitive.Content
+          ref={ref}
+          data-slot="dialog-content"
+          data-size={size ?? 'md'}
+          className={cn(dialogContentVariants({ size }), floatingMotionClassName, 'duration-slow', className)}
+          onEscapeKeyDown={handleEscapeKeyDown}
+          onInteractOutside={handleInteractOutside}
+          {...describedBy}
+          {...props}
+        >
+          <header data-slot="dialog-header" className={cn('flex flex-col gap-1 pe-8', hideTitle && !description && 'sr-only')}>
+            <DialogPrimitive.Title data-slot="dialog-title" className={cn('text-fg text-md font-semibold', hideTitle && 'sr-only')}>
+              <SectionMarker marker={marker} />
+              {title}
+            </DialogPrimitive.Title>
 
-          <Conditional.If condition={!!description}>
-            <DialogPrimitive.Description data-slot="dialog-description" className="text-fg-muted text-sm">
-              {description}
-            </DialogPrimitive.Description>
+            <Conditional.If condition={!!description}>
+              <DialogPrimitive.Description data-slot="dialog-description" className="text-fg-muted text-sm">
+                {description}
+              </DialogPrimitive.Description>
+            </Conditional.If>
+          </header>
+
+          {children}
+
+          <Conditional.If condition={dismissible}>
+            <DialogPrimitive.Close asChild>
+              <IconButton size="sm" tooltip={false} aria-label={t('close')} className="absolute end-3 top-3">
+                <XIcon />
+              </IconButton>
+            </DialogPrimitive.Close>
           </Conditional.If>
-        </header>
-
-        {children}
-
-        <Conditional.If condition={dismissible}>
-          <DialogPrimitive.Close asChild>
-            <IconButton size="sm" tooltip={false} aria-label={t('close')} className="absolute end-3 top-3">
-              <XIcon />
-            </IconButton>
-          </DialogPrimitive.Close>
-        </Conditional.If>
-      </DialogPrimitive.Content>
+        </DialogPrimitive.Content>
+      </SectionsReset>
     </DialogPrimitive.Portal>
   );
 };

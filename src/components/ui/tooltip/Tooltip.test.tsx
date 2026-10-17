@@ -16,7 +16,10 @@ describe('Tooltip', () => {
       </Tooltip.Provider>,
     );
     fireEvent.focus(screen.getByRole('button', { name: 'Archive' }));
-    expect((await screen.findByRole('tooltip')).textContent).toBe('Archive record');
+    const tip = await screen.findByRole('tooltip');
+    expect(tip.textContent).toBe('Archive record');
+    const bubble = tip.closest('[data-state]') ?? tip.parentElement;
+    expect((bubble as HTMLElement).className).toContain('rule-top-ink');
   });
 
   it('renders only the trigger when disabled', () => {

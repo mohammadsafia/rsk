@@ -2,7 +2,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
-import { Button, Dialog } from '@components/ui';
+import { Button, Dialog, Sections } from '@components/ui';
 
 import '../../../i18n';
 
@@ -59,5 +59,52 @@ describe('Dialog', () => {
     fireEvent.pointerDown(document.body);
     expect(screen.getByRole('dialog')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+  });
+
+  it('tops the dialog with the section rule and marks its title with §', () => {
+    render(
+      <Dialog>
+        <Dialog.Trigger>Open</Dialog.Trigger>
+        <Dialog.Content title="Edit patient" description="Changes save immediately." />
+      </Dialog>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit patient' });
+    expect(dialog.className).toContain('rule-top');
+    expect(dialog.className).toContain('rule-top-section');
+    expect(dialog.querySelector('[data-slot="dialog-title"] [data-slot="section-marker"]')?.textContent).toBe('§');
+  });
+
+  it('keeps the accessible name without the marker', () => {
+    render(
+      <Dialog>
+        <Dialog.Trigger>Open</Dialog.Trigger>
+        <Dialog.Content title="Edit patient" />
+      </Dialog>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    expect(screen.getByRole('dialog', { name: 'Edit patient' })).toBeTruthy();
+  });
+
+  it('a dialog opened inside Sections still shows §, and marker={false} removes it', () => {
+    const { unmount } = render(
+      <Sections>
+        <Dialog defaultOpen>
+          <Dialog.Content title="Edit patient" />
+        </Dialog>
+      </Sections>,
+    );
+    const edit = screen.getByRole('dialog', { name: 'Edit patient' });
+    expect(edit.querySelector<HTMLElement>('[data-slot="section-marker"]')?.dataset.kind).toBe('section');
+    unmount();
+
+    render(
+      <Sections>
+        <Dialog defaultOpen>
+          <Dialog.Content title="Delete patient" marker={false} />
+        </Dialog>
+      </Sections>,
+    );
+    expect(screen.getByRole('dialog', { name: 'Delete patient' }).querySelector('[data-slot="section-marker"]')).toBeNull();
   });
 });

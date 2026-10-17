@@ -1,7 +1,7 @@
 import { Children, type ComponentPropsWithoutRef, createContext, type FC, isValidElement, type ReactNode, useContext } from 'react';
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible';
 
-import { IconButton, Skeleton, Tooltip } from '@components/ui';
+import { IconButton, SectionMarker, type SectionMarkerValue, Skeleton, Tooltip } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -11,7 +11,7 @@ import { cn } from '@utils';
 
 import { ChevronDown, Info } from 'lucide-react';
 
-const cardVariants = cva('bg-surface border-border text-fg rounded-lg border', {
+const cardVariants = cva('bg-surface border-border text-fg relative rounded-lg border has-data-[slot=card-header]:rule-top', {
   variants: {
     tone: {
       neutral: '',
@@ -43,7 +43,7 @@ export type CardProps = Omit<ComponentPropsWithoutRef<'article'>, 'title'> &
   };
 
 type CardHeaderProps = ComponentPropsWithoutRef<'header'>;
-type CardTitleProps = ComponentPropsWithoutRef<'h3'>;
+type CardTitleProps = ComponentPropsWithoutRef<'h3'> & { marker?: SectionMarkerValue };
 type CardDescriptionProps = ComponentPropsWithoutRef<'p'>;
 type CardActionsProps = ComponentPropsWithoutRef<'div'>;
 type CardContentProps = ComponentPropsWithoutRef<'section'>;
@@ -94,12 +94,15 @@ const Header: FC<CardHeaderProps> = ({ className, children, ...props }) => {
   );
 };
 
-const Title: FC<CardTitleProps> = ({ className, ...props }) => (
+const Title: FC<CardTitleProps> = ({ className, children, marker = 'auto', ...props }) => (
   <h3
     data-slot="card-title"
     className={cn('text-fg text-md col-start-1 flex items-center gap-1.5 leading-tight font-semibold', className)}
     {...props}
-  />
+  >
+    <SectionMarker marker={marker} />
+    {children}
+  </h3>
 );
 
 const Description: FC<CardDescriptionProps> = ({ className, ...props }) => (

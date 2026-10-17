@@ -1,7 +1,7 @@
 import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
-import { IconButton } from '@components/ui';
+import { IconButton, SectionMarker, type SectionMarkerValue, SectionsReset } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -14,7 +14,7 @@ import { XIcon } from 'lucide-react';
 // Below md the sheet is a bottom sheet; from md up it is a full-height side panel.
 const sheetContentVariants = cva(
   [
-    'bg-surface-raised text-fg shadow-overlay border-border fixed z-50 flex flex-col outline-none',
+    'bg-surface-raised text-fg shadow-overlay border-border rule-top rule-top-section fixed z-50 flex flex-col outline-none',
     'inset-x-0 bottom-0 max-h-[85dvh] rounded-t-lg border-t',
     'md:inset-y-0 md:max-h-none md:w-full md:rounded-none md:border-t-0',
     'data-[state=open]:animate-in data-[state=closed]:animate-out duration-slow motion-reduce:animate-none',
@@ -49,6 +49,8 @@ export type SheetContentProps = Omit<ComponentProps<typeof DialogPrimitive.Conte
     description?: ReactNode;
     /** When false: no close button, Escape and outside interaction are ignored. */
     dismissible?: boolean;
+    /** Ledger mark before the title: § by default; false removes it. */
+    marker?: SectionMarkerValue;
   };
 
 type SheetComponent = FC<SheetProps> & {
@@ -70,6 +72,7 @@ const SheetContent: FC<SheetContentProps> = ({
   title,
   hideTitle = false,
   description,
+  marker = 'auto',
   dismissible = true,
   onEscapeKeyDown,
   onInteractOutside,
@@ -81,52 +84,55 @@ const SheetContent: FC<SheetContentProps> = ({
 
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay
-        data-slot="sheet-overlay"
-        className="bg-overlay data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 duration-slow fixed inset-0 z-50"
-      />
+      <SectionsReset>
+        <DialogPrimitive.Overlay
+          data-slot="sheet-overlay"
+          className="bg-overlay data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 duration-slow fixed inset-0 z-50"
+        />
 
-      <DialogPrimitive.Content
-        ref={ref}
-        data-slot="sheet-content"
-        data-side={side ?? 'end'}
-        className={cn(sheetContentVariants({ side, size }), className)}
-        onEscapeKeyDown={(event: EscapeKeyDownEvent) => {
-          if (!dismissible) event.preventDefault();
-          onEscapeKeyDown?.(event);
-        }}
-        onInteractOutside={(event: InteractOutsideEvent) => {
-          if (!dismissible) event.preventDefault();
-          onInteractOutside?.(event);
-        }}
-        {...describedBy}
-        {...props}
-      >
-        <header
-          data-slot="sheet-header"
-          className={cn('border-border-subtle flex flex-col gap-1 border-b px-5 py-4 pe-12', hideTitle && !description && 'sr-only')}
+        <DialogPrimitive.Content
+          ref={ref}
+          data-slot="sheet-content"
+          data-side={side ?? 'end'}
+          className={cn(sheetContentVariants({ side, size }), className)}
+          onEscapeKeyDown={(event: EscapeKeyDownEvent) => {
+            if (!dismissible) event.preventDefault();
+            onEscapeKeyDown?.(event);
+          }}
+          onInteractOutside={(event: InteractOutsideEvent) => {
+            if (!dismissible) event.preventDefault();
+            onInteractOutside?.(event);
+          }}
+          {...describedBy}
+          {...props}
         >
-          <DialogPrimitive.Title data-slot="sheet-title" className={cn('text-fg text-md font-semibold', hideTitle && 'sr-only')}>
-            {title}
-          </DialogPrimitive.Title>
+          <header
+            data-slot="sheet-header"
+            className={cn('border-border-subtle flex flex-col gap-1 border-b px-5 py-4 pe-12', hideTitle && !description && 'sr-only')}
+          >
+            <DialogPrimitive.Title data-slot="sheet-title" className={cn('text-fg text-md font-semibold', hideTitle && 'sr-only')}>
+              <SectionMarker marker={marker} />
+              {title}
+            </DialogPrimitive.Title>
 
-          <Conditional.If condition={!!description}>
-            <DialogPrimitive.Description data-slot="sheet-description" className="text-fg-muted text-sm">
-              {description}
-            </DialogPrimitive.Description>
+            <Conditional.If condition={!!description}>
+              <DialogPrimitive.Description data-slot="sheet-description" className="text-fg-muted text-sm">
+                {description}
+              </DialogPrimitive.Description>
+            </Conditional.If>
+          </header>
+
+          {children}
+
+          <Conditional.If condition={dismissible}>
+            <DialogPrimitive.Close asChild>
+              <IconButton size="sm" tooltip={false} aria-label={t('close')} className="absolute end-3 top-3">
+                <XIcon />
+              </IconButton>
+            </DialogPrimitive.Close>
           </Conditional.If>
-        </header>
-
-        {children}
-
-        <Conditional.If condition={dismissible}>
-          <DialogPrimitive.Close asChild>
-            <IconButton size="sm" tooltip={false} aria-label={t('close')} className="absolute end-3 top-3">
-              <XIcon />
-            </IconButton>
-          </DialogPrimitive.Close>
-        </Conditional.If>
-      </DialogPrimitive.Content>
+        </DialogPrimitive.Content>
+      </SectionsReset>
     </DialogPrimitive.Portal>
   );
 };

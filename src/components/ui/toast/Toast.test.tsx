@@ -34,6 +34,8 @@ describe('Toast', () => {
     const toast = screen.getByText('Saved').closest('[data-slot="toast"]');
     expect(toast?.getAttribute('data-tone')).toBe('success');
     expect(toast?.className).toContain('bg-surface-raised');
+    expect(toast?.className).toContain('rule-top');
+    expect(toast?.querySelector('[data-slot="toast-title"] [data-slot="section-marker"]')?.textContent).toBe('§');
     expect(screen.getByRole('button', { name: 'Close' })).toBeTruthy();
   });
 
