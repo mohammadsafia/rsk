@@ -56,6 +56,29 @@ describe('countPatterns', () => {
   });
 });
 
+describe('countPatterns — Ledger', () => {
+  it('counts the marks Ledger retires: state fills, soft radii, typed section numbers', () => {
+    const source = [
+      '<a className="data-[state=active]:bg-surface aria-selected:bg-hover aria-[current=page]:bg-hover" />',
+      '<b className="group-data-[variant=contained]/tabs-list:data-[state=active]:bg-surface data-[active=true]:bg-fg" />',
+      '<i className="rounded-xl rounded-2xl" />',
+      '<h2>01</h2><h3>§</h3>',
+    ].join('\n');
+
+    expect(countPatterns(source)).toEqual({ 'state-fill': 5, 'large-control-radius': 2, 'typed-section-number': 2 });
+  });
+
+  it('does not count the Ledger marks or keyboard highlight', () => {
+    const source = [
+      '<a className="data-[state=active]:ink-block data-highlighted:bg-hover data-[selected=true]:bg-hover focus:bg-hover" />',
+      '<i className="rounded-sm rounded-md rounded-lg rounded-full" />',
+      '<h2>{SECTION_SIGN} 2026</h2>',
+    ].join('\n');
+
+    expect(countPatterns(source)).toEqual({});
+  });
+});
+
 describe('compareToBaseline', () => {
   const baseline: Baseline = { 'src/a.tsx': { 'hex-color': 2 } };
 

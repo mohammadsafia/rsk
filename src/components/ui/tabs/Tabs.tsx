@@ -32,7 +32,7 @@ const triggerClassName = [
   'group-data-[variant=underline]/tabs-list:after:absolute group-data-[variant=underline]/tabs-list:after:inset-x-0 group-data-[variant=underline]/tabs-list:after:bottom-0 group-data-[variant=underline]/tabs-list:after:h-0.5',
   'group-data-[variant=underline]/tabs-list:data-[state=active]:after:bg-accent',
   'group-data-[variant=contained]/tabs-list:h-7 group-data-[variant=contained]/tabs-list:rounded-sm group-data-[variant=contained]/tabs-list:px-3',
-  'group-data-[variant=contained]/tabs-list:data-[state=active]:bg-surface group-data-[variant=contained]/tabs-list:data-[state=active]:ring-border group-data-[variant=contained]/tabs-list:data-[state=active]:ring-1',
+  'group-data-[variant=contained]/tabs-list:data-[state=active]:text-fg',
 ].join(' ');
 
 type TabsProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Root>;

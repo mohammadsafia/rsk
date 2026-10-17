@@ -43,11 +43,12 @@ describe('Sidebar', () => {
     expect(viewport?.style.overflowY).toBe('scroll');
   });
 
-  it('marks the active item with aria-current and a hover tint, never a stripe', () => {
+  it('marks the active item with aria-current and the Ledger ink, never a fill or a stripe', () => {
     wrap(menu());
     const active = screen.getByRole('link', { name: 'Dashboard' });
     expect(active.getAttribute('aria-current')).toBe('page');
-    expect(active.className).toContain('aria-[current=page]:bg-hover');
+    expect(active.className).toContain('aria-[current=page]:ink');
+    expect(active.className).not.toContain('aria-[current=page]:bg-');
     expect(active.className).not.toMatch(/border-s-|border-l-|before:/);
     expect(screen.getByRole('link', { name: /Members/ }).getAttribute('aria-current')).toBeNull();
     expect(screen.getByRole('navigation', { name: 'Navigation' })).toBeTruthy();

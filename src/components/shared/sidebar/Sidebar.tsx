@@ -116,7 +116,7 @@ const Item: FC<ItemProps> = ({ href, icon: Icon, active = false, badge, classNam
         aria-current={active ? 'page' : undefined}
         className={cn(
           ROW,
-          'aria-[current=page]:bg-hover aria-[current=page]:text-fg aria-[current=page]:font-medium',
+          'aria-[current=page]:text-fg aria-[current=page]:font-medium aria-[current=page]:ink',
           collapsed && 'md:justify-center md:px-0',
           className,
         )}
