@@ -96,7 +96,7 @@ function Specimen() {
           <div className="flex items-center justify-between">
             <span className={EYEBROW}>{t('specimen.table')}</span>
 
-            <span className="text-fg-subtle font-mono text-xs tabular-nums rtl:font-sans">{t('specimen.rows')}</span>
+            <span className="text-fg-muted font-mono text-xs tabular-nums rtl:font-sans">{t('specimen.rows')}</span>
           </div>
 
           <Table className="mt-2">

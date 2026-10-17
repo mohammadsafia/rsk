@@ -83,7 +83,7 @@ const Group: FC<GroupProps> = ({ label, className, children, ...props }) => {
       <p
         id={labelId}
         className={cn(
-          'text-fg-subtle text-2xs px-3 pb-1 font-medium tracking-wider uppercase rtl:tracking-normal',
+          'text-fg-muted text-2xs px-3 pb-1 font-medium tracking-wider uppercase rtl:tracking-normal',
           collapsed && 'md:sr-only',
         )}
       >

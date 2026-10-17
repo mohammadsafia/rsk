@@ -18,7 +18,7 @@ function Features() {
             data-slot="landing-feature"
             className="border-border-subtle grid gap-x-6 gap-y-1 border-b py-4 md:grid-cols-[3rem_14rem_1fr] md:items-baseline"
           >
-            <span data-slot="landing-feature-number" dir="ltr" className="text-fg-subtle font-mono text-sm tabular-nums">
+            <span data-slot="landing-feature-number" dir="ltr" className="text-fg-muted font-mono text-sm tabular-nums">
               {String(index + 1).padStart(2, '0')}
             </span>
 

@@ -72,7 +72,7 @@ const DayCell: FC<DayCellProps> = ({ dayNumber, isToday, isCurrentMonth, availab
         'mb-1 flex size-6 items-center justify-center rounded-md text-xs tabular-nums',
         isToday && 'text-accent font-semibold',
         !isToday && isCurrentMonth && 'text-fg',
-        !isToday && !isCurrentMonth && 'text-fg-subtle',
+        !isToday && !isCurrentMonth && 'text-fg-muted',
       )}
     >
       {dayNumber}

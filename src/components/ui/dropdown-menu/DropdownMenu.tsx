@@ -176,7 +176,7 @@ const Separator: FC<DropdownMenuSeparatorProps> = ({ className, ...props }) => (
 );
 
 const Shortcut: FC<DropdownMenuShortcutProps> = ({ className, ...props }) => (
-  <span data-slot="dropdown-shortcut" className={cn('text-fg-subtle ms-auto font-mono text-xs', className)} {...props} />
+  <span data-slot="dropdown-shortcut" className={cn('text-fg-muted ms-auto font-mono text-xs', className)} {...props} />
 );
 
 const DropdownMenu: DropdownMenuComponent = (props) => <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;

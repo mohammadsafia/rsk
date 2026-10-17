@@ -35,7 +35,7 @@ export default function OnThisPage({ headings }: { headings: ReadonlyArray<Headi
 
   return (
     <nav aria-label={t('onThisPage')} className="sticky top-6 hidden w-52 shrink-0 self-start xl:block">
-      <p className="text-fg-subtle text-2xs mb-2 font-medium tracking-wider uppercase rtl:tracking-normal">{t('onThisPage')}</p>
+      <p className="text-fg-muted text-2xs mb-2 font-medium tracking-wider uppercase rtl:tracking-normal">{t('onThisPage')}</p>
       <ul className="flex flex-col gap-1.5 text-sm">
         {headings.map((heading) => (
           <li key={heading.slug} className={cn(heading.depth === 3 && 'ps-3')}>

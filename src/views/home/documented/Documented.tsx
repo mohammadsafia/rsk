@@ -23,7 +23,7 @@ function Documented() {
         </Button>
 
         <div aria-hidden="true" className="bg-surface border-border overflow-hidden rounded-lg border">
-          <div dir="ltr" className="border-border-subtle text-fg-subtle border-b px-3 py-2 text-start font-mono text-xs">
+          <div dir="ltr" className="border-border-subtle text-fg-muted border-b px-3 py-2 text-start font-mono text-xs">
             {t('showcase.browserUrl')}/button
           </div>
 
