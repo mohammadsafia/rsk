@@ -32,7 +32,7 @@ const renderPage = (route = '/schedule') =>
       <SchedulePage />
       <Toaster />
     </>,
-    { route, path: '/schedule' },
+    { route, path: '/schedule', urlMemory: true },
   );
 const at = (column: number, minute: number) => ({ clientX: 150 + column * 200, clientY: (minute - 7 * 60) / 0.6 });
 

@@ -116,6 +116,7 @@ const save = async (values: Intake) => {
     { prop: 'draftKey', type: 'string', description: 'Save a session draft under rsk:wizard:<key>.' },
     { prop: 'urlSync', type: 'boolean', default: 'false', description: 'Keep ?step=<id> in the URL.' },
     { prop: 'onCancel', type: '() => void', description: 'Shows Cancel; asks before discarding a dirty form.' },
+    { prop: 'submitLabel', type: 'string', default: "'Submit'", description: 'Label of the final button, e.g. "Register patient".' },
   ]}
 />
 

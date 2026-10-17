@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 
 import { clinicStore } from '@api/clinic';
@@ -23,10 +23,18 @@ function LocationProbe() {
 }
 
 /** Renders a clinic page with the app's providers; any navigation away lands on a location probe. */
-export const renderClinic = (ui: ReactElement, { route = '/', path = '*' }: { route?: string; path?: string } = {}) =>
+/**
+ * `outside` renders next to the routes (like the app's global Toaster), so it survives a page navigating away.
+ * `urlMemory` keeps URL writes (nuqs `hasMemory`) for tests that read back what a page wrote. It is opt-in:
+ * the testing adapter's memory can carry state between tests in one file.
+ */
+export const renderClinic = (
+  ui: ReactElement,
+  { route = '/', path = '*', outside, urlMemory = false }: { route?: string; path?: string; outside?: ReactNode; urlMemory?: boolean } = {},
+) =>
   render(
     // nuqs reads its own copy of the query string; give it the route's so ?range=… etc. reach the page.
-    <NuqsTestingAdapter searchParams={new URL(route, 'http://clinic.test').search} hasMemory>
+    <NuqsTestingAdapter searchParams={new URL(route, 'http://clinic.test').search} hasMemory={urlMemory}>
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false, cacheTime: 0 } } })}>
         <Tooltip.Provider>
           <MemoryRouter initialEntries={[route]}>
@@ -34,6 +42,7 @@ export const renderClinic = (ui: ReactElement, { route = '/', path = '*' }: { ro
               <Route path={path} element={ui} />
               <Route path="*" element={<LocationProbe />} />
             </Routes>
+            {outside}
           </MemoryRouter>
         </Tooltip.Provider>
       </QueryClientProvider>

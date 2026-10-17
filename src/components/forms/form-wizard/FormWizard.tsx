@@ -26,6 +26,8 @@ export type FormWizardProps<TValues extends FieldValues> = {
   /** Keeps ?step=<id> in the URL. */
   urlSync?: boolean;
   onCancel?: () => void;
+  /** Label of the final button, e.g. "Register patient". @default "Submit" */
+  submitLabel?: string;
   className?: string;
   children: ReactNode;
 };
@@ -180,6 +182,7 @@ function FormWizard<TValues extends FieldValues>({
   draftKey,
   urlSync = false,
   onCancel,
+  submitLabel,
   className,
   children,
 }: FormWizardProps<TValues>) {
@@ -188,9 +191,29 @@ function FormWizard<TValues extends FieldValues>({
   const ids = steps.map((step) => step.id);
   const wizard = useWizardSteps(ids);
   const current = steps[wizard.index];
+  // A draft's step may exist only once its restored values apply (a `condition` step), so it's opened by id once
+  // the steps re-render; if it never appears, the wizard opens the first step the draft hasn't completed.
+  const [pendingRestore, setPendingRestore] = useState<{ stepId: string | undefined; completed: string[]; waited: boolean } | null>(null);
   const draft = useWizardDraft(draftKey, form, { stepId: wizard.currentId, completed: wizard.completed }, (stepId, completedIds) =>
-    wizard.restore(stepId ? Math.max(0, ids.indexOf(stepId)) : 0, completedIds),
+    setPendingRestore({ stepId, completed: completedIds, waited: false }),
   );
+  const idsKey = ids.join(',');
+  useEffect(() => {
+    if (!pendingRestore) return;
+    const target = pendingRestore.stepId ? ids.indexOf(pendingRestore.stepId) : 0;
+    if (target === -1 && !pendingRestore.waited) {
+      // Give the restored values one render to add conditional steps.
+      setPendingRestore({ ...pendingRestore, waited: true });
+      return;
+    }
+    const fallback = Math.max(
+      0,
+      ids.findIndex((id) => !pendingRestore.completed.includes(id)),
+    );
+    wizard.restore(target === -1 ? fallback : target, pendingRestore.completed);
+    setPendingRestore(null);
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- re-run when the step list or the pending restore changes
+  }, [pendingRestore, idsKey]);
   const [formError, setFormError] = useState<string[] | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
   // Read during render so react-hook-form tracks dirtiness (formState is a subscription proxy).
@@ -435,7 +458,7 @@ function FormWizard<TValues extends FieldValues>({
               </Button>
             </Conditional.If>
             <Button type="submit" loading={isLast && form.formState.isSubmitting}>
-              {isLast ? t('wizard.submit') : t('wizard.next')}
+              {isLast ? (submitLabel ?? t('wizard.submit')) : t('wizard.next')}
               <Conditional.If condition={!isLast}>
                 <ArrowRight aria-hidden="true" className="size-4 rtl:-scale-x-100" />
               </Conditional.If>
