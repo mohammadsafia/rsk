@@ -51,7 +51,8 @@ function FormCheckboxGroup<TFieldValues extends FieldValues, TOption = FormSelec
 
         return (
           <FormField id={fieldId} label={label} description={description} tooltip={tooltip} required={required} error={error}>
-            {(fieldControl) => (
+            {({ 'aria-required': _required, ...fieldControl }) => (
+              // aria-required isn't allowed on role="group"; the label's required marker carries it.
               <CheckboxGroup {...fieldControl} className={cn('flex flex-wrap gap-x-6 gap-y-2', className)} {...props}>
                 {options.map((option, index) => {
                   const value = getOptionValue(option);

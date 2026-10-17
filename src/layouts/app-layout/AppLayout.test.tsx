@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
@@ -49,7 +49,9 @@ describe('AppLayout', () => {
     renderAt('/dashboard');
     await screen.findByText('Dashboard page');
     const header = document.querySelector('[data-slot="app-shell-header"]') as HTMLElement;
-    expect(header.querySelector('[aria-label="Open command palette"]')).not.toBeNull();
+    // The visible text is the accessible name (WCAG 2.5.3), so voice users can say what they see.
+    const search = within(header).getByRole('button', { name: 'Search or jump to…' });
+    expect(search.getAttribute('aria-keyshortcuts')).toBe('Meta+K Control+K');
     expect(header.querySelector('[aria-label="Open user menu"]')).not.toBeNull();
     expect(header.querySelector('[aria-label="Notifications"]')).not.toBeNull();
     expect(header.innerHTML).not.toMatch(/text-muted-foreground|bg-secondary|ring-primary|bg-background/);

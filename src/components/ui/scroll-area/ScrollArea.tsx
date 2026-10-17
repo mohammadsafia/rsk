@@ -37,7 +37,12 @@ const ScrollArea: ScrollAreaComponent = ({ orientation = 'vertical', className, 
     className={cn('relative overflow-hidden', orientation === 'vertical' && '[&>[data-slot=scroll-area-viewport]>div]:block!', className)}
     {...props}
   >
-    <ScrollAreaPrimitive.Viewport data-slot="scroll-area-viewport" className={cn('h-full w-full rounded-[inherit]', viewportClassName)}>
+    <ScrollAreaPrimitive.Viewport
+      data-slot="scroll-area-viewport"
+      // Focusable so keyboard users can reach and scroll it (WCAG 2.1.1).
+      tabIndex={0}
+      className={cn('focus-ring h-full w-full rounded-[inherit]', viewportClassName)}
+    >
       {children}
     </ScrollAreaPrimitive.Viewport>
 

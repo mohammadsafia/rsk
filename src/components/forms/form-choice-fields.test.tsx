@@ -83,4 +83,14 @@ describe('choice fields', () => {
     expect(label.className).toContain('min-h-control-sm');
     expect(label.firstElementChild?.getAttribute('role')).toBe('checkbox');
   });
+
+  it('FormCheckboxGroup never puts aria-required on its role=group (not allowed there)', () => {
+    render(
+      <FormHarness defaultValues={{ allergies: [] }}>
+        <FormCheckboxGroup name="allergies" label="Allergies" required {...optionProps} />
+      </FormHarness>,
+    );
+    const group = screen.getByRole('group', { name: /Allergies/ });
+    expect(group.hasAttribute('aria-required')).toBe(false);
+  });
 });

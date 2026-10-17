@@ -39,8 +39,11 @@ describe('CalendarGrid localisation', () => {
   it('translates the view tabs and the list/calendar toggle', async () => {
     await act(() => i18n.changeLanguage('ar'));
     renderGrid('month');
-    expect(screen.getByRole('tablist', { name: 'طرق العرض' })).toBeTruthy();
-    expect(screen.getByRole('tab', { name: 'شهر' })).toBeTruthy();
+    // A view switch has no panels: it's a single choice (radio items), not tabs.
+    expect(screen.getByRole('radiogroup', { name: 'طرق العرض' })).toBeTruthy();
+    expect(screen.getByRole('radio', { name: 'شهر' })).toBeTruthy();
+    expect(screen.queryByRole('tablist')).toBeNull();
+    expect(screen.getByRole('radiogroup', { name: 'طريقة العرض' })).toBeTruthy();
     expect(screen.getByRole('radio', { name: 'عرض القائمة' })).toBeTruthy();
   });
 
@@ -51,7 +54,7 @@ describe('CalendarGrid localisation', () => {
 
   it('keeps the default tabs without Agenda', () => {
     renderGrid('month');
-    expect(screen.getAllByRole('tab')).toHaveLength(3);
+    expect(screen.getAllByRole('radio', { name: /^(Day|Week|Month)$/ })).toHaveLength(3);
   });
 
   it('renders weekday headers in the active language', async () => {
