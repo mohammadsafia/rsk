@@ -49,6 +49,15 @@ describe('Sheet', () => {
     expect(classes).not.toMatch(/\b(md:)?(right|left)-0\b/);
   });
 
+  it('slides up only as a bottom sheet; from md it slides in from its side, never from the bottom', () => {
+    render(<Example side="end" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Book' }));
+    const classes = screen.getByRole('dialog').className.split(/\s+/);
+    // Unscoped bottom slides leak into the md side panel and add vertical travel (a diagonal slide from below).
+    expect(classes.filter((name) => /slide-(in-from|out-to)-bottom/.test(name)).every((name) => name.startsWith('max-md:'))).toBe(true);
+    expect(classes).toContain('md:data-[state=open]:slide-in-from-end');
+  });
+
   it('ignores Escape when not dismissible', () => {
     render(<Example dismissible={false} />);
     fireEvent.click(screen.getByRole('button', { name: 'Book' }));

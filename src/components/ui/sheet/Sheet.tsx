@@ -18,7 +18,8 @@ const sheetContentVariants = cva(
     'inset-x-0 bottom-0 max-h-[85dvh] rounded-t-lg border-t',
     'md:inset-y-0 md:max-h-none md:w-full md:rounded-none md:border-t-0',
     'data-[state=open]:animate-in data-[state=closed]:animate-out duration-slow motion-reduce:animate-none',
-    'data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom',
+    // The bottom slide belongs to the bottom sheet only: unscoped, it also sets vertical travel on the md side panel.
+    'max-md:data-[state=open]:slide-in-from-bottom max-md:data-[state=closed]:slide-out-to-bottom',
   ],
   {
     variants: {
