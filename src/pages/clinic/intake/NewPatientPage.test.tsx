@@ -16,7 +16,9 @@ afterEach(async () => {
   await act(() => i18n.changeLanguage('en'));
 });
 
-const renderPage = () => renderClinic(<NewPatientPage />, { route: '/patients/new', path: '/patients/new', outside: <Toaster /> });
+// URL memory on: the wizard's URL sync once chased its own lagging writes here until the worker ran out of memory.
+const renderPage = () =>
+  renderClinic(<NewPatientPage />, { route: '/patients/new', path: '/patients/new', outside: <Toaster />, urlMemory: true });
 
 const type = (label: RegExp, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } });
 const next = async () => {
@@ -99,5 +101,57 @@ describe('NewPatientPage', () => {
     await act(() => i18n.changeLanguage('ar'));
     renderPage();
     expect(await screen.findByRole('heading', { level: 1, name: 'مريض جديد' })).toBeTruthy();
+  });
+
+  it('keeps the draft and says so when registration fails for a reason that is not a field', async () => {
+    renderPage();
+    await fillPatient();
+    await next();
+    await screen.findByRole('heading', { name: 'Contact' });
+    type(/^Phone/, '+962 79 555 0104');
+    await next();
+    await screen.findByRole('heading', { name: 'Documents' });
+    await next();
+    await screen.findByRole('heading', { name: 'Review' });
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    expect(sessionStorage.getItem('rsk:wizard:clinic-intake')).not.toBeNull();
+    clinicStore.failNext('registerPatient');
+    fireEvent.click(screen.getByRole('button', { name: 'Register patient' }));
+    expect((await screen.findByRole('alert')).textContent).toContain('Something went wrong');
+    expect(sessionStorage.getItem('rsk:wizard:clinic-intake')).not.toBeNull();
+  });
+
+  it('refuses a phone without enough digits on the Contact step', async () => {
+    renderPage();
+    await fillPatient();
+    await next();
+    await screen.findByRole('heading', { name: 'Contact' });
+    type(/^Phone/, 'abc');
+    await next();
+    expect(await screen.findByText('Enter a valid phone number')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Contact' })).toBeTruthy();
+  });
+
+  it('registers after skipping Insurance, without an insurer, and falls back per name part in Arabic', async () => {
+    renderPage();
+    await fillPatient({ insured: true });
+    type(/^First name \(Arabic\)/, 'هدى');
+    await next();
+    await screen.findByRole('heading', { name: 'Contact' });
+    type(/^Phone/, '+962 79 555 0105');
+    await next();
+    await screen.findByRole('heading', { name: 'Insurance' });
+    fireEvent.click(screen.getByRole('button', { name: 'Skip' }));
+    await screen.findByRole('heading', { name: 'Documents' });
+    await next();
+    const review = await screen.findByRole('heading', { name: 'Review' });
+    expect(review.closest('form')!.textContent).toContain('May 14, 1990');
+    fireEvent.click(screen.getByRole('button', { name: 'Register patient' }));
+    await screen.findByText('Patient registered');
+    expect(clinicStore.read().patients.find((p) => p.name.en === 'Huda Saadeh')).toMatchObject({
+      insurerId: null,
+      policyNumber: null,
+      name: { en: 'Huda Saadeh', ar: 'هدى Saadeh' },
+    });
   });
 });

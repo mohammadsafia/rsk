@@ -336,6 +336,7 @@
       "dobFuture": "The date of birth can't be in the future",
       "doctorRequired": "Choose a primary doctor",
       "phoneRequired": "Enter a phone number",
+      "phoneInvalid": "Enter a valid phone number",
       "emailInvalid": "Enter a valid email address",
       "insurerRequired": "Choose the insurer",
       "policyRequired": "Enter the policy number"

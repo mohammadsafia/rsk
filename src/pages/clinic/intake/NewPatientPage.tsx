@@ -16,7 +16,7 @@ import {
 } from '@components/forms';
 import { PageHeader } from '@components/shared';
 
-import { toast, useAppTranslation } from '@hooks/shared';
+import { toast, useAppTranslation, useDate } from '@hooks/shared';
 import { FULL_ROUTES_PATH, patientPath } from '@routes';
 
 import { useDoctors, useInsurers, useRegisterPatient } from '../queries';
@@ -63,6 +63,7 @@ function NewPatientPage() {
   const navigate = useNavigate();
   const localize = useLocalized();
   const { todayKey } = useClinicToday();
+  const { formatNullableDate, constants } = useDate();
   const doctors = useDoctors();
   const insurers = useInsurers();
   const register = useRegisterPatient();
@@ -102,7 +103,11 @@ function NewPatientPage() {
         primaryDoctorId: z.string().min(1, t('intake.errors.doctorRequired')),
       }),
       contact: z.object({
-        phone: z.string().trim().min(1, t('intake.errors.phoneRequired')),
+        phone: z
+          .string()
+          .trim()
+          .min(1, t('intake.errors.phoneRequired'))
+          .refine((phone) => phone.replace(/\D/g, '').length >= 7, t('intake.errors.phoneInvalid')),
         email: z.union([z.literal(''), z.string().trim().email(t('intake.errors.emailInvalid'))]),
       }),
       insurance: z.object({
@@ -115,16 +120,17 @@ function NewPatientPage() {
 
   const register_ = async (values: IntakeValues) => {
     const english = `${values.firstNameEn.trim()} ${values.lastNameEn.trim()}`;
-    const arabic = `${values.firstNameAr.trim()} ${values.lastNameAr.trim()}`.trim();
+    // Each Arabic part falls back to its English one, so a half-filled Arabic name still reads as a full name.
+    const arabic = `${values.firstNameAr.trim() || values.firstNameEn.trim()} ${values.lastNameAr.trim() || values.lastNameEn.trim()}`;
     const input: NewPatientInput = {
-      name: { en: english, ar: arabic || english },
+      name: { en: english, ar: arabic },
       sex: values.sex,
       dob: values.dob,
       phone: values.phone.trim(),
       email: values.email.trim() || null,
-      // Unticking "has insurance" drops whatever was typed on the Insurance step.
-      insurerId: values.insured ? values.insurerId : null,
-      policyNumber: values.insured ? values.policyNumber.trim() : null,
+      // Unticking "has insurance", or skipping its step, sends no insurance at all.
+      insurerId: values.insured && values.insurerId ? values.insurerId : null,
+      policyNumber: values.insured && values.insurerId ? values.policyNumber.trim() || null : null,
       allergies: [],
       primaryDoctorId: values.primaryDoctorId,
     };
@@ -139,7 +145,8 @@ function NewPatientPage() {
           Object.fromEntries(Object.entries(error.fieldErrors).map(([field, code]) => [field, t(`errors.${code}`)])),
         );
       }
-      toast({ title: t(`errors.${error instanceof ClinicError ? error.code : 'forced'}`), tone: 'danger' });
+      // Anything else stays on the Review step, with the draft kept, so the user can try again.
+      throw new FormWizardError({ form: t(`errors.${error instanceof ClinicError ? error.code : 'forced'}`) });
     }
   };
 
@@ -169,7 +176,11 @@ function NewPatientPage() {
               { name: 'firstNameEn', label: t('intake.fields.firstNameEn') },
               { name: 'lastNameEn', label: t('intake.fields.lastNameEn') },
               { name: 'sex', label: t('intake.fields.sex'), format: (value) => nameOf(sexOptions, value) },
-              { name: 'dob', label: t('intake.fields.dob') },
+              {
+                name: 'dob',
+                label: t('intake.fields.dob'),
+                format: (value) => formatNullableDate(value as string, constants.DateFormats.SHORT_MONTH_DAY_YEAR, '—'),
+              },
               { name: 'primaryDoctorId', label: t('intake.fields.doctor'), format: (value) => nameOf(doctorOptions, value) },
             ]}
           >

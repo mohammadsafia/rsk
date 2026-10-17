@@ -1,6 +1,9 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { StrictMode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+import { queryClient as appQueryClient } from '@api/config';
 import { NuqsAdapter } from 'nuqs/adapters/react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
@@ -23,23 +26,26 @@ import '../../i18n';
 const renderApp = (route: string) => {
   window.history.replaceState(null, '', route);
   return render(
-    <NuqsAdapter>
-      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false, cacheTime: 0 } } })}>
-        <Tooltip.Provider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/dashboard" element={<OperationsDashboard />} />
-              <Route path="/schedule" element={<SchedulePage />} />
-              <Route path="/patients" element={<PatientsPage />} />
-              <Route path="/patients/new" element={<NewPatientPage />} />
-              <Route path="/patients/:id" element={<PatientProfilePage />} />
-              <Route path="/billing" element={<BillingPage />} />
-            </Routes>
-            <Toaster />
-          </BrowserRouter>
-        </Tooltip.Provider>
-      </QueryClientProvider>
-    </NuqsAdapter>,
+    <StrictMode>
+      <NuqsAdapter>
+        {/* The app's query options (bootstrap.tsx), in a fresh client per test. */}
+        <QueryClientProvider client={new QueryClient({ defaultOptions: appQueryClient.getDefaultOptions() })}>
+          <Tooltip.Provider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/dashboard" element={<OperationsDashboard />} />
+                <Route path="/schedule" element={<SchedulePage />} />
+                <Route path="/patients" element={<PatientsPage />} />
+                <Route path="/patients/new" element={<NewPatientPage />} />
+                <Route path="/patients/:id" element={<PatientProfilePage />} />
+                <Route path="/billing" element={<BillingPage />} />
+              </Routes>
+              <Toaster />
+            </BrowserRouter>
+          </Tooltip.Provider>
+        </QueryClientProvider>
+      </NuqsAdapter>
+    </StrictMode>,
   );
 };
 
@@ -138,6 +144,8 @@ describe('clinic cross-links', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Next' }));
       await screen.findByRole('heading', { name: heading });
     }
+    // Let the wizard's ?step=review write land before leaving the page.
+    await waitFor(() => expect(path()).toContain('step=review'));
     fireEvent.click(screen.getByRole('button', { name: 'Register patient' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'Huda Saadeh' })).toBeTruthy();
     const created = clinicStore.read().patients.find((p) => p.name.en === 'Huda Saadeh')!;

@@ -344,6 +344,7 @@
       "dobFuture": "لا يمكن أن يكون تاريخ الميلاد في المستقبل",
       "doctorRequired": "اختر الطبيب المعالج",
       "phoneRequired": "أدخل رقم الهاتف",
+      "phoneInvalid": "أدخل رقم هاتف صالحًا",
       "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا",
       "insurerRequired": "اختر شركة التأمين",
       "policyRequired": "أدخل رقم البوليصة"

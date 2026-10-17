@@ -103,14 +103,34 @@ function WizardUrlSync({
   const [step, setStep] = useQueryState('step', parseAsString);
   const started = useRef(false);
   const wrote = useRef(false);
+  /**
+   * The URL can trail the wizard: while a write is on its way it may show an older step (an echo of an earlier write,
+   * or the old URL re-read), and a write's echo can land in the same render as the next move. Following those would
+   * move back, write again and chase its own tail. So the URL is followed only when it shows a step other than the
+   * last one the two agreed on (`agreed`), and only while none of this component's writes is in flight.
+   */
+  const inFlight = useRef(0);
+  const agreed = useRef<string | null>(null);
+  const write = (id: string | null, history: 'push' | 'replace') => {
+    agreed.current = id;
+    inFlight.current += 1;
+    void setStep(id, { history }).finally(() => {
+      // Let the landed write's own echo render before following the URL again.
+      setTimeout(() => {
+        inFlight.current -= 1;
+      }, 0);
+    });
+  };
 
   // Reads the URL: on mount, then whenever it changes (browser Back / Forward). Unreachable steps are refused.
   useEffect(() => {
     if (!started.current) {
       started.current = true;
       const target = step ? ids.indexOf(step) : -1;
-      if (target >= 0 && canJumpTo(target)) goTo(target);
-      else
+      if (target >= 0 && canJumpTo(target)) {
+        agreed.current = step;
+        goTo(target);
+      } else
         goTo(
           Math.max(
             0,
@@ -119,16 +139,18 @@ function WizardUrlSync({
         );
       return;
     }
-    if (!step || step === ids[index]) return;
+    if (!step || step === agreed.current || inFlight.current > 0) return;
     const target = ids.indexOf(step);
+    agreed.current = step;
+    if (target === index) return;
     if (target >= 0 && canJumpTo(target)) goTo(target);
-    else void setStep(ids[index] ?? null, { history: 'replace' });
+    else write(ids[index] ?? null, 'replace');
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- follow the URL only when it changes
   }, [step]);
 
   // Writes the URL when the wizard moves: the first write corrects the entry, later ones add history.
   useEffect(() => {
-    if (ids[index] && ids[index] !== step) void setStep(ids[index], { history: wrote.current ? 'push' : 'replace' });
+    if (ids[index] && ids[index] !== step) write(ids[index], wrote.current ? 'push' : 'replace');
     wrote.current = true;
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- write only when the wizard moves
   }, [index]);
@@ -273,6 +295,9 @@ function FormWizard<TValues extends FieldValues>({
    * Moves to another step. Forward moves (Next, the stepper) validate the current step first. Back never blocks, but a
    * passed step left invalid loses its "done" status, so the steps after it lock until it passes again.
    */
+  /** Optional steps the user skipped: submit doesn't hold the form back on them until they're filled in through Next. */
+  const skipped = useRef(new Set<string>());
+
   const moveTo = async (target: number) => {
     if (target === wizard.index || !current) return;
     if (target < wizard.index) {
@@ -284,6 +309,7 @@ function FormWizard<TValues extends FieldValues>({
     const result = await validateStep(current, { focus: true });
     setFormError(result.general.length ? result.general : null);
     if (!result.ok) return;
+    skipped.current.delete(current.id);
     wizard.markCompleted(current.id);
     wizard.goTo(target);
   };
@@ -305,7 +331,7 @@ function FormWizard<TValues extends FieldValues>({
   /** Re-checks every visible step (the last one included) before handing the values to react-hook-form's submit. */
   const submitAll = async (event: FormEvent<HTMLFormElement>) => {
     for (const [index, step] of steps.entries()) {
-      if (step.kind !== 'step' || (index !== wizard.index && !step.schema)) continue;
+      if (step.kind !== 'step' || (index !== wizard.index && !step.schema) || skipped.current.has(step.id)) continue;
       const result = await validateStep(step, { focus: index === wizard.index });
       if (result.ok) continue;
       setFormError(result.general.length ? result.general : null);
@@ -450,6 +476,8 @@ function FormWizard<TValues extends FieldValues>({
                 type="button"
                 variant="ghost"
                 onClick={() => {
+                  skipped.current.add(current.id);
+                  form.clearErrors();
                   wizard.markCompleted(current.id);
                   wizard.goTo(wizard.index + 1);
                 }}
