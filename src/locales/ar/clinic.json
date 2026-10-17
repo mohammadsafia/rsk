@@ -192,5 +192,47 @@
     "cash": "نقدًا",
     "card": "بطاقة",
     "insurance": "تأمين"
+  },
+  "schedule": {
+    "title": "الجدول",
+    "description": "الزيارات حسب الطبيب",
+    "onLeave": "في إجازة",
+    "conference": "مؤتمر",
+    "types": {
+      "consultation": "استشارة",
+      "follow-up": "مراجعة",
+      "procedure": "إجراء",
+      "check-up": "فحص دوري"
+    },
+    "status": {
+      "scheduled": "مجدولة",
+      "arrived": "وصل",
+      "completed": "مكتملة",
+      "no-show": "لم يحضر",
+      "cancelled": "ملغاة"
+    },
+    "actions": {
+      "arrived": "تسجيل الوصول",
+      "noShow": "تسجيل عدم الحضور",
+      "complete": "إنهاء الزيارة",
+      "openProfile": "فتح الملف",
+      "updated": "حُدّثت الزيارة"
+    },
+    "error": {
+      "title": "تعذّر تحميل الجدول",
+      "description": "حدث خطأ ما. حاول مرة أخرى بعد قليل."
+    },
+    "newVisit": {
+      "title": "زيارة جديدة",
+      "patient": "المريض",
+      "patientPlaceholder": "ابحث عن مريض",
+      "type": "نوع الزيارة",
+      "notes": "ملاحظات",
+      "submit": "حجز الزيارة",
+      "booked": "حُجزت الزيارة",
+      "patientRequired": "اختر مريضًا",
+      "when": "{{day}}، {{start}} – {{end}} · {{doctor}}",
+      "cancel": "إلغاء"
+    }
   }
 }

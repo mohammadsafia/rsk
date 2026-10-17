@@ -184,5 +184,47 @@
     "cash": "Cash",
     "card": "Card",
     "insurance": "Insurance"
+  },
+  "schedule": {
+    "title": "Schedule",
+    "description": "Visits by doctor",
+    "onLeave": "On leave",
+    "conference": "Conference",
+    "types": {
+      "consultation": "Consultation",
+      "follow-up": "Follow-up",
+      "procedure": "Procedure",
+      "check-up": "Check-up"
+    },
+    "status": {
+      "scheduled": "Scheduled",
+      "arrived": "Arrived",
+      "completed": "Completed",
+      "no-show": "No-show",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "arrived": "Mark arrived",
+      "noShow": "Mark no-show",
+      "complete": "Complete",
+      "openProfile": "Open profile",
+      "updated": "Visit updated"
+    },
+    "error": {
+      "title": "The schedule couldn't be loaded",
+      "description": "Something went wrong. Try again in a moment."
+    },
+    "newVisit": {
+      "title": "New visit",
+      "patient": "Patient",
+      "patientPlaceholder": "Search patients",
+      "type": "Visit type",
+      "notes": "Notes",
+      "submit": "Book visit",
+      "booked": "Visit booked",
+      "patientRequired": "Choose a patient",
+      "when": "{{day}}, {{start}} – {{end}} · {{doctor}}",
+      "cancel": "Cancel"
+    }
   }
 }

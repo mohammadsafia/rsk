@@ -1,6 +1,6 @@
 import type { ElementType } from 'react';
 
-import { Component, Contact, LayoutDashboard, Receipt, Settings, Users } from 'lucide-react';
+import { CalendarDays, Component, Contact, LayoutDashboard, Receipt, Settings, Users } from 'lucide-react';
 
 export type AppMenu = {
   id: string;
@@ -47,6 +47,9 @@ export const FULL_ROUTES_PATH = {
   BILLING: {
     INDEX: '/billing',
   },
+  SCHEDULE: {
+    INDEX: '/schedule',
+  },
   ROOT: {
     INDEX: '..',
   },
@@ -65,6 +68,13 @@ export const APP_MENU: AppMenu[] = [
     name: 'Dashboard',
     group: 'main',
     icon: LayoutDashboard,
+  },
+  {
+    id: 'schedule',
+    path: FULL_ROUTES_PATH.SCHEDULE.INDEX,
+    name: 'Schedule',
+    group: 'main',
+    icon: CalendarDays,
   },
   {
     id: 'patients',
