@@ -11,6 +11,7 @@ import {
   FONT_FAMILIES,
   RADIUS_SCALE,
   SEMANTIC_COLOR_ROLES,
+  SIGNATURE_MARKS,
   STATE_UTILITIES,
   TEXT_SCALE,
 } from '../../src/lib/constants/DesignTokens';
@@ -183,5 +184,47 @@ describe('code blocks', () => {
   it('always use the dark syntax palette, because --code-surface is dark in both themes', () => {
     expect(indexCss).not.toContain('var(--shiki-light)');
     expect(indexCss).toMatch(/\[data-rehype-pretty-code-figure\] code \[style\*='--shiki-dark'\] \{\s*color: var\(--shiki-dark\)/);
+  });
+});
+
+describe('Ledger signature marks', () => {
+  const utilitiesCss = readProjectFile('src/styles/utilities.css');
+  /** The body of one @utility block (up to the next @utility or the end). */
+  const utilityBlock = (name: string) => {
+    const start = utilitiesCss.indexOf(`@utility ${name} {`);
+    const next = utilitiesCss.indexOf('@utility ', start + 1);
+    return utilitiesCss.slice(start, next < 0 ? undefined : next);
+  };
+
+  for (const mark of SIGNATURE_MARKS) {
+    it(`declares @utility ${mark.token}`, () => expect(utilitiesCss).toContain(`@utility ${mark.token} {`));
+  }
+
+  it('draws in only when reduced motion is not requested', () => {
+    const blocks = utilitiesCss.split('@utility ').filter((block) => block.includes('animation: rsk-draw-in'));
+    expect(blocks.length).toBeGreaterThan(0);
+    for (const block of blocks) {
+      const gate = block.indexOf('@media (prefers-reduced-motion: no-preference)');
+      expect(gate).toBeGreaterThan(-1);
+      expect(gate).toBeLessThan(block.indexOf('animation: rsk-draw-in'));
+    }
+    expect(utilitiesCss).toContain('@keyframes rsk-draw-in');
+  });
+
+  it('mirrors the draw-in under dir=rtl', () => {
+    for (const name of ['ink-block', 'rule-top']) {
+      expect(utilityBlock(name)).toContain('transform-origin: left;');
+      expect(utilityBlock(name)).toMatch(/\[dir='rtl'\][^{]*\{\s*transform-origin: right;/);
+    }
+  });
+
+  it('keeps the ink and the rule visible in forced-colors mode', () => {
+    for (const name of ['ink-block', 'rule-top']) expect(utilityBlock(name)).toContain('@media (forced-colors: active)');
+  });
+
+  it('numbers sections with Western leading-zero counters', () => {
+    expect(utilityBlock('sections')).toContain('counter-reset: rsk-section;');
+    expect(utilityBlock('section-number')).toContain('counter-increment: rsk-section;');
+    expect(utilityBlock('section-number')).toContain('content: counter(rsk-section, decimal-leading-zero);');
   });
 });

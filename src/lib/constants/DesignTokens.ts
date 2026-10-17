@@ -106,3 +106,18 @@ export const STATE_UTILITIES: ReadonlyArray<FoundationScaleStep> = [
   { token: 'state-invalid', value: 'danger border + danger-subtle glow', use: 'aria-invalid controls (always with a message)' },
   { token: 'state-press', value: 'scale(0.98) on :active', use: 'Pressable controls' },
 ];
+
+/** Ledger signature marks (spec docs/superpowers/specs/2026-10-17-ledger-signature-design.md). One mark, one job. */
+export const SIGNATURE_MARKS: ReadonlyArray<FoundationScaleStep> = [
+  { token: 'ink', value: '2px ink underline, 4px offset', use: 'Current / selected text: the only state mark' },
+  { token: 'ink-block', value: '2px ink bar under the element, draws in', use: 'Active tab, current page, current nav item' },
+  { token: 'rule-top', value: '2px heavy rule on top, draws in', use: 'Toasts, stat cards, card headers, events, tooltips' },
+  { token: 'rule-top-section', value: 'rule-top at 3px', use: 'Dialogs, sheets, page sections' },
+  { token: 'rule-top-ink', value: 'rule-top in ink', use: 'Rules on inverse surfaces (tooltip)' },
+  { token: 'figure', value: 'mono 30px tabular, -0.03em', use: 'Values that matter: stats, progress' },
+  { token: 'smallcaps', value: 'uppercase, 0.08em tracking', use: 'Tabs, badges, section labels, table headers' },
+  { token: 'underline-tone', value: '1.5px underline in currentColor', use: 'Badges: status without a box' },
+  { token: 'sections', value: 'counter-reset', use: 'A group whose children are numbered 01, 02, …' },
+  { token: 'section-number', value: 'mono 10.5px counter, fg-subtle', use: 'The number of a structural section' },
+  { token: 'section-mark', value: 'mono 10.5px §, accent', use: 'A single titled block: dialog, sheet, card, toast' },
+];
