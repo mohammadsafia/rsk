@@ -8,7 +8,7 @@ import { cn } from '@utils';
 const switchRootVariants = cva(
   [
     'peer bg-border inline-flex shrink-0 cursor-pointer items-center rounded-full border border-transparent transition-colors',
-    'focus-ring data-[state=checked]:bg-accent disabled:cursor-not-allowed disabled:opacity-50',
+    'focus-ring data-[state=checked]:bg-fg disabled:cursor-not-allowed disabled:opacity-50',
   ],
   {
     variants: {
@@ -24,7 +24,7 @@ const switchRootVariants = cva(
 );
 
 const switchThumbVariants = cva(
-  'bg-fg-muted data-[state=checked]:bg-accent-fg duration-fast pointer-events-none block rounded-full transition-transform',
+  'bg-fg-muted data-[state=checked]:bg-fg-inverse duration-fast pointer-events-none block rounded-full transition-transform',
   {
     variants: {
       size: {

@@ -28,7 +28,7 @@ export const tagVariants = cva('bg-surface inline-flex shrink-0 items-center gap
       false: '',
     },
     selected: {
-      true: 'border-accent bg-accent-subtle text-accent hover:bg-accent-subtle',
+      true: 'border-fg text-fg ink',
       false: '',
     },
     removable: {

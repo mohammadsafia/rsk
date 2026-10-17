@@ -21,4 +21,13 @@ describe('Switch', () => {
     expect(thumb.className).toMatch(/rtl:data-\[state=checked\]:-translate-x-/);
     expect(thumb.className).toContain('rtl:-translate-x-0.5');
   });
+
+  it('fills the checked track with fg and keeps the switch shape', () => {
+    render(<Switch aria-label="SMS reminders" defaultChecked />);
+    const control = screen.getByRole('switch', { name: 'SMS reminders' });
+    expect(control.getAttribute('aria-checked')).toBe('true');
+    expect(control.className).toContain('data-[state=checked]:bg-fg');
+    expect(control.className).toContain('rounded-full');
+    expect(control.querySelector('span')?.className).toContain('data-[state=checked]:bg-fg-inverse');
+  });
 });

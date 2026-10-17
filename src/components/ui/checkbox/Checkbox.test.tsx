@@ -12,8 +12,12 @@ describe('Checkbox', () => {
     expect(screen.getByRole('checkbox', { name: 'Select all' }).getAttribute('aria-checked')).toBe('mixed');
   });
 
-  it('checked state uses the accent', () => {
+  it('checked state fills with fg (Ledger: no accent fill)', () => {
     render(<Checkbox aria-label="Agree" defaultChecked />);
-    expect(screen.getByRole('checkbox', { name: 'Agree' }).className).toContain('data-[state=checked]:bg-accent');
+    const box = screen.getByRole('checkbox', { name: 'Agree' });
+    expect(box.getAttribute('aria-checked')).toBe('true');
+    expect(box.className).toContain('data-[state=checked]:bg-fg');
+    expect(box.className).toContain('text-fg-inverse');
+    expect(box.className).not.toContain('bg-accent');
   });
 });

@@ -102,7 +102,7 @@ export const DURATIONS: ReadonlyArray<FoundationScaleStep> = [
 
 export const STATE_UTILITIES: ReadonlyArray<FoundationScaleStep> = [
   { token: 'focus-ring', value: '2px solid ring + 2px offset', use: 'Buttons, links, toggles' },
-  { token: 'focus-ring-input', value: 'ring border + 3px ring-subtle glow', use: 'Inputs and input-like triggers' },
+  { token: 'focus-ring-input', value: 'fg border + 2px ink underline', use: 'Inputs and input-like triggers (Ledger: the active field)' },
   { token: 'state-invalid', value: 'danger border + danger-subtle glow', use: 'aria-invalid controls (always with a message)' },
   { token: 'state-press', value: 'scale(0.98) on :active', use: 'Pressable controls' },
 ];

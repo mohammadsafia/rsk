@@ -24,7 +24,7 @@ type RadioGroupComponent = FC<RadioGroupProps> & {
 /** The 16px radio circle; `data-state="checked"` draws the accent ring and dot. */
 const radioCircleClassName = [
   'border-border-strong bg-surface flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors',
-  'after:size-2 after:rounded-full data-[state=checked]:border-accent data-[state=checked]:after:bg-accent',
+  'after:size-2 after:rounded-full data-[state=checked]:border-fg data-[state=checked]:after:bg-fg',
   'in-aria-invalid:border-danger',
 ].join(' ');
 
@@ -35,7 +35,7 @@ const Item: FC<RadioGroupItemProps> = ({ ref, className, children, ...props }) =
     className={cn(
       'group/radio-item border-border bg-surface text-fg flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition-colors',
       'focus-ring hover:not-disabled:border-border-strong',
-      'data-[state=checked]:border-accent data-[state=checked]:bg-accent-subtle',
+      'data-[state=checked]:border-fg',
       'in-aria-invalid:border-danger',
       'disabled:pointer-events-none disabled:opacity-50',
       className,

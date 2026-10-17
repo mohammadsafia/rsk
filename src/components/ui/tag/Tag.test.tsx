@@ -49,4 +49,17 @@ describe('Tag', () => {
     );
     expect(screen.getByRole('button', { name: 'Cardiology' }).getAttribute('aria-pressed')).toBe('true');
   });
+
+  it('marks a selected filter tag with ink, keeps aria-pressed and its box', () => {
+    render(
+      <Tag selected onClick={() => {}}>
+        Insured
+      </Tag>,
+    );
+    const tag = screen.getByRole('button', { name: 'Insured' });
+    expect(tag.getAttribute('aria-pressed')).toBe('true');
+    expect(tag.className).toContain('ink');
+    expect(tag.className).toContain('border-fg');
+    expect(tag.className).not.toContain('bg-accent-subtle');
+  });
 });

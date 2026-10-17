@@ -222,6 +222,17 @@ describe('Ledger signature marks', () => {
     for (const name of ['ink-block', 'rule-top']) expect(utilityBlock(name)).toContain('@media (forced-colors: active)');
   });
 
+  it('focuses text fields with an fg border and the ink underline', () => {
+    const block = utilityBlock('focus-ring-input');
+    expect(block).toContain('border-color: var(--fg);');
+    expect(block).toContain('box-shadow: 0 var(--ink-thickness) 0 0 var(--ink);');
+    expect(block).not.toContain('ring-subtle');
+  });
+
+  it('keeps state-invalid after focus-ring-input so invalid wins on focus', () => {
+    expect(utilitiesCss.indexOf('@utility state-invalid {')).toBeGreaterThan(utilitiesCss.indexOf('@utility focus-ring-input {'));
+  });
+
   it('numbers sections with Western leading-zero counters', () => {
     expect(utilityBlock('sections')).toContain('counter-reset: rsk-section;');
     expect(utilityBlock('section-number')).toContain('counter-increment: rsk-section;');

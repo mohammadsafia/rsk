@@ -38,7 +38,7 @@
   }
 }
 
-/* Focus: text inputs and input-like triggers — ring border + soft glow. */
+/* Focus: text inputs and input-like triggers — the field is the active one, so it takes the Ledger ink underline. */
 @utility focus-ring-input {
   /* transparent (not none) so forced-colors mode can still paint a focus outline */
   outline: 2px solid transparent;
@@ -46,8 +46,8 @@
 
   &:focus-visible,
   &:focus-within {
-    border-color: var(--ring);
-    box-shadow: 0 0 0 3px var(--ring-subtle);
+    border-color: var(--fg);
+    box-shadow: 0 var(--ink-thickness) 0 0 var(--ink);
   }
 }
 
