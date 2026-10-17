@@ -87,7 +87,7 @@ export function CodeBlock({ children, className, copyable = true, ...props }: Co
         </IconButton>
       </Conditional.If>
 
-      <pre dir="ltr" {...props} className={cn(preStyles, className)}>
+      <pre dir="ltr" tabIndex={0} {...props} className={cn(preStyles, 'focus-ring', className)}>
         {children}
       </pre>
     </div>

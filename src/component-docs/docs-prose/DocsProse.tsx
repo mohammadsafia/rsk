@@ -11,7 +11,8 @@ const PROSE = cn(
   '[&>p]:text-fg-muted [&>ul]:text-fg-muted [&>ol]:text-fg-muted',
   '[&>ul]:list-disc [&>ul]:ps-5 [&>ol]:list-decimal [&>ol]:ps-5 [&>ul>li]:my-1.5 [&>ol>li]:my-1.5 [&>ul>li]:ps-1 [&>ol>li]:ps-1',
   '[&>p_strong]:text-fg [&>ul_strong]:text-fg [&>ol_strong]:text-fg [&_strong]:font-semibold',
-  '[&>p_a]:text-accent [&>ul_a]:text-accent [&>ol_a]:text-accent [&>p_a]:underline-offset-4 [&>p_a:hover]:underline [&>ul_a:hover]:underline [&>ol_a:hover]:underline',
+  // Underlined, not told apart by colour alone (WCAG 1.4.1).
+  '[&>p_a]:text-accent [&>ul_a]:text-accent [&>ol_a]:text-accent [&>p_a]:underline [&>ul_a]:underline [&>ol_a]:underline [&>p_a]:underline-offset-4 [&>ul_a]:underline-offset-4 [&>ol_a]:underline-offset-4',
   '[&>blockquote]:bg-surface-sunken [&>blockquote]:text-fg-muted [&>blockquote]:rounded-md [&>blockquote]:px-4 [&>blockquote]:py-3',
 );
 
