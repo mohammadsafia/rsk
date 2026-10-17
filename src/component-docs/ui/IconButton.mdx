@@ -1,0 +1,56 @@
+---
+id: icon-button
+title: IconButton
+section: Components
+category: UI
+description: 'Square icon-only action with a required accessible label that doubles as its tooltip.'
+tags: [ui, button, icon, actions, tooltip]
+---
+
+import { IconButton } from '@components/ui';
+import { Copy, Pencil, Trash2 } from 'lucide-react';
+
+## Variants and sizes
+
+Same `variant`, `tone` and `size` as [Button](/docs/components/button); the default variant is `ghost`. Hover to see the tooltip.
+
+<Example title="Variants and sizes">
+  <IconButton size="sm" aria-label="Edit">
+    <Pencil />
+  </IconButton>
+  <IconButton variant="outline" aria-label="Duplicate">
+    <Copy />
+  </IconButton>
+  <IconButton variant="solid" tone="danger" size="lg" aria-label="Delete">
+    <Trash2 />
+  </IconButton>
+</Example>
+
+## Rules
+
+- `aria-label` is required by the type and becomes the tooltip text.
+- Pass `tooltip={false}` only when the button sits inside another trigger (for example a field's clear control), so tooltips don't stack.
+- Use `asChild` with `tooltip={false}` when the icon must render as a non-button element inside another button.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'aria-label', type: 'string', required: true, description: 'Accessible name and tooltip text.' },
+    { prop: 'tooltip', type: 'boolean', default: 'true', description: 'Show aria-label as a tooltip on hover and focus.' },
+    { prop: 'variant', type: "'solid' | 'outline' | 'ghost' | 'link'", default: "'ghost'", description: 'Visual weight.' },
+    { prop: 'tone', type: "'neutral' | 'accent' | 'danger'", default: "'neutral'", description: 'Meaning of the action.' },
+    { prop: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Square: 28px · 32px · 40px.' },
+  ]}
+/>
+
+Every other Button prop (`loading`, `disabled`, `asChild`, `onClick`) passes through; `fullWidth` does not apply.
+
+## Accessibility
+
+- The required `aria-label` names the button; the icon inside is decorative.
+- The tooltip appears on keyboard focus as well as hover.
+
+## RTL notes
+
+- Mirror directional icons (arrows, chevrons) with `rtl:-scale-x-100`; symmetric icons need nothing.

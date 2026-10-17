@@ -1,0 +1,76 @@
+---
+id: card-grid
+title: CardGrid
+section: Components
+category: Shared
+description: 'Responsive grid for cards: one column on phones, more as the screen widens.'
+tags: [shared, layout, grid, card]
+---
+
+import { Card } from '@components/ui';
+import { CardGrid } from '@components/shared';
+
+## Default
+
+One column, two from `sm`, four from `lg`. Resize the window to see it reflow.
+
+<Example title="Stat cards">
+  <CardGrid className="w-full">
+    <Card>
+      <Card.Content className="flex flex-col gap-1">
+        <span className="text-fg-muted text-sm">Visits today</span>
+        <span dir="ltr" className="text-fg font-mono text-2xl font-semibold tabular-nums">48</span>
+      </Card.Content>
+    </Card>
+    <Card>
+      <Card.Content className="flex flex-col gap-1">
+        <span className="text-fg-muted text-sm">No-shows</span>
+        <span dir="ltr" className="text-fg font-mono text-2xl font-semibold tabular-nums">3</span>
+      </Card.Content>
+    </Card>
+    <Card>
+      <Card.Content className="flex flex-col gap-1">
+        <span className="text-fg-muted text-sm">Average wait</span>
+        <span dir="ltr" className="text-fg font-mono text-2xl font-semibold tabular-nums">14 min</span>
+      </Card.Content>
+    </Card>
+    <Card>
+      <Card.Content className="flex flex-col gap-1">
+        <span className="text-fg-muted text-sm">Collected</span>
+        <span dir="ltr" className="text-fg font-mono text-2xl font-semibold tabular-nums">JOD 2,940</span>
+      </Card.Content>
+    </Card>
+  </CardGrid>
+</Example>
+
+## Fixed and per-breakpoint columns
+
+A number fixes the count; an object sets it per breakpoint.
+
+<Example title="Two columns, large gap">
+  <CardGrid columns={2} gap="lg" className="w-full">
+    <Card title="Morning shift" description="08:00 – 14:00" />
+    <Card title="Evening shift" description="14:00 – 20:00" />
+  </CardGrid>
+</Example>
+
+```tsx
+<CardGrid columns={{ base: 1, md: 2, xl: 3 }}>…</CardGrid>
+```
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'columns', type: '1–6 | { base?, sm?, md?, lg?, xl? }', default: '{ base: 1, sm: 2, lg: 4 }', description: 'Fixed count, or count per breakpoint.' },
+    { prop: 'gap', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '8px · 16px · 24px.' },
+  ]}
+/>
+
+## Accessibility
+
+- A plain grid `div`; cards keep their own headings, so the reading order is the source order.
+
+## RTL notes
+
+- Cards flow right to left in Arabic; wrap numbers in `dir="ltr"` as above.

@@ -17,46 +17,25 @@ export type SchemaVisitorResult<T> = {
  * Visitor interface — implement to handle each schema node type.
  */
 export type SchemaNodeVisitor<T> = {
-  visitObject(
-    name: string,
-    schema: OpenAPISchemaObject,
-    properties: Record<string, OpenAPISchemaObject>,
-    required: string[]
-  ): T;
+  visitObject(name: string, schema: OpenAPISchemaObject, properties: Record<string, OpenAPISchemaObject>, required: string[]): T;
 
   visitEnum(name: string, schema: OpenAPISchemaObject, values: string[]): T;
 
-  visitArray(
-    name: string,
-    schema: OpenAPISchemaObject,
-    items: OpenAPISchemaObject
-  ): T;
+  visitArray(name: string, schema: OpenAPISchemaObject, items: OpenAPISchemaObject): T;
 
   visitPrimitive(name: string, schema: OpenAPISchemaObject): T;
 
   visitReference(name: string, ref: string): T;
 
-  visitAllOf(
-    name: string,
-    schema: OpenAPISchemaObject,
-    allOf: OpenAPISchemaObject[]
-  ): T;
+  visitAllOf(name: string, schema: OpenAPISchemaObject, allOf: OpenAPISchemaObject[]): T;
 
-  visitOneOf(
-    name: string,
-    schema: OpenAPISchemaObject,
-    oneOf: OpenAPISchemaObject[]
-  ): T;
+  visitOneOf(name: string, schema: OpenAPISchemaObject, oneOf: OpenAPISchemaObject[]): T;
 };
 
 /**
  * Walk an OpenAPI schema and dispatch to the appropriate visitor method.
  */
-export function walkSchema<T>(
-  name: string,
-  schema: OpenAPISchemaObject,
-  visitor: SchemaNodeVisitor<T>
-): T {
+export function walkSchema<T>(name: string, schema: OpenAPISchemaObject, visitor: SchemaNodeVisitor<T>): T {
   // $ref
   if (schema.$ref) {
     return visitor.visitReference(name, schema.$ref);
@@ -87,12 +66,7 @@ export function walkSchema<T>(
 
   // Object (explicit or has properties)
   if (schema.type === 'object' || schema.properties) {
-    return visitor.visitObject(
-      name,
-      schema,
-      schema.properties ?? {},
-      schema.required ?? []
-    );
+    return visitor.visitObject(name, schema, schema.properties ?? {}, schema.required ?? []);
   }
 
   // Primitive (string, number, integer, boolean)

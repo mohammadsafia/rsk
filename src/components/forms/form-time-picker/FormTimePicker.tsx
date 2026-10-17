@@ -1,15 +1,15 @@
+import { useId } from 'react';
 import { Controller, type FieldValues } from 'react-hook-form';
 
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
+import { FormField } from '@components/forms';
 import { TimePicker, type TimePickerProps } from '@components/ui';
 
 import { type TimeFormat, useDate } from '@hooks/shared';
-import { cn } from '@utils';
 
 import type { ControlledFieldBaseProps } from '@app-types';
 
 type FormTimePickerProps<TFieldValues extends FieldValues> = Omit<ControlledFieldBaseProps<TFieldValues>, 'onChange' | 'value'> &
-  Omit<TimePickerProps, 'name' | 'value' | 'onChange' | 'error'> & {
+  Omit<TimePickerProps, 'name' | 'value' | 'onChange'> & {
     valueFormat?: TimeFormat;
   };
 
@@ -18,16 +18,17 @@ function FormTimePicker<TFieldValues extends FieldValues>({
   rules,
   control,
   label,
+  description,
   tooltip,
-  containerClassName,
-  labelClassName,
   className,
-  errorClassName,
   required,
   valueFormat,
   use24hFormat,
   ...props
 }: FormTimePickerProps<TFieldValues>) {
+  // Unique per instance: two forms on one page may share a field name.
+  const fieldId = `${name}-${useId()}`;
+
   const { toFormat, constants } = useDate();
 
   const displayFormat = use24hFormat ? constants.TimeFormats.HOUR_MINUTES_24 : constants.TimeFormats.HOUR_MINUTES_12;
@@ -53,29 +54,22 @@ function FormTimePicker<TFieldValues extends FieldValues>({
         };
 
         return (
-          <FormControl className={containerClassName}>
-            <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
-              {label}
-            </FormLabel>
-
-            <div className="relative">
+          <FormField id={fieldId} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+            {(fieldControl) => (
               <TimePicker
                 name={name}
+                id={fieldControl.id}
+                invalid={fieldControl.invalid}
+                aria-describedby={fieldControl['aria-describedby']}
+                aria-required={fieldControl['aria-required']}
                 value={timeValue}
                 onChange={handleChange}
                 use24hFormat={use24hFormat}
-                className={cn(
-                  error &&
-                    'border-destructive hover:ring-destructive focus-visible:ring-destructive focus-visible:border-destructive ps-8 focus-visible:ring-1',
-                  className,
-                )}
-                error={!!error}
+                className={className}
                 {...props}
               />
-
-              <FormMessage className={errorClassName} hidden={!error} error={error!} />
-            </div>
-          </FormControl>
+            )}
+          </FormField>
         );
       }}
     />

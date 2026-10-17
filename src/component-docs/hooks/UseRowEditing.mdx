@@ -12,14 +12,16 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-import { Button } from '@components/ui';
+import { Button, Card, IconButton } from '@components/ui';
 import { DataTable } from '@components/tables';
-import { CollapsibleCard, ConfirmDialog } from '@components/shared';
+import { ConfirmDialog } from '@components/shared';
 import { FormContainer, FormInput, FormSelect } from '@components/forms';
 
 import { RowEditingProvider, useDataTable, useRowEditing, useRowEditingContext } from '@hooks/utils';
 
 import { Check, Edit, FileCode2, PlusCircle, Trash, X } from 'lucide-react';
+import { demoSource } from '@component-docs/blocks';
+import pageSource from './UseRowEditing.mdx?raw';
 
 ## Overview
 
@@ -60,27 +62,24 @@ const { table } = useDataTable({
 return (
   <FormContainer formContext={form} onSuccess={handleSubmit}>
     <RowEditingProvider edit={edit}>
-      <CollapsibleCard>
-        <CollapsibleCard.Header>
-          <CollapsibleCard.Leading>
-            <FileCode2 className="text-primary size-5" />
-            <CollapsibleCard.Title>Billable Lines</CollapsibleCard.Title>
-          </CollapsibleCard.Leading>
+      <Card collapsible>
+        <Card.Header>
+          <Card.Title>
+            <FileCode2 className="text-fg-muted size-4" aria-hidden="true" />
+            Billable Lines
+          </Card.Title>
 
-          <div className="flex items-center gap-2">
+          <Card.Actions>
             <AddRowButton />
-            <CollapsibleCard.Trigger>
-              <CollapsibleCard.TriggerIcon />
-            </CollapsibleCard.Trigger>
-          </div>
-        </CollapsibleCard.Header>
+          </Card.Actions>
+        </Card.Header>
 
-        <CollapsibleCard.Content className="p-0">
+        <Card.Content className="p-0">
           <DataTable table={table}>
             <DataTable.Content className="rounded-t-none" emptyState={{ title: 'No lines' }} />
           </DataTable>
-        </CollapsibleCard.Content>
-      </CollapsibleCard>
+        </Card.Content>
+      </Card>
     </RowEditingProvider>
   </FormContainer>
 );
@@ -129,32 +128,32 @@ export const RowActions = ({ row }) => {
   if (isEditing(rowId)) {
     return (
       <div className="flex gap-1">
-        <Button variant="ghost" size="icon" onClick={() => save(rowId, localPersist)} aria-label="Save">
+        <IconButton onClick={() => save(rowId, localPersist)} aria-label="Save">
           <Check className="text-success size-4" />
-        </Button>
+        </IconButton>
 
-        <Button type="button" variant="ghost" size="icon" onClick={() => cancel(rowId)} aria-label="Cancel">
-          <X className="text-muted size-4" />
-        </Button>
+        <IconButton type="button" onClick={() => cancel(rowId)} aria-label="Cancel">
+          <X className="text-fg-muted size-4" />
+        </IconButton>
       </div>
     );
   }
   return (
     <div className="flex gap-1">
-      <Button type="button" variant="ghost" size="icon" disabled={isAnyEditing} onClick={() => enterEdit(rowId)} aria-label="Edit">
+      <IconButton type="button" disabled={isAnyEditing} onClick={() => enterEdit(rowId)} aria-label="Edit">
         <Edit className="size-4" />
-      </Button>
+      </IconButton>
 
-      <ConfirmDialog
-        variant="destructive"
+      <ConfirmDialog tone="danger"
+       
         title="Delete this row?"
         description="This will remove the line from the table. This action cannot be undone."
         confirmLabel="Delete"
         onConfirm={() => removeRow(rowId)}
       >
-        <Button type="button" variant="ghost" size="icon" disabled={isAnyEditing} aria-label="Delete">
-          <Trash className="text-destructive size-4" />
-        </Button>
+        <IconButton type="button" disabled={isAnyEditing} aria-label="Delete">
+          <Trash className="text-danger size-4" />
+        </IconButton>
       </ConfirmDialog>
     </div>
   );
@@ -207,10 +206,10 @@ export const ChargeCell = ({ row }) => {
 export const AddRowButton = () => {
   const { isAnyEditing, addRow } = useRowEditingContext();
   return (
-    <Button
+    <Button variant="outline" size="sm"
       type="button"
-      variant="outline"
-      size="sm"
+     
+     
       disabled={isAnyEditing}
       onClick={() => addRow({ units: '', charge: '' })}
     >
@@ -250,67 +249,66 @@ export const Demo = () => {
   return (
     <FormContainer formContext={form} onSuccess={(v) => console.log('submit', v)}>
       <RowEditingProvider edit={edit}>
-        <CollapsibleCard>
-          <CollapsibleCard.Header>
-            <CollapsibleCard.Leading>
-              <FileCode2 className="text-primary size-5" aria-hidden="true" />
+        <Card collapsible>
+          <Card.Header>
+            <Card.Title>
+              <FileCode2 className="text-fg-muted size-4" aria-hidden="true" />
+              Billable Lines
+            </Card.Title>
 
-              <CollapsibleCard.Title>Billable Lines</CollapsibleCard.Title>
-
-            </CollapsibleCard.Leading>
-
-            <div className="flex items-center gap-2">
+            <Card.Actions>
               <AddRowButton />
+            </Card.Actions>
+          </Card.Header>
 
-              <CollapsibleCard.Trigger>
-                <CollapsibleCard.TriggerIcon />
-              </CollapsibleCard.Trigger>
-            </div>
-          </CollapsibleCard.Header>
-
-          <CollapsibleCard.Content className="p-0">
+          <Card.Content className="p-0">
             <DataTable table={table}>
               <DataTable.Content
                 className="rounded-t-none"
                 emptyState={{ title: 'No lines yet', description: 'Click "Add diagnosis code" to start.' }}
               />
             </DataTable>
-          </CollapsibleCard.Content>
-        </CollapsibleCard>
+          </Card.Content>
+        </Card>
       </RowEditingProvider>
     </FormContainer>
   );
 };
 
-<Demo />
+<Example title="Billable lines" code={demoSource('Demo', pageSource)}>
+  <Demo />
+</Example>
 
 ## API
 
 ### `useRowEditing(options)`
 
-| Option | Type | Default | Notes |
-|---|---|---|---|
-| `form` | `UseFormReturn<TForm>` | — | The parent form |
-| `fieldArray` | `UseFieldArrayReturn<TForm, ArrayPath<TForm>>` | — | The array controller |
-| `arrayName` | `ArrayPath<TForm>` | — | Path to the array in the form |
-| `mode` | `'single' \| 'multi'` | `'single'` | `'single'` blocks entering a 2nd row while one is editing |
-| `rowIdKey` | `keyof TRow & string` | `'id'` | Field on each row used as the stable identifier |
-| `generateRowId` | `() => string` | `crypto.randomUUID` | Override for non-crypto contexts |
+<PropsTable
+  rows={[
+    { prop: 'form', type: 'UseFormReturn<TForm>', required: true, description: 'The parent form.' },
+    { prop: 'fieldArray', type: 'UseFieldArrayReturn<TForm, ArrayPath<TForm>>', required: true, description: 'The array controller.' },
+    { prop: 'arrayName', type: 'ArrayPath<TForm>', required: true, description: 'Path to the array in the form.' },
+    { prop: 'mode', type: "'single' | 'multi'", default: "'single'", description: 'single blocks entering a second row while one is editing.' },
+    { prop: 'rowIdKey', type: 'keyof TRow & string', default: "'id'", description: 'Field on each row used as the stable identifier.' },
+    { prop: 'generateRowId', type: '() => string', default: 'crypto.randomUUID', description: 'Override for non-crypto contexts.' },
+  ]}
+/>
 
 ### Return
 
-| Member | Type | Notes |
-|---|---|---|
-| `editingRowIds` | `ReadonlySet<string>` | Live set of row ids in edit mode |
-| `isEditing(rowId)` | `(rowId: string) => boolean` | Convenience |
-| `isAnyEditing` | `boolean` | Convenience |
-| `enterEdit(rowId)` | `(rowId) => void` | Captures a `structuredClone` snapshot of the row's form values and sets status to `editing` |
-| `exitEdit(rowId)` | `(rowId) => void` | Commit-in-place (no validation) |
-| `save(rowId, persist)` | `(rowId, PersistFn<TRow>) => Promise<void>` | Validates the row, sets status to `saving`, calls `persist(row, { isNew, index, rowId })`, commits the returned mapped row via `fieldArray.update` (or leaves it unchanged if `persist` returns `void`), then exits. Sets status to `error` on validation failure or thrown error so the row can show inline error/spinner |
-| `getStatus(rowId)` | `(rowId) => RowStatus` | One of `'idle' \| 'editing' \| 'creating' \| 'saving' \| 'error'` — drive spinners and inline errors from this |
-| `cancel(rowId)` | `(rowId) => void` | Restores snapshot via `fieldArray.update` |
-| `addRow(defaults?)` | `(defaults?) => string` | Synchronously generates a new `_rowId` via `crypto.randomUUID`, appends `{ ...defaults, _rowId }` to the field array, seeds status as `creating`, and returns the new `_rowId` |
-| `removeRow(rowId)` | `(rowId) => void` | Removes + clears edit state |
+<PropsTable
+  rows={[
+    { prop: 'editingRowIds', type: 'ReadonlySet<string>', description: 'Live set of row ids in edit mode.' },
+    { prop: 'isEditing(rowId) · isAnyEditing', type: '(rowId) => boolean · boolean', description: 'Convenience checks.' },
+    { prop: 'enterEdit(rowId)', type: '(rowId) => void', description: 'Snapshots the row (structuredClone) and sets status to editing.' },
+    { prop: 'exitEdit(rowId)', type: '(rowId) => void', description: 'Commit in place, without validation.' },
+    { prop: 'save(rowId, persist)', type: '(rowId, PersistFn<TRow>) => Promise<void>', description: 'Validates the row, sets saving, calls persist(row, { isNew, index, rowId }), commits the returned row via fieldArray.update, then exits. Sets error on validation failure or a thrown error.' },
+    { prop: 'getStatus(rowId)', type: "(rowId) => 'idle' | 'editing' | 'creating' | 'saving' | 'error'", description: 'Drive spinners and inline errors from this.' },
+    { prop: 'cancel(rowId)', type: '(rowId) => void', description: 'Restores the snapshot via fieldArray.update.' },
+    { prop: 'addRow(defaults?)', type: '(defaults?) => string', description: 'Appends { ...defaults, _rowId } with a new id, seeds status creating, returns the _rowId.' },
+    { prop: 'removeRow(rowId)', type: '(rowId) => void', description: 'Removes the row and clears its edit state.' },
+  ]}
+/>
 
 ### `RowEditingProvider`
 
@@ -331,6 +329,15 @@ Inside cells. Returns `{ table, ...edit }`. Always read state through context �
 
 ## See also
 
-- [`DataTable`](/component-docs/data-table) — the headless table primitive
-- [`FormContainer`](/component-docs/form-container) — the form wrapper
+- [DataTable](/docs/components/data-table): the table the rows render in
+- [FormContainer](/docs/components/form-container): the form wrapper
 - Design spec: `docs/superpowers/specs/2026-05-19-use-row-editing-design.md`
+
+## Accessibility
+
+- Edit, save, cancel and delete are labelled icon buttons; while a row is editing, its cells become real form fields with labels and inline errors.
+- In single mode, disable the other rows' actions (`disabled={isAnyEditing}`) so keyboard users can't leave a row half-edited.
+
+## RTL notes
+
+- The table and its fields follow the page direction; numeric cells (units, charges) stay LTR-isolated and end-aligned.

@@ -4,6 +4,17 @@ import * as PopoverPrimitive from '@radix-ui/react-popover';
 
 import { cn } from '@utils';
 
+/** The raised floating surface shared by Popover, DropdownMenu, Select and Toast (addendum §8). */
+export const floatingSurfaceClassName = 'bg-surface-raised text-fg shadow-raised z-50 rounded-lg outline-none';
+
+/** Enter/exit motion for Radix floating layers: fade + 0.98 scale; reduced motion keeps only the fade. */
+export const floatingMotionClassName = [
+  'duration-base data-[state=open]:animate-in data-[state=closed]:animate-out',
+  'data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
+  'data-[state=open]:zoom-in-98 data-[state=closed]:zoom-out-98',
+  'motion-reduce:data-[state=open]:zoom-in-100 motion-reduce:data-[state=closed]:zoom-out-100',
+].join(' ');
+
 type PopoverTriggerProps = ComponentProps<typeof PopoverPrimitive.Trigger>;
 
 type PopoverContentProps = ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>;
@@ -25,13 +36,7 @@ const PopoverContent: FC<PopoverContentProps> = ({ className, align = 'center', 
       data-slot="popover-content"
       align={align}
       sideOffset={sideOffset}
-      className={cn(
-        'border-muted-200 bg-popover text-popover-foreground z-50 rounded-md border p-4 shadow-md outline-none',
-        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-        'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2',
-        'data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-        className,
-      )}
+      className={cn(floatingSurfaceClassName, floatingMotionClassName, 'p-3', className)}
       {...props}
     />
   </PopoverPrimitive.Portal>
@@ -39,6 +44,7 @@ const PopoverContent: FC<PopoverContentProps> = ({ className, align = 'center', 
 
 const Popover: PopoverComponent = (props) => <PopoverPrimitive.Root data-slot="popover" {...props} />;
 
+// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
 Popover.Trigger = forwardRef<HTMLButtonElement, PopoverTriggerProps>((props, ref) => PopoverTrigger({ ...props, ref }));
 Popover.Content = PopoverContent;
 

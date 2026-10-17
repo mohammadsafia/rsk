@@ -1,18 +1,25 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 
-import { AuthGuard, AuthLayout, DashboardLayout, ErrorBoundary } from '@layouts';
+import { AppLayout, AuthGuard, AuthLayout, ErrorBoundary } from '@layouts';
 
+import { docsRoutes } from './docs-routes';
 import { FULL_ROUTES_PATH } from './routes';
 import { LoginPlaceholder, NotFound, SettingsPlaceholder } from './RoutePlaceholders';
 
 const HomePage = lazy(() => import('@pages/home/HomePage'));
-const ComponentsGalleryPage = lazy(() => import('@pages/components/ComponentsGalleryPage'));
-const ComponentDetailPage = lazy(() => import('@pages/components/ComponentDetailPage'));
-const DashboardPage = lazy(() => import('@pages/dashboard/DashboardPage'));
+const OperationsDashboard = lazy(() => import('@pages/clinic/dashboard/OperationsDashboard'));
 const MembersPage = lazy(() => import('@pages/members/MembersPage'));
+const PatientsPage = lazy(() => import('@pages/clinic/patients/PatientsPage'));
+const BillingPage = lazy(() => import('@pages/clinic/billing/BillingPage'));
+const SchedulePage = lazy(() => import('@pages/clinic/schedule/SchedulePage'));
+const PatientProfilePage = lazy(() => import('@pages/clinic/patient-profile/PatientProfilePage'));
+const NewPatientPage = lazy(() => import('@pages/clinic/intake/NewPatientPage'));
 
 export const router = createBrowserRouter([
+  // Public documentation site (no auth) and redirects from the old /components gallery
+  ...docsRoutes.map((route) => (route.path === '/docs' ? { ...route, errorElement: <ErrorBoundary /> } : route)),
+
   // Public routes
   {
     path: FULL_ROUTES_PATH.HOME.INDEX,
@@ -20,7 +27,11 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Suspense><HomePage /></Suspense>,
+        element: (
+          <Suspense>
+            <HomePage />
+          </Suspense>
+        ),
       },
     ],
   },
@@ -44,19 +55,31 @@ export const router = createBrowserRouter([
     errorElement: <ErrorBoundary />,
     children: [
       {
-        element: <DashboardLayout />,
+        element: <AppLayout />,
         children: [
           {
             path: FULL_ROUTES_PATH.HOME.DASHBOARD,
-            element: <DashboardPage />,
+            element: <OperationsDashboard />,
           },
           {
-            path: FULL_ROUTES_PATH.COMPONENTS.INDEX,
-            element: <ComponentsGalleryPage />,
+            path: FULL_ROUTES_PATH.SCHEDULE.INDEX,
+            element: <SchedulePage />,
           },
           {
-            path: FULL_ROUTES_PATH.COMPONENTS.DETAIL,
-            element: <ComponentDetailPage />,
+            path: FULL_ROUTES_PATH.PATIENTS.INDEX,
+            element: <PatientsPage />,
+          },
+          {
+            path: FULL_ROUTES_PATH.PATIENTS.NEW,
+            element: <NewPatientPage />,
+          },
+          {
+            path: FULL_ROUTES_PATH.PATIENTS.DETAIL,
+            element: <PatientProfilePage />,
+          },
+          {
+            path: FULL_ROUTES_PATH.BILLING.INDEX,
+            element: <BillingPage />,
           },
           {
             path: FULL_ROUTES_PATH.MEMBERS.INDEX,

@@ -1,0 +1,51 @@
+---
+id: spinner
+title: Spinner
+section: Components
+category: UI
+description: 'Indeterminate loading indicator with translated screen-reader text; can overlay its container or the whole page.'
+tags: [ui, spinner, loading, overlay]
+---
+
+import { Spinner } from '@components/ui';
+
+## Sizes
+
+<Example title="Sizes">
+  <Spinner size="sm" />
+  <Spinner />
+  <Spinner size="lg" />
+</Example>
+
+## Overlay
+
+`overlay` covers the nearest positioned ancestor with a translucent scrim. Add `fixed` to cover the viewport.
+
+<Example title="Container overlay">
+  <div className="border-border relative h-32 w-full max-w-md rounded-lg border p-4">
+    <p className="text-fg-muted text-sm">Visit summary is refreshing…</p>
+    <Spinner overlay label="Refreshing visit summary" />
+  </div>
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '16px · 24px · 32px.' },
+    { prop: 'label', type: 'string', default: '"Loading"', description: 'Screen-reader text inside the status region (translated by default).' },
+    { prop: 'overlay', type: 'boolean', default: 'false', description: 'Covers the nearest positioned ancestor with a scrim.' },
+    { prop: 'fixed', type: 'boolean', default: 'false', description: 'With overlay, covers the viewport instead.' },
+  ]}
+/>
+
+For known progress use [Progress](/docs/components/progress); for content placeholders use [Skeleton](/docs/components/skeleton).
+
+## Accessibility
+
+- Renders `role="status"` with the label as text, so screen readers announce it politely; the icon is `aria-hidden`.
+- Rotation stops under `prefers-reduced-motion`.
+
+## RTL notes
+
+- No direction-specific behaviour.

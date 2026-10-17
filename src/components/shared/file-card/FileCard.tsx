@@ -10,16 +10,10 @@ import {
   useState,
 } from 'react';
 
-import { Avatar, Card, Chip } from '@components/ui';
-import {
-  Combobox,
-  ComposedLoadingButton,
-  FileIcon,
-  type NormalizedExtension,
-  PrimeDropdown,
-  PrimeTooltip,
-  TooltipButton,
-} from '@components/shared';
+import { Avatar, Card, Badge, IconButton, Tooltip } from '@components/ui';
+// !Direct import is required and not by mistake to avoid circular dependencies (FileCard reads DropdownMenu statics at module load)
+import DropdownMenu from '@components/ui/dropdown-menu/DropdownMenu';
+import { Combobox, ComposedButton, FileIcon, type NormalizedExtension, ComposedDropdownItem } from '@components/shared';
 import { Conditional } from '@components/utils';
 
 import { type ComboboxOptionsParams, type DateInput, useAppTranslation, useComboboxOptions, useDate } from '@hooks/shared';
@@ -44,13 +38,13 @@ type FileCardContextValue<TEntry> = {
 
 type HeaderProps = ComponentPropsWithoutRef<typeof Card.Header>;
 type TitleProps = Omit<ComponentPropsWithoutRef<'div'>, 'children'>;
-type ActionsProps<TEntry> = { children: FileCardSlotChildren<TEntry> } & Pick<ComponentProps<typeof PrimeDropdown>, 'align'>;
+type ActionsProps<TEntry> = { children: FileCardSlotChildren<TEntry> } & Pick<ComponentProps<typeof DropdownMenu.Content>, 'align'>;
 type PreviewProps<TEntry> = { children: FileCardSlotChildren<TEntry>; className?: string };
 type FileShapeProps = ComponentPropsWithoutRef<'div'>;
 type FolderShapeProps = Omit<ComponentPropsWithoutRef<'div'>, 'children'> & { count: number };
 type ApprovalPromptProps = ComponentPropsWithoutRef<'p'>;
-type ApproveProps = ComponentProps<typeof ComposedLoadingButton>;
-type RejectProps = ComponentProps<typeof ComposedLoadingButton>;
+type ApproveProps = ComponentProps<typeof ComposedButton>;
+type RejectProps = ComponentProps<typeof ComposedButton>;
 type StatusProps<TOption> = Omit<ComboboxOptionsParams<TOption>, 'open'> & {
   value: TOption | null;
   getOptionLabel: (option: TOption) => string;
@@ -85,12 +79,12 @@ type FileCardComponents = (<TEntry>(props: FileCardProps<TEntry>) => ReactNode) 
   Header: FC<HeaderProps>;
   Title: FC<TitleProps>;
   Actions: <TEntry>(props: ActionsProps<TEntry>) => ReactNode;
-  Item: typeof PrimeDropdown.Item;
-  Separator: typeof PrimeDropdown.Separator;
+  Item: typeof ComposedDropdownItem;
+  Separator: typeof DropdownMenu.Separator;
   Preview: <TEntry>(props: PreviewProps<TEntry>) => ReactNode;
   FileShape: FC<FileShapeProps>;
   FolderShape: FC<FolderShapeProps>;
-  StatusPill: typeof Chip;
+  StatusPill: typeof Badge;
   ApprovalPrompt: FC<ApprovalPromptProps>;
   Approve: FC<ApproveProps>;
   Reject: FC<RejectProps>;
@@ -123,9 +117,9 @@ const Title: FC<TitleProps> = ({ className, ...props }) => {
     <div data-slot="file-card-title" className={cn('flex min-w-0 items-center gap-2', className)} {...props}>
       <FileIcon extension={accessors.getFileType(entry)} variant="chip" size={20} />
 
-      <PrimeTooltip content={accessors.getTitle(entry)}>
+      <Tooltip content={accessors.getTitle(entry)}>
         <span className="truncate text-sm font-bold">{accessors.getTitle(entry)}</span>
-      </PrimeTooltip>
+      </Tooltip>
     </div>
   );
 };
@@ -136,15 +130,15 @@ const Actions = <TEntry,>({ children, align = 'end' }: ActionsProps<TEntry>): Re
   const { t } = useAppTranslation('common');
 
   return (
-    <PrimeDropdown align={align}>
-      <PrimeDropdown.Trigger asChild>
-        <TooltipButton title={t('actions')} type="button" variant="ghost" size="icon-sm">
+    <DropdownMenu>
+      <DropdownMenu.Trigger asChild>
+        <IconButton size="sm" type="button" aria-label={t('actions')}>
           <MoreHorizontal size={16} />
-        </TooltipButton>
-      </PrimeDropdown.Trigger>
+        </IconButton>
+      </DropdownMenu.Trigger>
 
-      <PrimeDropdown.List>{children(entry)}</PrimeDropdown.List>
-    </PrimeDropdown>
+      <DropdownMenu.Content align={align}>{children(entry)}</DropdownMenu.Content>
+    </DropdownMenu>
   );
 };
 
@@ -164,46 +158,58 @@ const FileShape: FC<FileShapeProps> = ({ className, children, ...props }) => (
     className={cn('relative isolate flex min-h-40 w-full flex-col items-center justify-center gap-3 px-6 py-4', className)}
     {...props}
   >
-    <FileText size={160} strokeWidth={1.25} className="text-primary-15 absolute inset-0 -z-10 m-auto" />
+    <FileText size={160} strokeWidth={1.25} className="text-border absolute inset-0 -z-10 m-auto" />
 
     <div className="flex flex-col items-center gap-3">{children}</div>
   </div>
 );
 
-const FolderShape: FC<FolderShapeProps> = ({ className, count, ...props }) => (
-  <div
-    data-slot="file-card-folder-shape"
-    className={cn(
-      'bg-primary-15 relative flex min-h-40 w-full max-w-44 flex-col items-center justify-center gap-2 rounded-md px-4 py-6',
-      className,
-    )}
-    {...props}
-  >
-    <FolderOpen size={36} className="text-primary-200" />
+const FolderShape: FC<FolderShapeProps> = ({ className, count, ...props }) => {
+  const { t } = useAppTranslation('common');
 
-    <span className="text-2xl font-bold">{count}</span>
+  return (
+    <div
+      data-slot="file-card-folder-shape"
+      className={cn(
+        'bg-surface-sunken relative flex min-h-40 w-full max-w-44 flex-col items-center justify-center gap-2 rounded-md px-4 py-6',
+        className,
+      )}
+      {...props}
+    >
+      <FolderOpen size={36} aria-hidden="true" className="text-fg-subtle" />
 
-    <span className="text-2xs text-muted-400 font-medium uppercase">{count === 1 ? 'document' : 'documents'}</span>
-  </div>
-);
+      <span className="text-2xl font-bold tabular-nums">{count}</span>
+
+      <span className="text-2xs text-fg-muted font-medium uppercase">{t('fileCard.documents', { count })}</span>
+    </div>
+  );
+};
 
 const ApprovalPrompt: FC<ApprovalPromptProps> = ({ className, children, ...props }) => (
-  <p data-slot="file-card-approval-prompt" className={cn('text-muted-400 text-xs font-medium', className)} {...props}>
+  <p data-slot="file-card-approval-prompt" className={cn('text-fg-muted text-xs font-medium', className)} {...props}>
     {children}
   </p>
 );
 
-const Approve: FC<ApproveProps> = ({ children = 'Approve', ...props }) => (
-  <ComposedLoadingButton variant="outline-success" size="lg" {...props}>
-    {children}
-  </ComposedLoadingButton>
-);
+const Approve: FC<ApproveProps> = ({ children, ...props }) => {
+  const { t } = useAppTranslation('common');
 
-const Reject: FC<RejectProps> = ({ children = 'Reject', ...props }) => (
-  <ComposedLoadingButton variant="outline-destructive" size="lg" {...props}>
-    {children}
-  </ComposedLoadingButton>
-);
+  return (
+    <ComposedButton variant="outline" size="lg" {...props}>
+      {children ?? t('fileCard.approve')}
+    </ComposedButton>
+  );
+};
+
+const Reject: FC<RejectProps> = ({ children, ...props }) => {
+  const { t } = useAppTranslation('common');
+
+  return (
+    <ComposedButton variant="outline" tone="danger" size="lg" {...props}>
+      {children ?? t('fileCard.reject')}
+    </ComposedButton>
+  );
+};
 
 const Status = <TOption,>({
   options,
@@ -214,7 +220,7 @@ const Status = <TOption,>({
   getOptionDisabled,
   queryKey = 'file-card-status-options',
   urlSearchParams,
-  placeholder = 'Select status',
+  placeholder,
   disabled,
   onChange,
 }: StatusProps<TOption>): ReactNode => {
@@ -239,12 +245,14 @@ const Status = <TOption,>({
   return (
     <div data-slot="file-card-status" className="px-4 py-3">
       <Combobox open={open} onOpenChange={setOpen}>
-        <Combobox.Trigger className="bg-primary-15 rounded-full border-none px-4 py-2 shadow-none" disabled={disabled}>
+        <Combobox.Trigger size="sm" className="bg-surface-sunken rounded-full border-none px-4 shadow-none" disabled={disabled}>
           <Conditional.If condition={!!value && !!getOptionDot}>
             <span className={cn('size-3 rounded-full', value && getOptionDot?.(value))} />
           </Conditional.If>
 
-          <Combobox.Value className="text-sm font-bold">{value ? getOptionLabel(value) : placeholder}</Combobox.Value>
+          <Combobox.Value className="text-sm font-bold">
+            {value ? getOptionLabel(value) : (placeholder ?? t('fileCard.selectStatus'))}
+          </Combobox.Value>
 
           <Combobox.Icon />
         </Combobox.Trigger>
@@ -255,7 +263,7 @@ const Status = <TOption,>({
           </Combobox.Input>
 
           <Combobox.List onScroll={onScroll}>
-            <Combobox.Empty when={!isLoading && allOptions.length === 0}>No options</Combobox.Empty>
+            <Combobox.Empty when={!isLoading && allOptions.length === 0}>{t('fileCard.noOptions')}</Combobox.Empty>
 
             {allOptions.map((option) => {
               const optValue = getOptionValue(option);
@@ -279,7 +287,7 @@ const Status = <TOption,>({
               );
             })}
 
-            <Combobox.Loader when={isFetchingNextPage} message="Loading more..." />
+            <Combobox.Loader when={isFetchingNextPage} message={t('loadingMore')} />
           </Combobox.List>
         </Combobox.Content>
       </Combobox>
@@ -301,7 +309,7 @@ const Assignee = <TOption,>({
   getOptionAvatar,
   queryKey = 'file-card-assignee-options',
   urlSearchParams,
-  placeholder = 'Unassigned',
+  placeholder,
   clearTitle,
   disabled,
   onChange,
@@ -319,7 +327,7 @@ const Assignee = <TOption,>({
   });
 
   const selectedValue = value ? getOptionValue(value) : null;
-  const selectedLabel = value ? getOptionLabel(value) : placeholder;
+  const selectedLabel = value ? getOptionLabel(value) : (placeholder ?? t('fileCard.unassigned'));
   const selectedAvatarUrl = value ? getOptionAvatar?.(value) : undefined;
   const selectedInitials = value ? getOptionLabel(value).slice(0, 2).toUpperCase() : '?';
 
@@ -341,19 +349,19 @@ const Assignee = <TOption,>({
         )}
         disabled={disabled}
       >
-        <Avatar className="text-2xs ring-primary-25 size-7 shrink-0 font-bold ring-2">
+        <Avatar size="sm" className="text-2xs ring-surface shrink-0 font-bold ring-2">
           <Avatar.Image src={selectedAvatarUrl} alt={selectedLabel} />
 
-          <Avatar.Fallback className="bg-primary text-primary-foreground">{selectedInitials}</Avatar.Fallback>
+          <Avatar.Fallback className="bg-fg text-fg-inverse">{selectedInitials}</Avatar.Fallback>
         </Avatar>
 
-        <PrimeTooltip content={selectedLabel}>
+        <Tooltip content={selectedLabel}>
           <span className="truncate text-sm font-medium">{selectedLabel}</span>
-        </PrimeTooltip>
+        </Tooltip>
 
         <Combobox.Clear when={!!value && !disabled} title={clearTitle} onClear={onClear} />
 
-        <ChevronDown size={14} className="text-muted-400 shrink-0" />
+        <ChevronDown size={14} aria-hidden="true" className="text-fg-muted shrink-0" />
       </Combobox.Trigger>
 
       <Combobox.Content className="w-(--radix-popover-content-available-width) min-w-64" shouldFilter={!isAsync}>
@@ -362,7 +370,7 @@ const Assignee = <TOption,>({
         </Combobox.Input>
 
         <Combobox.List onScroll={onScroll}>
-          <Combobox.Empty when={!isLoading && allOptions.length === 0}>No assignees</Combobox.Empty>
+          <Combobox.Empty when={!isLoading && allOptions.length === 0}>{t('fileCard.noAssignees')}</Combobox.Empty>
 
           {allOptions.map((option) => {
             const optValue = getOptionValue(option);
@@ -376,12 +384,10 @@ const Assignee = <TOption,>({
               >
                 <Combobox.Indicator />
 
-                <Avatar className="text-2xs ring-primary-25 size-6 font-bold ring-2">
+                <Avatar size="sm" className="text-2xs ring-surface font-bold ring-2">
                   <Avatar.Image src={getOptionAvatar?.(option)} alt={getOptionLabel(option)} />
 
-                  <Avatar.Fallback className="bg-primary text-primary-foreground">
-                    {getOptionLabel(option).slice(0, 2).toUpperCase()}
-                  </Avatar.Fallback>
+                  <Avatar.Fallback className="bg-fg text-fg-inverse">{getOptionLabel(option).slice(0, 2).toUpperCase()}</Avatar.Fallback>
                 </Avatar>
 
                 {getOptionLabel(option)}
@@ -389,7 +395,7 @@ const Assignee = <TOption,>({
             );
           })}
 
-          <Combobox.Loader when={isFetchingNextPage} message="Loading more..." />
+          <Combobox.Loader when={isFetchingNextPage} message={t('loadingMore')} />
         </Combobox.List>
       </Combobox.Content>
     </Combobox>
@@ -401,7 +407,7 @@ const Date: FC<DateProps> = ({ className, ...props }) => {
   const { formatNullableDate, constants } = useDate();
 
   return (
-    <span data-slot="file-card-date" className={cn('text-muted-400 text-xs font-medium', className)} {...props}>
+    <span data-slot="file-card-date" dir="ltr" className={cn('text-fg-muted text-xs font-medium tabular-nums', className)} {...props}>
       {formatNullableDate(accessors.getDate(entry), constants.DateFormats.US_DATE, '')}
     </span>
   );
@@ -414,7 +420,7 @@ function FileCardRoot<TEntry>({ entry, accessors, onClick, className, children, 
     <FileCardContext.Provider value={contextValue as FileCardContextValue<unknown>}>
       <Card
         className={cn(
-          'border-primary-25 flex flex-col border transition-transform',
+          'border-border flex flex-col border transition-transform motion-reduce:transition-none',
           onClick && 'cursor-pointer hover:-translate-y-1',
           className,
         )}
@@ -432,12 +438,12 @@ const FileCard = FileCardRoot as FileCardComponents;
 FileCard.Header = Header;
 FileCard.Title = Title;
 FileCard.Actions = Actions;
-FileCard.Item = PrimeDropdown.Item;
-FileCard.Separator = PrimeDropdown.Separator;
+FileCard.Item = ComposedDropdownItem;
+FileCard.Separator = DropdownMenu.Separator;
 FileCard.Preview = Preview;
 FileCard.FileShape = FileShape;
 FileCard.FolderShape = FolderShape;
-FileCard.StatusPill = Chip;
+FileCard.StatusPill = Badge;
 FileCard.ApprovalPrompt = ApprovalPrompt;
 // React 18 bridge — remove forwardRef wrapper when upgrading to React 19
 FileCard.Approve = forwardRef<HTMLButtonElement, ApproveProps>((props, ref) => Approve({ ...props, ref }));

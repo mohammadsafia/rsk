@@ -1,5 +1,8 @@
 import { Link } from 'react-router-dom';
 
+import { Button } from '@components/ui';
+import { EmptyState, PageHeader } from '@components/shared';
+
 import { useAppTranslation } from '@hooks/shared';
 
 import { FULL_ROUTES_PATH } from './routes';
@@ -8,16 +11,14 @@ export function NotFound() {
   const { t } = useAppTranslation('errors');
 
   return (
-    <div className="flex h-dvh flex-col items-center justify-center gap-3 px-6 text-center">
-      <p className="text-primary text-5xl font-bold">404</p>
-
-      <h1 className="text-foreground text-xl font-semibold">{t('notFound.title')}</h1>
-
-      <p className="text-muted-foreground max-w-sm text-sm">{t('notFound.description')}</p>
-
-      <Link to={FULL_ROUTES_PATH.HOME.INDEX} className="text-primary mt-2 text-sm font-medium hover:underline">
-        {t('notFound.backHome')}
-      </Link>
+    <div className="bg-canvas flex min-h-dvh items-center justify-center p-6">
+      <EmptyState kind="no-results" titleAs="h1" title={t('notFound.title')} description={t('notFound.description')}>
+        <EmptyState.Actions>
+          <Button variant="outline" asChild>
+            <Link to={FULL_ROUTES_PATH.HOME.INDEX}>{t('notFound.backHome')}</Link>
+          </Button>
+        </EmptyState.Actions>
+      </EmptyState>
     </div>
   );
 }
@@ -25,11 +26,11 @@ export function NotFound() {
 export function SettingsPlaceholder() {
   const { t } = useAppTranslation('nav');
 
-  return <div className="text-foreground p-6 text-lg font-semibold">{t('settings')}</div>;
+  return <PageHeader title={t('settings')} />;
 }
 
 export function LoginPlaceholder() {
   const { t } = useAppTranslation('auth');
 
-  return <div className="p-6">{t('login.title')}</div>;
+  return <h1 className="text-fg text-xl font-semibold">{t('login.title')}</h1>;
 }

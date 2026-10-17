@@ -15,11 +15,7 @@ export function createWriteStep(): PipelineStep {
       const writer = new FileWriter();
       const dryRun = ctx.config.dryRun;
 
-      const spinner = logger.spinner(
-        dryRun
-          ? 'Dry-run: previewing changes...'
-          : `Writing ${ctx.generatedFiles.length} file(s) to disk...`
-      );
+      const spinner = logger.spinner(dryRun ? 'Dry-run: previewing changes...' : `Writing ${ctx.generatedFiles.length} file(s) to disk...`);
       spinner.stop();
 
       const results = writer.write(ctx.generatedFiles, dryRun);
@@ -91,13 +87,9 @@ export function createWriteStep(): PipelineStep {
       ctx.stats.filesSkippedUntracked = skippedUntracked;
 
       if (dryRun) {
-        logger.success(
-          `Dry-run complete: ${created} would be created, ${changed} would change, ${unchanged} unchanged.`
-        );
+        logger.success(`Dry-run complete: ${created} would be created, ${changed} would change, ${unchanged} unchanged.`);
       } else {
-        logger.success(
-          `Created ${created}, updated ${changed}, ${unchanged} unchanged.`
-        );
+        logger.success(`Created ${created}, updated ${changed}, ${unchanged} unchanged.`);
       }
     },
   };

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-import { Command, Dialog } from '@components/ui';
+import { Command } from '@components/ui';
 
 import { THEME_TYPES, useCommandPalette, useTheme } from '@contexts';
 import { useAppTranslation, useAuth } from '@hooks/shared';
@@ -24,9 +24,7 @@ function CommandPalette() {
   };
 
   return (
-    <Command.Dialog open={open} onOpenChange={setOpen}>
-      <Dialog.Title className="sr-only">{t('commandPalette')}</Dialog.Title>
-
+    <Command.Dialog title={t('commandPalette')} open={open} onOpenChange={setOpen}>
       <Command.Input placeholder={t('header:searchPlaceholder')} />
 
       <Command.List>

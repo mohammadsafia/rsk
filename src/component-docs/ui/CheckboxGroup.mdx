@@ -3,45 +3,78 @@ id: checkbox-group
 title: CheckboxGroup
 section: Components
 category: UI
-description: 'Card-style checkbox group with composable indicator for custom icons.'
+description: 'Option cards with a checkbox indicator; selected cards take the accent tint.'
 tags: [ui, checkbox, input]
 ---
 
-import { CheckboxGroupDemo } from '@pages/components/components.data.demos';
-
-## Demo
-
-<CheckboxGroupDemo />
-
-## Imports
-
-```tsx
+import { useState } from 'react';
 import { CheckboxGroup } from '@components/ui';
-import { CheckSquareFilled } from '@assets/icons';
-import { Square } from 'lucide-react';
-```
+import { Check } from 'lucide-react';
 
-## Code
+export const OPTIONS = ['Email', 'SMS', 'Push'];
 
-```tsx
-<CheckboxGroup>
-  <CheckboxGroup.Item checked={checked} onCheckedChange={setChecked}>
-    <span className="...">Option 1</span>
-    <CheckboxGroup.Indicator>
-      <CheckSquareFilled className="hidden text-secondary group-data-[state=checked]/checkbox-item:block" />
-      <Square size={24} strokeWidth={1.5} className="block rounded text-muted-300 group-data-[state=checked]/checkbox-item:hidden" />
-    </CheckboxGroup.Indicator>
-  </CheckboxGroup.Item>
-</CheckboxGroup>
+export const ChannelsDemo = () => {
+  const [selected, setSelected] = useState(['Email']);
+  const toggle = (option, checked) => setSelected((current) => (checked ? [...current, option] : current.filter((value) => value !== option)));
 
-// Custom Icons
-<CheckboxGroup>
-  <CheckboxGroup.Item checked={checked} onCheckedChange={setChecked}>
-    <span className="...">Option 1</span>
-    <CheckboxGroup.Indicator>
-      <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/checkbox-item:block" />
-      <Star size={20} className="block text-muted-300 group-data-[state=checked]/checkbox-item:hidden" />
-    </CheckboxGroup.Indicator>
-  </CheckboxGroup.Item>
-</CheckboxGroup>
-```
+  return (
+    <CheckboxGroup aria-label="Notification channels" className="w-full max-w-sm">
+      {OPTIONS.map((option) => (
+        <CheckboxGroup.Item key={option} checked={selected.includes(option)} onCheckedChange={(checked) => toggle(option, !!checked)}>
+          <span className="flex-1">{option}</span>
+          <CheckboxGroup.Indicator>
+            <Check className="hidden size-3 group-data-[state=checked]/checkbox-item:block" strokeWidth={3} />
+          </CheckboxGroup.Indicator>
+        </CheckboxGroup.Item>
+      ))}
+    </CheckboxGroup>
+  );
+};
+
+## Option cards
+
+Each item is a whole-card checkbox; checked cards take the accent border and tint.
+
+<Example
+  title="Controlled selection"
+  code={`const [selected, setSelected] = useState(['Email']);
+
+<CheckboxGroup aria-label="Notification channels">
+  {OPTIONS.map((option) => (
+    <CheckboxGroup.Item
+      key={option}
+      checked={selected.includes(option)}
+      onCheckedChange={(checked) => toggle(option, !!checked)}
+    >
+      <span className="flex-1">{option}</span>
+      <CheckboxGroup.Indicator>
+        <Check className="hidden size-3 group-data-[state=checked]/checkbox-item:block" strokeWidth={3} />
+      </CheckboxGroup.Indicator>
+    </CheckboxGroup.Item>
+  ))}
+</CheckboxGroup>`}
+>
+  <ChannelsDemo />
+</Example>
+
+In forms, use [FormCheckboxGroup](/docs/components/form-checkbox-group), which manages the array value and the label and error.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'invalid', type: 'boolean', default: 'false', description: 'Danger border on every item and aria-invalid on the group.' },
+    { prop: 'Item · checked · onCheckedChange', type: 'boolean · (checked) => void', description: 'Each item is a Radix checkbox; the group does not hold state.' },
+    { prop: 'Item · disabled', type: 'boolean', default: 'false', description: 'Dims and blocks one option.' },
+    { prop: 'Indicator', type: 'ReactNode children', description: 'The 16px box, always mounted; put a Check icon inside.' },
+  ]}
+/>
+
+## Accessibility
+
+- The container has `role="group"`; give it an `aria-label` or `aria-labelledby` naming the choice.
+- Each card is a `role="checkbox"` button with `aria-checked`, so the text inside is its accessible name.
+
+## RTL notes
+
+- The label sits at the start and the indicator at the end, so they swap sides in Arabic.

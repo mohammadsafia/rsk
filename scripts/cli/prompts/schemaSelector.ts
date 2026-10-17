@@ -29,19 +29,11 @@ export async function selectGenerationMode(): Promise<GenerationMode> {
   });
 }
 
-export async function selectSchemas(
-  schemas: Map<string, IRSchema>,
-  diffs?: Map<string, SchemaDiffResult>
-): Promise<string[]> {
+export async function selectSchemas(schemas: Map<string, IRSchema>, diffs?: Map<string, SchemaDiffResult>): Promise<string[]> {
   const choices = Array.from(schemas.entries())
     .map(([key, schema]) => {
       const name = key.split('::')[1];
-      const kindLabel =
-        schema.kind === 'enum'
-          ? '[enum]'
-          : schema.kind === 'alias'
-            ? '[alias]'
-            : '[dto]';
+      const kindLabel = schema.kind === 'enum' ? '[enum]' : schema.kind === 'alias' ? '[alias]' : '[dto]';
 
       let diffLabel = '';
       let sortOrder = 2;
@@ -82,10 +74,7 @@ export async function selectSchemas(
   });
 }
 
-export function filterSchemasByMode(
-  schemas: Map<string, IRSchema>,
-  mode: GenerationMode
-): string[] {
+export function filterSchemasByMode(schemas: Map<string, IRSchema>, mode: GenerationMode): string[] {
   if (mode === 'all') {
     return [];
   }

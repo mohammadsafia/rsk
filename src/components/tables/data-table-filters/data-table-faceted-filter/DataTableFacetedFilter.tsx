@@ -1,6 +1,6 @@
 import type { Column } from '@tanstack/react-table';
 
-import { AsyncSelectFilter, DateFilter, SelectFilter, TimeFilter } from '@components/tables';
+import { AsyncSelectFilter, BooleanFilter, DateFilter, NumberRangeFilter, SelectFilter, TextFilter, TimeFilter } from '@components/tables';
 
 import { isAsyncFilterMeta } from '@utils';
 
@@ -21,10 +21,23 @@ function DataTableFacetedFilter<TData>({ column }: DataTableFacetedFilterProps<T
     case 'time':
       return <TimeFilter column={column} filterMeta={filterMeta} />;
 
-    default:
+    case 'select':
+    case 'multiSelect':
       if (isAsyncFilterMeta(filterMeta)) return <AsyncSelectFilter column={column} filterMeta={filterMeta} />;
 
       return <SelectFilter column={column} filterMeta={filterMeta} />;
+
+    case 'boolean':
+      return <BooleanFilter column={column} filterMeta={filterMeta} />;
+
+    case 'text':
+      return <TextFilter column={column} filterMeta={filterMeta} />;
+
+    case 'numberRange':
+      return <NumberRangeFilter column={column} filterMeta={filterMeta} />;
+
+    default:
+      return null;
   }
 }
 

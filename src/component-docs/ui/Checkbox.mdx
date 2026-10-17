@@ -3,24 +3,52 @@ id: checkbox
 title: Checkbox
 section: Components
 category: UI
-description: 'Multi-select control.'
+description: '16px checkbox with checked and indeterminate states in the Oxblood accent.'
 tags: [ui, input]
 ---
 
 import { Checkbox } from '@components/ui';
 
-## Demo
+## States
 
-<Checkbox defaultChecked />
+<Example title="Unchecked, checked, indeterminate, disabled, invalid">
+  <Checkbox aria-label="Unchecked" />
+  <Checkbox aria-label="Checked" defaultChecked />
+  <Checkbox aria-label="Indeterminate" checked="indeterminate" />
+  <Checkbox aria-label="Disabled" disabled defaultChecked />
+  <Checkbox aria-label="Invalid" invalid />
+</Example>
 
-## Imports
+## With a label
 
-```tsx
-import { Checkbox } from '@components/ui';
-```
+Wrap the checkbox and its text in a `<label>` so clicking the text toggles it.
 
-## Code
+<Example title="Labelled">
+  <label className="text-fg flex items-center gap-2 text-sm">
+    <Checkbox defaultChecked />
+    Email me when a report is ready
+  </label>
+</Example>
 
-```tsx
-<Checkbox defaultChecked />
-```
+In forms, use [FormCheckbox](/docs/components/form-checkbox), which adds the label, description and error message.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'checked', type: "boolean | 'indeterminate'", description: 'Controlled state; "indeterminate" shows a dash.' },
+    { prop: 'defaultChecked', type: 'boolean', description: 'Initial state when uncontrolled.' },
+    { prop: 'onCheckedChange', type: "(checked: boolean | 'indeterminate') => void", description: 'Called when the user toggles it.' },
+    { prop: 'invalid', type: 'boolean', default: 'false', description: 'Danger border and aria-invalid.' },
+    { prop: 'disabled', type: 'boolean', default: 'false', description: 'Dims and blocks interaction.' },
+  ]}
+/>
+
+## Accessibility
+
+- Radix renders a `button` with `role="checkbox"` and `aria-checked` (`mixed` when indeterminate); Space toggles it.
+- Every checkbox needs a label: a wrapping `<label>`, `aria-labelledby`, or `aria-label` when there is no visible text.
+
+## RTL notes
+
+- No direction-specific behaviour; in a label the box sits at the start.

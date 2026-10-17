@@ -11,7 +11,7 @@ function StepCircleCheckedIcon(props: SVGProps<SVGSVGElement>) {
         strokeLinejoin="round"
       />
       <path d="M12 20C16.4 20 20 16.4 20 12C20 7.6 16.4 4 12 4C7.6 4 4 7.6 4 12C4 16.4 7.6 20 12 20Z" fill="currentColor" />
-      <path d="M8 12.5L10.58 14.8299L15.5 10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 12.5L10.58 14.8299L15.5 10" stroke="var(--fg-inverse)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

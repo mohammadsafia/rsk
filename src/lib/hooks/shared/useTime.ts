@@ -2,7 +2,7 @@ export const useTime = () => {
   const padN = (n: number) => n.toString().padStart(2, '0');
 
   const parseTimeString = (val: string): [number, number, string] => {
-    // eslint-disable-next-line prefer-const
+    // oxlint-disable-next-line prefer-const
     let [h, m, am] = val.split(/\W/g);
     if (h === '12' && am !== undefined) h = '0';
     return [parseInt(h) + (am?.toLowerCase() === 'pm' ? 12 : 0), parseInt(m), am];

@@ -36,12 +36,12 @@ registry/
 
 These exports are the contract the UI depends on (re-exported from `registry/index.ts`):
 
-| Export | What it is | When to use |
-|---|---|---|
-| `getComponentDocsRegistry()` | Returns the cached `ReadonlyArray<ComponentDocEntry>` | Used by the docs UI to list and render docs |
-| `resetComponentDocsRegistryCache()` | Clears registry, glob caches, and errors | Use in dev or tests when you need a clean rebuild |
-| `normalizeCategoryKey()` | Normalizes a category key (trim, uppercase, default `UI`) | Use whenever grouping or comparing categories |
-| `componentDocsErrors` | Collected validation errors during registry build | Read in the UI to display issues |
+| Export                              | What it is                                                | When to use                                       |
+| ----------------------------------- | --------------------------------------------------------- | ------------------------------------------------- |
+| `getComponentDocsRegistry()`        | Returns the cached `ReadonlyArray<ComponentDocEntry>`     | Used by the docs UI to list and render docs       |
+| `resetComponentDocsRegistryCache()` | Clears registry, glob caches, and errors                  | Use in dev or tests when you need a clean rebuild |
+| `normalizeCategoryKey()`            | Normalizes a category key (trim, uppercase, default `UI`) | Use whenever grouping or comparing categories     |
+| `componentDocsErrors`               | Collected validation errors during registry build         | Read in the UI to display issues                  |
 
 Types:
 
@@ -127,14 +127,14 @@ Notes:
 
 When frontmatter fields are missing, the registry applies these fallbacks instead of rejecting the entry:
 
-| Field | Fallback | Notes |
-|---|---|---|
-| `id` | Filename without `.mdx` extension | e.g. `Button.mdx` becomes `Button` |
-| `title` | Same as resolved `id` | |
-| `section` | `'Components'` | |
-| `category` | Folder category (normalized) | See category rules below |
-| `description` | `''` (empty string) | |
-| `tags` | `undefined` | |
+| Field         | Fallback                          | Notes                              |
+| ------------- | --------------------------------- | ---------------------------------- |
+| `id`          | Filename without `.mdx` extension | e.g. `Button.mdx` becomes `Button` |
+| `title`       | Same as resolved `id`             |                                    |
+| `section`     | `'Components'`                    |                                    |
+| `category`    | Folder category (normalized)      | See category rules below           |
+| `description` | `''` (empty string)               |                                    |
+| `tags`        | `undefined`                       |                                    |
 
 Missing required fields still produce a validation error in `componentDocsErrors`, but the entry is still included in
 the registry. The UI decides how to handle entries with errors.
@@ -152,7 +152,9 @@ Categories are normalized using:
 Equivalent logic:
 
 ```ts
-String(raw ?? 'UI').trim().toUpperCase() || 'UI'
+String(raw ?? 'UI')
+  .trim()
+  .toUpperCase() || 'UI';
 ```
 
 ### Folder category inference
@@ -175,8 +177,8 @@ Final category is computed as:
 2. Normalize frontmatter category if present
 3. Resolved category:
 
-    - frontmatter category when provided
-    - otherwise folder category
+   - frontmatter category when provided
+   - otherwise folder category
 
 ### Category mismatch reporting
 
@@ -204,7 +206,7 @@ If any required key is missing or empty:
 - the entry is still created using fallback values
 
 Note: the registry does **not** detect duplicate `id` values at runtime. Duplicate detection is handled by the linter
-(`yarn docs:lint`). See `docs/technical-debt.md` for context on this gap.
+(`pnpm docs:lint`). See `docs/technical-debt.md` for context on this gap.
 
 ## Errors surfaced in the UI
 
@@ -240,13 +242,13 @@ Use when you want a clean rebuild without restarting the dev server.
 
 ## Troubleshooting
 
-| Problem | Likely cause | Fix |
-|---|---|---|
-| Doc does not show up | Missing required frontmatter or not under scanned path | Check `componentDocsErrors` and fix frontmatter or location |
-| Category mismatch error | Frontmatter `category` differs from folder category | Update frontmatter or move file to the correct folder |
-| Duplicate id issues | Another doc already uses the same `id` | Change `id` and run `yarn docs:lint` (runtime does not catch this) |
-| Wrong title in gallery | Missing `title` in frontmatter | Add `title`; fallback is the raw `id` which may not look right |
-| Stale data after adding a doc | Registry cache not invalidated | Call `resetComponentDocsRegistryCache()` or restart dev server |
+| Problem                       | Likely cause                                           | Fix                                                                |
+| ----------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------ |
+| Doc does not show up          | Missing required frontmatter or not under scanned path | Check `componentDocsErrors` and fix frontmatter or location        |
+| Category mismatch error       | Frontmatter `category` differs from folder category    | Update frontmatter or move file to the correct folder              |
+| Duplicate id issues           | Another doc already uses the same `id`                 | Change `id` and run `pnpm docs:lint` (runtime does not catch this) |
+| Wrong title in gallery        | Missing `title` in frontmatter                         | Add `title`; fallback is the raw `id` which may not look right     |
+| Stale data after adding a doc | Registry cache not invalidated                         | Call `resetComponentDocsRegistryCache()` or restart dev server     |
 
 ## Summary
 

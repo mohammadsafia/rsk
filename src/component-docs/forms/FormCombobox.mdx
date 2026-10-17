@@ -3,41 +3,42 @@ id: form-combobox
 title: FormCombobox (Searchable Select)
 section: Components
 category: Forms
-description: Searchable dropdown with autocomplete.
-tags: [forms, combobox, search]
+description: Searchable single-select bound to react-hook-form, with static or async options.
+tags: [forms, combobox, search, select]
 ---
 
+import { demoSource } from '@component-docs/blocks';
 import { FormComboboxDemo } from '@pages/components/components.data.demos';
 
-## Demo
+## Static options
 
-<FormComboboxDemo />
+Type to filter the list. For options loaded from an API, pass a function instead of an array; see [FormCombobox (async)](/docs/components/form-combobox-async).
 
-## Imports
+<Example title="Country" code={demoSource('FormComboboxDemo')}>
+  <FormComboboxDemo />
+</Example>
 
-```tsx
-import { FormContainer, FormCombobox } from '@components/forms';
-import { useForm } from 'react-hook-form';
-```
+## API
 
-## Code
+<PropsTable
+  rows={[
+    { prop: 'name · control', type: 'Path · Control', required: true, description: 'Field path and form.control.' },
+    { prop: 'options', type: 'TOption[] | AsyncOptionsFn', required: true, description: 'An array, or a fetcher for async options.' },
+    { prop: 'getOptionLabel · getOptionValue', type: '(option) => string', required: true, description: 'How to read each option.' },
+    { prop: 'getOptionDisabled', type: '(option) => boolean', description: 'Disable individual options.' },
+    { prop: 'valueType', type: "'flat' | 'contain'", default: "'flat'", description: 'Store the option value, or the whole option object.' },
+    { prop: 'onOptionChange', type: '(option | null) => void', description: 'Called with the selected option object.' },
+    { prop: 'placeholder · noOptionsText', type: 'string', description: 'Empty-field text and empty-list text.' },
+  ]}
+/>
 
-```tsx
-const form = useForm();
-const options = [
-  { id: 'us', name: 'United States' },
-  { id: 'uk', name: 'United Kingdom' },
-];
+Plus the [shared field props](/docs/components/form-field#shared-by-every-form-field). The UI is the shared [Combobox](/docs/components/combobox).
 
-<FormContainer formContext={form} onSuccess={console.log}>
-  <FormCombobox
-    name="country"
-    control={form.control}
-    label="Country"
-    options={options}
-    getOptionLabel={(o) => o.name}
-    getOptionValue={(o) => o.id}
-    placeholder="Search country..."
-  />
-</FormContainer>;
-```
+## Accessibility
+
+- The search box gets focus when the list opens; Arrow keys move through options and Enter selects.
+- The selected option shows a check mark; picking an option closes the list.
+
+## RTL notes
+
+- The chevron sits at the end of the field, on the left in Arabic.

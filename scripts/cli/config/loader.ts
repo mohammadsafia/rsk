@@ -11,9 +11,7 @@ import { logger } from '../utils/logger.js';
 
 export function loadConfig(configPath?: string): DtoGenConfig {
   const projectRoot = findProjectRoot();
-  const resolvedPath = configPath
-    ? path.resolve(configPath)
-    : path.join(projectRoot, CONFIG_FILENAME);
+  const resolvedPath = configPath ? path.resolve(configPath) : path.join(projectRoot, CONFIG_FILENAME);
 
   if (!fs.existsSync(resolvedPath)) {
     logger.dim(`No config file found at ${resolvedPath}, using defaults.`);
@@ -39,9 +37,7 @@ export function loadConfig(configPath?: string): DtoGenConfig {
 
 export function saveConfig(config: DtoGenConfig, configPath?: string): void {
   const projectRoot = findProjectRoot();
-  const resolvedPath = configPath
-    ? path.resolve(configPath)
-    : path.join(projectRoot, CONFIG_FILENAME);
+  const resolvedPath = configPath ? path.resolve(configPath) : path.join(projectRoot, CONFIG_FILENAME);
 
   const { dryRun, ...configToSave } = config;
   fs.writeFileSync(resolvedPath, JSON.stringify(configToSave, null, 2) + '\n', 'utf-8');

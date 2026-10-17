@@ -13,9 +13,21 @@ function StepCircleRejectIcon(props: SVGProps<SVGSVGElement>) {
 
       <path d="M12 20C16.4 20 20 16.4 20 12C20 7.6 16.4 4 12 4C7.6 4 4 7.6 4 12C4 16.4 7.6 20 12 20Z" fill="currentColor" />
 
-      <path d="M9.16992 14.8299L14.8299 9.16992" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M9.16992 14.8299L14.8299 9.16992"
+        stroke="var(--fg-inverse)"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
 
-      <path d="M14.8299 14.8299L9.16992 9.16992" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M14.8299 14.8299L9.16992 9.16992"
+        stroke="var(--fg-inverse)"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }

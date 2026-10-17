@@ -1,0 +1,50 @@
+---
+id: textarea
+title: Textarea
+section: Components
+category: UI
+description: 'Multi-line field on the shared field shape; grows with its content.'
+tags: [ui, textarea, input]
+---
+
+import { Textarea } from '@components/ui';
+
+## Basic
+
+The field starts at 80px and grows with its content (`field-sizing: content`); users can still drag it taller.
+
+<Example title="Notes">
+  <div className="w-full max-w-md">
+    <Textarea aria-label="Visit notes" placeholder="Visit notes" />
+  </div>
+</Example>
+
+## States
+
+<Example title="Invalid and disabled">
+  <div className="grid w-full max-w-md gap-3">
+    <Textarea aria-label="Reason" invalid defaultValue="Too short" />
+    <Textarea aria-label="Locked notes" disabled defaultValue="Signed notes can't be edited." />
+  </div>
+</Example>
+
+In forms, use [FormTextarea](/docs/components/form-textarea), which adds the label, description and error message.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'invalid', type: 'boolean', default: 'false', description: 'Danger border and aria-invalid.' },
+  ]}
+/>
+
+Every native `<textarea>` attribute passes through (`rows`, `maxLength`, `placeholder`, `disabled`, …). A disabled textarea stops growing.
+
+## Accessibility
+
+- A native textarea: label it with a `<label htmlFor>`, `aria-label`, or the form field.
+- Pair `maxLength` with a visible counter if the limit matters.
+
+## RTL notes
+
+- Text direction follows the page; Arabic notes read right to left and the resize handle moves to the left corner.

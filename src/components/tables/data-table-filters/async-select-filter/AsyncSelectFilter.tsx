@@ -1,17 +1,17 @@
-import { type MouseEvent, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import type { Column } from '@tanstack/react-table';
 
-import { Checkbox, RadioDot } from '@components/ui';
+import { Checkbox, RadioGroup } from '@components/ui';
 import { Combobox } from '@components/shared';
 import { Conditional } from '@components/utils';
-import { type FilterChipItem, FilterChipList } from '@components/tables';
+import { FilterPill } from '@components/tables/data-table-filters/filter-pill';
 
-import { type AsyncOptionsFn, useAsyncOptionsInfiniteQuery, useDebounce, useInfiniteScroll } from '@hooks/shared';
-
-import { ChevronDown } from 'lucide-react';
+import { type AsyncOptionsFn, useAppTranslation, useAsyncOptionsInfiniteQuery, useDebounce, useInfiniteScroll } from '@hooks/shared';
 
 import type { SelectFilterMeta } from '@app-types';
+
+type FilterChip = { value: string; label: string };
 
 type AsyncSelectFilterProps<TData> = {
   column: Column<TData>;
@@ -19,6 +19,7 @@ type AsyncSelectFilterProps<TData> = {
 };
 
 function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps<TData>) {
+  const { t } = useAppTranslation('common');
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -46,7 +47,7 @@ function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps
 
   const allOptions = useMemo(() => infiniteQuery.data?.pages.flatMap((p) => p.data) ?? [], [infiniteQuery.data]);
 
-  const chips = useMemo<FilterChipItem[]>(
+  const chips = useMemo<FilterChip[]>(
     () =>
       selectedValues.map((val) => {
         const option = allOptions.find((o) => filterMeta.getOptionValue(o) === val);
@@ -73,30 +74,9 @@ function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps
     [column, isMulti, selectedSet, selectedValues],
   );
 
-  const onRemoveChip = useCallback(
-    (chipValue: string, e: MouseEvent) => {
-      e.stopPropagation();
-      e.preventDefault();
-
-      if (isMulti) {
-        const next = selectedValues.filter((v) => v !== chipValue);
-        column.setFilterValue(next.length > 0 ? next : undefined);
-      } else {
-        column.setFilterValue(undefined);
-      }
-    },
-    [column, isMulti, selectedValues],
-  );
-
   return (
     <Combobox open={open} onOpenChange={setOpen}>
-      <Combobox.Trigger className="hover:not-disabled:border-primary-25 hover:not-disabled:ring-primary-25 w-auto gap-1 rounded-sm px-2 py-1 text-xs">
-        {filterMeta.label}
-
-        <ChevronDown size={16} className="text-muted-400" />
-
-        <FilterChipList chips={chips} onRemoveChip={onRemoveChip} maxVisibleChips={isMulti ? undefined : 1} />
-      </Combobox.Trigger>
+      <FilterPill label={filterMeta.label} values={chips.map((chip) => chip.label)} onClear={() => column.setFilterValue(undefined)} />
 
       <Combobox.Content className="min-w-60" shouldFilter={false}>
         <Combobox.Input placeholder={filterMeta.placeholder ?? filterMeta.label} value={search} onValueChange={setSearch}>
@@ -104,7 +84,7 @@ function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps
         </Combobox.Input>
 
         <Combobox.List onScroll={handleScroll}>
-          <Combobox.Empty when={!infiniteQuery.isFetching && allOptions.length === 0}>No results</Combobox.Empty>
+          <Combobox.Empty when={!infiniteQuery.isFetching && allOptions.length === 0}>{t('noResults')}</Combobox.Empty>
 
           {allOptions.map((opt) => {
             const optValue = filterMeta.getOptionValue(opt);
@@ -120,13 +100,13 @@ function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps
                 <Conditional>
                   <Conditional.If condition={isMulti}>
                     <Combobox.Indicator>
-                      <Checkbox checked={isChecked} variant="primary" tabIndex={-1} className="pointer-events-none" />
+                      <Checkbox checked={isChecked} tabIndex={-1} className="pointer-events-none" />
                     </Combobox.Indicator>
                   </Conditional.If>
 
                   <Conditional.Else>
                     <Combobox.Indicator>
-                      <RadioDot checked={isChecked} />
+                      <RadioGroup.Dot checked={isChecked} />
                     </Combobox.Indicator>
                   </Conditional.Else>
                 </Conditional>
@@ -136,7 +116,7 @@ function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps
             );
           })}
 
-          <Combobox.Loader when={infiniteQuery.isFetchingNextPage} message="Loading more..." />
+          <Combobox.Loader when={infiniteQuery.isFetchingNextPage} message={t('loadingMore')} />
         </Combobox.List>
       </Combobox.Content>
     </Combobox>

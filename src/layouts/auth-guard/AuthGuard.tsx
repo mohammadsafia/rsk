@@ -1,7 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
-import { PrimeLoader } from '@components/shared';
 import { useAuth } from '@hooks/shared';
 
 import { FULL_ROUTES_PATH } from '@routes';

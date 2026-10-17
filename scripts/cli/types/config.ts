@@ -11,8 +11,8 @@ export type SwaggerEndpoint = {
 };
 
 export type FormattingConfig = {
-  prettier: boolean;
-  eslint: boolean;
+  format: boolean;
+  lint: boolean;
 };
 
 export type DtoGenConfig = {

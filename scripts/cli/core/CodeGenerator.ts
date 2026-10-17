@@ -3,11 +3,7 @@
  * Delegates to the appropriate generator based on schema kind and options.
  */
 
-import type {
-  IRSchema,
-  GeneratorOptions,
-  GeneratorResult,
-} from '../types/index.js';
+import type { IRSchema, GeneratorOptions, GeneratorResult } from '../types/index.js';
 import { GeneratorRegistry } from '../generators/GeneratorRegistry.js';
 
 export class CodeGenerator {
@@ -24,9 +20,7 @@ export class CodeGenerator {
     const generator = this.registry.resolve(schema, options);
 
     if (!generator) {
-      throw new Error(
-        `No generator found for schema "${schema.name}" (kind: ${schema.kind})`
-      );
+      throw new Error(`No generator found for schema "${schema.name}" (kind: ${schema.kind})`);
     }
 
     return generator.generate(schema, options);
@@ -35,10 +29,7 @@ export class CodeGenerator {
   /**
    * Generate code for multiple schemas.
    */
-  generateAll(
-    schemas: IRSchema[],
-    options: GeneratorOptions
-  ): GeneratorResult[] {
+  generateAll(schemas: IRSchema[], options: GeneratorOptions): GeneratorResult[] {
     return schemas.map((schema) => this.generate(schema, options));
   }
 }

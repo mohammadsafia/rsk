@@ -10,3 +10,4 @@ export * from './useTime';
 export * from './useAuth';
 export * from './useDataTableQuery';
 export * from './useAppTranslation';
+export * from './useDataTableFilters';

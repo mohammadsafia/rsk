@@ -88,9 +88,7 @@ class Logger {
    *
    * @param roots — Array of root nodes, each with optional children (recursive).
    */
-  tree(
-    roots: TreeNode[]
-  ): void {
+  tree(roots: TreeNode[]): void {
     for (const root of roots) {
       console.log(`    ${chalk.green(root.label)}`);
       this.printTreeChildren(root.children ?? [], '    ');

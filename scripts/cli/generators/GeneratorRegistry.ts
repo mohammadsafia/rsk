@@ -23,10 +23,7 @@ export class GeneratorRegistry {
   /**
    * Find the first generator that supports the given schema and options.
    */
-  resolve(
-    schema: IRSchema,
-    options: GeneratorOptions
-  ): BaseGenerator | undefined {
+  resolve(schema: IRSchema, options: GeneratorOptions): BaseGenerator | undefined {
     return this.generators.find((g) => g.supports(schema, options));
   }
 

@@ -1,128 +1,157 @@
-import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type HTMLAttributes } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
+import { floatingMotionClassName, IconButton } from '@components/ui';
+import { Conditional } from '@components/utils';
+
+import { useAppTranslation } from '@hooks/shared';
+
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
-type DialogPortalProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Portal>;
-type DialogOverlayProps = ComponentProps<typeof DialogPrimitive.Overlay>;
-type DialogTriggerProps = ComponentProps<typeof DialogPrimitive.Trigger>;
-type DialogPanelProps = ComponentProps<typeof DialogPrimitive.Content>;
-type DialogCloseProps = ComponentProps<typeof DialogPrimitive.Close>;
-type DialogHeaderProps = HTMLAttributes<HTMLDivElement>;
-type DialogTitleProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Title>;
-type DialogDescriptionProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Description>;
-type DialogContentProps = HTMLAttributes<HTMLElement>;
-type DialogFooterProps = HTMLAttributes<HTMLDivElement>;
+import { XIcon } from 'lucide-react';
+
+const dialogContentVariants = cva(
+  [
+    'bg-surface-raised text-fg shadow-overlay fixed inset-x-4 top-1/2 z-50 mx-auto flex max-h-[85dvh] -translate-y-1/2 flex-col gap-4',
+    'overflow-y-auto rounded-lg p-5 outline-none',
+  ],
+  {
+    variants: {
+      size: {
+        sm: 'max-w-sm',
+        md: 'max-w-lg',
+        lg: 'max-w-2xl',
+      },
+    },
+    defaultVariants: {
+      size: 'md',
+    },
+  },
+);
 
 type DialogProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Root>;
+type DialogTriggerProps = ComponentProps<typeof DialogPrimitive.Trigger>;
+type DialogCloseProps = ComponentProps<typeof DialogPrimitive.Close>;
+type DialogFooterProps = ComponentPropsWithoutRef<'footer'>;
+
+export type DialogContentProps = Omit<ComponentProps<typeof DialogPrimitive.Content>, 'title'> &
+  VariantProps<typeof dialogContentVariants> & {
+    title: ReactNode;
+    /** Keeps the title for assistive tech but hides it visually. */
+    hideTitle?: boolean;
+    description?: ReactNode;
+    /** When false: no close button, Escape and outside interaction are ignored. */
+    dismissible?: boolean;
+  };
 
 type DialogComponent = FC<DialogProps> & {
-  Portal: FC<DialogPortalProps>;
-  Overlay: FC<DialogOverlayProps>;
   Trigger: FC<DialogTriggerProps>;
-  Panel: FC<DialogPanelProps>;
-  Close: FC<DialogCloseProps>;
-  Header: FC<DialogHeaderProps>;
-  Title: FC<DialogTitleProps>;
-  Description: FC<DialogDescriptionProps>;
   Content: FC<DialogContentProps>;
   Footer: FC<DialogFooterProps>;
+  Close: FC<DialogCloseProps>;
 };
 
-const DialogOverlay: FC<DialogOverlayProps> = ({ ref, className, ...props }) => (
-  <DialogPrimitive.Overlay
-    ref={ref}
-    data-slot="dialog-overlay"
-    className={cn(
-      'bg-foreground/20 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50',
-      className,
-    )}
-    {...props}
-  />
+type EscapeKeyDownEvent = Parameters<NonNullable<DialogContentProps['onEscapeKeyDown']>>[0];
+type InteractOutsideEvent = Parameters<NonNullable<DialogContentProps['onInteractOutside']>>[0];
+
+const DialogTrigger: FC<DialogTriggerProps> = ({ ref, ...props }) => (
+  <DialogPrimitive.Trigger ref={ref} data-slot="dialog-trigger" {...props} />
 );
 
-const DialogTrigger: FC<DialogTriggerProps> = ({ ref, className, ...props }) => (
-  <DialogPrimitive.Trigger ref={ref} data-slot="dialog-trigger" className={cn(className)} {...props} />
-);
+const DialogClose: FC<DialogCloseProps> = ({ ref, ...props }) => <DialogPrimitive.Close ref={ref} data-slot="dialog-close" {...props} />;
 
-const DialogPanel: FC<DialogPanelProps> = ({ ref, className, children, ...props }) => (
-  <DialogPrimitive.Portal>
-    <Dialog.Overlay />
+const DialogContent: FC<DialogContentProps> = ({
+  ref,
+  className,
+  size,
+  title,
+  hideTitle = false,
+  description,
+  dismissible = true,
+  onEscapeKeyDown,
+  onInteractOutside,
+  children,
+  ...props
+}) => {
+  const { t } = useAppTranslation('common');
 
-    <DialogPrimitive.Content
-      ref={ref}
-      onWheel={(e) => e.stopPropagation()}
-      data-slot="dialog-panel"
-      className={cn(
-        'bg-background grid w-full max-w-lg gap-6 rounded-2xl py-6 shadow-lg',
-        'fixed left-1/2 top-1/2 z-50 translate-x-[-50%] translate-y-[-50%] duration-200',
-        'focus:outline-none',
-        'data-[state=open]:animate-in data-[state=closed]:animate-out',
-        'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-        'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-        'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-top',
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </DialogPrimitive.Content>
-  </DialogPrimitive.Portal>
-);
+  const handleEscapeKeyDown = (event: EscapeKeyDownEvent) => {
+    if (!dismissible) event.preventDefault();
+    onEscapeKeyDown?.(event);
+  };
 
-const DialogClose: FC<DialogCloseProps> = ({ ref, className, ...props }) => (
-  <DialogPrimitive.Close ref={ref} data-slot="dialog-close" className={cn(className)} {...props} />
-);
+  const handleInteractOutside = (event: InteractOutsideEvent) => {
+    if (!dismissible) event.preventDefault();
+    onInteractOutside?.(event);
+  };
 
-const DialogHeader: FC<HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
-  <header data-slot="dialog-header" className={cn('px-6', className)} {...props} />
-);
+  // Radix warns unless a dialog without a Description opts out explicitly.
+  const describedBy = description ? {} : { 'aria-describedby': undefined };
 
-const DialogHeaderTitle: FC<ComponentPropsWithoutRef<typeof DialogPrimitive.Title>> = ({ className, ...props }) => (
-  <DialogPrimitive.Title
-    data-slot="dialog-title"
-    className={cn('text-foreground text-xl leading-none font-semibold', className)}
-    {...props}
-  />
-);
+  return (
+    <DialogPrimitive.Portal>
+      <DialogPrimitive.Overlay
+        data-slot="dialog-overlay"
+        className={cn(
+          'bg-overlay fixed inset-0 z-50 duration-slow',
+          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
+        )}
+      />
 
-const DialogHeaderDescription: FC<ComponentPropsWithoutRef<typeof DialogPrimitive.Description>> = ({ className, ...props }) => (
-  <DialogPrimitive.Description data-slot="dialog-description" className={cn('text-muted-foreground text-sm', className)} {...props} />
-);
+      <DialogPrimitive.Content
+        ref={ref}
+        data-slot="dialog-content"
+        data-size={size ?? 'md'}
+        className={cn(dialogContentVariants({ size }), floatingMotionClassName, 'duration-slow', className)}
+        onEscapeKeyDown={handleEscapeKeyDown}
+        onInteractOutside={handleInteractOutside}
+        {...describedBy}
+        {...props}
+      >
+        <header data-slot="dialog-header" className={cn('flex flex-col gap-1 pe-8', hideTitle && !description && 'sr-only')}>
+          <DialogPrimitive.Title data-slot="dialog-title" className={cn('text-fg text-md font-semibold', hideTitle && 'sr-only')}>
+            {title}
+          </DialogPrimitive.Title>
 
-const DialogContent: FC<DialogContentProps> = ({ className, ...props }) => (
-  <section data-slot="dialog-content" className={cn('px-6', className)} {...props} />
-);
+          <Conditional.If condition={!!description}>
+            <DialogPrimitive.Description data-slot="dialog-description" className="text-fg-muted text-sm">
+              {description}
+            </DialogPrimitive.Description>
+          </Conditional.If>
+        </header>
 
-const DialogFooter: FC<HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
-  <footer data-slot="dialog-footer" className={cn('px-6', className)} {...props} />
+        {children}
+
+        <Conditional.If condition={dismissible}>
+          <DialogPrimitive.Close asChild>
+            <IconButton size="sm" tooltip={false} aria-label={t('close')} className="absolute end-3 top-3">
+              <XIcon />
+            </IconButton>
+          </DialogPrimitive.Close>
+        </Conditional.If>
+      </DialogPrimitive.Content>
+    </DialogPrimitive.Portal>
+  );
+};
+
+const DialogFooter: FC<DialogFooterProps> = ({ className, ...props }) => (
+  <footer data-slot="dialog-footer" className={cn('flex justify-end gap-2 pt-2', className)} {...props} />
 );
 
 const Dialog = DialogPrimitive.Root as unknown as DialogComponent;
 
-Dialog.Portal = DialogPrimitive.Portal;
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-Dialog.Overlay = forwardRef<HTMLDivElement, DialogOverlayProps>((props, ref) => DialogOverlay({ ...props, ref }));
 // React 18 bridge — remove forwardRef wrapper when upgrading to React 19
 Dialog.Trigger = forwardRef<HTMLButtonElement, DialogTriggerProps>((props, ref) => DialogTrigger({ ...props, ref }));
 // React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-Dialog.Panel = forwardRef<HTMLDivElement, DialogPanelProps>((props, ref) => DialogPanel({ ...props, ref }));
+Dialog.Content = forwardRef<HTMLDivElement, DialogContentProps>((props, ref) => DialogContent({ ...props, ref }));
 // React 18 bridge — remove forwardRef wrapper when upgrading to React 19
 Dialog.Close = forwardRef<HTMLButtonElement, DialogCloseProps>((props, ref) => DialogClose({ ...props, ref }));
-Dialog.Header = DialogHeader;
-Dialog.Title = DialogHeaderTitle;
-Dialog.Description = DialogHeaderDescription;
-Dialog.Content = DialogContent;
 Dialog.Footer = DialogFooter;
 
-Dialog.Overlay.displayName = DialogPrimitive.Overlay.displayName;
 Dialog.Trigger.displayName = 'DialogTrigger';
-Dialog.Panel.displayName = 'DialogPanel';
+Dialog.Content.displayName = 'DialogContent';
 Dialog.Close.displayName = 'DialogClose';
-DialogHeader.displayName = 'DialogHeader';
-DialogHeaderTitle.displayName = DialogPrimitive.Title.displayName;
-DialogHeaderDescription.displayName = DialogPrimitive.Description.displayName;
-DialogContent.displayName = 'DialogContent';
 DialogFooter.displayName = 'DialogFooter';
 
 export default Dialog;

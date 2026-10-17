@@ -7,55 +7,126 @@ description: 'Searchable dropdown with command input and loading state.'
 tags: [shared, combobox, select, search]
 ---
 
+import { useState } from 'react';
 import { Combobox } from '@components/shared';
+import { Conditional } from '@components/utils';
+import { CheckIcon } from 'lucide-react';
 
-## Demo
+export const DOCTORS = [
+  { id: 'lina', name: 'Dr. Lina Khoury', specialty: 'Cardiology' },
+  { id: 'omar', name: 'Dr. Omar Nasser', specialty: 'Dermatology' },
+  { id: 'sara', name: 'Dr. Sara Haddad', specialty: 'Paediatrics' },
+  { id: 'yousef', name: 'Dr. Yousef Saleh', specialty: 'Orthopaedics' },
+];
 
-<div className="w-64">
-  <Combobox>
-    <Combobox.Trigger>
-      <Combobox.Value placeholder="Select an option..." />
-    </Combobox.Trigger>
+export const DoctorPicker = () => {
+  const [open, setOpen] = useState(false);
+  const [doctorId, setDoctorId] = useState();
+  const selected = DOCTORS.find((doctor) => doctor.id === doctorId);
 
-    <Combobox.Content>
-      <Combobox.Input placeholder="Search..." />
+  return (
+    <Combobox open={open} onOpenChange={setOpen}>
+      <Combobox.Trigger className="w-72">
+        <Combobox.Value placeholder="Choose a doctor">{selected?.name}</Combobox.Value>
+      </Combobox.Trigger>
 
-      <Combobox.List>
-        <Combobox.Empty>No results found.</Combobox.Empty>
+      <Combobox.Content>
+        <Combobox.Input placeholder="Search doctors…" />
 
-        <Combobox.Item value="option-1">Option 1</Combobox.Item>
+        <Combobox.List>
+          <Combobox.Empty>No doctors match.</Combobox.Empty>
 
-        <Combobox.Item value="option-2">Option 2</Combobox.Item>
+          {DOCTORS.map((doctor) => (
+            <Combobox.Item
+              key={doctor.id}
+              value={`${doctor.name} ${doctor.specialty}`}
+              data-checked={doctor.id === doctorId || undefined}
+              onSelect={() => {
+                setDoctorId(doctor.id);
+                setOpen(false);
+              }}
+            >
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="text-fg">{doctor.name}</span>
+                <span className="text-fg-muted text-xs">{doctor.specialty}</span>
+              </span>
 
-        <Combobox.Item value="option-3">Option 3</Combobox.Item>
-      </Combobox.List>
-    </Combobox.Content>
+              <Conditional.If condition={doctor.id === doctorId}>
+                <CheckIcon aria-hidden="true" className="text-accent size-4" />
+              </Conditional.If>
+            </Combobox.Item>
+          ))}
+        </Combobox.List>
+      </Combobox.Content>
+    </Combobox>
+  );
+};
 
-  </Combobox>
-</div>
+## Single select
 
-## Imports
+Click or focus the trigger, type to filter, use the arrow keys to move and Enter to choose; Escape closes without choosing. The search box gets focus when the list opens.
 
-```tsx
-import { Combobox } from '@components/shared';
-```
+<Example
+  title="Doctor picker"
+  code={`const [open, setOpen] = useState(false);
+const [doctorId, setDoctorId] = useState<string>();
+const selected = DOCTORS.find((doctor) => doctor.id === doctorId);
 
-## Code
-
-```tsx
 <Combobox open={open} onOpenChange={setOpen}>
-  <Combobox.Trigger>
-    <Combobox.Value placeholder="Select..." />
-    <Combobox.Clear onClick={handleClear} />
+  <Combobox.Trigger className="w-72">
+    <Combobox.Value placeholder="Choose a doctor">{selected?.name}</Combobox.Value>
   </Combobox.Trigger>
-
   <Combobox.Content>
-    <Combobox.Input placeholder="Search..." />
-
+    <Combobox.Input placeholder="Search doctors…" />
     <Combobox.List>
-      <Combobox.Empty>No results.</Combobox.Empty>
-      <Combobox.Item value="item-1">Item 1</Combobox.Item>
+      <Combobox.Empty>No doctors match.</Combobox.Empty>
+      {DOCTORS.map((doctor) => (
+        <Combobox.Item
+          key={doctor.id}
+          value={\`\${doctor.name} \${doctor.specialty}\`}
+          onSelect={() => {
+            setDoctorId(doctor.id);
+            setOpen(false);
+          }}
+        >
+          {doctor.name}
+        </Combobox.Item>
+      ))}
     </Combobox.List>
   </Combobox.Content>
-</Combobox>
-```
+</Combobox>`}
+>
+  <DoctorPicker />
+</Example>
+
+`value` is the text matched by the search, so include anything users might type, such as the specialty.
+
+## Building blocks
+
+Combobox is the low-level UI behind [FormCombobox](/docs/components/form-combobox) and [FormMultiCombobox](/docs/components/form-multi-combobox). Use those in forms; use Combobox directly for filters and toolbars.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'open · onOpenChange', type: 'boolean · (open) => void', description: 'Controlled open state; close it yourself in onSelect.' },
+    { prop: 'Trigger · size · invalid', type: "'sm' | 'md' | 'lg' · boolean", description: 'Field-shaped trigger, same heights as Input.' },
+    { prop: 'Value · placeholder', type: 'string', description: 'Shown when the Value has no children.' },
+    { prop: 'Content · shouldFilter', type: 'boolean', default: 'true', description: 'Turn off client filtering for server-side search.' },
+    { prop: 'Item · value · onSelect', type: 'string · () => void', description: 'Search text and the choose handler.' },
+    { prop: 'Clear · when · onClear', type: 'boolean · () => void', description: 'A clear control inside the trigger.' },
+    { prop: 'Loader · when · message', type: 'boolean · string', description: 'Loading row inside the list.' },
+    { prop: 'Empty', type: 'ReactNode', description: 'Shown when nothing matches.' },
+  ]}
+/>
+
+`Indicator` and `Icon` render the check mark and the chevron.
+
+## Accessibility
+
+- The trigger is a button that opens a popover; the search input controls a `listbox` of options.
+- Arrow keys move, Enter chooses, Escape closes and returns focus to the trigger.
+
+## RTL notes
+
+- The chevron sits at the end of the trigger; the list text aligns to the start.

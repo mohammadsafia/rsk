@@ -1,7 +1,20 @@
 {
   "gallery": {
     "title": "معرض المكونات",
-    "subtitle": "تصفح واستكشف المكونات مع عروض حية وأمثلة استخدام."
+    "subtitle": "تصفح واستكشف المكونات مع عروض حية وأمثلة استخدام.",
+    "toggleSidebar": "إظهار أو إخفاء الشريط الجانبي",
+    "filterByTag": "التصفية حسب الوسم",
+    "tagsShown": "عرض {{count}} وسمًا. استخدم البحث لتضييق النتائج.",
+    "noResults": "لا توجد مكوّنات.",
+    "selectPrompt": "اختر مكوّنًا لعرض توثيقه.",
+    "search": "ابحث في المكوّنات…",
+    "count_zero": "لا توجد مكوّنات",
+    "count_one": "مكوّن واحد",
+    "count_two": "مكوّنان",
+    "count_few": "{{count}} مكوّنات",
+    "count_many": "{{count}} مكوّنًا",
+    "count_other": "{{count}} مكوّن",
+    "countFiltered": "{{shown}} من {{count}} مكوّنًا"
   },
   "detail": {
     "notFoundTitle": "المكون غير موجود",
@@ -10,5 +23,9 @@
     "breadcrumbComponents": "المكونات",
     "mdxValidationIssues": "مشكلات التحقق من وثائق MDX",
     "loadingDocumentation": "جارٍ تحميل الوثائق..."
+  },
+  "code": {
+    "copy": "نسخ الشيفرة",
+    "copied": "تم النسخ"
   }
 }

@@ -3,29 +3,59 @@ id: form-checkbox
 title: FormCheckbox
 section: Components
 category: Forms
-description: Controlled checkbox component.
+description: 'A single consent-style checkbox bound to react-hook-form; the label sits in a selectable card next to the box.'
 tags: [forms, checkbox]
 ---
 
-import { FormCheckboxDemo } from '@pages/components/components.data.demos';
-
-## Demo
-
-<FormCheckboxDemo />
-
-## Imports
-
-```tsx
-import { FormContainer, FormCheckbox } from '@components/forms';
 import { useForm } from 'react-hook-form';
-```
+import { FormCheckbox, FormContainer } from '@components/forms';
 
-## Code
+export const ConsentDemo = () => {
+  const form = useForm({ defaultValues: { reminders: true, terms: false } });
+  return (
+    <FormContainer formContext={form} onSuccess={() => {}} className="grid w-96 gap-3">
+      <FormCheckbox name="reminders" control={form.control} label="Send visit reminders by SMS" />
+      <FormCheckbox name="terms" control={form.control} label="I agree to the privacy policy" required rules={{ required: 'Accept the policy to continue' }} />
+    </FormContainer>
+  );
+};
 
-```tsx
-const form = useForm();
+## Consent
 
-<FormContainer formContext={form} onSuccess={console.log}>
-  <FormCheckbox name="agree" control={form.control} label="I agree" />
-</FormContainer>;
-```
+<Example
+  title="Optional and required"
+  code={`const form = useForm({ defaultValues: { reminders: true, terms: false } });
+
+<FormCheckbox name="reminders" control={form.control} label="Send visit reminders by SMS" />
+<FormCheckbox
+  name="terms"
+  control={form.control}
+  label="I agree to the privacy policy"
+  required
+  rules={{ required: 'Accept the policy to continue' }}
+/>`}
+>
+  <ConsentDemo />
+</Example>
+
+For several related options, use [FormCheckboxGroup](/docs/components/form-checkbox-group).
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'name', type: 'Path<TFieldValues>', required: true, description: 'Field path; the value is a boolean.' },
+    { prop: 'control', type: 'Control<TFieldValues>', required: true, description: 'form.control from useForm.' },
+    { prop: 'onChange', type: '(checked: boolean | string) => void', description: 'Called after the form value updates.' },
+  ]}
+/>
+
+Plus the [shared field props](/docs/components/form-field#shared-by-every-form-field).
+
+## Accessibility
+
+- The whole card is the label, so clicking the text toggles the box; errors are linked with `aria-describedby`.
+
+## RTL notes
+
+- The box sits at the start of the card, on the right in Arabic.

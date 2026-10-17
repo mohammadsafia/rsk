@@ -3,64 +3,115 @@ id: command
 title: Command
 section: Components
 category: UI
-description: 'Autocomplete field with searchable options.'
+description: 'Searchable command list on a raised surface with mono shortcut hints.'
 tags: [ui, command, autocomplete, combobox]
 ---
 
-import { CommandAutocompleteDemo } from '@pages/components/components.data.demos';
+import { useState } from 'react';
+import { Button, Command } from '@components/ui';
+import { CalendarPlus, FileText, Search, Settings, UserPlus } from 'lucide-react';
 
-## Demo
+export const PaletteDemo = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        <Search aria-hidden="true" className="size-4" />
+        Search actions
+      </Button>
+      <Command.Dialog open={open} onOpenChange={setOpen} title="Search actions">
+        <Command.Input placeholder="Type an action…" />
+        <Command.List>
+          <Command.Empty>No results.</Command.Empty>
+          <Command.Group heading="Create">
+            <Command.Item onSelect={() => setOpen(false)}>New patient</Command.Item>
+            <Command.Item onSelect={() => setOpen(false)}>New appointment</Command.Item>
+          </Command.Group>
+        </Command.List>
+      </Command.Dialog>
+    </>
+  );
+};
 
-<CommandAutocompleteDemo />
+## Inline list
 
-## Imports
+Type to filter. Items are grouped, and `Command.Shortcut` shows a mono key hint at the end.
 
-```tsx
-import { Command, Popover, Button } from '@components/ui';
-import { Check, ChevronsUpDown } from 'lucide-react';
-```
+<Example title="Grouped, with shortcuts">
+  <Command className="border-border w-full max-w-sm rounded-lg border">
+    <Command.Input placeholder="Search actions…" />
+    <Command.List>
+      <Command.Empty>No results.</Command.Empty>
+      <Command.Group heading="Create">
+        <Command.Item>
+          <UserPlus aria-hidden="true" />
+          New patient
+          <Command.Shortcut>⌘N</Command.Shortcut>
+        </Command.Item>
+        <Command.Item>
+          <CalendarPlus aria-hidden="true" />
+          New appointment
+        </Command.Item>
+      </Command.Group>
+      <Command.Separator />
+      <Command.Group heading="Go to">
+        <Command.Item>
+          <FileText aria-hidden="true" />
+          Reports
+        </Command.Item>
+        <Command.Item>
+          <Settings aria-hidden="true" />
+          Settings
+          <Command.Shortcut>⌘,</Command.Shortcut>
+        </Command.Item>
+      </Command.Group>
+    </Command.List>
+  </Command>
+</Example>
 
-## Code
+## Palette dialog
 
-```tsx
-const [open, setOpen] = useState(false);
-const [value, setValue] = useState('');
+`Command.Dialog` puts the list in a dialog, for a ⌘K-style palette. Pass `filter` to change ranking (this site's search uses it to ignore Arabic diacritics).
 
-const frameworks = [
-  { value: 'react', label: 'React' },
-  { value: 'vue', label: 'Vue' },
-  { value: 'angular', label: 'Angular' },
-];
+<Example
+  title="Command palette"
+  code={`const [open, setOpen] = useState(false);
 
-<Popover open={open} onOpenChange={setOpen}>
-  <Popover.Trigger asChild>
-    <Button variant="outline" role="combobox" aria-expanded={open}>
-      {value ? frameworks.find((f) => f.value === value)?.label : 'Select...'}
-      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-    </Button>
-  </Popover.Trigger>
-  <Popover.Content className="w-[200px] p-0">
-    <Command>
-      <Command.Input placeholder="Search..." />
-      <Command.List>
-        <Command.Empty>No results found.</Command.Empty>
-        <Command.Group>
-          {frameworks.map((framework) => (
-            <Command.Item
-              key={framework.value}
-              value={framework.label}
-              onSelect={() => {
-                setValue(framework.value === value ? '' : framework.value);
-                setOpen(false);
-              }}
-            >
-              <Check className={`mr-2 h-4 w-4 ${value === framework.value ? 'opacity-100' : 'opacity-0'}`} />
-              {framework.label}
-            </Command.Item>
-          ))}
-        </Command.Group>
-      </Command.List>
-    </Command>
-  </Popover.Content>
-</Popover>;
-```
+<Button variant="outline" onClick={() => setOpen(true)}>Search actions</Button>
+
+<Command.Dialog open={open} onOpenChange={setOpen} title="Search actions">
+  <Command.Input placeholder="Type an action…" />
+  <Command.List>
+    <Command.Empty>No results.</Command.Empty>
+    <Command.Group heading="Create">
+      <Command.Item onSelect={() => setOpen(false)}>New patient</Command.Item>
+    </Command.Group>
+  </Command.List>
+</Command.Dialog>`}
+>
+  <PaletteDemo />
+</Example>
+
+For a select-like field built on Command, use [Combobox](/docs/components/combobox).
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'Item · onSelect', type: '(value: string) => void', description: 'Called on click or Enter.' },
+    { prop: 'Item · value', type: 'string', description: 'Text to match against; defaults to the item text.' },
+    { prop: 'Group · heading', type: 'ReactNode', description: 'Small label above the group.' },
+    { prop: 'Empty · when', type: 'boolean', description: 'Force the empty state (e.g. for async results).' },
+    { prop: 'Dialog · title', type: 'string', required: true, description: 'Names the dialog for screen readers.' },
+    { prop: 'Dialog · filter', type: '(value, search) => number', description: 'Custom ranking (cmdk filter).' },
+  ]}
+/>
+
+## Accessibility
+
+- The input controls a `listbox`; Arrow keys move the active option and Enter selects it.
+- `Command.Dialog` requires a `title` and traps focus like any dialog.
+
+## RTL notes
+
+- Icons sit at the start and shortcuts at the end (`ms-auto`), so they swap sides in Arabic.

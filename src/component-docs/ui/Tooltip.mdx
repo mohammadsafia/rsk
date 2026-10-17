@@ -3,38 +3,64 @@ id: tooltip
 title: Tooltip
 section: Components
 category: UI
-description: 'Contextual hints on hover or focus.'
+description: 'Short inverse hint on hover or keyboard focus. Pass the text as content; the trigger is the child.'
 tags: [ui, tooltip, feedback]
 ---
 
-import { Tooltip, Button } from '@components/ui';
+import { Button, IconButton, Tooltip } from '@components/ui';
+import { Archive } from 'lucide-react';
 
-## Demo
+## Basic
 
-<Tooltip.Provider>
-  <Tooltip>
-    <Tooltip.Trigger asChild>
-      <Button variant="secondary">Hover me</Button>
-    </Tooltip.Trigger>
-    <Tooltip.Content>Helpful hint</Tooltip.Content>
+The child is the trigger; `content` is the hint.
+
+<Example title="Hover or focus">
+  <Tooltip content="Exports the current filters">
+    <Button variant="outline">Export</Button>
   </Tooltip>
-</Tooltip.Provider>
+</Example>
 
-## Imports
+## Placement
 
-```tsx
-import { Tooltip, Button } from '@components/ui';
-```
-
-## Code
-
-```tsx
-<Tooltip.Provider>
-  <Tooltip>
-    <Tooltip.Trigger asChild>
-      <Button>Hover me</Button>
-    </Tooltip.Trigger>
-    <Tooltip.Content>Helpful hint</Tooltip.Content>
+<Example title="Side and align">
+  <Tooltip content="Shown below, aligned to the start" side="bottom" align="start">
+    <Button variant="outline">Bottom start</Button>
   </Tooltip>
-</Tooltip.Provider>
-```
+  <Tooltip content="Shown on the end side" side="right">
+    <Button variant="outline">Right</Button>
+  </Tooltip>
+</Example>
+
+## Icon buttons
+
+`IconButton` already shows its `aria-label` as a tooltip, so don't wrap it in another one.
+
+<Example title="Built in">
+  <IconButton aria-label="Archive record">
+    <Archive />
+  </IconButton>
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'content', type: 'ReactNode', required: true, description: 'The hint. Empty content renders only the trigger.' },
+    { prop: 'side', type: "'top' | 'right' | 'bottom' | 'left'", default: "'top'", description: 'Preferred side; flips when there is no room.' },
+    { prop: 'align', type: "'start' | 'center' | 'end'", default: "'center'", description: 'Alignment against the trigger.' },
+    { prop: 'sideOffset', type: 'number', default: '4', description: 'Gap from the trigger in px.' },
+    { prop: 'delayDuration', type: 'number', default: 'provider (300ms)', description: 'Hover delay before opening.' },
+    { prop: 'disabled', type: 'boolean', default: 'false', description: 'Render the trigger with no tooltip.' },
+  ]}
+/>
+
+The child must be a single element that can hold a ref (a button or link). The app root provides `Tooltip.Provider`.
+
+## Accessibility
+
+- The trigger gets `aria-describedby` pointing at the tooltip; it opens on keyboard focus and closes on Escape.
+- Tooltips only describe; never put essential information or actions in one.
+
+## RTL notes
+
+- `align="start"` and `"end"` follow the reading direction; `side="left"` and `"right"` are physical and do not flip.

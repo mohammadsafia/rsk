@@ -1,0 +1,57 @@
+---
+id: logo
+title: Logo
+section: Components
+category: Shared
+description: 'The RSK mark and lockup in three sizes; the accent square is the only accent near it.'
+tags: [shared, brand, logo]
+---
+
+import { Logo } from '@components/shared';
+
+## Mark
+
+<Example title="Sizes">
+  <Logo size="sm" />
+  <Logo />
+  <Logo size="lg" />
+</Example>
+
+## Lockup
+
+The lockup adds the wordmark as real text; `tagline` adds "React Starter Kit".
+
+<Example title="Lockup and tagline">
+  <Logo variant="lockup" />
+  <Logo variant="lockup" size="lg" tagline />
+</Example>
+
+## On surfaces
+
+<Example title="Sunken surface">
+  <div className="bg-surface-sunken border-border flex items-center gap-4 rounded-lg border p-4">
+    <Logo size="lg" />
+    <span className="text-fg-muted text-sm">Reads on sunken and raised surfaces alike.</span>
+  </div>
+</Example>
+
+Never place the logo on an accent background: its accent square must be the only accent around it.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'variant', type: "'mark' | 'lockup'", default: "'mark'", description: 'Mark only, or mark with the wordmark.' },
+    { prop: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '16 · 24 · 32px; sm uses larger squares so they survive rasterising.' },
+    { prop: 'tagline', type: 'boolean', default: 'false', description: 'Lockup only: adds "React Starter Kit".' },
+  ]}
+/>
+
+## Accessibility
+
+- The mark is `role="img"` named "RSK"; the lockup's wordmark is text, so screen readers read it once.
+- When the logo is a home link, give the link the label ("RSK home") rather than the image.
+
+## RTL notes
+
+- The lockup keeps the mark at the start, so it sits to the right of the wordmark in Arabic; the Latin wordmark never mirrors.

@@ -1,22 +1,28 @@
-import type { ComponentDocEntry, Frontmatter, MdxModule } from './types';
+import type { ComponentDocEntry, DocHeading, Frontmatter, MdxModule } from './types';
 
-export { type DocComponent, type ComponentDocEntry } from './types';
+export { type DocComponent, type ComponentDocEntry, type DocHeading } from './types';
 
 const REQUIRED_FRONTMATTER_KEYS = ['id', 'title', 'section', 'category', 'description'] as const;
 
 export const componentDocsErrors: string[] = [];
 
 export function normalizeCategoryKey(raw: string | undefined | null): string {
-  return String(raw ?? 'UI').trim().toUpperCase() || 'UI';
+  return (
+    String(raw ?? 'UI')
+      .trim()
+      .toUpperCase() || 'UI'
+  );
 }
 
 let mdxFrontmatter: Record<string, Frontmatter> | undefined;
 let mdxLazy: Record<string, () => Promise<MdxModule>> | undefined;
+let mdxHeadings: Record<string, DocHeading[]> | undefined;
 
 function getMdxGlobs() {
   mdxFrontmatter ??= import.meta.glob<Frontmatter>('../**/*.mdx', { eager: true, import: 'frontmatter' }) as Record<string, Frontmatter>;
   mdxLazy ??= import.meta.glob<MdxModule>('../**/*.mdx') as Record<string, () => Promise<MdxModule>>;
-  return { mdxFrontmatter, mdxLazy };
+  mdxHeadings ??= import.meta.glob<DocHeading[]>('../**/*.mdx', { eager: true, import: 'headings' }) as Record<string, DocHeading[]>;
+  return { mdxFrontmatter, mdxLazy, mdxHeadings };
 }
 
 function inferCategoryFromPath(path: string) {
@@ -45,12 +51,19 @@ function createLoader(path: string) {
 function buildRegistry(): ReadonlyArray<ComponentDocEntry> {
   componentDocsErrors.length = 0;
 
-  const { mdxFrontmatter } = getMdxGlobs();
+  const { mdxFrontmatter, mdxHeadings } = getMdxGlobs();
   const registry = Object.keys(mdxFrontmatter)
+    // The docs:new template lives next to the docs but is not one.
+    // Underscore folders (_template, _fixtures) hold tooling, not docs.
+    .filter((path) => !/\/_[^/]+\//.test(path))
     .map((path) => {
       const fm: Frontmatter = mdxFrontmatter[path] ?? {};
 
-      const idFromPath = path.split('/').pop()?.replace(/\.mdx$/, '') ?? path;
+      const idFromPath =
+        path
+          .split('/')
+          .pop()
+          ?.replace(/\.mdx$/, '') ?? path;
       const id = fm.id ?? idFromPath;
 
       const error = validateFrontmatter(path, id, fm);
@@ -74,6 +87,9 @@ function buildRegistry(): ReadonlyArray<ComponentDocEntry> {
         category: resolvedCategory,
         description: fm.description ?? '',
         tags: fm.tags ? [...fm.tags] : undefined,
+        order: fm.order,
+        importFrom: fm.importFrom,
+        headings: mdxHeadings[path] ?? [],
         load: createLoader(path),
       });
     })

@@ -18,12 +18,7 @@ import { cleanCommand } from '../commands/clean.js';
 
 const program = new Command();
 
-program
-  .name('dto-gen')
-  .description(
-    'Advanced TypeScript DTO generator from OpenAPI/Swagger specs'
-  )
-  .version('1.0.0');
+program.name('dto-gen').description('Advanced TypeScript DTO generator from OpenAPI/Swagger specs').version('1.0.0');
 
 program
   .command('generate')
@@ -42,11 +37,7 @@ program
   .command('list')
   .alias('ls')
   .description('List available schemas from swagger')
-  .option(
-    '-v, --version <version>',
-    'API version (v1, v2, all)',
-    'all'
-  )
+  .option('-v, --version <version>', 'API version (v1, v2, all)', 'all')
   .option('--json', 'Output as JSON', false)
   .option('--diff', 'Show diff between BE schemas and local files', false)
   .action(listCommand);

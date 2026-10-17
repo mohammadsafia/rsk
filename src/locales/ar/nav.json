@@ -1,5 +1,8 @@
 {
   "dashboard": "لوحة التحكم",
+  "schedule": "الجدول",
+  "patients": "المرضى",
+  "billing": "الفواتير",
   "components": "المكوّنات",
   "members": "الأعضاء",
   "settings": "الإعدادات",
@@ -14,5 +17,6 @@
   "groups": {
     "main": "الرئيسية",
     "account": "الحساب"
-  }
+  },
+  "skipToContent": "تخطَّ إلى المحتوى"
 }

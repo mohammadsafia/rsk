@@ -52,9 +52,9 @@ export const getCommonPinningStyles = <TData>({
   return {
     boxShadow: withBorder
       ? isLastLeftPinnedColumn
-        ? '-4px 0 4px -4px hsl(var(--border)) inset'
+        ? '-4px 0 4px -4px var(--border) inset'
         : isFirstRightPinnedColumn
-          ? '4px 0 4px -4px hsl(var(--border)) inset'
+          ? '4px 0 4px -4px var(--border) inset'
           : undefined
       : undefined,
     left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
@@ -146,6 +146,20 @@ export function createFilterMeta(config: {
   min?: string;
   max?: string;
   step?: number;
+}): DataTableFilterMeta;
+export function createFilterMeta(config: {
+  variant: 'boolean';
+  label: string;
+  trueLabel?: string;
+  falseLabel?: string;
+}): DataTableFilterMeta;
+export function createFilterMeta(config: { variant: 'text'; label: string; placeholder?: string }): DataTableFilterMeta;
+export function createFilterMeta(config: {
+  variant: 'numberRange';
+  label: string;
+  format?: 'decimal' | 'currency' | 'percent';
+  min?: number;
+  max?: number;
 }): DataTableFilterMeta;
 export function createFilterMeta(config: unknown): DataTableFilterMeta {
   return config as DataTableFilterMeta;

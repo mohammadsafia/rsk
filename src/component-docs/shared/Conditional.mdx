@@ -3,45 +3,61 @@ id: conditional
 title: Conditional
 section: Components
 category: Shared
-description: Declarative conditional rendering helper.
-tags: [shared, conditional, utility]
+description: 'Declarative if / else for JSX, so render branches read top to bottom.'
+tags: [shared, utility, conditional]
+importFrom: '@components/utils'
 ---
 
 import { Conditional } from '@components/utils';
 
-## Demo
+## If and else
 
-<div className="space-y-2">
-  <Conditional>
-    <Conditional.If condition={true}>
-      <div className="text-green-600">✓ Condition is true</div>
-    </Conditional.If>
-    <Conditional.Else>
-      <div className="text-red-600">✗ Condition is false</div>
-    </Conditional.Else>
-  </Conditional>
+`Conditional.If` renders its children when `condition` is true; `Conditional.Else` renders when no `If` matched.
 
-  <Conditional>
-    <Conditional.If condition={false}>
-      <div className="text-green-600">✓ This won't show</div>
-    </Conditional.If>
-    <Conditional.Else>
-      <div className="text-muted">→ Fallback content</div>
-    </Conditional.Else>
-  </Conditional>
-</div>
+<Example title="Branches">
+  <div className="grid gap-2 text-sm">
+    <Conditional>
+      <Conditional.If condition={true}>
+        <span className="text-success">Insurance verified</span>
+      </Conditional.If>
+      <Conditional.Else>
+        <span className="text-danger">Insurance missing</span>
+      </Conditional.Else>
+    </Conditional>
+    <Conditional>
+      <Conditional.If condition={false}>
+        <span>Hidden</span>
+      </Conditional.If>
+      <Conditional.Else>
+        <span className="text-fg-muted">No upcoming visits</span>
+      </Conditional.Else>
+    </Conditional>
+  </div>
+</Example>
 
-## Imports
+## Alone
+
+`Conditional.If` also works on its own, as a readable `condition && …`.
 
 ```tsx
-import { Conditional } from '@components/utils';
+<Conditional.If condition={isAdmin}>
+  <Button tone="danger">Delete</Button>
+</Conditional.If>
 ```
 
-## Code
+## API
 
-```tsx
-<Conditional>
-  <Conditional.If condition={true}>Content</Conditional.If>
-  <Conditional.Else>Fallback</Conditional.Else>
-</Conditional>
-```
+<PropsTable
+  rows={[
+    { prop: 'If · condition', type: 'boolean', required: true, description: 'Render the children when true.' },
+    { prop: 'Else', type: 'ReactNode children', description: 'Rendered when no sibling If matched.' },
+  ]}
+/>
+
+## Accessibility
+
+- Renders no wrapper element, so it never changes the DOM structure or semantics.
+
+## RTL notes
+
+- No direction-specific behaviour.

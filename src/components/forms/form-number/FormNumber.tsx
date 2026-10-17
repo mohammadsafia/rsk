@@ -1,10 +1,8 @@
 import { useId } from 'react';
 import { Controller, type FieldValues } from 'react-hook-form';
 
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
+import { FormField } from '@components/forms';
 import { FormattedNumber, type FormattedNumberProps } from '@components/ui';
-
-import { cn } from '@utils';
 
 import type { ControlledFieldBaseProps } from '@app-types';
 
@@ -15,11 +13,9 @@ function FormNumber<TFieldValues extends FieldValues>({
   rules,
   control,
   label,
+  description,
   tooltip,
-  containerClassName,
-  labelClassName,
   className,
-  errorClassName,
   required,
   ...props
 }: FormNumberProps<TFieldValues>) {
@@ -30,37 +26,11 @@ function FormNumber<TFieldValues extends FieldValues>({
       name={name}
       control={control}
       rules={rules}
-      render={({ field, fieldState: { error } }) => {
-        return (
-          <FormControl className={containerClassName}>
-            <FormLabel
-              className={labelClassName}
-              htmlFor={`${id}-${name}`}
-              tooltip={tooltip}
-              required={required}
-              hidden={!label}
-              error={error!}
-            >
-              {label}
-            </FormLabel>
-
-            <div className="relative">
-              <FormattedNumber
-                id={`${id}-${name}`}
-                className={cn(
-                  error &&
-                    'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive placeholder:text-destructive ps-8',
-                  className,
-                )}
-                {...field}
-                {...props}
-              />
-
-              <FormMessage className={errorClassName} hidden={!error} error={error!} />
-            </div>
-          </FormControl>
-        );
-      }}
+      render={({ field, fieldState: { error } }) => (
+        <FormField id={`${id}-${name}`} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+          {(fieldControl) => <FormattedNumber className={className} {...fieldControl} {...field} {...props} />}
+        </FormField>
+      )}
     />
   );
 }

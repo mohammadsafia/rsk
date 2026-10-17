@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import {
   type ColumnDef,
-  type FilterFn,
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
@@ -12,14 +11,24 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import { Badge } from '@components/ui';
+import { Badge, Button } from '@components/ui';
 import { DataTable } from '@components/tables';
 
-import { useAppTranslation } from '@hooks/shared';
+import { useAppTranslation, useDataTableFilters } from '@hooks/shared';
 
-import { createFilterMeta, dateFilterFn, dateRangeFilterFn, timeFilterFn } from '@utils';
-import { ActionPanel } from '@components/shared';
-import { AddCircle } from 'iconsax-react';
+import {
+  booleanFilterFn,
+  containsFilterFn,
+  createFilterMeta,
+  dateFilterFn,
+  dateRangeFilterFn,
+  inListFilterFn,
+  numberRangeFilterFn,
+  timeFilterFn,
+} from '@utils';
+import { PageHeader } from '@components/shared';
+
+import { Plus } from 'lucide-react';
 
 type Member = {
   id: string;
@@ -30,6 +39,8 @@ type Member = {
   joined: string;
   lastSeen: string;
   shiftStart: string;
+  twoFactor: boolean;
+  sessions: number;
 };
 
 const SHIFT_TIMES = ['08:00 AM', '09:30 AM', '01:00 PM', '03:45 PM'];
@@ -48,10 +59,10 @@ const STATUS_OPTIONS: Option[] = [
   { id: 'Suspended', labelKey: 'statuses.Suspended' },
 ];
 
-const STATUS_VARIANT: Record<Member['status'], 'success' | 'warning' | 'destructive'> = {
+const STATUS_TONE: Record<Member['status'], 'success' | 'warning' | 'danger'> = {
   Active: 'success',
   Invited: 'warning',
-  Suspended: 'destructive',
+  Suspended: 'danger',
 };
 
 const FIRST_NAMES = ['Sarah', 'Alex', 'Jordan', 'Taylor', 'Chris', 'Morgan', 'Jamie', 'Casey', 'Riley', 'Avery', 'Quinn', 'Sam'];
@@ -73,15 +84,10 @@ const MEMBERS: Member[] = Array.from({ length: 24 }, (_, i) => {
     joined: `2026-${String((i % 12) + 1).padStart(2, '0')}-${day}`,
     lastSeen: `2026-${String(((i * 2) % 12) + 1).padStart(2, '0')}-${lastSeenDay}`,
     shiftStart: SHIFT_TIMES[i % SHIFT_TIMES.length],
+    twoFactor: i % 3 !== 0,
+    sessions: (i * 7) % 40,
   };
 });
-
-/** Matches a scalar cell value against the array of selected filter values. */
-const inSelectedValues: FilterFn<Member> = (row, columnId, filterValue) => {
-  if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
-
-  return (filterValue as string[]).includes(String(row.getValue(columnId)));
-};
 
 type TranslateFn = ReturnType<typeof useAppTranslation>['t'];
 
@@ -94,17 +100,23 @@ const buildColumns = (t: TranslateFn): ColumnDef<Member>[] => {
       accessorKey: 'name',
       header: t('columns.name'),
       enableSorting: true,
-      cell: ({ row }) => <span className="text-foreground font-medium">{row.original.name}</span>,
+      filterFn: containsFilterFn,
+      cell: ({ row }) => <span className="text-fg font-medium">{row.original.name}</span>,
+      meta: { label: t('columns.name'), filterMeta: createFilterMeta({ variant: 'text', label: t('columns.name') }) },
     },
     {
       accessorKey: 'email',
       header: t('columns.email'),
-      cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span>,
+      cell: ({ row }) => (
+        <span data-slot="member-email" dir="ltr" className="text-fg-muted">
+          {row.original.email}
+        </span>
+      ),
     },
     {
       accessorKey: 'role',
       header: t('columns.role'),
-      filterFn: inSelectedValues,
+      filterFn: inListFilterFn,
       meta: {
         label: t('columns.role'),
         filterMeta: createFilterMeta({
@@ -119,8 +131,8 @@ const buildColumns = (t: TranslateFn): ColumnDef<Member>[] => {
     {
       accessorKey: 'status',
       header: t('columns.status'),
-      filterFn: inSelectedValues,
-      cell: ({ row }) => <Badge variant={STATUS_VARIANT[row.original.status]}>{t(`statuses.${row.original.status}`)}</Badge>,
+      filterFn: inListFilterFn,
+      cell: ({ row }) => <Badge tone={STATUS_TONE[row.original.status]}>{t(`statuses.${row.original.status}`)}</Badge>,
       meta: {
         label: t('columns.status'),
         filterMeta: createFilterMeta({
@@ -138,7 +150,11 @@ const buildColumns = (t: TranslateFn): ColumnDef<Member>[] => {
       enableSorting: true,
       sortDescFirst: true,
       filterFn: dateRangeFilterFn,
-      cell: ({ row }) => <span className="text-muted-foreground">{row.original.joined}</span>,
+      cell: ({ row }) => (
+        <span dir="ltr" className="text-fg-muted tabular-nums">
+          {row.original.joined}
+        </span>
+      ),
       meta: {
         label: t('columns.joined'),
         filterMeta: createFilterMeta({
@@ -153,7 +169,11 @@ const buildColumns = (t: TranslateFn): ColumnDef<Member>[] => {
       enableSorting: true,
       sortDescFirst: true,
       filterFn: dateFilterFn,
-      cell: ({ row }) => <span className="text-muted-foreground">{row.original.lastSeen}</span>,
+      cell: ({ row }) => (
+        <span dir="ltr" className="text-fg-muted tabular-nums">
+          {row.original.lastSeen}
+        </span>
+      ),
       meta: {
         label: t('columns.lastSeen'),
         filterMeta: createFilterMeta({
@@ -163,10 +183,44 @@ const buildColumns = (t: TranslateFn): ColumnDef<Member>[] => {
       },
     },
     {
+      accessorKey: 'twoFactor',
+      header: t('columns.twoFactor'),
+      filterFn: booleanFilterFn,
+      cell: ({ row }) => (
+        <Badge variant="dot" tone={row.original.twoFactor ? 'success' : 'neutral'}>
+          {t(row.original.twoFactor ? 'twoFactor.on' : 'twoFactor.off')}
+        </Badge>
+      ),
+      meta: {
+        label: t('columns.twoFactor'),
+        filterMeta: createFilterMeta({
+          variant: 'boolean',
+          label: t('columns.twoFactor'),
+          trueLabel: t('twoFactor.on'),
+          falseLabel: t('twoFactor.off'),
+        }),
+      },
+    },
+    {
+      accessorKey: 'sessions',
+      header: t('columns.sessions'),
+      filterFn: numberRangeFilterFn,
+      cell: ({ row }) => <span className="tabular-nums">{row.original.sessions}</span>,
+      meta: {
+        label: t('columns.sessions'),
+        numeric: true,
+        filterMeta: createFilterMeta({ variant: 'numberRange', label: t('columns.sessions'), min: 0 }),
+      },
+    },
+    {
       accessorKey: 'shiftStart',
       header: t('columns.shiftStart'),
       filterFn: timeFilterFn,
-      cell: ({ row }) => <span className="text-muted-foreground">{row.original.shiftStart}</span>,
+      cell: ({ row }) => (
+        <span dir="ltr" className="text-fg-muted tabular-nums">
+          {row.original.shiftStart}
+        </span>
+      ),
       meta: {
         label: t('columns.shiftStart'),
         filterMeta: createFilterMeta({
@@ -182,10 +236,14 @@ function MembersPage() {
   const { t } = useAppTranslation('members');
 
   const columns = useMemo(() => buildColumns(t), [t]);
+  const filters = useDataTableFilters({ columns, urlSync: true, storageKey: 'members' });
 
   const table = useReactTable<Member>({
     data: MEMBERS,
     columns,
+    state: filters.state,
+    onColumnFiltersChange: filters.onColumnFiltersChange,
+    onGlobalFilterChange: filters.onGlobalFilterChange,
     enableGlobalFilter: true,
     globalFilterFn: 'includesString',
     enableSortingRemoval: true,
@@ -201,26 +259,24 @@ function MembersPage() {
   const totalCount = table.getFilteredRowModel().rows.length;
 
   return (
-    <DataTable table={table}>
-      <ActionPanel>
-        <ActionPanel.Header>
-          <ActionPanel.Title>{t('title')}</ActionPanel.Title>
-        </ActionPanel.Header>
-
-        <ActionPanel.Actions>
-          <ActionPanel.Action>
-            <AddCircle size={20} />
+    <div className="flex h-full min-h-0 flex-col">
+      <PageHeader title={t('title')} description={t('description')}>
+        <PageHeader.Actions>
+          <Button>
+            <Plus aria-hidden="true" />
             {t('addMember')}
-          </ActionPanel.Action>
-        </ActionPanel.Actions>
-      </ActionPanel>
+          </Button>
+        </PageHeader.Actions>
+      </PageHeader>
 
-      <DataTable.Toolbar totalCount={totalCount} totalLabel={t('totalLabel')} placeholder={t('searchPlaceholder')} />
+      <DataTable table={table} onResetFilters={filters.reset} className="min-h-0 flex-1">
+        <DataTable.Toolbar totalCount={totalCount} totalLabel={t('totalLabel')} placeholder={t('searchPlaceholder')} />
 
-      <DataTable.Content emptyState={{ title: t('emptyState.title'), description: t('emptyState.description') }} />
+        <DataTable.Content emptyState={{ title: t('emptyState.title'), description: t('emptyState.description') }} />
 
-      <DataTable.Pagination />
-    </DataTable>
+        <DataTable.Pagination />
+      </DataTable>
+    </div>
   );
 }
 

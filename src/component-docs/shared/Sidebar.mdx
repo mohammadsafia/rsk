@@ -1,0 +1,76 @@
+---
+id: sidebar
+title: Sidebar
+section: Components
+category: Shared
+description: 'Grouped navigation with icons, badges, sub-menus and a collapsed icon rail; scrolls when the menu is long.'
+tags: [shared, navigation, sidebar, menu]
+---
+
+import { Sidebar } from '@components/shared';
+import { CalendarDays, ClipboardList, Receipt, Users } from 'lucide-react';
+
+## Expanded
+
+Active items get the hover tint and `aria-current="page"`; there is never a coloured side stripe.
+
+<Example title="Groups, badge and sub-menu">
+  <div className="bg-sidebar border-border h-96 w-64 overflow-hidden rounded-lg border">
+    <Sidebar>
+      <Sidebar.Header>
+        <span className="text-fg text-sm font-semibold">Al-Noor Clinic</span>
+      </Sidebar.Header>
+      <Sidebar.Content>
+        <Sidebar.Group label="Clinic">
+          <Sidebar.Item href="/docs/components/sidebar" icon={CalendarDays} active>Schedule</Sidebar.Item>
+          <Sidebar.Item href="/docs/components/sidebar" icon={Users} badge={4}>Patients</Sidebar.Item>
+          <Sidebar.SubMenu icon={Receipt} label="Billing">
+            <Sidebar.Item href="/docs/components/sidebar" icon={ClipboardList}>Invoices</Sidebar.Item>
+          </Sidebar.SubMenu>
+        </Sidebar.Group>
+      </Sidebar.Content>
+    </Sidebar>
+  </div>
+</Example>
+
+## Collapsed
+
+From `md` up, `collapsed` shows an icon rail; each item keeps its name and shows it as a tooltip.
+
+<Example title="Icon rail">
+  <div className="bg-sidebar border-border h-72 w-16 overflow-hidden rounded-lg border">
+    <Sidebar collapsed>
+      <Sidebar.Content>
+        <Sidebar.Group label="Clinic">
+          <Sidebar.Item href="/docs/components/sidebar" icon={CalendarDays} active>Schedule</Sidebar.Item>
+          <Sidebar.Item href="/docs/components/sidebar" icon={Users} badge={4}>Patients</Sidebar.Item>
+        </Sidebar.Group>
+      </Sidebar.Content>
+    </Sidebar>
+  </div>
+</Example>
+
+Inside an [AppShell](/docs/components/app-shell), `collapsed` follows the shell's state and `Sidebar.CollapseButton` toggles it. `Sidebar.Content` scrolls when the menu is taller than the screen.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'collapsed', type: 'boolean', description: 'Defaults to the surrounding AppShell’s state; applies from md up.' },
+    { prop: 'Group · label', type: 'ReactNode', required: true, description: 'Labels the group (role="group"); hidden visually when collapsed.' },
+    { prop: 'Item · href · icon', type: 'string · LucideIcon', required: true, description: 'Destination and icon.' },
+    { prop: 'Item · active · badge', type: 'boolean · number', description: 'Current page, and a count at the end.' },
+    { prop: 'SubMenu · icon · label · active', type: 'LucideIcon · ReactNode · boolean', description: 'A disclosure; clicking it while collapsed expands the sidebar first.' },
+  ]}
+/>
+
+`Sidebar.Header`, `Sidebar.Footer` and `Sidebar.CollapseButton` (desktop only) complete the frame.
+
+## Accessibility
+
+- `Sidebar.Content` is a labelled `nav`; groups are `role="group"` with their label, and the current page has `aria-current="page"`.
+- Collapsed items keep their accessible names; the tooltip repeats them for sighted users.
+
+## RTL notes
+
+- Icons sit at the start and badges at the end; the sub-menu chevron and the collapse button mirror in Arabic.

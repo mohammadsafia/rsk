@@ -1,14 +1,13 @@
-import { type FC, type RefCallback, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type FC, type RefCallback, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { type DateRange } from 'react-day-picker';
 import { type FieldError, type FieldPath, type FieldValues, useController } from 'react-hook-form';
 
-import { Calendar, type CalendarProps, Popover } from '@components/ui';
-import { TooltipButton } from '@components/shared';
+import { Calendar, type CalendarProps, fieldVariants, Popover, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
+import { FormField } from '@components/forms';
 
-import { DATE_INPUT_FORMATS, type DateInputFormat, useDateRangeMask } from '@hooks/shared';
+import { DATE_INPUT_FORMATS, type DateInputFormat, useAppTranslation, useDateRangeMask } from '@hooks/shared';
 import { cn } from '@utils';
 
 import { CalendarIcon, XIcon } from 'lucide-react';
@@ -76,17 +75,19 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
   inputRef,
   error,
   label,
+  description,
   tooltip,
-  containerClassName,
-  labelClassName,
   className,
-  errorClassName,
   required,
   disabled,
   placeholder,
   dateFormat = DATE_INPUT_FORMATS.US_SLASH,
   ...props
 }) => {
+  const { t } = useAppTranslation('common');
+  // Unique per instance: two forms on one page may share a field name.
+  const fieldId = `${name}-${useId()}`;
+
   const [isOpen, setIsOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState<Date | undefined>(undefined);
 
@@ -187,23 +188,17 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
   const hasValue = dateRange?.from || dateRange?.to;
 
   return (
-    <FormControl className={containerClassName}>
-      <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
-        {label}
-      </FormLabel>
-
-      <div className="relative">
+    <FormField id={fieldId} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+      {(fieldControl) => (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <div
             data-slot="date-range-container"
+            aria-invalid={fieldControl.invalid || undefined}
+            data-disabled={disabled || undefined}
             className={cn(
-              'group bg-background relative flex h-12 w-full items-center rounded-md border px-3 py-3 text-xs shadow-xs',
-              'transition-colors focus-within:outline-none',
-              {
-                'border-muted-200 hover:border-muted-300 focus-within:border-primary focus-within:ring-primary focus-within:ring-1': !error,
-                'border-destructive focus-within:border-destructive focus-within:ring-destructive ps-8 focus-within:ring-1': !!error,
-                'pointer-events-none cursor-not-allowed opacity-50': disabled,
-              },
+              fieldVariants(),
+              'group gap-2 pe-1',
+              'data-disabled:border-border data-disabled:bg-surface-sunken data-disabled:text-fg-subtle data-disabled:pointer-events-none',
               className,
             )}
           >
@@ -213,25 +208,24 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
                   type="button"
                   disabled={disabled}
                   onClick={handleIconClick}
-                  className="shrink-0 focus:outline-none"
-                  aria-label="Open calendar"
+                  className="focus-ring shrink-0 rounded-sm"
+                  aria-label={t('openCalendar')}
                   tabIndex={-1}
                 >
                   <CalendarIcon
-                    size={20}
-                    className={cn('h-5 w-5 cursor-pointer transition-colors', {
-                      'text-destructive': !!error,
-                      'text-muted-300 opacity-50': disabled,
-                      'text-muted-400 hover:text-primary': !error && !disabled,
-                      'text-primary': isOpen && !error && !disabled,
-                    })}
+                    aria-hidden="true"
+                    className={cn(
+                      'text-fg-muted hover:text-fg size-4 cursor-pointer transition-colors',
+                      isOpen && 'text-accent',
+                      !!error && 'text-danger',
+                    )}
                   />
                 </button>
               </Popover.Trigger>
 
               <input
                 ref={inputRef}
-                id={name}
+                id={fieldControl.id}
                 type="text"
                 inputMode="numeric"
                 autoComplete="off"
@@ -242,19 +236,21 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
                 onKeyDown={handleKeyDown}
                 onPaste={handlePaste}
                 onBlur={handleInputBlur}
-                aria-invalid={!!error}
-                className={cn('min-w-0 flex-1 bg-transparent text-xs outline-none', 'placeholder:text-muted-400', {
-                  'text-primary-900': !!inputValue && isValidInput,
-                  'text-destructive': !!inputValue && !isValidInput,
-                })}
+                aria-invalid={fieldControl.invalid || undefined}
+                aria-describedby={fieldControl['aria-describedby']}
+                aria-required={fieldControl['aria-required']}
+                className={cn(
+                  'text-fg placeholder:text-fg-muted min-w-0 flex-1 bg-transparent outline-none',
+                  !!inputValue && !isValidInput && 'text-danger',
+                )}
               />
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
               <Conditional.If condition={!!hasValue && !disabled}>
-                <TooltipButton tabIndex={-1} title="Clear" variant="ghost-muted-destructive" size="unstyled" onClick={handleClear}>
+                <IconButton tabIndex={-1} tone="danger" size="sm" aria-label={t('clear')} onClick={handleClear}>
                   <XIcon size={16} />
-                </TooltipButton>
+                </IconButton>
               </Conditional.If>
             </div>
           </div>
@@ -273,10 +269,8 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
             />
           </Popover.Content>
         </Popover>
-
-        <FormMessage className={errorClassName} hidden={!error} error={error!} />
-      </div>
-    </FormControl>
+      )}
+    </FormField>
   );
 };
 

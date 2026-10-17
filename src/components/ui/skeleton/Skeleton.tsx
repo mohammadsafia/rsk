@@ -3,45 +3,47 @@ import { type FC, type HTMLAttributes } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
-type SkeletonProps = HTMLAttributes<HTMLDivElement> & VariantProps<typeof skeletonVariants>;
-
-type SkeletonComponent = FC<SkeletonProps>;
-
-const skeletonVariants = cva('animate-pulse bg-muted overflow-hidden', {
+const skeletonVariants = cva('bg-border-subtle animate-pulse', {
   variants: {
-    variant: {
-      default: 'bg-muted-200',
-      card: 'bg-card',
-      primary: 'bg-primary/10',
+    shape: {
+      line: 'w-full rounded-sm',
+      circle: 'shrink-0 rounded-full',
+      block: 'w-full rounded-md',
     },
     size: {
-      default: '[--skw:35px] [--skh2:35px] [--line:10px]',
-      xs: '[--skw:20px] [--skh2:20px] [--line:5px]',
-      sm: '[--skw:35px] [--skh2:35px] [--line:10px]',
-      md: '[--skw:70px] [--skh2:70px] [--line:20px]',
-      lg: '[--skw:140px] [--skh2:140px] [--line:40px]',
-      xl: '[--skw:180px] [--skh2:180px] [--line:80px]',
-    },
-    shape: {
-      text: 'w-full h-(--line) rounded-md',
-      avatar: 'w-(--skw) h-(--skh2) rounded-full',
-      banner: 'w-full h-[calc(var(--skh2)*2)] rounded-md',
-      thumbnail: 'w-[calc(var(--skw)*1.6)] h-[calc(var(--skh2)*1.6)] rounded-md',
-      square: 'w-(--skw) h-(--skh2) rounded-md',
-      rectangle: 'w-[calc(var(--skw)*1.14)] h-[calc(var(--skh2)*0.57)] rounded-md',
-      squareSharp: 'w-[calc(var(--skw)*1.6)] h-[calc(var(--skh2)*1.6)] rounded-none',
-      rectangleSharp: 'w-[calc(var(--skw)*1.14)] h-[calc(var(--skh2)*0.57)] rounded-none',
+      sm: '',
+      md: '',
+      lg: '',
     },
   },
+  compoundVariants: [
+    { shape: 'line', size: 'sm', className: 'h-3' },
+    { shape: 'line', size: 'md', className: 'h-3.5' },
+    { shape: 'line', size: 'lg', className: 'h-4.5' },
+    { shape: 'circle', size: 'sm', className: 'size-6' },
+    { shape: 'circle', size: 'md', className: 'size-8' },
+    { shape: 'circle', size: 'lg', className: 'size-10' },
+    { shape: 'block', size: 'sm', className: 'h-16' },
+    { shape: 'block', size: 'md', className: 'h-24' },
+    { shape: 'block', size: 'lg', className: 'h-40' },
+  ],
   defaultVariants: {
-    variant: 'default',
-    size: 'default',
-    shape: 'text',
+    shape: 'line',
+    size: 'md',
   },
 });
 
-const Skeleton: SkeletonComponent = ({ className, variant, size, shape, ...props }) => {
-  return <div data-slot="skeleton" className={cn(skeletonVariants({ variant, size, shape }), className)} {...props} />;
-};
+type SkeletonProps = HTMLAttributes<HTMLDivElement> & VariantProps<typeof skeletonVariants>;
+
+const Skeleton: FC<SkeletonProps> = ({ className, shape, size, ...props }) => (
+  <div
+    aria-hidden="true"
+    data-slot="skeleton"
+    data-shape={shape ?? 'line'}
+    data-size={size ?? 'md'}
+    className={cn(skeletonVariants({ shape, size }), className)}
+    {...props}
+  />
+);
 
 export default Skeleton;

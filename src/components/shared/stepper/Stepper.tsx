@@ -31,10 +31,10 @@ const STEP_ICONS: Record<StepStatus, FC<ComponentPropsWithoutRef<'svg'>>> = {
 const stepIconVariants = cva('size-6 shrink-0', {
   variants: {
     status: {
-      done: 'text-primary-400',
-      current: 'text-primary-400',
-      error: 'text-destructive-400',
-      next: 'text-primary-50',
+      done: 'text-accent',
+      current: 'text-accent',
+      error: 'text-danger',
+      next: 'text-border-strong',
     },
   },
   defaultVariants: {

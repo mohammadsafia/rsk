@@ -4,40 +4,79 @@ title: FormCombobox (Async with Infinite Scroll)
 section: Components
 category: Forms
 description: Async options loading from backend API with infinite pagination and debounced search.
-tags: [forms, combobox, async, infinite-scroll, api]
+tags: [forms, combobox, async, infinite-scroll]
 ---
 
-import { FormComboboxAsyncDemo } from '@pages/components/components.data.demos';
-
-## Demo
-
-<FormComboboxAsyncDemo />
-
-## Imports
-
-```tsx
-import { FormContainer, FormCombobox } from '@components/forms';
 import { useForm } from 'react-hook-form';
-import { LookupService } from 'api';
+import { fetchDoctors } from '@component-docs/blocks';
+import { FormCombobox, FormContainer } from '@components/forms';
+
+export const AsyncDemo = () => {
+  const form = useForm({ defaultValues: { doctorId: '' } });
+  return (
+    <FormContainer formContext={form} onSuccess={() => {}} className="grid w-96 gap-3">
+      <FormCombobox
+        name="doctorId"
+        control={form.control}
+        label="Doctor"
+        options={fetchDoctors}
+        getOptionLabel={(option) => option?.name ?? ''}
+        getOptionValue={(option) => option?.id ?? ''}
+        placeholder="Search doctors…"
+      />
+    </FormContainer>
+  );
+};
+
+## Loading from an API
+
+Pass a fetcher as `options`. It receives a query string with `pageNumber`, `pageSize`, `searchTerm` and your `urlSearchParams`, and returns a page. Scrolling to the end loads the next page; typing is debounced.
+
+<Example
+  title="Doctors (mock API, 45 records)"
+  code={`<FormCombobox
+  name="doctorId"
+  control={form.control}
+  label="Doctor"
+  options={LookupService.doctors.request} // (query: string) => Promise<PaginatedDataTable<Doctor>>
+  getOptionLabel={(option) => option?.name ?? ''}
+  getOptionValue={(option) => option?.id ?? ''}
+  placeholder="Search doctors…"
+  urlSearchParams={new URLSearchParams({ userTypes: 'DoctorUser' })}
+/>`}
+>
+  <AsyncDemo />
+</Example>
+
+The docs have no backend, so this example uses a local mock that answers like the API.
+
+## The fetcher contract
+
+```ts
+type AsyncOptionsFn<TOption> = (queryParams: string) => Promise<TOption[] | PaginatedDataTable<TOption>>;
+// queryParams: "pageNumber=1&pageSize=20&searchTerm=had&selectedItemsIds=dr-3&…your urlSearchParams"
 ```
 
-## Code
+Return `{ data, pagination: { page, pageSize, total, totalPages } }` for paging, or a plain array for a single page. The current value's id is sent as `selectedItemsIds`, so the API can include it even when it isn't on the first page.
 
-```tsx
-const form = useForm();
+## API
 
-<FormContainer formContext={form} onSuccess={console.log}>
-  <FormCombobox
-    name="userId"
-    control={form.control}
-    label="User"
-    options={LookupService.users.request}
-    getOptionLabel={(o) => o.name || o.label || String(o)}
-    getOptionValue={(o) => o.id || String(o)}
-    placeholder="Search users..."
-    urlSearchParams={new URLSearchParams({ roles: 'admin,user' })}
-    debounceMs={500}
-    pageSize={20}
-  />
-</FormContainer>;
-```
+<PropsTable
+  rows={[
+    { prop: 'options', type: 'AsyncOptionsFn<TOption>', required: true, description: 'The fetcher.' },
+    { prop: 'urlSearchParams', type: 'URLSearchParams | string', description: 'Extra filters sent with every request.' },
+    { prop: 'debounceMs', type: 'number', default: '500', description: 'Delay after typing before searching.' },
+    { prop: 'pageSize', type: 'number', default: '20', description: 'Options per page.' },
+    { prop: 'optionMapper', type: '(option) => TOption', description: 'Reshape each fetched option.' },
+  ]}
+/>
+
+Plus everything on [FormCombobox](/docs/components/form-combobox#api). Requests use React Query, so the app needs a `QueryClientProvider` (the app root has one).
+
+## Accessibility
+
+- While a page loads, the list shows a loading row; "No results" is shown when the search matches nothing.
+
+## RTL notes
+
+- Search terms are sent as typed; Arabic searches work the same as English ones.

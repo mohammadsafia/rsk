@@ -27,9 +27,7 @@ export function createParseStep(): PipelineStep {
         }
 
         ctx.stats.totalSchemas = ctx.schemas.size;
-        spinner.succeed(
-          `Parsed ${ctx.schemas.size} schema(s) from swagger specs.`
-        );
+        spinner.succeed(`Parsed ${ctx.schemas.size} schema(s) from swagger specs.`);
       } catch (error) {
         spinner.fail('Failed to parse schemas.');
         throw error;

@@ -58,7 +58,6 @@ interface ImportMetaEnv {
   readonly VITE_APP_MAX_UPLOAD_BATCH_SIZE: string;
   readonly VITE_MAX_UPLOAD_BATCH_SIZE: string;
 
-
   // Monitoring
   readonly VITE_SENTRY_DSN: string;
   readonly VITE_SENTRY_ENVIRONMENT: string;
@@ -73,12 +72,8 @@ interface ImportMetaEnv {
 
   // Build configuration
   readonly GENERATE_SOURCEMAP: string;
-
-  // MDX Component gallery (dev only)
-  readonly VITE_ENABLE_COMPONENT_GALLERY?: 'true' | 'false';
 }
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
-

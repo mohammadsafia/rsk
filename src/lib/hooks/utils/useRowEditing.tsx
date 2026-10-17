@@ -1,14 +1,6 @@
 import { createContext, type FC, type ReactNode, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
-import type {
-  ArrayPath,
-  FieldArray,
-  FieldPath,
-  FieldValues,
-  Path,
-  UseFieldArrayReturn,
-  UseFormReturn,
-} from 'react-hook-form';
+import type { ArrayPath, FieldArray, FieldPath, FieldValues, Path, UseFieldArrayReturn, UseFormReturn } from 'react-hook-form';
 
 export type RowEditingMode = 'single' | 'multi';
 
@@ -22,11 +14,7 @@ export type RowEditingActionContext = {
 
 export type PersistFn<TRow> = (row: TRow, ctx: RowEditingActionContext) => Promise<TRow | void>;
 
-export type UseRowEditingOptions<
-  TRow extends FieldValues,
-  TForm extends FieldValues = FieldValues,
-  TKeyName extends string = 'id',
-> = {
+export type UseRowEditingOptions<TRow extends FieldValues, TForm extends FieldValues = FieldValues, TKeyName extends string = 'id'> = {
   form: UseFormReturn<TForm>;
   fieldArray: UseFieldArrayReturn<TForm, ArrayPath<TForm>, TKeyName>;
   arrayName: ArrayPath<TForm>;
@@ -88,11 +76,7 @@ const DIRTY_STATUSES: ReadonlySet<RowStatus> = new Set(['editing', 'creating', '
 // If a table ever grows to hundreds of editable rows, swap this for a per-row subscription
 // store (Zustand / a tiny external store) so toggling one row no longer re-renders the rest.
 
-export const useRowEditing = <
-  TRow extends FieldValues,
-  TForm extends FieldValues = FieldValues,
-  TKeyName extends string = 'id',
->(
+export const useRowEditing = <TRow extends FieldValues, TForm extends FieldValues = FieldValues, TKeyName extends string = 'id'>(
   options: UseRowEditingOptions<TRow, TForm, TKeyName>,
 ): UseRowEditingReturn<TRow> => {
   const {
@@ -110,10 +94,7 @@ export const useRowEditing = <
   const errorsRef = useRef<Map<string, unknown>>(new Map());
 
   const indexOf = useCallback(
-    (rowId: string): number =>
-      fieldArray.fields.findIndex(
-        (f) => String((f as Record<string, unknown>)[rowIdKey] ?? '') === rowId,
-      ),
+    (rowId: string): number => fieldArray.fields.findIndex((f) => String((f as Record<string, unknown>)[rowIdKey] ?? '') === rowId),
     [fieldArray, rowIdKey],
   );
 
@@ -155,10 +136,7 @@ export const useRowEditing = <
     return count;
   }, [statusMap]);
 
-  const isEditing = useCallback(
-    (rowId: string): boolean => ACTIVE_STATUSES.has(statusMap.get(rowId) ?? 'idle'),
-    [statusMap],
-  );
+  const isEditing = useCallback((rowId: string): boolean => ACTIVE_STATUSES.has(statusMap.get(rowId) ?? 'idle'), [statusMap]);
 
   const isAnyEditing = useMemo(() => {
     for (const status of statusMap.values()) {
@@ -308,21 +286,7 @@ export const useRowEditing = <
       removeRow,
       moveRow,
     }),
-    [
-      isEditing,
-      isAnyEditing,
-      dirtyCount,
-      getStatus,
-      getError,
-      fieldName,
-      enterEdit,
-      exitEdit,
-      save,
-      cancel,
-      addRow,
-      removeRow,
-      moveRow,
-    ],
+    [isEditing, isAnyEditing, dirtyCount, getStatus, getError, fieldName, enterEdit, exitEdit, save, cancel, addRow, removeRow, moveRow],
   );
 };
 
@@ -331,13 +295,6 @@ export type RowEditingProviderProps<TRow extends FieldValues> = {
   children: ReactNode;
 };
 
-export const RowEditingProvider = <TRow extends FieldValues>({
-  edit,
-  children,
-}: RowEditingProviderProps<TRow>): ReturnType<FC> => {
-  return (
-    <RowEditingContext.Provider value={edit as unknown as RowEditingContextValue<FieldValues>}>
-      {children}
-    </RowEditingContext.Provider>
-  );
+export const RowEditingProvider = <TRow extends FieldValues>({ edit, children }: RowEditingProviderProps<TRow>): ReturnType<FC> => {
+  return <RowEditingContext.Provider value={edit as unknown as RowEditingContextValue<FieldValues>}>{children}</RowEditingContext.Provider>;
 };

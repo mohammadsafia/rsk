@@ -1,0 +1,45 @@
+---
+id: forms
+title: Forms
+section: Guides
+category: Guides
+description: FormContainer, the FormField contract, validation with zod, and form actions.
+order: 5
+tags: [guides, forms, validation]
+---
+
+import { FormWithValidationDemo } from '@pages/components/components.data.demos';
+
+## FormContainer
+
+`FormContainer` wraps react-hook-form's `FormProvider` and a native `<form>`. Pass a `useForm` result as `formContext` and an `onSuccess` handler; validation runs through the resolver you configure (usually zod).
+
+```tsx
+const form = useForm({ resolver: zodResolver(schema), defaultValues });
+
+<FormContainer formContext={form} onSuccess={save}>
+  <FormInput name="email" label="Email" />
+  <FormContainer.Actions />
+</FormContainer>
+```
+
+## The FormField contract
+
+Every `Form*` field renders through `FormField`, so they all behave the same way:
+
+- a `<label>` linked to the control, and an optional `description`;
+- the inline error message under the field, wired with `aria-invalid` and `aria-describedby`;
+- a required `*` and an optional ⓘ tooltip that stays outside the label's accessible name;
+- unique ids, and the same height as `Input`.
+
+<Example title="Validated form" code={'<FormWithValidationDemo />'}>
+  <FormWithValidationDemo />
+</Example>
+
+## Actions
+
+`FormContainer.Actions` renders Submit and Cancel. Submit shows a loading state while the handler runs; Cancel on a dirty form can ask for confirmation (`confirmOnCancel`) before navigating away, and `sticky` keeps the bar visible on long forms.
+
+## Sections
+
+Group long forms with `FormSection` (title, description, a two-column grid on wide screens).

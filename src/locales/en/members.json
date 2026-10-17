@@ -1,7 +1,8 @@
 {
   "title": "Members",
+  "description": "Everyone with access to this workspace and what they can do.",
   "addMember": "Add Member",
-  "totalLabel": "members",
+  "totalLabel": "Members",
   "searchPlaceholder": "Search members…",
   "columns": {
     "name": "Name",
@@ -10,7 +11,9 @@
     "status": "Status",
     "joined": "Joined",
     "lastSeen": "Last seen",
-    "shiftStart": "Shift start"
+    "shiftStart": "Shift start",
+    "twoFactor": "Two-factor",
+    "sessions": "Sessions"
   },
   "roles": {
     "Admin": "Admin",
@@ -25,5 +28,9 @@
   "emptyState": {
     "title": "No members found",
     "description": "No members match your search. Try adjusting your filters or keywords."
+  },
+  "twoFactor": {
+    "on": "On",
+    "off": "Off"
   }
 }

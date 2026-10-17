@@ -3,29 +3,51 @@ id: form-textarea
 title: FormTextarea
 section: Components
 category: Forms
-description: 'Multi-line text input with validation and error tooltip.'
-tags: [forms, textarea, input]
+description: 'Multi-line text bound to react-hook-form; grows with its content.'
+tags: [forms, textarea]
 ---
 
-import { FormNumberTextareaDemo } from '@pages/components/components.data.demos';
-
-## Demo
-
-<FormNumberTextareaDemo />
-
-## Imports
-
-```tsx
-import { FormContainer, FormTextarea } from '@components/forms';
 import { useForm } from 'react-hook-form';
-```
+import { FormContainer, FormTextarea } from '@components/forms';
 
-## Code
+export const TextareaDemo = () => {
+  const form = useForm({ defaultValues: { notes: '' } });
+  return (
+    <FormContainer formContext={form} onSuccess={() => {}} className="grid w-96 gap-3">
+      <FormTextarea name="notes" label="Visit notes" description="Visible to the care team only" placeholder="Symptoms, findings, plan…" />
+    </FormContainer>
+  );
+};
 
-```tsx
-const form = useForm({ defaultValues: { notes: '' } });
+## Notes field
 
-<FormContainer formContext={form} onSuccess={console.log}>
-  <FormTextarea name="notes" label="Notes" placeholder="Enter your notes..." required />
-</FormContainer>;
-```
+<Example
+  title="With description"
+  code={`<FormTextarea
+  name="notes"
+  label="Visit notes"
+  description="Visible to the care team only"
+  placeholder="Symptoms, findings, plan…"
+/>`}
+>
+  <TextareaDemo />
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'name', type: 'Path<TFieldValues>', required: true, description: 'Field path in the form values.' },
+    { prop: 'rows · maxLength · placeholder · …', type: 'TextareaHTMLAttributes', description: 'Native textarea attributes pass through.' },
+  ]}
+/>
+
+Plus the [shared field props](/docs/components/form-field#shared-by-every-form-field). Like [Textarea](/docs/components/textarea), it grows with its content.
+
+## Accessibility
+
+- The label and the message line are wired to the textarea; errors set `aria-invalid`.
+
+## RTL notes
+
+- Text follows the page direction; Arabic notes read right to left.

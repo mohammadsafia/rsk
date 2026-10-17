@@ -1,5 +1,8 @@
 {
   "dashboard": "Dashboard",
+  "schedule": "Schedule",
+  "patients": "Patients",
+  "billing": "Billing",
   "components": "Components",
   "members": "Members",
   "settings": "Settings",
@@ -14,5 +17,6 @@
   "groups": {
     "main": "Main",
     "account": "Account"
-  }
+  },
+  "skipToContent": "Skip to content"
 }

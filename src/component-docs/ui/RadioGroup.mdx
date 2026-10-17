@@ -3,45 +3,78 @@ id: radio-group
 title: RadioGroup
 section: Components
 category: UI
-description: 'Single selection control with card-style radio items.'
+description: 'Option cards with a radio indicator; RadioGroup.Dot is the non-interactive indicator for custom lists.'
 tags: [ui, radio, input]
 ---
 
-import { RadioGroupDemo } from '@pages/components/components.data.demos';
-
-## Demo
-
-<RadioGroupDemo />
-
-## Imports
-
-```tsx
 import { RadioGroup } from '@components/ui';
-import { CheckCircleFilled } from '@assets/icons';
-import { Circle } from 'lucide-react';
-```
 
-## Code
+## Option cards
 
-```tsx
-<RadioGroup value={value} onValueChange={setValue}>
-  <RadioGroup.Item value="option1">
-    <span className="...">Option 1</span>
-    <RadioGroup.Indicator>
-      <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
-      <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
-    </RadioGroup.Indicator>
-  </RadioGroup.Item>
-</RadioGroup>
+Each item is a whole-card radio; the checked card takes the accent border and tint.
 
-// Custom Icons
-<RadioGroup value={value} onValueChange={setValue}>
-  <RadioGroup.Item value="option1">
-    <span className="...">Option 1</span>
-    <RadioGroup.Indicator>
-      <Star size={20} className="text-yellow-500 hidden fill-yellow-500 group-data-[state=checked]/radio-item:block" />
-      <Star size={20} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
-    </RadioGroup.Indicator>
-  </RadioGroup.Item>
-</RadioGroup>
-```
+<Example title="Plan">
+  <RadioGroup aria-label="Plan" defaultValue="clinic" className="max-w-sm">
+    <RadioGroup.Item value="solo">
+      <span className="flex-1">Solo practice</span>
+      <RadioGroup.Indicator />
+    </RadioGroup.Item>
+    <RadioGroup.Item value="clinic">
+      <span className="flex-1">Clinic</span>
+      <RadioGroup.Indicator />
+    </RadioGroup.Item>
+    <RadioGroup.Item value="hospital" disabled>
+      <span className="flex-1">Hospital (contact sales)</span>
+      <RadioGroup.Indicator />
+    </RadioGroup.Item>
+  </RadioGroup>
+</Example>
+
+## In a row
+
+The root is a grid, so `grid-cols-*` lays the cards out side by side.
+
+<Example title="Two columns">
+  <RadioGroup aria-label="Visit type" defaultValue="in-person" className="max-w-md grid-cols-2">
+    <RadioGroup.Item value="in-person">
+      <span className="flex-1">In person</span>
+      <RadioGroup.Indicator />
+    </RadioGroup.Item>
+    <RadioGroup.Item value="video">
+      <span className="flex-1">Video call</span>
+      <RadioGroup.Indicator />
+    </RadioGroup.Item>
+  </RadioGroup>
+</Example>
+
+## Dot
+
+`RadioGroup.Dot` is the same circle without behaviour, for custom single-select lists such as table filters.
+
+<Example title="Non-interactive indicator">
+  <RadioGroup.Dot checked />
+  <RadioGroup.Dot />
+</Example>
+
+In forms, use [FormRadioGroup](/docs/components/form-radio-group).
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'value · defaultValue · onValueChange', type: 'string · (value) => void', description: 'The selected item, controlled or initial.' },
+    { prop: 'invalid', type: 'boolean', default: 'false', description: 'Danger border on every item and aria-invalid.' },
+    { prop: 'Item · value', type: 'string', required: true, description: 'The value this card selects.' },
+    { prop: 'Item · disabled', type: 'boolean', default: 'false', description: 'Dims and skips one option.' },
+    { prop: 'Dot · checked', type: 'boolean', default: 'false', description: 'Filled or empty circle (aria-hidden).' },
+  ]}
+/>
+
+## Accessibility
+
+- Radix renders `role="radiogroup"` with `role="radio"` items; Arrow keys move and select, Tab leaves the group.
+- Label the group with `aria-label` or `aria-labelledby`; each card's text is its option name.
+
+## RTL notes
+
+- The label sits at the start and the indicator at the end, so they swap sides in Arabic; Arrow keys follow the reading direction.

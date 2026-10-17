@@ -3,24 +3,48 @@ id: breadcrumb
 title: Breadcrumb
 section: Components
 category: Shared
-description: Navigation breadcrumb trail.
+description: 'Trail of links to the current page; the last item is the page itself.'
 tags: [shared, breadcrumb, navigation]
 ---
 
 import { Breadcrumb } from '@components/shared';
+import { Slash } from 'lucide-react';
 
-## Demo
+## Trail
 
-<Breadcrumb links={[{ title: 'Dashboard', href: '/' }, { title: 'Settings', href: '/settings' }, { title: 'Profile' }]} />
+Items with `href` are links; the last item is the current page.
 
-## Imports
+<Example title="Settings page">
+  <Breadcrumb links={[{ title: 'Dashboard', href: '/dashboard' }, { title: 'Settings', href: '/settings' }, { title: 'Profile' }]} />
+</Example>
 
-```tsx
-import { Breadcrumb } from '@components/shared';
-```
+## Root and separator
 
-## Code
+`withRoot` prepends a translated "Home" link; `separator` replaces the chevron.
 
-```tsx
-<Breadcrumb links={[{ title: 'Home', href: '/' }, { title: 'Page' }]} />
-```
+<Example title="With root, custom separator">
+  <Breadcrumb withRoot separator={<Slash className="size-3" />} links={[{ title: 'Members', href: '/members' }, { title: 'Layla Haddad' }]} />
+</Example>
+
+[PageHeader](/docs/components/page-header) renders a breadcrumb above the title for you.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'links', type: '{ title: string; href?: string }[]', required: true, description: 'The trail, root first.' },
+    { prop: 'withRoot', type: 'boolean', default: 'false', description: 'Prepend a translated Home link.' },
+    { prop: 'separator', type: 'ReactNode', default: 'chevron', description: 'Drawn between items (aria-hidden).' },
+  ]}
+/>
+
+Renders nothing when `links` is empty and `withRoot` is off.
+
+## Accessibility
+
+- A `nav` labelled "Breadcrumb" with an ordered list; the last item has `aria-current="page"`.
+- Separators are hidden from screen readers.
+
+## RTL notes
+
+- The trail runs right to left in Arabic and the default chevron mirrors to point along it.

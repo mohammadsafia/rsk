@@ -3,65 +3,104 @@ id: card
 title: Card
 section: Components
 category: UI
-description: 'Container with header, content, and footer sections.'
+description: 'Flat surface with a hairline border: header (title, description, trailing actions), content and footer. No resting shadow.'
 tags: [ui, layout, card]
 ---
 
 import { Card, Button } from '@components/ui';
+import { CalendarClock, Users } from 'lucide-react';
 
-## Demo
+## Composition
 
-<div className="space-y-4">
-  <Card className="w-full">
+`Card.Header` holds the title, description and trailing `Card.Actions`; `Card.Content` is the body; `Card.Footer` sits under a hairline.
+
+<Example title="Header, content and footer">
+  <Card className="w-full max-w-md">
     <Card.Header>
-      <Card.Title>Simple Card</Card.Title>
-      <Card.Description>Card with title and description</Card.Description>
+      <Card.Title>Patients</Card.Title>
+      <Card.Description>Seen this week</Card.Description>
+      <Card.Actions>
+        <Button variant="outline" size="sm">Export</Button>
+      </Card.Actions>
     </Card.Header>
     <Card.Content>
-      <p className="text-sm">This is the card content area.</p>
+      <p className="text-sm">248 visits across 3 clinics.</p>
     </Card.Content>
-  </Card>
-
-  <Card className="w-full">
-    <Card.Header>
-      <Card.Title>Card with Footer</Card.Title>
-    </Card.Header>
-    <Card.Content>
-      <p className="text-sm">Content goes here.</p>
-    </Card.Content>
-    <Card.Footer className="flex justify-between">
-      <Button variant="outline" size="sm">
-        Cancel
-      </Button>
-      <Button size="sm">Save</Button>
+    <Card.Footer className="flex justify-end gap-2">
+      <Button variant="ghost" size="sm">Dismiss</Button>
+      <Button size="sm">Open report</Button>
     </Card.Footer>
   </Card>
-</div>
+</Example>
 
-## Imports
+## Header shortcut
 
-```tsx
-import { Card, Button } from '@components/ui';
-```
+`title`, `description`, `icon` and `tooltip` build the header when the card has no `Card.Header` child.
 
-## Code
+<Example title="Header props">
+  <Card className="w-full max-w-md" title="Patients" description="Seen this week" icon={<Users />} tooltip="Counts unique visits">
+    <Card.Content>
+      <p className="text-sm">248 patients</p>
+    </Card.Content>
+  </Card>
+</Example>
 
-```tsx
-// Basic Card
-<Card>
-  <Card.Header>
-    <Card.Title>Title</Card.Title>
-    <Card.Description>Description</Card.Description>
-  </Card.Header>
-  <Card.Content>Content</Card.Content>
-</Card>
+## Tones
 
-// With Footer
-<Card>
-  <Card.Header>
-    <Card.Title>Title</Card.Title>
-  </Card.Header>
-  <Card.Content>Content</Card.Content>
-  <Card.Footer>Footer content</Card.Footer>
-</Card>
-```
+A tone tints the whole card; text stays `fg` on every tint.
+
+<Example title="Tones">
+  <div className="grid w-full gap-3 sm:grid-cols-3">
+    <Card tone="neutral" title="Neutral" />
+    <Card tone="accent" title="Accent" />
+    <Card tone="info" title="Info" />
+    <Card tone="success" title="Success" />
+    <Card tone="warning" title="Warning" />
+    <Card tone="danger" title="Danger" />
+  </div>
+</Example>
+
+## Collapsible
+
+`collapsible` adds a toggle to the header; use `defaultOpen` or `open` with `onOpenChange` to control it.
+
+<Example title="Collapsible">
+  <Card collapsible className="w-full max-w-md" title="Upcoming visits" icon={<CalendarClock />}>
+    <Card.Content>
+      <p className="text-sm">Three visits scheduled for tomorrow.</p>
+    </Card.Content>
+  </Card>
+</Example>
+
+## Loading
+
+`loading` replaces the body with skeleton lines while the header stays visible.
+
+<Example title="Loading">
+  <Card className="w-full max-w-md" title="Patients" loading>
+    <Card.Content>Real content</Card.Content>
+  </Card>
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'tone', type: "'neutral' | 'accent' | 'info' | 'success' | 'warning' | 'danger'", default: "'neutral'", description: 'Tints the whole card.' },
+    { prop: 'title · description · icon · tooltip', type: 'ReactNode', description: 'Header shortcut, used when there is no Card.Header child.' },
+    { prop: 'collapsible', type: 'boolean', default: 'false', description: 'Adds a header toggle that shows and hides the body.' },
+    { prop: 'open · defaultOpen · onOpenChange', type: 'boolean · (open) => void', description: 'Controlled or initial open state when collapsible.' },
+    { prop: 'loading', type: 'boolean', default: 'false', description: 'Replaces the body with skeleton lines and sets aria-busy.' },
+  ]}
+/>
+
+Parts and their elements: `Card` is an `article`, `Card.Header` a `header`, `Card.Title` an `h3`, `Card.Description` a `p`, `Card.Actions` a `div`, `Card.Content` a `section`, `Card.Footer` a `footer`.
+
+## Accessibility
+
+- The title is an `h3`, so a page using cards should have its `h1` and `h2` above them.
+- The collapse toggle and the tooltip trigger are buttons with translated `aria-label`s.
+
+## RTL notes
+
+- `Card.Actions` sits at the end of the header and the icon at the start, so both swap sides in Arabic.

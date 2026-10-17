@@ -1,0 +1,97 @@
+---
+id: page-header
+title: PageHeader
+section: Components
+category: Shared
+description: 'The top of a page: title, description, back link, breadcrumb and an action row.'
+tags: [shared, layout, header, title]
+---
+
+import { Avatar, Badge, Button } from '@components/ui';
+import { PageHeader } from '@components/shared';
+import { Download, Plus } from 'lucide-react';
+
+## With actions
+
+`PageHeader.Actions` is end-aligned and wraps under the title on narrow screens.
+
+<Example title="List page">
+  <PageHeader className="w-full" title="Patients" description="Everyone registered at the Amman clinic.">
+    <PageHeader.Actions>
+      <Button variant="outline">
+        <Download aria-hidden="true" />
+        Export
+      </Button>
+      <Button>
+        <Plus aria-hidden="true" />
+        Register patient
+      </Button>
+    </PageHeader.Actions>
+  </PageHeader>
+</Example>
+
+## Back link and breadcrumb
+
+`back` takes a path (a link) or a function (a button); `breadcrumb` renders a [Breadcrumb](/docs/components/breadcrumb) above the title.
+
+<Example title="Detail page">
+  <PageHeader
+    className="w-full"
+    title="Sara Haddad"
+    description="MRN-20391 · Last visit 12 Oct 2026"
+    back="/docs/components/page-header"
+    breadcrumb={[{ title: 'Patients', href: '/docs/components/page-header' }, { title: 'Sara Haddad' }]}
+  />
+</Example>
+
+## Media and meta
+
+`media` puts an avatar or icon before the title; `meta` adds badges and key/value items under the description.
+
+<Example title="Patient profile">
+  <PageHeader
+    className="w-full"
+    title="Sara Haddad"
+    media={
+      <Avatar size="lg">
+        <Avatar.Fallback>SH</Avatar.Fallback>
+      </Avatar>
+    }
+    meta={
+      <>
+        <Badge tone="success">Active</Badge>
+        <span dir="ltr" className="font-mono">MRN-20391</span>
+        <span>Last visit 12 Oct 2026</span>
+      </>
+    }
+  >
+    <PageHeader.Actions>
+      <Button variant="outline">Message</Button>
+      <Button>Book visit</Button>
+    </PageHeader.Actions>
+  </PageHeader>
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'title', type: 'ReactNode', required: true, description: 'Rendered as the page’s h1.' },
+    { prop: 'description', type: 'ReactNode', description: 'Muted line under the title.' },
+    { prop: 'back', type: 'string | () => void', description: 'A path renders a link; a function renders a button. Labelled "Back".' },
+    { prop: 'media', type: 'ReactNode', description: 'Avatar or icon before the title.' },
+    { prop: 'meta', type: 'ReactNode', description: 'Badges and key/value items under the description.' },
+    { prop: 'breadcrumb', type: 'BreadcrumbLink[]', description: 'Rendered with Breadcrumb above the title.' },
+  ]}
+/>
+
+`PageHeader.Actions` is a `div` for the page's buttons; keep one primary action.
+
+## Accessibility
+
+- The title is the page's only `h1`; the back control has a translated label.
+- Put actions in the order they should be tabbed; the primary action last.
+
+## RTL notes
+
+- The back chevron mirrors in Arabic, and the action row aligns to the end (left).

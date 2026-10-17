@@ -1,0 +1,58 @@
+# Publishes the generated app starter to mohammadsafia/rsk-starter, so
+# `vp create github:mohammadsafia/rsk-starter -- my-app` always has the latest kit.
+# Nothing is pushed unless `pnpm starter:verify` passes.
+name: Starter sync
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: starter-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 1
+
+      # The pnpm version comes from package.json `packageManager`.
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Verify the starter (type check, lint, tests, build)
+        run: pnpm starter:verify
+
+      - name: Build the starter
+        run: pnpm starter:build "$RUNNER_TEMP/starter"
+
+      - uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.STARTER_DEPLOY_KEY }}
+
+      - name: Clone rsk-starter
+        run: git clone --depth 1 git@github.com:mohammadsafia/rsk-starter.git "$RUNNER_TEMP/publish"
+
+      - name: Commit the starter
+        run: pnpm starter:publish "$RUNNER_TEMP/starter" "$RUNNER_TEMP/publish"
+
+      # A no-op when the previous step reported "starter unchanged".
+      - name: Push
+        run: git -C "$RUNNER_TEMP/publish" push origin HEAD:main

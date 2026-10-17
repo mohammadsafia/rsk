@@ -1,6 +1,6 @@
 # RSK — React Starter Kit
 
-A production-grade React + TypeScript starter template with an opinionated architecture, 78+ pre-built components, a warm earth design system in OKLCH, enforced code standards, and advanced tooling including a Swagger-to-TypeScript DTO generator and MDX component documentation. Built for teams that care about consistency, type safety, and developer experience.
+A production-grade React + TypeScript starter template with an opinionated architecture, 78+ pre-built components, the Graphite Instrument design system in OKLCH, enforced code standards, and advanced tooling including a Swagger-to-TypeScript DTO generator and MDX component documentation. Built for teams that care about consistency, type safety, and developer experience.
 
 ---
 
@@ -10,14 +10,14 @@ RSK is built on five architectural pillars. Every decision — from folder struc
 
 ### Component Hierarchy
 
-| Tier   | Location                      | Purpose                              |
-|--------|-------------------------------|--------------------------------------|
-| Pages  | `src/pages/`                  | Route-level components; logic lives here |
-| Views  | `src/views/<feature>/`        | Reusable across 2+ pages             |
-| Shared | `src/components/shared/`      | Compound pattern                     |
-| UI     | `src/components/ui/`          | Radix primitives + CVA               |
-| Forms  | `src/components/forms/`       | React Hook Form wrappers             |
-| Tables | `src/components/tables/`      | TanStack wrappers                    |
+| Tier   | Location                 | Purpose                                  |
+| ------ | ------------------------ | ---------------------------------------- |
+| Pages  | `src/pages/`             | Route-level components; logic lives here |
+| Views  | `src/views/<feature>/`   | Reusable across 2+ pages                 |
+| Shared | `src/components/shared/` | Compound pattern                         |
+| UI     | `src/components/ui/`     | Radix primitives + CVA                   |
+| Forms  | `src/components/forms/`  | React Hook Form wrappers                 |
+| Tables | `src/components/tables/` | TanStack wrappers                        |
 
 Shared components follow the compound component pattern: every sub-component accepts a `className` prop, uses `cn()` for class merging, spreads `...props` to the underlying element, and adds a `data-slot` attribute to enable parent-driven styling without prop drilling.
 
@@ -42,33 +42,34 @@ Flow: `ApiEndpoints.ts` → `handlers/` → `hooks/queries/` & `hooks/mutations/
 
 DTO naming conventions:
 
-| Suffix          | Usage                        |
-|-----------------|------------------------------|
-| `ForReadDto`    | GET responses                |
-| `ForCreateDto`  | POST payloads                |
-| `ForUpdateDto`  | PUT/PATCH payloads           |
-| `ListDto`       | Item shape inside a list     |
-| `ParamsDto`     | Query string parameters      |
+| Suffix         | Usage                    |
+| -------------- | ------------------------ |
+| `ForReadDto`   | GET responses            |
+| `ForCreateDto` | POST payloads            |
+| `ForUpdateDto` | PUT/PATCH payloads       |
+| `ListDto`      | Item shape inside a list |
+| `ParamsDto`    | Query string parameters  |
 
 Key rules: `queryKey` is a plain `string`, not an array. Every handler response is fully typed — `any` is not permitted.
 
 ### Design System
 
-RSK uses the OKLCH color space with a warm earth palette centered on hue 55–65. This provides perceptually uniform lightness steps and vibrant, accessible color at every shade.
+RSK's visual system is **Graphite Instrument**: dark-first graphite neutrals with a hand-tuned light mode, one **Oxblood** accent, vermilion errors and steel info — all defined in OKLCH.
 
-- 14 primary tonal variations spanning L 10–98
-- Dual light/dark themes — every token is defined in both `:root` and `.dark` in `index.css`
-- Shadow system built with `color-mix()` for theme-aware depth
-- Shared a11y utilities exported from `src/lib/utils/tailwind.ts`: `FOCUS_RING`, `DISABLED_STYLES`, `TRANSITION_DEFAULT`
-- DM Sans variable font, type scale from `2xs` to `2xl`
+- Two token layers: raw ramps in `src/styles/palette.css`, semantic roles (`canvas`, `surface`, `fg-muted`, `border-strong`, `accent`, `danger`, …) in `src/styles/tokens.css`, exposed to Tailwind by `src/styles/theme.css`
+- Dual light/dark themes — every semantic token is defined in both `:root, .light` and `.dark`; WCAG AA contrast is enforced by `tests/design-system/contrast.test.ts`
+- Schibsted Grotesk + Noto Kufi Arabic + Spline Sans Mono; 14px body, type scale from `2xs` to `2xl`, extra leading under `dir="rtl"`
+- Radius 4 / 6 / 10, control heights 28 / 32 / 40 (`h-control-sm|md|lg`), borders on resting surfaces and `shadow-raised` / `shadow-overlay` for floating layers
+- State utilities in `src/styles/utilities.css`: `focus-ring`, `focus-ring-input`, `state-invalid`, `state-press`, `duration-fast|base|slow` (reduced-motion safe)
+- Browse it all on the **Foundations** tab of the component gallery (`/components`)
 
 ### Routing & Layouts
 
-| Zone      | Layout            | Guard                         | Purpose                            |
-|-----------|-------------------|-------------------------------|------------------------------------|
-| Public    | None              | None                          | Landing page, public content       |
-| Auth      | `AuthLayout`      | Redirects if authenticated    | Login, register                    |
-| Protected | `DashboardLayout` | `AuthGuard`                   | Dashboard, components, settings    |
+| Zone      | Layout            | Guard                      | Purpose                         |
+| --------- | ----------------- | -------------------------- | ------------------------------- |
+| Public    | None              | None                       | Landing page, public content    |
+| Auth      | `AuthLayout`      | Redirects if authenticated | Login, register                 |
+| Protected | `DashboardLayout` | `AuthGuard`                | Dashboard, components, settings |
 
 All page components are code-split with `React.lazy` + `Suspense`. Route constants live in `FULL_ROUTES_PATH` and the sidebar navigation is driven by `APP_MENU`, where each entry carries a Lucide icon (`LayoutDashboard`, `Component`, `Settings`).
 
@@ -87,18 +88,18 @@ All page components are code-split with `React.lazy` + `Suspense`. Route constan
 
 ## Tech Stack
 
-| Domain        | Stack                                                              |
-|---------------|--------------------------------------------------------------------|
-| Core          | React, TypeScript, Vite (SWC), Tailwind CSS                       |
-| UI Primitives | Radix UI (15+ primitives), CVA, lucide-react                      |
-| Forms         | React Hook Form + Zod + 18 form components                        |
-| Data          | TanStack React Query + React Table, Axios                         |
-| State         | MobX (client state), React Query (server state)                   |
-| Auth          | OIDC (Microsoft), AuthGuard HOC                                   |
-| i18n          | i18next with browser detection                                    |
-| Monitoring    | Sentry (error tracking), Firebase (push notifications)            |
-| Docs          | MDX + rehype-pretty-code + Shiki (component gallery)              |
-| Tooling       | DTO generator CLI, ESLint, Prettier, Vitest                       |
+| Domain        | Stack                                                        |
+| ------------- | ------------------------------------------------------------ |
+| Core          | React, TypeScript, Vite (SWC), Tailwind CSS                  |
+| UI Primitives | Radix UI (15+ primitives), CVA, lucide-react                 |
+| Forms         | React Hook Form + Zod + 18 form components                   |
+| Data          | TanStack React Query + React Table, Axios                    |
+| State         | MobX (client state), React Query (server state)              |
+| Auth          | OIDC (Microsoft), AuthGuard HOC                              |
+| i18n          | i18next with browser detection                               |
+| Monitoring    | Sentry (error tracking), Firebase (push notifications)       |
+| Docs          | MDX + rehype-pretty-code + Shiki (component gallery)         |
+| Tooling       | Vite+ (`vp`: Vite, Rolldown, Vitest, Oxlint, Oxfmt), DTO CLI |
 
 ---
 
@@ -112,7 +113,7 @@ The codebase enforces a 12-category standards checklist. Here are the key princi
 
 **Conditional Rendering** — The `Conditional.If` component is mandatory. Never use `&&` or ternary operators for conditional rendering in JSX. Use the `fallback` prop for else-cases.
 
-**Styling** — Theme-aware tokens only (`bg-background`, not `bg-white`). Use `cn()` for conditional class merging. Tailwind scale values only — no arbitrary pixel values like `p-[24px]`. No hardcoded hex/rgb colors.
+**Styling** — Semantic tokens only (`bg-canvas`, `text-fg-muted`, `border-border-strong` — see the Foundations page in the gallery); never raw colors. Use `cn()` for conditional class merging. Tailwind scale values only — no arbitrary pixel values like `p-[24px]`. No hardcoded hex/rgb colors.
 
 **Component Order** — Strict internal hook ordering is enforced: core hooks → contexts → utility hooks → queries/mutations → refs → state → computed → callbacks → effects → JSX.
 
@@ -170,10 +171,7 @@ const TaskCategoryForm = ({ initialCategory }: TaskCategoryFormProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   // 6. Computed values
-  const activeCategories = useMemo(
-    () => TASK_CATEGORIES.filter((c) => c.isActive),
-    [],
-  );
+  const activeCategories = useMemo(() => TASK_CATEGORIES.filter((c) => c.isActive), []);
 
   // 7. Callbacks (handle* prefix)
   const handleSubmit = (data: TaskCategory) => {
@@ -247,52 +245,77 @@ All folders use **kebab-case**. Each component lives in its own folder with a ba
 
 ### Prerequisites
 
-- Node.js **22.14.0** (`.nvmrc` included)
-- Yarn
+- Node.js **22.18+** (`.node-version` included)
+- pnpm 10 (pinned via `packageManager`)
+- Optional: the [Vite+ global CLI](https://viteplus.dev/guide/) (`curl -fsSL https://vite.plus | bash`), which manages Node and pnpm for you
 
 ### Install & Run
 
 ```bash
-nvm use
-yarn install
-yarn dev
+vp install   # or: pnpm install
+vp dev       # or: pnpm dev
 ```
 
 Opens on http://localhost:3000.
 
 ### Scripts
 
-| Command           | Description                                                     |
-|-------------------|-----------------------------------------------------------------|
-| `yarn dev`        | Start the Vite development server                               |
-| `yarn build`      | Type-check and build for production                             |
-| `yarn build:dev`  | Build with the development mode flag                            |
-| `yarn preview`    | Serve the production build locally                              |
-| `yarn test`       | Run the Vitest test suite                                       |
-| `yarn lint`       | Lint the codebase with ESLint 9                                 |
-| `yarn dto:gen`    | Interactive DTO generation with diff badges                     |
-| `yarn dto:list`   | List all tracked schemas in the manifest                        |
-| `yarn dto:diff`   | Show schemas that have changed since last generation            |
-| `yarn dto:clean`  | Remove orphaned generated files and update the manifest         |
-| `yarn dto:init`   | Scaffold the `.dto-gen.json` configuration file                 |
-| `yarn docs:new`   | Scaffold a new MDX component documentation file                 |
-| `yarn docs:lint`  | Validate completeness of component documentation                |
+| Command          | Description                                             |
+| ---------------- | ------------------------------------------------------- |
+| `pnpm dev`       | Start the Vite development server                       |
+| `pnpm build`     | Type-check and build for production                     |
+| `pnpm build:dev` | Build with the development mode flag                    |
+| `pnpm preview`   | Serve the production build locally                      |
+| `pnpm test`      | Run the Vitest test suite                               |
+| `pnpm lint`      | Lint the codebase with Oxlint (type-aware)              |
+| `vp check`       | Format check (Oxfmt), lint, and type-check in one pass  |
+| `vp fmt`         | Format the codebase with Oxfmt                          |
+| `pnpm dto:gen`   | Interactive DTO generation with diff badges             |
+| `pnpm dto:list`  | List all tracked schemas in the manifest                |
+| `pnpm dto:diff`  | Show schemas that have changed since last generation    |
+| `pnpm dto:clean` | Remove orphaned generated files and update the manifest |
+| `pnpm dto:init`  | Scaffold the `.dto-gen.json` configuration file         |
+| `pnpm docs:new`  | Scaffold a new MDX component documentation file         |
+| `pnpm docs:lint` | Validate completeness of component documentation        |
 
 ### Important Notes
+
+- **Tooling config** — Vite, Vitest (`test`), Oxlint (`lint`), and Oxfmt (`fmt`) are all configured in `vite.config.ts`. Import from `vite-plus` / `vite-plus/test`, not `vite` / `vitest`.
 
 - **Path aliases** are configured in both `vite.config.ts` and `tsconfig.app.json`. Available aliases: `@api`, `@components`, `@hooks`, `@utils`, `@contexts`, `@constants`, `@layouts`, `@pages`, `@views`, `@routes`, `@app-types`, `@assets`, `@locales`, `@app-config`, `@hoc`, `@component-docs`.
 
 - **Environment variables** — A `.env` file is required. All app variables use the `VITE_APP_*` prefix. Key variables: `VITE_APP_BASE_URL` (API base URL), `VITE_APP_CLIENT_ID` (OIDC client ID), plus Firebase config variables for push notifications.
 
-- **DTO generator** — Requires a Swagger/OpenAPI endpoint configured in `.dto-gen.json`. Run `yarn dto:init` to scaffold the config file before first use.
+- **DTO generator** — Requires a Swagger/OpenAPI endpoint configured in `.dto-gen.json`. Run `pnpm dto:init` to scaffold the config file before first use.
 
-- **Theming** — The default theme is dark. When adding new design tokens, define them in both `:root` (light) and `.dark` (dark) blocks in `index.css`.
+- **Theming** — The default theme is dark. Semantic tokens live in `src/styles/tokens.css` (light on `:root, .light`, dark on `.dark`) and are exposed to Tailwind in `src/styles/theme.css`; `pnpm test` enforces WCAG contrast for every pair.
 
-- **Component docs** — Run `yarn docs:new` to scaffold MDX component documentation in `src/component-docs/`. The live demo gallery is driven by these files.
+- **Component docs** — Run `pnpm docs:new` to scaffold MDX component documentation in `src/component-docs/`. The live demo gallery is driven by these files.
 
 - **Conditional rendering** — `Conditional.If` is mandatory for all conditional rendering in JSX. Do not use `&&` or ternary expressions inside JSX templates.
 
 - **Auth** — Authentication uses Microsoft OIDC via `oidc-client-ts`. `AuthGuard` wraps all protected routes as a HOC. Use the `useAuth()` hook to access the current user and auth state inside components.
+
+---
+
+## App Starter
+
+This repository is the kit's development home: the component docs, the docs site and the clinic example pages live here. New apps start from a generated starter that has the kit and the app shell, but none of the showcase.
+
+```bash
+pnpm starter:build [outDir]   # write the starter (default: .starter)
+pnpm starter:verify           # build it in a temp folder, install offline, run tsc, vp check, vp test and vp build
+```
+
+`vp create` takes GitHub repositories and npm packages, not local folders. The starter is published to [mohammadsafia/rsk-starter](https://github.com/mohammadsafia/rsk-starter), and apps start with:
+
+```bash
+vp create github:mohammadsafia/rsk-starter -- my-app
+```
+
+On every push to `main`, the `Starter sync` workflow (`.github/workflows/starter-sync.yml`) runs `pnpm starter:verify`, then builds the starter and commits it to `rsk-starter` as `sync: rsk@<sha> — <subject>`. A starter that fails verification is never published. The workflow pushes with the `STARTER_DEPLOY_KEY` secret, a deploy key with write access to `rsk-starter` only.
+
+The `-- my-app` names the folder. Without it, `vp create` names it after the repository. For a private registry, the starter can instead be bundled under `templates/` in an `@org/create` package, and apps start with `vp create @org:web`. Rename `.gitignore` to `_gitignore` there, because `npm publish` drops `.gitignore` files.
 
 ---
 
@@ -305,23 +328,24 @@ The DTO generator runs a seven-step pipeline for each generation:
 **Fetch → Parse → Filter → Resolve → Generate → Format → Write**
 
 Features:
+
 - Interactive schema selection with real-time diff badges showing what has changed
 - Auto-dependency resolution via BFS — selecting a schema automatically includes all referenced schemas
 - Flexible enum strategies — generate as TypeScript `type` literals or native `enum` declarations
 - Manifest tracking — the generator records every generated file and automatically removes orphans on clean
-- Post-generation formatting with Prettier and ESLint to ensure generated files match project standards
+- Post-generation formatting with Oxfmt and Oxlint (via Vite+) to ensure generated files match project standards
 
-| Command           | Description                                                     |
-|-------------------|-----------------------------------------------------------------|
-| `yarn dto:gen`    | Run interactive DTO generation with diff badges                 |
-| `yarn dto:list`   | List all schemas currently tracked in the manifest              |
-| `yarn dto:diff`   | Show which tracked schemas have upstream changes                |
-| `yarn dto:clean`  | Delete orphaned generated files and sync the manifest           |
-| `yarn dto:init`   | Scaffold `.dto-gen.json` with a guided setup prompt             |
+| Command          | Description                                           |
+| ---------------- | ----------------------------------------------------- |
+| `pnpm dto:gen`   | Run interactive DTO generation with diff badges       |
+| `pnpm dto:list`  | List all schemas currently tracked in the manifest    |
+| `pnpm dto:diff`  | Show which tracked schemas have upstream changes      |
+| `pnpm dto:clean` | Delete orphaned generated files and sync the manifest |
+| `pnpm dto:init`  | Scaffold `.dto-gen.json` with a guided setup prompt   |
 
 ### Component Docs
 
-Run `yarn docs:new` to scaffold MDX documentation for a new component. The scaffolded file includes frontmatter, a live demo section, and prop tables. Run `yarn docs:lint` to validate completeness.
+Run `pnpm docs:new` to scaffold MDX documentation for a new component. The scaffolded file includes frontmatter, a live demo section, and prop tables. Run `pnpm docs:lint` to validate completeness.
 
 ### Components Gallery
 
@@ -332,22 +356,22 @@ The gallery is available at `/components` and showcases UI, Forms, and Shared co
 **Adding a new component doc:**
 
 ```bash
-yarn docs:new
+pnpm docs:new
 ```
 
 The interactive CLI prompts for category, component id (kebab-case), description, and optional tags — then scaffolds an MDX file in the correct folder.
 
 **MDX frontmatter** (all 5 fields required):
 
-| Field | Example |
-|-------|---------|
-| `id` | `alert` (kebab-case, unique) |
-| `title` | `Alert` |
-| `section` | `Components` (always) |
-| `category` | `UI` (must match folder name) |
+| Field         | Example                                                      |
+| ------------- | ------------------------------------------------------------ |
+| `id`          | `alert` (kebab-case, unique)                                 |
+| `title`       | `Alert`                                                      |
+| `section`     | `Components` (always)                                        |
+| `category`    | `UI` (must match folder name)                                |
 | `description` | `Display important messages with different severity levels.` |
-| `tags` | `[ui, alert, feedback]` (optional, auto-generated by CLI) |
+| `tags`        | `[ui, alert, feedback]` (optional, auto-generated by CLI)    |
 
 **MDX sections:** Each doc includes a `## Demo` section with live JSX, a `## Imports` section with the import statement, and a `## Code` section with usage examples. See any file under `src/component-docs/ui/` for reference.
 
-**Validation:** Run `yarn docs:lint` before committing. It checks all required frontmatter fields, validates kebab-case ids, ensures category matches folder name, detects duplicate ids, and flags any remaining template placeholders.
+**Validation:** Run `pnpm docs:lint` before committing. It checks all required frontmatter fields, validates kebab-case ids, ensures category matches folder name, detects duplicate ids, and flags any remaining template placeholders.

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { type DateRange } from 'react-day-picker';
-import { CalendarIcon, Check, ChevronsUpDown, Circle, Square, Star, StarOffIcon, Trash2, X } from 'lucide-react';
-import { Button, Calendar, CheckboxGroup, Command, Popover, RadioGroup, TimePicker } from '@components/ui';
+import { CalendarIcon, Check, ChevronsUpDown, Circle, Square, Star, StarOffIcon, Trash2 } from 'lucide-react';
+import { Button, Calendar, CheckboxGroup, Command, Input, Popover, RadioGroup, TimePicker, IconButton } from '@components/ui';
 import { Dialog } from '@components/ui/dialog';
 import {
   FormCheckbox,
@@ -20,7 +20,7 @@ import {
   FormTextarea,
   FormTimePicker,
 } from '@components/forms';
-import { ConfirmDialog, DateNavigation, FacetedFilter, PrimeDialog, TooltipButton } from '@components/shared';
+import { ConfirmDialog, DateNavigation } from '@components/shared';
 
 import { useToast } from '@hooks/shared';
 import { LookupHandler as LookupService } from '@api/handlers';
@@ -31,32 +31,50 @@ import { CheckCircleFilled, CheckSquareFilled } from '@assets/icons';
 
 // ---------- Demo components (hooks must be used inside components) ----------
 export function DialogDemo() {
-  const [open, setOpen] = useState(false);
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger asChild>
-        <Button variant="secondary">Open Dialog</Button>
-      </Dialog.Trigger>
+    <div className="flex flex-wrap gap-2">
+      <Dialog>
+        <Dialog.Trigger asChild>
+          <Button variant="outline">Edit profile</Button>
+        </Dialog.Trigger>
 
-      <Dialog.Panel>
-        <Dialog.Close
-          aria-label="Close"
-          className="absolute end-4 top-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
-        >
-          <X size={18} />
-        </Dialog.Close>
+        <Dialog.Content title="Edit profile" description="Changes are saved when you press Save.">
+          <Input aria-label="Name" defaultValue="Layla Haddad" />
 
-        <Dialog.Header>
-          <Dialog.Title>Dialog Title</Dialog.Title>
+          <Dialog.Footer>
+            <Dialog.Close asChild>
+              <Button variant="outline">Cancel</Button>
+            </Dialog.Close>
 
-          <Dialog.Description>This is a dialog description.</Dialog.Description>
-        </Dialog.Header>
+            <Button tone="accent">Save</Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>
 
-        <Dialog.Content>Dialog content goes here.</Dialog.Content>
+      <Dialog>
+        <Dialog.Trigger asChild>
+          <Button variant="outline">Large</Button>
+        </Dialog.Trigger>
 
-        <Dialog.Footer>Dialog footer goes here.</Dialog.Footer>
-      </Dialog.Panel>
-    </Dialog>
+        <Dialog.Content title="Visit notes" size="lg">
+          <p className="text-fg-muted text-sm">A wider dialog for longer content such as notes or tables.</p>
+        </Dialog.Content>
+      </Dialog>
+
+      <Dialog>
+        <Dialog.Trigger asChild>
+          <Button variant="outline">Not dismissible</Button>
+        </Dialog.Trigger>
+
+        <Dialog.Content title="Finish this step" description="Escape and outside clicks are ignored." dismissible={false}>
+          <Dialog.Footer>
+            <Dialog.Close asChild>
+              <Button>Done</Button>
+            </Dialog.Close>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>
+    </div>
   );
 }
 
@@ -64,12 +82,12 @@ export function PopoverDemo() {
   return (
     <Popover>
       <Popover.Trigger asChild>
-        <Button variant="secondary">Open Popover</Button>
+        <Button variant="outline">Open Popover</Button>
       </Popover.Trigger>
       <Popover.Content>
         <div className="space-y-2">
           <h4 className="font-medium">Popover Title</h4>
-          <p className="text-muted text-sm">Popover content here.</p>
+          <p className="text-fg-muted text-sm">Popover content here.</p>
         </div>
       </Popover.Content>
     </Popover>
@@ -94,12 +112,12 @@ export function CommandAutocompleteDemo() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
+        <Button variant="outline" role="combobox" aria-expanded={open} className="w-50 justify-between">
           {selectedFramework ? selectedFramework.label : 'Select framework...'}
           <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </Popover.Trigger>
-      <Popover.Content className="w-[200px] p-0">
+      <Popover.Content className="w-50 p-0">
         <Command>
           <Command.Input placeholder="Search framework..." />
           <Command.List>
@@ -257,6 +275,7 @@ export function FormNumberTextareaDemo() {
     <FormContainer formContext={form} onSuccess={() => {}} className="w-96 space-y-3">
       <FormNumber name="qty" control={form.control} label="Quantity" required placeholder="Enter quantity " />
       <FormNumber
+        showStepButtons
         name="qty2"
         control={form.control}
         min={-10}
@@ -274,15 +293,16 @@ export function FormNumberTextareaDemo() {
 export function FormWithValidationDemo() {
   const [disabled, setDisabled] = useState(false);
   const schema = z.object({
-    email: z.string(),
+    email: z.string().email('Enter a complete email address'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
-    age: z.string().transform(Number).pipe(z.number().min(18, 'Must be at least 18 years old').transform(Number)),
+    age: z.coerce.number().min(18, 'Must be at least 18 years old'),
     notes: z.string().optional(),
   });
 
   type FormData = z.infer<typeof schema>;
 
   const form = useForm<FormData>({
+    resolver: zodResolver(schema),
     defaultValues: { email: '', password: '', age: 18, notes: 'Test notes' },
   });
 
@@ -298,7 +318,7 @@ export function FormWithValidationDemo() {
           Toggle Disabled
         </Button>
       </div>
-      <p className="text-muted text-xs">Try submitting with invalid data to see validation</p>
+      <p className="text-fg-muted text-xs">Try submitting with invalid data to see validation</p>
     </FormContainer>
   );
 }
@@ -587,37 +607,40 @@ export function ConfirmDialogDemo() {
     <div className="flex flex-wrap gap-2">
       {/* Uncontrolled + async onConfirm */}
       <ConfirmDialog
-        variant="success"
+        tone="success"
+
         title="Confirm Change"
         description="Are you sure you want to make this change? This action cannot be undone."
         onConfirm={onConfirm}
       >
-        <TooltipButton title="Confirm" variant="outline-success" size="icon">
+        <IconButton variant="outline" aria-label="Confirm">
           <Check size={18} />
-        </TooltipButton>
+        </IconButton>
       </ConfirmDialog>
 
       {/* Uncontrolled + async onConfirm */}
       <ConfirmDialog
-        variant="destructive"
+        tone="danger"
+
         title="Delete Admin"
         description="Are you sure you want to delete this admin? This action cannot be undone."
         confirmLabel="Delete"
         onConfirm={onDelete}
       >
-        <TooltipButton title="Delete" variant="outline-destructive" size="icon">
+        <IconButton variant="outline" tone="danger" aria-label="Delete">
           <Trash2 size={18} />
-        </TooltipButton>
+        </IconButton>
       </ConfirmDialog>
 
-      <TooltipButton onClick={onSubmit}>Submit Form</TooltipButton>
+      <Button onClick={onSubmit}>Submit Form</Button>
 
       {/* Controlled + custom actions */}
       <ConfirmDialog
-        className="md:min-w-[450px]"
+        tone="warning"
+        className="md:min-w-112"
         open={open}
         onOpenChange={setOpen}
-        variant="warning"
+
         title="Warning: Forbidden CIF Detected"
         description={
           <>
@@ -629,7 +652,7 @@ export function ConfirmDialogDemo() {
       >
         <div className="flex flex-col gap-2">
           <label className="flex cursor-pointer items-center gap-2">
-            <span className="text-foreground leading-none">Exceptional?</span>
+            <span className="text-fg leading-none">Exceptional?</span>
           </label>
         </div>
         <>
@@ -644,18 +667,19 @@ export function ConfirmDialogDemo() {
       </ConfirmDialog>
 
       {/* Success variant */}
-      <ConfirmDialog variant="success" title="Operation Successful" description="Your changes have been saved." confirmLabel="OK">
-        <Button variant="success">Success</Button>
+      <ConfirmDialog tone="success" title="Operation Successful" description="Your changes have been saved." confirmLabel="OK">
+        <Button>Success</Button>
       </ConfirmDialog>
 
       {/* Info variant */}
-      <ConfirmDialog variant="info" title="Information" description="This is an informational message." confirmLabel="Got it">
+      <ConfirmDialog tone="info" title="Information" description="This is an informational message." confirmLabel="Got it">
         <Button variant="outline">Info</Button>
       </ConfirmDialog>
 
       {/* Not Auto Closes on Confirm */}
       <ConfirmDialog
-        variant="info"
+        tone="info"
+
         title="Not Auto Closes on Confirm"
         description="Don't Close on Confirm by passing loading prop as well as not returning a Promise from the onConfirm which indicate this is sync operation"
         confirmLabel="Keep Open"
@@ -667,7 +691,8 @@ export function ConfirmDialogDemo() {
 
       {/* Auto Closes on Confirm */}
       <ConfirmDialog
-        variant="info"
+        tone="info"
+
         title="Auto Close on Confirm"
         description="Close on Confirm don't pass loading prop"
         confirmLabel="Close on Confirm"
@@ -677,18 +702,19 @@ export function ConfirmDialogDemo() {
       </ConfirmDialog>
 
       {/* Loading variant */}
-      <ConfirmDialog variant="warning" title="External Loading" description="This is an async external loading action." loading>
-        <Button variant="secondary">External Loading</Button>
+      <ConfirmDialog tone="warning" title="External Loading" description="This is an async external loading action." loading>
+        <Button variant="outline">External Loading</Button>
       </ConfirmDialog>
 
       {/* Dismissable variant by default (false) */}
       <ConfirmDialog
-        variant="warning"
+        tone="warning"
+
         title="Dismissable"
         description="This is a dismissable via espace-key or backdrop example."
         dismissible={true}
       >
-        <Button variant="muted">Dismissable</Button>
+        <Button variant="outline">Dismissable</Button>
       </ConfirmDialog>
     </div>
   );
@@ -709,131 +735,6 @@ export function DateNavigationDemo() {
   return <DateNavigation date={currentDate} onSetDate={setCurrentDate} handlePrevious={handlePrevious} handleNext={handleNext} />;
 }
 
-export function FacetedFilterDemo() {
-  const form = useForm({ defaultValues: { status: [], search: '', date: null, dateRange: null } });
-  return (
-    <FormContainer formContext={form} onSuccess={() => {}}>
-      <div className="space-y-4">
-        <FacetedFilter name="search" title="Text Search" control={form.control} filterVariant="text" />
-        <FacetedFilter
-          name="status"
-          title="Select"
-          control={form.control}
-          filterVariant="select"
-          filterOptions={[
-            { label: 'Active', value: 'active' },
-            { label: 'Inactive', value: 'inactive' },
-          ]}
-        />
-        <FacetedFilter
-          name="status"
-          title="Multi-Select"
-          control={form.control}
-          filterVariant="multi-select"
-          filterOptions={[
-            { label: 'Active', value: 'active' },
-            { label: 'Inactive', value: 'inactive' },
-            { label: 'Pending', value: 'pending' },
-          ]}
-        />
-        <FacetedFilter name="date" title="Date" control={form.control} filterVariant="date" />
-        <FacetedFilter name="dateRange" title="Date Range" control={form.control} filterVariant="date-range" />
-      </div>
-    </FormContainer>
-  );
-}
-
-export function PrimeDialogDemo() {
-  const [openCreate, setOpenCreate] = useState(false);
-  const [openUpdate, setOpenUpdate] = useState(false);
-  const [openView, setOpenView] = useState(false);
-  return (
-    <div className="flex flex-wrap gap-2">
-      <PrimeDialog dialogMode="Create" open={openCreate} onOpenChange={setOpenCreate}>
-        <PrimeDialog.Trigger asChild>
-          <Button variant="secondary">Create Mode</Button>
-        </PrimeDialog.Trigger>
-
-        <PrimeDialog.Panel>
-          <PrimeDialog.Header>
-            <PrimeDialog.Title>User</PrimeDialog.Title>
-
-            <PrimeDialog.Description>User Description</PrimeDialog.Description>
-          </PrimeDialog.Header>
-
-          <PrimeDialog.Content>Create mode dialog content</PrimeDialog.Content>
-
-          <PrimeDialog.Actions />
-        </PrimeDialog.Panel>
-      </PrimeDialog>
-
-      <PrimeDialog dialogMode="Update" open={openUpdate} onOpenChange={setOpenUpdate}>
-        <PrimeDialog.Trigger asChild>
-          <Button variant="secondary">Update Mode</Button>
-        </PrimeDialog.Trigger>
-
-        <PrimeDialog.Panel>
-          <PrimeDialog.Header>
-            <PrimeDialog.Title>User</PrimeDialog.Title>
-          </PrimeDialog.Header>
-
-          <PrimeDialog.Content>Update mode dialog content</PrimeDialog.Content>
-
-          <PrimeDialog.Actions />
-        </PrimeDialog.Panel>
-      </PrimeDialog>
-
-      <PrimeDialog dialogMode="View" open={openView} onOpenChange={setOpenView}>
-        <PrimeDialog.Trigger asChild>
-          <Button variant="secondary">View Mode</Button>
-        </PrimeDialog.Trigger>
-
-        <PrimeDialog.Panel>
-          <PrimeDialog.Header>
-            <PrimeDialog.Title>User</PrimeDialog.Title>
-          </PrimeDialog.Header>
-
-          <PrimeDialog.Content>View mode dialog content (submit button hidden)</PrimeDialog.Content>
-
-          <PrimeDialog.Actions />
-        </PrimeDialog.Panel>
-      </PrimeDialog>
-
-      <PrimeDialog>
-        <PrimeDialog.Trigger asChild>
-          <Button variant="secondary">Dismissable Dialog</Button>
-        </PrimeDialog.Trigger>
-
-        <PrimeDialog.Panel dismissible>
-          <PrimeDialog.Header>
-            <PrimeDialog.Title>Dialog can be dismissed</PrimeDialog.Title>
-          </PrimeDialog.Header>
-
-          <PrimeDialog.Content>
-            Click on the backdrop Or press Escape-Key to close the Dialog (Default is not dismissable)
-          </PrimeDialog.Content>
-
-          <PrimeDialog.Actions />
-        </PrimeDialog.Panel>
-      </PrimeDialog>
-
-      <PrimeDialog>
-        <PrimeDialog.Trigger asChild>
-          <Button variant="secondary">Prime Dialog With no Actions</Button>
-        </PrimeDialog.Trigger>
-
-        <PrimeDialog.Panel dismissible>
-          <PrimeDialog.Header>
-            <PrimeDialog.Title>Dialog with no Actions</PrimeDialog.Title>
-          </PrimeDialog.Header>
-
-          <PrimeDialog.Content>This Dialog doesn't contain the actions/footer</PrimeDialog.Content>
-        </PrimeDialog.Panel>
-      </PrimeDialog>
-    </div>
-  );
-}
-
 export function ToastDemo() {
   const { toast } = useToast();
 
@@ -841,7 +742,6 @@ export function ToastDemo() {
     toast({
       title: 'Default Toast',
       description: 'This is a default toast notification.',
-      variant: 'default',
     });
   };
 
@@ -849,7 +749,7 @@ export function ToastDemo() {
     toast({
       title: 'Toast Info',
       description: 'Operation completed successfully.',
-      variant: 'success',
+      tone: 'success',
     });
   };
 
@@ -857,7 +757,7 @@ export function ToastDemo() {
     toast({
       title: 'Toast Error',
       description: 'Something went wrong. Please try again.',
-      variant: 'destructive',
+      tone: 'danger',
     });
   };
 
@@ -865,7 +765,7 @@ export function ToastDemo() {
     toast({
       title: 'Toast Warning',
       description: 'This action is irreversible. Please proceed with caution.',
-      variant: 'warning',
+      tone: 'warning',
     });
   };
 
@@ -873,7 +773,7 @@ export function ToastDemo() {
     toast({
       title: 'Toast Info',
       description: 'Your session is about to expire. Please save your work.',
-      variant: 'info',
+      tone: 'info',
     });
   };
 
@@ -881,7 +781,7 @@ export function ToastDemo() {
     toast({
       title: 'Toast with Action & position variant',
       description: 'Your session is about to expire. Please save your work.',
-      variant: 'info',
+      tone: 'info',
       action: (
         <Button variant="outline" size="sm" onClick={() => alert('Retrying...')}>
           Retry
@@ -895,7 +795,7 @@ export function ToastDemo() {
     toast({
       title: 'Toast bottom position',
       description: 'Something went wrong. Please try again.',
-      variant: 'destructive',
+      tone: 'danger',
       action: <h1>Retry again!</h1>,
       position: 'bottom-end',
     });
@@ -904,10 +804,8 @@ export function ToastDemo() {
   return (
     <div className="flex flex-wrap gap-2">
       <Button onClick={showDefaultToast}>Default</Button>
-      <Button variant="success" onClick={showSuccessToast}>
-        Success
-      </Button>
-      <Button variant="destructive" onClick={showErrorToast}>
+      <Button onClick={showSuccessToast}>Success</Button>
+      <Button tone="danger" onClick={showErrorToast}>
         Destructive
       </Button>
       <Button variant="ghost" onClick={showWarningToast}>
@@ -916,10 +814,10 @@ export function ToastDemo() {
       <Button variant="outline" onClick={showInfoToast}>
         Info
       </Button>
-      <Button variant="muted" onClick={showToastWithAction}>
+      <Button variant="outline" onClick={showToastWithAction}>
         Action & top-center
       </Button>
-      <Button variant="outline-destructive" onClick={showToastWithBottomPosition}>
+      <Button variant="outline" tone="danger" onClick={showToastWithBottomPosition}>
         bottom-end
       </Button>
     </div>
@@ -944,10 +842,10 @@ export function CalendarDemo() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Single Date Selection</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Single Date Selection</p>
         <Popover>
           <Popover.Trigger asChild>
-            <Button variant="outline" className="w-[280px] justify-start text-start font-normal">
+            <Button variant="outline" className="w-70 justify-start text-start font-normal">
               <CalendarIcon className="me-2 h-4 w-4" />
               {date ? date.toLocaleDateString() : 'Pick a date'}
             </Button>
@@ -961,10 +859,10 @@ export function CalendarDemo() {
         </Button>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Date Range Selection</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Date Range Selection</p>
         <Popover>
           <Popover.Trigger asChild>
-            <Button variant="outline" className="w-[280px] justify-start text-start font-normal">
+            <Button variant="outline" className="w-70 justify-start text-start font-normal">
               <CalendarIcon className="me-2 h-4 w-4" />
               {dateRange?.from ? (
                 dateRange.to ? (
@@ -1022,116 +920,116 @@ export function RadioGroupDemo() {
   return (
     <div className="w-80 space-y-4">
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Default</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Default</p>
         <RadioGroup value={value} onValueChange={setValue}>
           <RadioGroup.Item value="option1">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 1
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
           <RadioGroup.Item value="option2">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 2
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
         </RadioGroup>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Default Row</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Default Row</p>
         <RadioGroup className="grid-cols-2" value={value} onValueChange={setValue}>
           <RadioGroup.Item value="option1">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 1
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
           <RadioGroup.Item value="option2">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 2
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
         </RadioGroup>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Disabled</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Disabled</p>
         <RadioGroup defaultValue="disabled1" disabled>
           <RadioGroup.Item value="disabled1">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 group-disabled/radio-item:text-muted-300 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent group-disabled/radio-item:text-fg-subtle flex flex-1 items-center text-sm font-normal">
               Checked Disabled
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted group-disabled/radio-item:text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
           <RadioGroup.Item value="disabled2">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 group-disabled/radio-item:text-muted-300 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent group-disabled/radio-item:text-fg-subtle flex flex-1 items-center text-sm font-normal">
               Unchecked Disabled
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted group-disabled/radio-item:text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
         </RadioGroup>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Disabled Row</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Disabled Row</p>
         <RadioGroup className="grid-cols-2" defaultValue="disabled1" disabled>
           <RadioGroup.Item value="disabled1">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 group-disabled/radio-item:text-muted-300 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent group-disabled/radio-item:text-fg-subtle flex flex-1 items-center text-sm font-normal">
               Checked Disabled
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted group-disabled/radio-item:text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
           <RadioGroup.Item value="disabled2">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 group-disabled/radio-item:text-muted-300 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent group-disabled/radio-item:text-fg-subtle flex flex-1 items-center text-sm font-normal">
               Unchecked Disabled
             </span>
             <RadioGroup.Indicator>
-              <CheckCircleFilled className="text-secondary group-disabled/radio-item:text-muted-400 hidden group-data-[state=checked]/radio-item:block" />
-              <Circle size={24} strokeWidth={1.5} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <CheckCircleFilled className="text-fg-muted group-disabled/radio-item:text-fg-muted hidden group-data-[state=checked]/radio-item:block" />
+              <Circle size={24} strokeWidth={1.5} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
         </RadioGroup>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Custom Icons</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Custom Icons</p>
         <RadioGroup value={value} onValueChange={setValue}>
           <RadioGroup.Item value="option1">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 1
             </span>
             <RadioGroup.Indicator>
-              <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/radio-item:block" />
-              <StarOffIcon size={20} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <Star size={20} className="fill-warning text-warning hidden group-data-[state=checked]/radio-item:block" />
+              <StarOffIcon size={20} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
           <RadioGroup.Item value="option2">
-            <span className="text-muted group-data-[state=checked]/radio-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/radio-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 2
             </span>
             <RadioGroup.Indicator>
-              <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/radio-item:block" />
-              <StarOffIcon size={20} className="text-muted-300 block group-data-[state=checked]/radio-item:hidden" />
+              <Star size={20} className="fill-warning text-warning hidden group-data-[state=checked]/radio-item:block" />
+              <StarOffIcon size={20} className="text-fg-subtle block group-data-[state=checked]/radio-item:hidden" />
             </RadioGroup.Indicator>
           </RadioGroup.Item>
         </RadioGroup>
@@ -1161,7 +1059,7 @@ export function FormRadioGroupDemo() {
         getOptionValue={(o) => o.id}
         disabled={disabled}
       />
-      <p className="text-muted mb-2 text-xs font-medium">Default Row</p>
+      <p className="text-fg-muted mb-2 text-xs font-medium">Default Row</p>
       <FormRadioGroup
         name="plan"
         control={form.control}
@@ -1189,86 +1087,86 @@ export function CheckboxGroupDemo() {
   return (
     <div className="w-80 space-y-4">
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Default</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Default</p>
         <CheckboxGroup>
           <CheckboxGroup.Item checked={checked1} onCheckedChange={(v) => setChecked1(!!v)}>
-            <span className="text-muted group-data-[state=checked]/checkbox-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/checkbox-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 1
             </span>
             <CheckboxGroup.Indicator>
-              <CheckSquareFilled className="text-secondary hidden group-data-[state=checked]/checkbox-item:block" />
+              <CheckSquareFilled className="text-fg-muted hidden group-data-[state=checked]/checkbox-item:block" />
               <Square
                 size={24}
                 strokeWidth={1.5}
-                className="text-muted-300 block rounded group-data-[state=checked]/checkbox-item:hidden"
+                className="text-fg-subtle block rounded group-data-[state=checked]/checkbox-item:hidden"
               />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>
           <CheckboxGroup.Item checked={checked2} onCheckedChange={(v) => setChecked2(!!v)}>
-            <span className="text-muted group-data-[state=checked]/checkbox-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/checkbox-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 2
             </span>
             <CheckboxGroup.Indicator>
-              <CheckSquareFilled className="text-secondary hidden group-data-[state=checked]/checkbox-item:block" />
+              <CheckSquareFilled className="text-fg-muted hidden group-data-[state=checked]/checkbox-item:block" />
               <Square
                 size={24}
                 strokeWidth={1.5}
-                className="text-muted-300 block rounded group-data-[state=checked]/checkbox-item:hidden"
+                className="text-fg-subtle block rounded group-data-[state=checked]/checkbox-item:hidden"
               />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>
         </CheckboxGroup>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Disabled</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Disabled</p>
         <CheckboxGroup>
           <CheckboxGroup.Item checked disabled>
-            <span className="text-muted group-data-[state=checked]/checkbox-item:text-primary-900 group-disabled/checkbox-item:text-muted-300 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/checkbox-item:text-accent group-disabled/checkbox-item:text-fg-subtle flex flex-1 items-center text-sm font-normal">
               Checked Disabled
             </span>
             <CheckboxGroup.Indicator>
-              <CheckSquareFilled className="text-secondary group-disabled/checkbox-item:text-muted-400 hidden group-data-[state=checked]/checkbox-item:block" />
+              <CheckSquareFilled className="text-fg-muted group-disabled/checkbox-item:text-fg-muted hidden group-data-[state=checked]/checkbox-item:block" />
               <Square
                 size={24}
                 strokeWidth={1.5}
-                className="text-muted-300 block rounded group-data-[state=checked]/checkbox-item:hidden"
+                className="text-fg-subtle block rounded group-data-[state=checked]/checkbox-item:hidden"
               />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>
           <CheckboxGroup.Item disabled>
-            <span className="text-muted group-disabled/checkbox-item:text-muted-300 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-disabled/checkbox-item:text-fg-subtle flex flex-1 items-center text-sm font-normal">
               Unchecked Disabled
             </span>
             <CheckboxGroup.Indicator>
-              <CheckSquareFilled className="text-secondary group-disabled/checkbox-item:text-muted-400 hidden group-data-[state=checked]/checkbox-item:block" />
+              <CheckSquareFilled className="text-fg-muted group-disabled/checkbox-item:text-fg-muted hidden group-data-[state=checked]/checkbox-item:block" />
               <Square
                 size={24}
                 strokeWidth={1.5}
-                className="text-muted-300 block rounded group-data-[state=checked]/checkbox-item:hidden"
+                className="text-fg-subtle block rounded group-data-[state=checked]/checkbox-item:hidden"
               />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>
         </CheckboxGroup>
       </div>
       <div>
-        <p className="text-muted mb-2 text-xs font-medium">Custom Icons</p>
+        <p className="text-fg-muted mb-2 text-xs font-medium">Custom Icons</p>
         <CheckboxGroup>
           <CheckboxGroup.Item checked={checked1} onCheckedChange={(v) => setChecked1(!!v)}>
-            <span className="text-muted group-data-[state=checked]/checkbox-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/checkbox-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 1
             </span>
             <CheckboxGroup.Indicator>
-              <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/checkbox-item:block" />
-              <Star size={20} className="text-muted-300 block group-data-[state=checked]/checkbox-item:hidden" />
+              <Star size={20} className="fill-warning text-warning hidden group-data-[state=checked]/checkbox-item:block" />
+              <Star size={20} className="text-fg-subtle block group-data-[state=checked]/checkbox-item:hidden" />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>
           <CheckboxGroup.Item checked={checked2} onCheckedChange={(v) => setChecked2(!!v)}>
-            <span className="text-muted group-data-[state=checked]/checkbox-item:text-primary-900 flex flex-1 items-center text-sm font-normal">
+            <span className="text-fg-muted group-data-[state=checked]/checkbox-item:text-accent flex flex-1 items-center text-sm font-normal">
               Option 2
             </span>
             <CheckboxGroup.Indicator>
-              <Star size={20} className="hidden fill-yellow-500 text-yellow-500 group-data-[state=checked]/checkbox-item:block" />
-              <Star size={20} className="text-muted-300 block group-data-[state=checked]/checkbox-item:hidden" />
+              <Star size={20} className="fill-warning text-warning hidden group-data-[state=checked]/checkbox-item:block" />
+              <Star size={20} className="text-fg-subtle block group-data-[state=checked]/checkbox-item:hidden" />
             </CheckboxGroup.Indicator>
           </CheckboxGroup.Item>
         </CheckboxGroup>
@@ -1303,6 +1201,37 @@ export function FormCheckboxGroupDemo() {
         <Button type="button" onClick={() => setDisabled(!disabled)}>
           Toggle Disabled
         </Button>
+      </div>
+    </FormContainer>
+  );
+}
+
+export function FieldFamilyDemo() {
+  const form = useForm({ defaultValues: { name: '', role: '', time: null, amount: null, visit: null, doctor: '' } });
+
+  return (
+    <FormContainer formContext={form} onSuccess={() => {}}>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <FormInput name="name" label="Name" placeholder="Layla Haddad" />
+        <FormSelect
+          name="role"
+          label="Role"
+          control={form.control}
+          options={[{ label: 'Admin', value: 'admin' }]}
+          getOptionLabel={(option) => option.label}
+          getOptionValue={(option) => option.value}
+        />
+        <FormTimePicker name="time" label="Time" control={form.control} />
+        <FormNumber name="amount" label="Amount" control={form.control} showStepButtons />
+        <FormDatePicker name="visit" label="Visit" control={form.control} />
+        <FormCombobox
+          name="doctor"
+          label="Doctor"
+          control={form.control}
+          options={[{ label: 'Dr. Haddad', value: 'haddad' }]}
+          getOptionLabel={(option) => option.label}
+          getOptionValue={(option) => option.value}
+        />
       </div>
     </FormContainer>
   );

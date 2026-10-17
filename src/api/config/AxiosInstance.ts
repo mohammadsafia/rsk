@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance } from 'axios';
 
 import { getPersistentData } from '@utils';
-import {APP_CONFIGURATIONS } from '@app-config';
+import { APP_CONFIGURATIONS } from '@app-config';
 
 const instance: AxiosInstance = axios.create({
   baseURL: APP_CONFIGURATIONS.VITE_APP_API_URL,

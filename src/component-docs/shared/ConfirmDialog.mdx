@@ -3,33 +3,105 @@ id: confirm-dialog
 title: ConfirmDialog
 section: Components
 category: Shared
-description: Confirmation dialog with async action support and optional reason input.
-tags: [shared, confirm-dialog, dialog, modal]
+description: 'Ask before an action: tone icon, title, description and a confirm button that waits for async work.'
+tags: [shared, dialog, confirm]
 ---
 
-import { ConfirmDialogDemo } from '@pages/components/components.data.demos';
-
-## Demo
-
-<ConfirmDialogDemo />
-
-## Imports
-
-```tsx
+import { useState } from 'react';
+import { Button, IconButton } from '@components/ui';
 import { ConfirmDialog } from '@components/shared';
-import { Button } from '@components/ui/button';
-```
+import { Trash2 } from 'lucide-react';
 
-## Code
+export const ControlledDemo = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button variant="outline" onClick={() => setOpen(true)}>Submit claim</Button>
+      <ConfirmDialog
+        tone="warning"
+        open={open}
+        onOpenChange={setOpen}
+        title="Submit with missing documents?"
+        description="The insurer may reject claims without a referral letter."
+        confirmLabel="Submit anyway"
+        onConfirm={() => new Promise((resolve) => setTimeout(resolve, 1200))}
+      />
+    </>
+  );
+};
 
-```tsx
+## With a trigger
+
+Without `open`, the first child is the trigger. Return a promise from `onConfirm` and the button shows a spinner, then the dialog closes when it resolves (and stays open if it rejects).
+
+<Example title="Delete">
+  <ConfirmDialog
+    tone="danger"
+    title="Delete this visit?"
+    description="The visit and its notes are removed for everyone. This can't be undone."
+    confirmLabel="Delete visit"
+    onConfirm={() => new Promise((resolve) => setTimeout(resolve, 1200))}
+  >
+    <IconButton variant="outline" tone="danger" aria-label="Delete visit">
+      <Trash2 />
+    </IconButton>
+  </ConfirmDialog>
+</Example>
+
+## Controlled
+
+With `open` and `onOpenChange`, open it from code, for example after a check fails. Children are then `[content?, actions?]` (no trigger).
+
+<Example
+  title="Opened from code"
+  code={`const [open, setOpen] = useState(false);
+
+<Button variant="outline" onClick={() => setOpen(true)}>Submit claim</Button>
+
 <ConfirmDialog
-  title="Confirm Action"
-  description="Are you sure?"
+  tone="warning"
   open={open}
   onOpenChange={setOpen}
-  onConfirm={() => console.log('Confirmed')}
+  title="Submit with missing documents?"
+  description="The insurer may reject claims without a referral letter."
+  confirmLabel="Submit anyway"
+  onConfirm={submitClaim}
+/>`}
 >
-  <Button variant="destructive">Delete</Button>
-</ConfirmDialog>
-```
+  <ControlledDemo />
+</Example>
+
+## Tones
+
+| `tone` | Icon | Confirm button | Cancel shown |
+|---|---|---|---|
+| `danger` (default) | ✕ circle | danger | yes |
+| `warning` | triangle | neutral | yes |
+| `success` | check circle | neutral | no |
+| `info` | info | neutral | no |
+
+Tone is carried by the icon and the confirm button; the dialog has no coloured border.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'tone', type: "'danger' | 'warning' | 'success' | 'info'", default: "'danger'", description: 'Meaning; sets the icon and the confirm button.' },
+    { prop: 'title · description', type: 'ReactNode', description: 'What will happen, and its consequence.' },
+    { prop: 'confirmLabel · cancelLabel', type: 'string', default: '"Confirm" · "Cancel"', description: 'Name the action ("Delete visit"), not "OK".' },
+    { prop: 'onConfirm', type: '() => void | Promise', description: 'A promise gets an automatic spinner and closes on resolve.' },
+    { prop: 'open · onOpenChange', type: 'boolean · (open) => void', description: 'Controlled mode.' },
+    { prop: 'loading', type: 'boolean', description: 'Manage the spinner and closing yourself.' },
+    { prop: 'primaryTone', type: "Button['tone']", description: 'Override the confirm button tone.' },
+    { prop: 'dismissible', type: 'boolean', default: 'false', description: 'Let Escape and outside clicks close it; a ✕ is always shown.' },
+  ]}
+/>
+
+## Accessibility
+
+- A modal dialog with the title as its name and the description wired to `aria-describedby`; focus returns to the trigger on close.
+- Not dismissible by default, so a stray Escape can't skip the decision.
+
+## RTL notes
+
+- The icon, title, description and buttons are centred, so nothing needs mirroring; Cancel and Confirm keep their order in reading direction.

@@ -1,0 +1,94 @@
+---
+id: tag
+title: Tag
+section: Components
+category: UI
+description: 'Interactive label: a toggle (selected / onClick) or a removable token (onRemove). Use Badge for static status.'
+tags: [ui, tag, chip, filter, token]
+---
+
+import { useState } from 'react';
+import { Tag } from '@components/ui';
+
+export const ToggleDemo = () => {
+  const [selected, setSelected] = useState(['Cardiology']);
+  const toggle = (name) => setSelected((current) => (current.includes(name) ? current.filter((value) => value !== name) : [...current, name]));
+  return ['Cardiology', 'Dermatology', 'Pediatrics'].map((name) => (
+    <Tag key={name} selected={selected.includes(name)} onClick={() => toggle(name)}>
+      {name}
+    </Tag>
+  ));
+};
+
+export const RemovableDemo = () => {
+  const [allergies, setAllergies] = useState(['Penicillin', 'Latex', 'Peanuts']);
+  return allergies.map((name) => (
+    <Tag key={name} tone="danger" onRemove={() => setAllergies((current) => current.filter((value) => value !== name))}>
+      {name}
+    </Tag>
+  ));
+};
+
+## Tones and sizes
+
+<Example title="Plain tags">
+  <Tag>Asthma</Tag>
+  <Tag tone="accent">Cardiology</Tag>
+  <Tag tone="info">Referred</Tag>
+  <Tag size="sm">Small</Tag>
+</Example>
+
+## Toggle
+
+With `onClick`, a tag is a toggle button; `selected` sets `aria-pressed` and the selected look.
+
+<Example
+  title="Filter toggles"
+  code={`const [selected, setSelected] = useState(['Cardiology']);
+
+<Tag selected={selected.includes('Cardiology')} onClick={() => toggle('Cardiology')}>
+  Cardiology
+</Tag>`}
+>
+  <ToggleDemo />
+</Example>
+
+## Removable
+
+With `onRemove`, a tag gets a remove button announced as "Remove &lt;text&gt;".
+
+<Example
+  title="Removable tokens"
+  code={`<Tag tone="danger" onRemove={() => remove('Penicillin')}>
+  Penicillin
+</Tag>`}
+>
+  <RemovableDemo />
+</Example>
+
+## Rules
+
+- A tag is either a toggle (`onClick`, optional `selected`) or removable (`onRemove`), never both: the types forbid mixing them.
+- 6px corners and a hairline border; no pill shapes.
+- For a static status label, use [Badge](/docs/components/badge).
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'tone', type: "'neutral' | 'accent' | 'success' | 'warning' | 'danger' | 'info'", default: "'neutral'", description: 'Text colour on the hairline tag.' },
+    { prop: 'size', type: "'sm' | 'md'", default: "'md'", description: '20px or 24px tall.' },
+    { prop: 'onClick · selected', type: '() => void · boolean', description: 'Makes the tag a toggle button with aria-pressed.' },
+    { prop: 'onRemove', type: '() => void', description: 'Adds a remove button.' },
+    { prop: 'label', type: 'string', description: 'Names the remove button when children are not plain text.' },
+  ]}
+/>
+
+## Accessibility
+
+- Toggle tags are buttons with `aria-pressed`; removable tags keep the text plain and put the action on a labelled remove button.
+- The remove label is translated ("Remove Penicillin"); pass `label` when the children are not a string.
+
+## RTL notes
+
+- The remove button sits at the end of the tag, so it moves to the left in Arabic.

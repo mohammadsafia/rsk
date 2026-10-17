@@ -1,0 +1,43 @@
+---
+id: introduction
+title: Introduction
+section: Guides
+category: Guides
+description: What RSK is, the principles behind the kit, and where to start.
+order: 1
+tags: [guides, introduction]
+---
+
+import { Button, Card, Tag } from '@components/ui';
+
+RSK is a React, TypeScript and Vite starter with a complete UI kit: primitives, form fields, data tables, calendars and app shells, all built on one token system and documented here with live examples.
+
+## What you get
+
+- **A UI kit** in `@components/ui` (buttons, fields, overlays, tables), `@components/forms` (fields wired to react-hook-form), `@components/shared` (composites such as `PageHeader`, `AppShell`, `EmptyState`), `@components/tables` and `@components/calendar`.
+- **An app frame**: authenticated layout with a collapsible sidebar, a docs site for development (this one; left out of production builds) and a landing page.
+- **Tooling**: Vite+ (`vp`) for dev, lint, format and test, an MDX docs registry, design-system guards and codemods.
+
+<Example title="The kit at a glance">
+  <Card title="Next patient" description="Sara Haddad · 10:30" className="w-72">
+    <Card.Content className="flex items-center justify-between">
+      <Tag tone="success">Checked in</Tag>
+      <Button size="sm">Start visit</Button>
+    </Card.Content>
+  </Card>
+</Example>
+
+## Principles
+
+- **Semantic tokens only.** Components use `bg-surface`, `text-fg-muted`, `border-border`, `text-accent` — never palette values or hex. A guard test keeps the codebase at zero violations.
+- **RTL first.** Every component works in English and Arabic: logical spacing (`ms-`, `ps-`, `start-`), mirrored directional icons, Western digits, and data values (IDs, amounts, dates) isolated left-to-right.
+- **Accessible by default.** Real labels, focus rings, keyboard support, and live regions only where they belong.
+- **One vocabulary.** Visual options follow `variant × tone × size`, and every field has the same height as `Input`.
+
+## Where to go next
+
+- [Installation](/docs/installation) — run the project and learn the scripts.
+- [Theming & tokens](/docs/theming) — how colours, dark mode and the guard work.
+- [RTL & i18n](/docs/rtl-i18n) — writing components that read right in Arabic.
+- [Forms](/docs/forms) and [Data tables](/docs/data-tables) — the two biggest building blocks.
+- [Components](/docs/components) — every component, with live examples.

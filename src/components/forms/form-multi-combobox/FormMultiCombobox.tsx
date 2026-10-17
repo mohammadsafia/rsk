@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useState, useId } from 'react';
 
 import { type FieldValues, useController } from 'react-hook-form';
 
 import { Badge, Button, Checkbox } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { Combobox } from '@components/shared';
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
+import { FormField } from '@components/forms';
 
 import { cn } from '@utils';
 
-import { type AsyncOptionsFn, useAsyncOptionsInfiniteQuery, useDebounce, useInfiniteScroll } from '@hooks/shared';
+import { type AsyncOptionsFn, useAsyncOptionsInfiniteQuery, useDebounce, useInfiniteScroll, useAppTranslation } from '@hooks/shared';
 
 import { XIcon } from 'lucide-react';
 
@@ -42,11 +42,9 @@ function FormMultiCombobox<TFieldValues extends FieldValues, TOption = FormSelec
   rules,
   control,
   label,
+  description,
   tooltip,
-  containerClassName,
-  labelClassName,
   className,
-  errorClassName,
   required,
   disabled,
   options,
@@ -56,12 +54,19 @@ function FormMultiCombobox<TFieldValues extends FieldValues, TOption = FormSelec
   optionMapper,
   onOptionChange,
   valueType = 'flat',
-  placeholder = 'Select...',
-  noOptionsText = 'No options',
+  placeholder: placeholderProp,
+  noOptionsText: noOptionsProp,
   urlSearchParams,
   debounceMs = 500,
   pageSize = 20,
 }: FormMultiComboboxProps<TFieldValues, TOption>) {
+  // Defaults follow the app language (a literal 'Select' showed in English on Arabic pages).
+  const { t: tCommon } = useAppTranslation('common');
+  const placeholder = placeholderProp ?? tCommon('form.selectPlaceholder');
+  const noOptionsText = noOptionsProp ?? tCommon('form.noOptions');
+  // Unique per instance: two forms on one page may share a field name.
+  const fieldId = `${name}-${useId()}`;
+
   const {
     field: { ref, value, onChange, ...field },
     fieldState: { error },
@@ -137,23 +142,15 @@ function FormMultiCombobox<TFieldValues extends FieldValues, TOption = FormSelec
   };
 
   return (
-    <FormControl className={containerClassName}>
-      <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
-        {label}
-      </FormLabel>
-
-      <div className="relative">
+    <FormField id={fieldId} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+      {(fieldControl) => (
         <Combobox open={open} onOpenChange={setOpen}>
           <Combobox.Trigger
             ref={ref}
-            id={name}
+            {...fieldControl}
             onBlur={field.onBlur}
             disabled={field.disabled || disabled}
-            className={cn(
-              error &&
-                'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive text-destructive ps-8',
-              className,
-            )}
+            className={cn('h-auto min-h-control-md flex-wrap py-1', className)}
           >
             <Combobox.Value placeholder={placeholder}>
               <Conditional>
@@ -164,19 +161,18 @@ function FormMultiCombobox<TFieldValues extends FieldValues, TOption = FormSelec
                         {getOptionLabel(opt)}
 
                         <Conditional.If condition={!field.disabled && !disabled}>
-                          <Button
-                            asChild
-                            variant="ghost-muted-destructive"
-                            size="unstyled"
+                          <XIcon
+                            size={12}
+                            role="button"
+                            aria-label="Clear"
+                            className="text-fg-muted hover:text-danger shrink-0 cursor-pointer"
                             onPointerDown={(e) => e.stopPropagation()}
                             onClick={(e) => {
                               e.stopPropagation();
                               e.preventDefault();
                               onToggleValue(getOptionValue(opt));
                             }}
-                          >
-                            <XIcon size={12} />
-                          </Button>
+                          />
                         </Conditional.If>
                       </Badge>
                     ))}
@@ -217,7 +213,7 @@ function FormMultiCombobox<TFieldValues extends FieldValues, TOption = FormSelec
                     onSelect={() => onToggleValue(optValue)}
                   >
                     <Combobox.Indicator>
-                      <Checkbox checked={isChecked} variant="primary" tabIndex={-1} className="pointer-events-none" />
+                      <Checkbox checked={isChecked} tabIndex={-1} className="pointer-events-none" />
                     </Combobox.Indicator>
 
                     {getOptionLabel(option)}
@@ -229,10 +225,8 @@ function FormMultiCombobox<TFieldValues extends FieldValues, TOption = FormSelec
             </Combobox.List>
           </Combobox.Content>
         </Combobox>
-
-        <FormMessage className={errorClassName} hidden={!error} error={error!} />
-      </div>
-    </FormControl>
+      )}
+    </FormField>
   );
 }
 

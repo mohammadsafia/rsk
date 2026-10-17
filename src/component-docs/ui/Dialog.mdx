@@ -3,34 +3,85 @@ id: dialog
 title: Dialog
 section: Components
 category: UI
-description: 'Modal dialog overlay.'
+description: 'Modal dialog on the raised surface. Content requires a title; size sm/md/lg; dismissible by default.'
 tags: [ui, dialog, modal]
 ---
 
-import { DialogDemo } from '@pages/components/components.data.demos';
+import { Button, Dialog, Input } from '@components/ui';
 
-## Demo
+## Basic
 
-<DialogDemo />
+`Dialog.Content` takes the `title` and an optional `description`; actions go in `Dialog.Footer`.
 
-## Imports
+<Example title="Edit form">
+  <Dialog>
+    <Dialog.Trigger asChild>
+      <Button variant="outline">Edit profile</Button>
+    </Dialog.Trigger>
+    <Dialog.Content title="Edit profile" description="Changes are saved when you press Save.">
+      <Input aria-label="Name" defaultValue="Layla Haddad" />
+      <Dialog.Footer>
+        <Dialog.Close asChild>
+          <Button variant="outline">Cancel</Button>
+        </Dialog.Close>
+        <Button tone="accent">Save</Button>
+      </Dialog.Footer>
+    </Dialog.Content>
+  </Dialog>
+</Example>
 
-```tsx
-import { Dialog, Button } from '@components/ui';
-```
+## Sizes
 
-## Code
+<Example title="Large">
+  <Dialog>
+    <Dialog.Trigger asChild>
+      <Button variant="outline">Visit notes</Button>
+    </Dialog.Trigger>
+    <Dialog.Content title="Visit notes" size="lg">
+      <p className="text-fg-muted text-sm">A wider dialog for longer content such as notes or tables.</p>
+    </Dialog.Content>
+  </Dialog>
+</Example>
 
-```tsx
-<Dialog open={open} onOpenChange={setOpen}>
-  <Dialog.Trigger asChild>
-    <Button>Open</Button>
-  </Dialog.Trigger>
-  <Dialog.Content>
-    <Dialog.Header>
-      <Dialog.Title>Title</Dialog.Title>
-    </Dialog.Header>
-    Content here
-  </Dialog.Content>
-</Dialog>
-```
+## Not dismissible
+
+`dismissible={false}` removes the close button and ignores Escape and outside clicks, so the user must choose an action.
+
+<Example title="Required step">
+  <Dialog>
+    <Dialog.Trigger asChild>
+      <Button variant="outline">Finish setup</Button>
+    </Dialog.Trigger>
+    <Dialog.Content title="Finish this step" description="Escape and outside clicks are ignored." dismissible={false}>
+      <Dialog.Footer>
+        <Dialog.Close asChild>
+          <Button>Done</Button>
+        </Dialog.Close>
+      </Dialog.Footer>
+    </Dialog.Content>
+  </Dialog>
+</Example>
+
+For "Are you sure?" prompts, use [ConfirmDialog](/docs/components/confirm-dialog).
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'Content · title', type: 'ReactNode', required: true, description: 'Names the dialog for assistive tech.' },
+    { prop: 'Content · hideTitle', type: 'boolean', default: 'false', description: 'Keeps the title for screen readers only.' },
+    { prop: 'Content · description', type: 'ReactNode', description: 'Shown under the title; wired to aria-describedby.' },
+    { prop: 'Content · size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Max width: 384px · 512px · 672px.' },
+    { prop: 'Content · dismissible', type: 'boolean', default: 'true', description: 'false removes the close button and ignores Escape and outside clicks.' },
+    { prop: 'open · onOpenChange', type: 'boolean · (open) => void', description: 'On Dialog, to control it from state.' },
+  ]}
+/>
+
+## Accessibility
+
+- Radix sets `role="dialog"`, `aria-modal`, and links the title and description; focus moves in, is trapped, and returns to the trigger on close.
+- Escape closes a dismissible dialog. Put the primary action last in the footer.
+
+## RTL notes
+
+- The close button sits at the end of the header and footer actions align to the end, so both move left in Arabic.

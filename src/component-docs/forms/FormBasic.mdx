@@ -7,34 +7,41 @@ description: Minimal form using react-hook-form and provided fields.
 tags: [forms, input, select]
 ---
 
+import { demoSource } from '@component-docs/blocks';
 import { FormBasicDemo } from '@pages/components/components.data.demos';
 
-## Demo
+## Example
 
-<FormBasicDemo />
+The smallest complete form: a `FormContainer` with two fields and a submit button. "Toggle Disabled" disables every field at once.
 
-## Imports
+<Example title="Input and Select" code={demoSource('FormBasicDemo')}>
+  <FormBasicDemo />
+</Example>
 
-```tsx
-import { FormContainer, FormInput, FormSelect } from '@components/forms';
-import { useForm } from 'react-hook-form';
-```
+## Steps
 
-## Code
+1. Create the form with `useForm`, with `defaultValues` and (optionally) a `zodResolver`.
+2. Wrap the fields in [FormContainer](/docs/components/form-container) and pass `formContext` and `onSuccess`.
+3. Add fields by `name`. Controlled fields such as `FormSelect` also take `control={form.control}`.
+4. Add a submit button, or `FormContainer.Actions` for the standard Save / Cancel row.
 
-```tsx
-import { Button } from '@components/ui';
-const form = useForm();
+## API
 
-<FormContainer formContext={form} onSuccess={console.log}>
-  <FormInput name="email" label="Email" />
-  <FormSelect
-    name="fruit"
-    control={form.control}
-    options={[{ id: 'apple', name: 'Apple' }]}
-    getOptionLabel={(o) => o.name}
-    getOptionValue={(o) => o.id}
-  />
-  <Button type="submit">Submit</Button>
-</FormContainer>;
-```
+<PropsTable
+  rows={[
+    { prop: 'FormInput · name', type: 'string', required: true, description: 'Registers a text input.' },
+    { prop: 'FormSelect · options · getOptionLabel · getOptionValue', type: 'T[] · (o) => string', required: true, description: 'Options and how to read them.' },
+    { prop: 'FormSelect · control', type: 'Control', required: true, description: 'form.control from useForm.' },
+  ]}
+/>
+
+Every field also takes the [shared field props](/docs/components/form-field#shared-by-every-form-field).
+
+## Accessibility
+
+- Each field has a real label, and errors are announced through `aria-describedby`.
+- Use a `type="submit"` button so Enter submits the form.
+
+## RTL notes
+
+- Fields and labels follow the page direction; the email value is typed left to right because inputs use `dir="auto"`.

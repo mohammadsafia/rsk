@@ -1,4 +1,4 @@
-import { Button } from '@components/ui';
+import { Button, IconButton } from '@components/ui';
 
 import { LANGUAGE_OPTIONS, type LANGUAGES } from '@constants';
 import { useAppTranslation } from '@hooks/shared';
@@ -11,16 +11,9 @@ function LanguageSwitcher() {
   const handleToggle = () => changeLanguage(nextLanguage.code as LANGUAGES);
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={handleToggle}
-      aria-label={t('switchLanguage')}
-      title={t('switchLanguage')}
-      className="text-muted-foreground hover:text-foreground h-9 w-9 text-xs font-semibold tracking-wider uppercase"
-    >
+    <IconButton onClick={handleToggle} aria-label={t('switchLanguage')} className="text-xs font-semibold tracking-wider uppercase">
       {nextLanguage.code.toUpperCase()}
-    </Button>
+    </IconButton>
   );
 }
 

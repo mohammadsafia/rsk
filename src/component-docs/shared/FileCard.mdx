@@ -8,6 +8,8 @@ tags: [shared, file-card, card, file, folder, document, ioc, composable, generic
 ---
 
 import { useState } from 'react';
+import { demoSource } from '@component-docs/blocks';
+import fileCardSource from './FileCard.mdx?raw';
 import { ConfirmDialog, FileCard } from '@components/shared';
 import { Download, Mail, Trash } from 'lucide-react';
 
@@ -19,11 +21,11 @@ export const ACCESSORS = {
 };
 
 export const STATUS_OPTIONS = [
-  { id: 'todo', label: 'To Do', dotClass: 'bg-primary' },
+  { id: 'todo', label: 'To Do', dotClass: 'bg-accent' },
   { id: 'in-progress', label: 'In Progress', dotClass: 'bg-warning' },
   { id: 'in-review', label: 'In Review', dotClass: 'bg-accent' },
   { id: 'done', label: 'Done', dotClass: 'bg-success' },
-  { id: 'blocked', label: 'Blocked', dotClass: 'bg-destructive' },
+  { id: 'blocked', label: 'Blocked', dotClass: 'bg-danger' },
 ];
 
 export const ASSIGNEE_OPTIONS = [
@@ -51,11 +53,11 @@ export const NeutralDemo = () => {
         <FileCard.Actions>
           {(entry) => (
             <>
-              <FileCard.Item icon={<Mail size={16} />}>Send by Email</FileCard.Item>
+              <FileCard.Item><Mail />Send by Email</FileCard.Item>
 
               <FileCard.Separator />
 
-              <FileCard.Item icon={<Trash size={16} />} variant="destructive">
+              <FileCard.Item tone="danger"><Trash />
                 Delete
               </FileCard.Item>
             </>
@@ -84,13 +86,13 @@ export const ApprovedDemo = () => {
       <FileCard.Header>
         <FileCard.Title />
 
-        <FileCard.Actions>{(entry) => <FileCard.Item icon={<Download size={16} />}>Download</FileCard.Item>}</FileCard.Actions>
+        <FileCard.Actions>{(entry) => <FileCard.Item><Download />Download</FileCard.Item>}</FileCard.Actions>
       </FileCard.Header>
 
       <FileCard.Preview>
         {(entry) => (
           <FileCard.FileShape>
-            <FileCard.StatusPill variant="success">Approved</FileCard.StatusPill>
+            <FileCard.StatusPill variant="soft" tone="success">Approved</FileCard.StatusPill>
           </FileCard.FileShape>
         )}
       </FileCard.Preview>
@@ -114,13 +116,13 @@ export const RejectedDemo = () => {
       <FileCard.Header>
         <FileCard.Title />
 
-        <FileCard.Actions>{(entry) => <FileCard.Item icon={<Download size={16} />}>Download</FileCard.Item>}</FileCard.Actions>
+        <FileCard.Actions>{(entry) => <FileCard.Item><Download />Download</FileCard.Item>}</FileCard.Actions>
       </FileCard.Header>
 
       <FileCard.Preview>
         {(entry) => (
           <FileCard.FileShape>
-            <FileCard.StatusPill variant="destructive">Rejected</FileCard.StatusPill>
+            <FileCard.StatusPill variant="soft" tone="danger">Rejected</FileCard.StatusPill>
           </FileCard.FileShape>
         )}
       </FileCard.Preview>
@@ -147,11 +149,11 @@ export const ApprovalRequiredDemo = () => {
         <FileCard.Actions>
           {(entry) => (
             <>
-              <FileCard.Item icon={<Mail size={16} />}>Send by Email</FileCard.Item>
+              <FileCard.Item><Mail />Send by Email</FileCard.Item>
 
               <FileCard.Separator />
 
-              <FileCard.Item icon={<Trash size={16} />} variant="destructive">
+              <FileCard.Item tone="danger"><Trash />
                 Delete
               </FileCard.Item>
             </>
@@ -165,13 +167,13 @@ export const ApprovalRequiredDemo = () => {
             <FileCard.ApprovalPrompt>Your approval is required for this file</FileCard.ApprovalPrompt>
 
             <div className="flex gap-2">
-              <ConfirmDialog variant="destructive" title="Reject Document" onConfirm={() => {}}>
+              <ConfirmDialog tone="danger" title="Reject Document" onConfirm={() => {}}>
                 <div>
                   <FileCard.Reject>Reject</FileCard.Reject>
                 </div>
               </ConfirmDialog>
 
-              <ConfirmDialog variant="success" title="Approve Document" onConfirm={() => {}}>
+              <ConfirmDialog tone="success" title="Approve Document" onConfirm={() => {}}>
                 <div>
                   <FileCard.Approve>Approve</FileCard.Approve>
                 </div>
@@ -201,7 +203,7 @@ export const FolderDemo = () => {
 
         <FileCard.Actions>
           {(entry) => (
-            <FileCard.Item icon={<Trash size={16} />} variant="destructive">
+            <FileCard.Item tone="danger"><Trash />
               Delete
             </FileCard.Item>
           )}
@@ -219,133 +221,81 @@ export const FolderDemo = () => {
   );
 };
 
-## Variant — Neutral
+## Neutral
 
-File shape with no overlay. Status pill / approval prompt only render when consumer mounts them inside `Preview`. Status combobox and assignee picker are interactive — try selecting different options.
+A file shape with no overlay. The status and assignee pickers are interactive: try changing them.
 
-<NeutralDemo />
+<Example title="File card" code={demoSource('NeutralDemo', fileCardSource)}>
+  <NeutralDemo />
+</Example>
 
-## Variant — Approved
+## Approved and rejected
 
-`<FileCard.StatusPill variant="success">` mounted inside the file shape — content sits in front of the watermark icon.
+Mount `FileCard.StatusPill` (a soft `Badge`) inside the file shape; it sits in front of the watermark icon.
 
-<ApprovedDemo />
+<Example title="Approved" code={demoSource('ApprovedDemo', fileCardSource)}>
+  <ApprovedDemo />
+</Example>
 
-## Variant — Rejected
+<Example title="Rejected" code={demoSource('RejectedDemo', fileCardSource)}>
+  <RejectedDemo />
+</Example>
 
-`<FileCard.StatusPill variant="destructive">`.
+## Approval required
 
-<RejectedDemo />
+`FileCard.ApprovalPrompt` with `FileCard.Approve` and `FileCard.Reject` as `ConfirmDialog` triggers; both buttons forward refs, so they work as `Dialog.Trigger asChild`.
 
-## Variant — Approval Required (dual-action)
+<Example title="Dual action" code={demoSource('ApprovalRequiredDemo', fileCardSource)}>
+  <ApprovalRequiredDemo />
+</Example>
 
-`<FileCard.ApprovalPrompt>` + `<FileCard.Approve>` / `<FileCard.Reject>` as ConfirmDialog triggers. Each button is `forwardRef` so it works with `Dialog.Trigger asChild`.
+## Folder
 
-<ApprovalRequiredDemo />
+Mount `FileCard.FolderShape count={…}` inside `Preview` instead of `FileShape`; pass `onClick` to make the whole card a navigation target.
 
-## Variant — Folder Mode
+<Example title="Folder" code={demoSource('FolderDemo', fileCardSource)}>
+  <FolderDemo />
+</Example>
 
-Mount `<FileCard.FolderShape count={...} />` inside Preview instead of `<FileCard.FileShape>`. The same card chrome (header / footer) reads as a folder. Pair with `onClick` to make the whole card a navigation target. The count comes from `accessors`-aligned entry data.
+## Composition
 
-<FolderDemo />
-
-## Imports
+Actions, approve and reject accept `condition` and `permissions` (they are composed with `withConditional` and `withAuth`), so the card hides what the user can't do:
 
 ```tsx
-import { FileCard, type FileCardAccessors } from '@components/shared';
+<FileCard.Item condition={entry.canDelete} permissions={[Permissions.Delete]} tone="danger" onClick={onDelete}>
+  <Trash />
+  Delete
+</FileCard.Item>
 ```
 
-## Composition shape
-
-```tsx
-<FileCard entry={entry} accessors={ACCESSORS} onClick={onClick}>
-  <FileCard.Header>
-    <FileCard.Title />
-
-    <FileCard.Actions>
-      {(entry) => (
-        <>
-          <FileCard.Item condition={entry.canSendByEmail} permissions={[Permissions.SendByEmail]} icon={<Mail size={16} />} onClick={...}>
-            Send by Email
-          </FileCard.Item>
-
-          <FileCard.Separator />
-
-          <FileCard.Item condition={entry.canDelete} permissions={[Permissions.Delete]} icon={<Trash size={16} />} variant="destructive" onClick={...}>
-            Delete
-          </FileCard.Item>
-        </>
-      )}
-    </FileCard.Actions>
-  </FileCard.Header>
-
-  <FileCard.Preview>
-    {(entry) => (
-      <FileCard.FileShape>
-        <FileCard.ApprovalPrompt>Your approval is required for this file</FileCard.ApprovalPrompt>
-
-        <div className="flex gap-2">
-          <ConfirmDialog variant="destructive" title="Reject" onConfirm={() => rejectMutation.mutateAsync(entry.id)}>
-            <div>
-              <FileCard.Reject condition={entry.canReject} permissions={[Permissions.Reject]}>
-                Reject
-              </FileCard.Reject>
-            </div>
-          </ConfirmDialog>
-
-          <ConfirmDialog variant="success" title="Approve" onConfirm={() => approveMutation.mutateAsync(entry.id)}>
-            <div>
-              <FileCard.Approve condition={entry.canApprove} permissions={[Permissions.Approve]}>
-                Approve
-              </FileCard.Approve>
-            </div>
-          </ConfirmDialog>
-        </div>
-      </FileCard.FileShape>
-    )}
-  </FileCard.Preview>
-
-  <FileCard.Status
-    options={statusOptions}
-    value={entry.taskStatus}
-    getOptionLabel={(o) => o.label}
-    getOptionValue={(o) => o.id}
-    getOptionDot={(o) => o.dotClass}
-    onChange={(option) => onStatusChange(entry, option)}
-  />
-
-  <FileCard.Footer>
-    <FileCard.Assignee
-      options={teamOptionsAsync}
-      value={entry.assignee}
-      getOptionLabel={(o) => o.name}
-      getOptionValue={(o) => o.id}
-      getOptionAvatar={(o) => o.avatarUrl}
-      onChange={(option) => onAssign(entry, option)}
-    />
-
-    <FileCard.Date />
-  </FileCard.Footer>
-</FileCard>
-```
-
-## Sub-compound surface
-
-| Sub-compound | Type | Auto-renders |
+| Part | Kind | Renders |
 |---|---|---|
-| `<FileCard.Header>` | container | — |
-| `<FileCard.Title>` | reads context | file-icon chip + title text |
-| `<FileCard.Actions>` | reads context, render-prop children | dropdown trigger + list |
-| `<FileCard.Item>` | alias of `PrimeDropdown.Item` | already `withConditional(withAuth(…))` |
-| `<FileCard.Separator>` | alias of `PrimeDropdown.Separator` | — |
-| `<FileCard.Preview>` | reads context, render-prop children | preview region container |
-| `<FileCard.FileShape>` | visual primitive | document watermark icon with content overlay |
-| `<FileCard.FolderShape>` | visual primitive | folder shape with `count` |
-| `<FileCard.StatusPill>` | alias of `Badge` | DS Badge with full variant set (default / success / destructive / warning / muted / secondary / neutral / accent) + size set |
-| `<FileCard.ApprovalPrompt>` | visual primitive | text styling for approval-required copy |
-| `<FileCard.Approve>` | wraps `ComposedButton` (outline-success) | `forwardRef` — works as `Dialog.Trigger asChild` |
-| `<FileCard.Reject>` | wraps `ComposedButton` (outline-destructive) | `forwardRef` — works as `Dialog.Trigger asChild` |
-| `<FileCard.Status>` | baked combobox | DI: `options`, `getOption*`, `value`, `onChange` (sync or async) |
-| `<FileCard.Footer>` | container | — |
-| `<FileCard.Assignee>` | baked combobox | DI: `options`, `getOption*`, `value`, `onChange` (sync or async) |
-| `<FileCard.Date>` | reads context | formatted date via `accessors.getDate` |
+| `Header` · `Footer` | container | — |
+| `Title` | reads context | file-icon chip and title |
+| `Actions` | render-prop children | dropdown trigger and menu |
+| `Item` · `Separator` | `DropdownMenu` parts | conditional, permission-aware items |
+| `Preview` | render-prop children | the preview region |
+| `FileShape` · `FolderShape` | visual | document watermark, or folder with `count` |
+| `StatusPill` | `Badge` | soft status badge |
+| `ApprovalPrompt` · `Approve` · `Reject` | visual · buttons | approval copy and actions |
+| `Status` · `Assignee` | baked combobox | `options`, `getOption*`, `value`, `onChange` (sync or async) |
+| `Date` | reads context | date from `accessors.getDate` |
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'entry', type: 'TEntry', required: true, description: 'Your record; parts read it through context.' },
+    { prop: 'accessors', type: 'FileCardAccessors<TEntry>', required: true, description: 'getId, getTitle, getFileType and getDate.' },
+    { prop: 'onClick', type: '(entry) => void', description: 'Makes the whole card a link-like target.' },
+  ]}
+/>
+
+## Accessibility
+
+- The card is an `article` titled by its file name; the actions menu trigger is a labelled icon button.
+- With `onClick`, the card is keyboard-activatable; keep the menu and pickers as separate tab stops.
+
+## RTL notes
+
+- The file chip and title sit at the start, the actions menu at the end; the due date is formatted for the app language with Western digits.

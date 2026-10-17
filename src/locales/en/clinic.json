@@ -1,0 +1,353 @@
+{
+  "patients": {
+    "title": "Patients",
+    "description": "Everyone registered at the clinic.",
+    "newPatient": "New patient",
+    "searchPlaceholder": "Search by name, MRN or phone",
+    "totalLabel": "patients",
+    "selfPay": "Self-pay",
+    "columns": {
+      "name": "Name",
+      "mrn": "MRN",
+      "phone": "Phone",
+      "doctor": "Primary doctor",
+      "insurer": "Insurer",
+      "lastVisit": "Last visit",
+      "balance": "Balance",
+      "registered": "Registered"
+    },
+    "empty": {
+      "title": "No patients yet",
+      "description": "Register the first patient to start booking visits."
+    },
+    "noResults": {
+      "title": "No matching patients",
+      "description": "Try another search or clear the filters."
+    },
+    "error": {
+      "title": "Patients couldn't be loaded",
+      "description": "Something went wrong. Try again in a moment."
+    }
+  },
+  "retry": "Retry",
+  "dashboard": {
+    "title": "Operations",
+    "description": "How the clinic is doing",
+    "range": "Range",
+    "ranges": {
+      "7": "Last 7 days",
+      "30": "Last 30 days",
+      "90": "Last 90 days"
+    },
+    "stats": {
+      "visits": "Visits",
+      "newPatients": "New patients",
+      "noShowRate": "No-show rate",
+      "revenue": "Revenue"
+    },
+    "sparkline": {
+      "visits": "Visits per day",
+      "newPatients": "New patients per day",
+      "noShowRate": "No-show rate per day",
+      "revenue": "Revenue per day"
+    },
+    "charts": {
+      "visits": "Visits per day",
+      "completed": "Completed",
+      "noShows": "No-shows",
+      "payerMix": "Payer mix",
+      "insured": "Insured",
+      "selfPay": "Self-pay",
+      "payerCenter": "Visits",
+      "revenueByDoctor": "Revenue by doctor",
+      "revenue": "Revenue"
+    },
+    "today": {
+      "title": "Today's visits",
+      "empty": "No more visits today",
+      "viewSchedule": "View schedule",
+      "error": "Today's visits couldn't be loaded"
+    },
+    "error": {
+      "title": "The dashboard couldn't be loaded",
+      "description": "Something went wrong. Try again in a moment."
+    },
+    "vsPrevious": "vs previous {{days}} days"
+  },
+  "billing": {
+    "title": "Billing",
+    "description": "Invoices, payments and what is still owed.",
+    "summary": {
+      "outstanding": "Outstanding",
+      "overdue": "Overdue",
+      "overdueCaption_one": "{{count}} invoice",
+      "overdueCaption_other": "{{count}} invoices",
+      "collected": "Collected this month"
+    },
+    "tabs": {
+      "label": "Invoice status",
+      "all": "All"
+    },
+    "status": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "overdue": "Overdue",
+      "paid": "Paid",
+      "void": "Void"
+    },
+    "columns": {
+      "number": "Number",
+      "patient": "Patient",
+      "issued": "Issued",
+      "due": "Due",
+      "status": "Status",
+      "total": "Total",
+      "balance": "Balance"
+    },
+    "searchPlaceholder": "Search by number or patient",
+    "totalLabel": "invoices",
+    "bulk": {
+      "remind": "Send reminders",
+      "markPaid": "Mark paid",
+      "export": "Export CSV",
+      "confirmTitle_one": "Mark {{count}} invoice paid?",
+      "confirmTitle_other": "Mark {{count}} invoices paid?",
+      "confirmDescription": "Their outstanding balance is recorded as a card payment today.",
+      "reminded": "Reminders sent to {{done}}",
+      "markedPaid": "{{done}} marked paid",
+      "skipped": ", {{skipped}} skipped (not open)",
+      "failed": "The action couldn't be completed"
+    },
+    "empty": {
+      "title": "No invoices yet",
+      "description": "Invoices appear here after completed visits."
+    },
+    "noResults": {
+      "title": "No matching invoices",
+      "description": "Try another status or search."
+    },
+    "error": {
+      "title": "Invoices couldn't be loaded",
+      "description": "Something went wrong. Try again in a moment."
+    },
+    "sheet": {
+      "issuedDue": "Issued {{issued}} · Due {{due}}",
+      "lines": "Services",
+      "service": "Service",
+      "quantity": "Qty",
+      "unitPrice": "Unit price",
+      "amount": "Amount",
+      "total": "Total",
+      "payments": "Payments",
+      "noPayments": "No payments yet",
+      "balance": "Balance",
+      "record": {
+        "title": "Record payment",
+        "amount": "Amount",
+        "method": "Method",
+        "date": "Date",
+        "submit": "Record payment",
+        "success": "Payment recorded",
+        "amountRequired": "Enter an amount above 0",
+        "amountTooHigh": "Can't be more than the balance ({{balance}})",
+        "dateRequired": "Enter the payment date",
+        "dateFuture": "A payment can't be dated in the future"
+      },
+      "send": "Send invoice",
+      "sent": "Invoice sent",
+      "void": "Void invoice",
+      "voidTitle": "Void {{number}}?",
+      "voidDescription": "A voided invoice can't be paid or sent.",
+      "voided": "Invoice voided",
+      "notFound": "Invoice not found",
+      "notFoundDescription": "It may have been removed. Pick another invoice from the list.",
+      "close": "Close",
+      "loadingTitle": "Invoice",
+      "loadError": "This invoice couldn't be loaded"
+    }
+  },
+  "errors": {
+    "conflict": "That time is no longer free",
+    "not-found": "It no longer exists",
+    "invalid-transition": "That isn't possible in its current state",
+    "duplicate-phone": "That phone number is already registered",
+    "forced": "Something went wrong. Try again.",
+    "invalid": "Some values aren't valid",
+    "closed": "The doctor isn't working at that time"
+  },
+  "services": {
+    "consultation": "Consultation",
+    "follow-up": "Follow-up",
+    "procedure": "Procedure",
+    "check-up": "Check-up"
+  },
+  "methods": {
+    "cash": "Cash",
+    "card": "Card",
+    "insurance": "Insurance"
+  },
+  "schedule": {
+    "title": "Schedule",
+    "description": "Visits by doctor",
+    "onLeave": "On leave",
+    "conference": "Conference",
+    "types": {
+      "consultation": "Consultation",
+      "follow-up": "Follow-up",
+      "procedure": "Procedure",
+      "check-up": "Check-up"
+    },
+    "status": {
+      "scheduled": "Scheduled",
+      "arrived": "Arrived",
+      "completed": "Completed",
+      "no-show": "No-show",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "arrived": "Mark arrived",
+      "noShow": "Mark no-show",
+      "complete": "Complete",
+      "openProfile": "Open profile",
+      "updated": "Visit updated"
+    },
+    "error": {
+      "title": "The schedule couldn't be loaded",
+      "description": "Something went wrong. Try again in a moment."
+    },
+    "newVisit": {
+      "title": "New visit",
+      "patient": "Patient",
+      "patientPlaceholder": "Search patients",
+      "type": "Visit type",
+      "notes": "Notes",
+      "submit": "Book visit",
+      "booked": "Visit booked",
+      "patientRequired": "Choose a patient",
+      "when": "{{day}}, {{start}} – {{end}} · {{doctor}}",
+      "cancel": "Cancel",
+      "doctor": "Doctor",
+      "doctorRequired": "Choose a doctor"
+    }
+  },
+  "profile": {
+    "bookVisit": "Book visit",
+    "edit": "Edit",
+    "backToPatients": "Back to patients",
+    "age_zero": "{{count}} years",
+    "age_one": "{{count}} year",
+    "age_two": "{{count}} years",
+    "age_few": "{{count}} years",
+    "age_many": "{{count}} years",
+    "age_other": "{{count}} years",
+    "stats": {
+      "visitsThisYear": "Visits this year",
+      "balanceDue": "Balance due",
+      "lastVisit": "Last visit"
+    },
+    "tabs": {
+      "label": "Patient record",
+      "overview": "Overview",
+      "timeline": "Timeline",
+      "invoices": "Invoices"
+    },
+    "fields": {
+      "dob": "Date of birth",
+      "sex": "Sex",
+      "email": "Email",
+      "insurer": "Insurer",
+      "policy": "Policy number",
+      "doctor": "Primary doctor",
+      "allergies": "Allergies"
+    },
+    "sex": {
+      "female": "Female",
+      "male": "Male"
+    },
+    "allergies": {
+      "penicillin": "Penicillin",
+      "latex": "Latex",
+      "peanuts": "Peanuts",
+      "aspirin": "Aspirin",
+      "pollen": "Pollen",
+      "none": "No known allergies"
+    },
+    "timeline": {
+      "payment": "Payment received",
+      "empty": "Nothing yet"
+    },
+    "invoices": {
+      "empty": "No invoices"
+    },
+    "notFound": {
+      "title": "Patient not found",
+      "description": "This record may have been removed."
+    },
+    "error": {
+      "title": "This patient couldn't be loaded",
+      "description": "Something went wrong. Try again in a moment."
+    },
+    "editSheet": {
+      "title": "Edit contact details",
+      "phone": "Phone",
+      "email": "Email",
+      "insurer": "Insurer",
+      "policy": "Policy number",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saved": "Contact details saved",
+      "phoneRequired": "Enter a phone number",
+      "emailInvalid": "Enter a valid email address",
+      "policyRequired": "Enter the policy number",
+      "phoneInvalid": "Enter a valid phone number"
+    }
+  },
+  "intake": {
+    "title": "New patient",
+    "description": "Register a patient in a few short steps.",
+    "steps": {
+      "patient": "Patient",
+      "patientDescription": "Who the patient is and who will see them.",
+      "contact": "Contact",
+      "insurance": "Insurance",
+      "documents": "Documents",
+      "documentsDescription": "Referral letters, ID or previous reports.",
+      "review": "Review"
+    },
+    "fields": {
+      "firstNameEn": "First name",
+      "lastNameEn": "Last name",
+      "firstNameAr": "First name (Arabic)",
+      "lastNameAr": "Last name (Arabic)",
+      "sex": "Sex",
+      "dob": "Date of birth",
+      "doctor": "Primary doctor",
+      "insured": "The patient has insurance",
+      "phone": "Phone",
+      "email": "Email",
+      "insurer": "Insurer",
+      "policy": "Policy number",
+      "documents": "Documents"
+    },
+    "errors": {
+      "firstNameRequired": "Enter the first name",
+      "lastNameRequired": "Enter the last name",
+      "dobRequired": "Enter the date of birth",
+      "dobFuture": "The date of birth can't be in the future",
+      "doctorRequired": "Choose a primary doctor",
+      "phoneRequired": "Enter a phone number",
+      "phoneInvalid": "Enter a valid phone number",
+      "emailInvalid": "Enter a valid email address",
+      "insurerRequired": "Choose the insurer",
+      "policyRequired": "Enter the policy number"
+    },
+    "files_zero": "No files",
+    "files_one": "{{count}} file",
+    "files_two": "{{count}} files",
+    "files_few": "{{count}} files",
+    "files_many": "{{count}} files",
+    "files_other": "{{count}} files",
+    "submit": "Register patient",
+    "registered": "Patient registered"
+  }
+}

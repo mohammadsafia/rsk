@@ -1,43 +1,23 @@
-import { type FC, useMemo, useState } from 'react';
+import { type FC, type ReactNode, useMemo, useRef, useState } from 'react';
 
-import { CalendarTimeGrid, type CalendarTimeGridAxisRow, Popover } from '@components/ui';
-import { type CalendarAccessors, type EventTimeStatus, useCalendarGridContext } from '@components/calendar';
+import { Conditional } from '@components/utils';
+import { Avatar, CalendarTimeGrid, type CalendarTimeGridAxisRow, Popover } from '@components/ui';
+import { type CalendarResource, useCalendarGridContext } from '@components/calendar';
 
-import { type DateInput, useDate } from '@hooks/shared';
+import { type DateInput, useAppTranslation, useDate } from '@hooks/shared';
 
-type ParsedEvent<T> = {
-  event: T;
-  start: string;
-  end: string;
-  startMins: number;
-  endMins: number;
-};
+import { cn } from '@utils';
 
-type PlacedEvent<T> = {
-  event: T;
-  status: EventTimeStatus;
-  top: number;
-  height: number;
-  left: number;
-  width: number;
-  isOverflow: boolean;
-};
+import { dayKeyOf, slotRangesFor } from '../scheduling';
+import AllDayRow from './AllDayRow';
+import { isAllDayEvent, type PlacedEvent, placeEvents } from './placement';
+import { TimeGridGestureContext, useTimeGridGestureContext, useTimeGridGestures } from './useTimeGridGestures';
 
-type PlaceEventsParams<T> = {
-  events: T[];
-  accessors: CalendarAccessors<T>;
-  startHour: number;
-  endHour: number;
-  dayKey: string;
-  isoFor: (date: DateInput) => string;
-  now: DateInput;
-  toMinutes: (date: DateInput) => number;
-  isBefore: (a: DateInput, b: DateInput) => boolean;
-  isAfter: (a: DateInput, b: DateInput) => boolean;
-};
+export type GridColumn = { key: string; dayKey: string; resourceId?: string };
 
 type EventSlotProps = {
   placement: PlacedEvent<unknown>;
+  columnIndex: number;
 };
 
 type CalendarGridTimeViewComponents = FC & {
@@ -45,138 +25,10 @@ type CalendarGridTimeViewComponents = FC & {
   WeekView: FC;
 };
 
-const MAX_VISIBLE_COLUMNS = 4;
-const MIN_HEIGHT_PERCENT = 2;
-
-const parseTimeMinutes = (time: string): number => {
-  const [hStr, mStr] = time.split(':');
-  return Number(hStr) * 60 + Number(mStr ?? 0);
-};
-
 const computeRowCount = (startHour: number, endHour: number, stepMinutes: number): number => {
   const totalMinutes = (endHour - startHour) * 60;
   return Math.max(Math.floor(totalMinutes / stepMinutes), 1);
 };
-
-function parseEventsForDay<T>(
-  events: T[],
-  accessors: CalendarAccessors<T>,
-  dayKey: string,
-  isoFor: (date: DateInput) => string,
-  toMinutes: (date: DateInput) => number,
-  startMinutes: number,
-  endMinutes: number,
-): ParsedEvent<T>[] {
-  return events
-    .filter((event) => isoFor(accessors.getStartTime(event)) === dayKey)
-    .map((event) => {
-      const start = accessors.getStartTime(event);
-      const end = accessors.getEndTime(event);
-      const rawStart = toMinutes(start);
-      const rawEnd = toMinutes(end);
-
-      return {
-        event,
-        start,
-        end,
-        startMins: Math.max(rawStart, startMinutes),
-        endMins: rawEnd === rawStart ? rawStart + 1 : Math.min(rawEnd, endMinutes),
-      };
-    })
-    .sort((a, b) => a.startMins - b.startMins || b.endMins - b.startMins - (a.endMins - a.startMins));
-}
-
-function clusterEvents<T>(parsed: ParsedEvent<T>[]): ParsedEvent<T>[][] {
-  const clusters: ParsedEvent<T>[][] = [];
-  const visited = new Set<number>();
-
-  for (let i = 0; i < parsed.length; i++) {
-    if (visited.has(i)) continue;
-
-    const cluster = [parsed[i]];
-    visited.add(i);
-    let clusterEnd = parsed[i].endMins;
-
-    for (let j = i + 1; j < parsed.length; j++) {
-      if (visited.has(j)) continue;
-      if (parsed[j].startMins < clusterEnd) {
-        cluster.push(parsed[j]);
-        visited.add(j);
-        clusterEnd = Math.max(clusterEnd, parsed[j].endMins);
-      }
-    }
-
-    clusters.push(cluster);
-  }
-
-  return clusters;
-}
-
-function placeCluster<T>(
-  cluster: ParsedEvent<T>[],
-  startMinutes: number,
-  totalMinutes: number,
-  now: DateInput,
-  isBefore: (a: DateInput, b: DateInput) => boolean,
-  isAfter: (a: DateInput, b: DateInput) => boolean,
-): PlacedEvent<T>[] {
-  const columnMap = new Map<number, ParsedEvent<T>[]>();
-  const result: PlacedEvent<T>[] = [];
-
-  for (const item of cluster) {
-    let col = 0;
-
-    for (; ; col++) {
-      const colEvents = columnMap.get(col) ?? [];
-      if (!colEvents.some((e) => item.startMins < e.endMins && item.endMins > e.startMins)) break;
-    }
-
-    if (!columnMap.has(col)) columnMap.set(col, []);
-    columnMap.get(col)!.push(item);
-
-    let maxConcurrent = 0;
-    for (const other of cluster) {
-      if (item.startMins < other.endMins && item.endMins > other.startMins) maxConcurrent++;
-    }
-
-    const effectiveColumns = Math.min(maxConcurrent, MAX_VISIBLE_COLUMNS);
-    const isOverflow = col >= MAX_VISIBLE_COLUMNS;
-
-    result.push({
-      event: item.event,
-      status: isBefore(item.end, now) ? 'past' : isAfter(item.start, now) ? 'future' : 'current',
-      top: ((item.startMins - startMinutes) / totalMinutes) * 100,
-      height: Math.max(((item.endMins - item.startMins) / totalMinutes) * 100, MIN_HEIGHT_PERCENT),
-      left: isOverflow ? 0 : col * (100 / effectiveColumns),
-      width: isOverflow ? 0 : 100 / effectiveColumns,
-      isOverflow,
-    });
-  }
-
-  return result;
-}
-
-function placeEvents<T>({
-  events,
-  accessors,
-  startHour,
-  endHour,
-  dayKey,
-  isoFor,
-  now,
-  toMinutes,
-  isBefore,
-  isAfter,
-}: PlaceEventsParams<T>): PlacedEvent<T>[] {
-  const startMinutes = startHour * 60;
-  const endMinutes = endHour * 60;
-  const totalMinutes = endMinutes - startMinutes;
-
-  const parsed = parseEventsForDay(events, accessors, dayKey, isoFor, toMinutes, startMinutes, endMinutes);
-  const clusters = clusterEvents(parsed);
-
-  return clusters.flatMap((cluster) => placeCluster(cluster, startMinutes, totalMinutes, now, isBefore, isAfter));
-}
 
 const DayHeader: FC<{ day: DateInput }> = ({ day }) => {
   const { formatDate, toDate, constants } = useDate();
@@ -187,7 +39,7 @@ const DayHeader: FC<{ day: DateInput }> = ({ day }) => {
   return <CalendarTimeGrid.Header dayName={dayName} dayNumber={dayNumber} isToday={isToday} />;
 };
 
-const TimeAxis: FC = () => {
+const TimeAxis: FC<{ className?: string }> = ({ className }) => {
   const { startHour, endHour, stepMinutes, showStepLabels } = useCalendarGridContext();
   const { formatHour, constants } = useDate();
 
@@ -201,7 +53,7 @@ const TimeAxis: FC = () => {
       const isHourMark = min === 0;
 
       items.push({
-        label: isHourMark ? formatHour(hour, constants.TimeFormats.HOUR_MINUTES_12) : '',
+        label: isHourMark ? formatHour(hour, constants.TimeFormats.HOUR_12) : '',
         isHourMark,
       });
     }
@@ -209,12 +61,18 @@ const TimeAxis: FC = () => {
     return items;
   }, [startHour, endHour, stepMinutes, formatHour, constants]);
 
-  return <CalendarTimeGrid.Axis rows={rows} showStepLabels={showStepLabels} />;
+  return <CalendarTimeGrid.Axis rows={rows} showStepLabels={showStepLabels} className={className} />;
 };
 
-const EventSlot: FC<EventSlotProps> = ({ placement }) => {
-  const { renderEvent, popoverContent } = useCalendarGridContext();
+const EventSlot: FC<EventSlotProps> = ({ placement, columnIndex }) => {
+  const { renderEvent, popoverContent, eventAccessors, isEditable } = useCalendarGridContext();
+  const gestures = useTimeGridGestureContext();
+  const { formatNullableDate, constants } = useDate();
   const [open, setOpen] = useState(false);
+  const day = formatNullableDate(eventAccessors.getStartTime(placement.event), constants.DateFormats.FULL_MONTH_DAY_YEAR, '');
+  const id = eventAccessors.getId(placement.event);
+  const editable = isEditable(placement.event);
+  const dragging = gestures.draft?.eventId === id;
 
   const trigger = (
     <CalendarTimeGrid.EventCard
@@ -222,9 +80,28 @@ const EventSlot: FC<EventSlotProps> = ({ placement }) => {
       height={placement.height}
       left={placement.left}
       width={placement.width}
-      onClick={popoverContent ? () => setOpen(true) : undefined}
+      data-event-id={id}
+      className={cn(editable && 'touch-none', dragging && 'opacity-50')}
+      aria-keyshortcuts={editable ? 'M R' : undefined}
+      onPointerDown={(event) => gestures.onEventPointerDown(event, placement.event, columnIndex)}
+      onKeyDown={(event) => gestures.onEventKeyDown(event, placement.event, columnIndex)}
+      onBlur={() => gestures.onEventBlur(placement.event)}
+      onClick={(event) => {
+        // The click that ends a drag must not open the popover (preventDefault also stops Radix's trigger).
+        if (gestures.shouldSuppressClick()) {
+          event.preventDefault();
+          return;
+        }
+        if (popoverContent) setOpen(true);
+      }}
     >
+      <Conditional.If condition={!!day}>
+        <span className="sr-only">{`${day}, `}</span>
+      </Conditional.If>
+
       {renderEvent(placement.event, placement.status)}
+
+      {editable ? <span data-resize-handle="" aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2 cursor-ns-resize" /> : null}
     </CalendarTimeGrid.EventCard>
   );
 
@@ -236,6 +113,33 @@ const EventSlot: FC<EventSlotProps> = ({ placement }) => {
 
       <Popover.Content className="w-80 p-0">{popoverContent(placement.event, () => setOpen(false))}</Popover.Content>
     </Popover>
+  );
+};
+
+/** The range being drawn or the target of a move/resize, with a live time label. */
+const DraftGhost: FC<{ columnIndex: number }> = ({ columnIndex }) => {
+  const { startHour, endHour } = useCalendarGridContext();
+  const { draft, label } = useTimeGridGestureContext();
+
+  if (!draft || draft.columnIndex !== columnIndex) return null;
+
+  const total = (endHour - startHour) * 60;
+  const percent = (minutes: number) => ((minutes - startHour * 60) / total) * 100;
+
+  return (
+    <div
+      data-slot="calendar-grid-draft"
+      aria-hidden="true"
+      className={cn(
+        'pointer-events-none absolute inset-x-1 z-30 flex items-start overflow-hidden rounded-md border px-1.5 py-0.5',
+        draft.allowed ? 'border-accent bg-accent-subtle text-accent' : 'border-danger bg-danger-subtle text-danger',
+      )}
+      style={{ top: `${percent(draft.start)}%`, height: `${percent(draft.end) - percent(draft.start)}%` }}
+    >
+      <span className="text-2xs font-medium tabular-nums">
+        <bdi dir="ltr">{label(columnIndex, draft.start, draft.end)}</bdi>
+      </span>
+    </div>
   );
 };
 
@@ -253,27 +157,50 @@ const NowIndicator: FC<{ day: DateInput }> = ({ day }) => {
   return <CalendarTimeGrid.NowLine percent={percent} mode={nowLine} />;
 };
 
-const DayColumn: FC<{ day: DateInput; className?: string }> = ({ day, className }) => {
-  const { events, eventAccessors, slots, startHour, endHour, stepMinutes } = useCalendarGridContext();
+const initials = (label: string) =>
+  label
+    .replace(/^(dr|mr|mrs|ms)\.?\s+/i, '')
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+
+const ResourceHeader: FC<{ resource: CalendarResource }> = ({ resource }) => (
+  <div
+    data-slot="calendar-grid-resource-header"
+    className="border-border-subtle bg-surface flex min-w-44 flex-1 items-center justify-center gap-2 border-y border-e px-2 py-2 last:border-e-0"
+  >
+    <Avatar size="sm">
+      {resource.avatar ? <Avatar.Image src={resource.avatar} alt="" /> : <></>}
+      <Avatar.Fallback>{initials(resource.label)}</Avatar.Fallback>
+    </Avatar>
+
+    <span className="text-fg truncate text-sm font-medium">{resource.label}</span>
+  </div>
+);
+
+const DayColumn: FC<{ column: GridColumn; index: number; wide: boolean }> = ({ column, index, wide }) => {
+  const { t } = useAppTranslation('common');
+  const { events, eventAccessors, slots, startHour, endHour, stepMinutes, onSlotSelect } = useCalendarGridContext();
+  const gestures = useTimeGridGestureContext();
   const { toDate, toDateUnits, isBefore, isAfter } = useDate();
 
-  const dayKey = toDate(day);
+  const { dayKey, resourceId } = column;
   const rowCount = computeRowCount(startHour, endHour, stepMinutes);
 
   const cells = useMemo(() => {
-    const slotRanges = (slots?.[dayKey] ?? []).map((s) => ({
-      start: parseTimeMinutes(s.startTime),
-      end: parseTimeMinutes(s.endTime),
-    }));
+    const ranges = slotRangesFor(slots, dayKey, resourceId);
 
     return Array.from({ length: rowCount }, (_, idx) => {
       const cellStart = startHour * 60 + idx * stepMinutes;
       const cellEnd = cellStart + stepMinutes;
-      const isAvailable = slotRanges.some((r) => cellStart < r.end && cellEnd > r.start);
 
-      return { isAvailable };
+      // Without availability data a selectable grid is open everywhere; a read-only one keeps today's sunken look.
+      if (ranges === null) return { isAvailable: !!onSlotSelect };
+
+      return { isAvailable: ranges.some((range) => cellStart < range.end && cellEnd > range.start) };
     });
-  }, [slots, dayKey, rowCount, startHour, stepMinutes]);
+  }, [slots, dayKey, resourceId, rowCount, startHour, stepMinutes, onSlotSelect]);
 
   const placements = useMemo(() => {
     const toMinutes = (input: DateInput): number => {
@@ -286,60 +213,134 @@ const DayColumn: FC<{ day: DateInput; className?: string }> = ({ day, className 
       accessors: eventAccessors,
       startHour,
       endHour,
-      dayKey,
-      isoFor: toDate,
+      belongs: (event) =>
+        dayKeyOf(eventAccessors.getStartTime(event)) === dayKey &&
+        (resourceId === undefined || eventAccessors.getResourceId?.(event) === resourceId) &&
+        !isAllDayEvent(event, eventAccessors),
       now: toDate(),
       toMinutes,
       isBefore,
       isAfter,
     });
-  }, [events, eventAccessors, startHour, endHour, dayKey, toDate, toDateUnits, isBefore, isAfter]);
+  }, [events, eventAccessors, startHour, endHour, dayKey, resourceId, toDate, toDateUnits, isBefore, isAfter]);
 
   return (
-    <CalendarTimeGrid.Column rowCount={rowCount} className={className}>
-      <NowIndicator day={day} />
+    <CalendarTimeGrid.Column
+      rowCount={rowCount}
+      data-calendar-column=""
+      data-column-index={index}
+      data-day={dayKey}
+      data-resource={resourceId}
+      className={cn('border-border-subtle border-e last:border-e-0', wide ? 'min-w-44' : 'min-w-0')}
+      onPointerDown={(event) => gestures.onColumnPointerDown(event, index)}
+    >
+      <NowIndicator day={dayKey} />
 
       {placements.map((placement, idx) => (
-        <EventSlot key={`${eventAccessors.getId(placement.event)}-${idx}`} placement={placement} />
+        <EventSlot key={`${eventAccessors.getId(placement.event)}-${idx}`} placement={placement} columnIndex={index} />
       ))}
 
-      {cells.map((cell, idx) => (
-        <CalendarTimeGrid.Cell key={idx} available={cell.isAvailable} />
-      ))}
+      <DraftGhost columnIndex={index} />
+
+      {cells.map((cell, idx) => {
+        if (!onSlotSelect) return <CalendarTimeGrid.Cell key={idx} available={cell.isAvailable} />;
+
+        // Selectable cells: a roving tab stop, arrow keys between cells, Enter selects one step.
+        const start = startHour * 60 + idx * stepMinutes;
+        const allowed = gestures.isAllowed(index, start, start + stepMinutes);
+        const stop = gestures.tabStop();
+        const label = gestures.describe(index, start);
+
+        return (
+          <CalendarTimeGrid.Cell
+            key={idx}
+            available={cell.isAvailable}
+            aria-hidden={undefined}
+            role="button"
+            data-cell-row={idx}
+            tabIndex={stop.column === index && stop.row === idx ? 0 : -1}
+            aria-label={allowed ? label : `${label}, ${t('calendar.unavailable')}`}
+            aria-disabled={allowed ? undefined : true}
+            className="focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
+            onFocus={() => gestures.setFocusedCell({ column: index, row: idx })}
+            onKeyDown={(event) => gestures.onCellKeyDown(event, index, idx)}
+          />
+        );
+      })}
     </CalendarTimeGrid.Column>
   );
 };
 
-const DayView: FC = () => {
-  const { view, viewMode, date } = useCalendarGridContext();
-
-  if (view !== 'day' || viewMode !== 'calendar') return null;
+/** Shared layout of the day and week views: one scroller with a sticky header row and a sticky time axis. */
+/**
+ * Shared layout of the day and week views: one scroller with a sticky header row and a sticky time axis.
+ * `wide`: resource columns keep a readable width and scroll horizontally instead of squeezing.
+ */
+const TimeGrid: FC<{ slot: string; columns: GridColumn[]; headers: ReactNode; wide?: boolean }> = ({
+  slot,
+  columns,
+  headers,
+  wide = false,
+}) => {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const gestures = useTimeGridGestures(columns, scrollerRef);
 
   return (
-    <div data-slot="calendar-grid-day-view" className="flex min-h-0 flex-1 flex-col">
-      <div
-        data-slot="calendar-grid-header-row"
-        className="flex shrink-0 overflow-y-scroll [scrollbar-color:var(--color-muted-50)_var(--color-muted-50)] [scrollbar-gutter:stable] [scrollbar-width:thin]"
-      >
-        <CalendarTimeGrid.Spacer />
+    <TimeGridGestureContext.Provider value={gestures}>
+      <div data-slot={slot} className="flex min-h-0 flex-1 flex-col">
+        <div
+          ref={scrollerRef}
+          data-slot="calendar-grid-body"
+          className="relative min-h-128 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--color-border-strong)_transparent] overflow-auto"
+        >
+          <div className="flex w-max min-w-full flex-col">
+            <div data-slot="calendar-grid-header-row" className="bg-surface sticky top-0 z-40 flex flex-col">
+              <div className="flex">
+                <CalendarTimeGrid.Spacer className="sticky start-0 z-10" />
 
-        <DayHeader day={date} />
+                <div data-slot="calendar-grid-day-headers" className="flex flex-1">
+                  {headers}
+                </div>
+              </div>
+
+              <AllDayRow columns={columns} resourceMode={wide} />
+            </div>
+
+            <div data-slot="calendar-grid-body-row" className="flex flex-1">
+              <TimeAxis className="sticky start-0 z-30" />
+
+              {columns.map((column, index) => (
+                <DayColumn key={column.key} column={column} index={index} wide={wide} />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
-
-      <div
-        data-slot="calendar-grid-body-row"
-        className="flex min-h-128 flex-1 overflow-y-auto [scrollbar-color:var(--color-muted-200)_transparent] [scrollbar-gutter:stable] [scrollbar-width:thin]"
-      >
-        <TimeAxis />
-
-        <DayColumn day={date} />
-      </div>
-    </div>
+    </TimeGridGestureContext.Provider>
   );
 };
 
+const DayView: FC = () => {
+  const { view, viewMode, date, resources } = useCalendarGridContext();
+
+  const columns = useMemo<GridColumn[]>(
+    () =>
+      resources.length > 0
+        ? resources.map((resource) => ({ key: `${date}:${resource.id}`, dayKey: date, resourceId: resource.id }))
+        : [{ key: date, dayKey: date }],
+    [resources, date],
+  );
+
+  if (view !== 'day' || viewMode !== 'calendar') return null;
+
+  const headers =
+    resources.length > 0 ? resources.map((resource) => <ResourceHeader key={resource.id} resource={resource} />) : <DayHeader day={date} />;
+
+  return <TimeGrid slot="calendar-grid-day-view" columns={columns} headers={headers} wide={resources.length > 0} />;
+};
+
 const WeekView: FC = () => {
-  const { view, viewMode, range } = useCalendarGridContext();
+  const { view, viewMode, range, resourceFilter } = useCalendarGridContext();
 
   const { addDuration, toDate, constants } = useDate();
 
@@ -348,42 +349,29 @@ const WeekView: FC = () => {
     let current = range.startDate;
 
     for (let i = 0; i < 7; i++) {
-      result.push(current);
+      result.push(toDate(current));
 
       current = addDuration(current, 1, constants.UnitOfTime.DAY);
     }
 
     return result;
-  }, [range.startDate, addDuration, constants]);
+  }, [range.startDate, addDuration, toDate, constants]);
+
+  const columns = useMemo<GridColumn[]>(
+    () => days.map((day) => ({ key: day, dayKey: day, resourceId: resourceFilter ?? undefined })),
+    [days, resourceFilter],
+  );
 
   if (view !== 'week' || viewMode !== 'calendar') return null;
 
   return (
-    <div data-slot="calendar-grid-week-view" className="flex min-h-0 flex-1 flex-col">
-      <div
-        data-slot="calendar-grid-header-row"
-        className="flex shrink-0 overflow-y-scroll [scrollbar-color:var(--color-muted-50)_var(--color-muted-50)] [scrollbar-gutter:stable] [scrollbar-width:thin]"
-      >
-        <CalendarTimeGrid.Spacer />
-
-        <div data-slot="calendar-grid-day-headers" className="flex flex-1">
-          {days.map((day) => (
-            <DayHeader key={toDate(day)} day={day} />
-          ))}
-        </div>
-      </div>
-
-      <div
-        data-slot="calendar-grid-body-row"
-        className="flex min-h-128 flex-1 overflow-y-auto [scrollbar-color:var(--color-muted-200)_transparent] [scrollbar-gutter:stable] [scrollbar-width:thin]"
-      >
-        <TimeAxis />
-
-        {days.map((day) => (
-          <DayColumn key={toDate(day)} day={day} className="border-muted-200 border-e last:border-e-0" />
-        ))}
-      </div>
-    </div>
+    <TimeGrid
+      slot="calendar-grid-week-view"
+      columns={columns}
+      headers={days.map((day) => (
+        <DayHeader key={day} day={day} />
+      ))}
+    />
   );
 };
 

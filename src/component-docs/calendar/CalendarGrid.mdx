@@ -8,9 +8,11 @@ tags: [calendar, calendar-grid, schedule, compound, day-view, week-view, month-v
 ---
 
 import { useMemo, useState } from 'react';
+import { demoSource } from '@component-docs/blocks';
+import pageSource from './CalendarGrid.mdx?raw';
 
-import { Chip, Divider, Table } from '@components/ui';
-import { MetaCard, TooltipButton } from '@components/shared';
+import { CalendarEvent, Tag, Divider, Table, IconButton } from '@components/ui';
+import { DescriptionList } from '@components/shared';
 import { CalendarGrid } from '@components/calendar';
 import { Conditional } from '@components/utils';
 
@@ -18,15 +20,15 @@ import { cn } from '@utils';
 
 import { CalendarClock, Clock, MapPin, Stethoscope, X } from 'lucide-react';
 
-## Demo
+For resources, drag to create, move and resize, an all-day row and an agenda view, see the [Scheduler](/docs/components/calendar-scheduler) page.
+
+## Schedule
+
+Day, week and month views with events, availability slots, a legend, a list mode and event popovers. Switch views and click an event.
 
 The demo wires the same calendar to BOTH a calendar mode and a list mode. Use the view toggle (top-right, calendar/list icons) to switch — the calendar views self-guard out, and the consumer-rendered `<Table>` takes over the body.
 
-export const TONES = {
-  initial: { bg: 'bg-secondary-100', text: 'text-secondary', dotClass: 'bg-secondary' },
-  're-eval': { bg: 'bg-primary-100', text: 'text-primary', dotClass: 'bg-primary-400' },
-  deposition: { bg: 'bg-destructive-200', text: 'text-destructive', dotClass: 'bg-destructive' },
-};
+export const TONES = { initial: 'info', 're-eval': 'accent', deposition: 'danger' };
 
 export const TYPE_LABELS = { initial: 'Initial Evaluation', 're-eval': 'Re Evaluation', deposition: 'Deposition' };
 
@@ -126,7 +128,7 @@ export const CalendarGridDemo = () => {
   }, [range, hasSlots, hasEvents, events, slots]);
 
   return (
-    <div className="flex h-[760px] flex-col">
+    <div className="flex h-190 w-full min-w-0 flex-col">
       <CalendarGrid
         initialView="week"
         viewMode={viewMode}
@@ -150,65 +152,60 @@ export const CalendarGridDemo = () => {
 
         <CalendarGrid.Legend
           items={[
-            { label: 'Available', colorClass: 'bg-background' },
-            { label: 'Not Available', colorClass: 'bg-muted-100' },
-            { label: 'Initial Evaluation', colorClass: 'bg-secondary-100' },
-            { label: 'Re Evaluation', colorClass: 'bg-primary-100' },
-            { label: 'Deposition', colorClass: 'bg-destructive-200' },
+            { label: 'Available', colorClass: 'bg-surface' },
+            { label: 'Not Available', colorClass: 'bg-surface-sunken' },
+            { label: 'Initial Evaluation', colorClass: 'bg-info-subtle' },
+            { label: 'Re Evaluation', colorClass: 'bg-accent-subtle' },
+            { label: 'Deposition', colorClass: 'bg-danger-subtle' },
           ]}
         />
 
         <CalendarGrid.EventTemplate>
-          {(event, status) => {
-            const tone = TONES[event.type];
-            const pastDecoration = status === 'past' ? 'line-through' : '';
-            return (
-              <div className={`text-2xs h-full w-full truncate px-1.5 py-0.5 ${tone.bg} ${tone.text} ${pastDecoration}`}>
-                <span className={`me-1 inline-block size-1.5 rounded-full ${tone.dotClass}`} />
-                {formatTime(event.start)} - {event.patient}
-              </div>
-            );
-          }}
+          {(event, status) => (
+            <CalendarEvent tone={TONES[event.type]} past={status === 'past'}>
+              {formatTime(event.start)} · {event.patient}
+            </CalendarEvent>
+          )}
         </CalendarGrid.EventTemplate>
 
         <CalendarGrid.PopoverTemplate>
           {(event, onClose) => (
             <div className="flex w-80 flex-col gap-3 p-4">
-              <div className="border-muted-200 flex items-start justify-between border-b pb-3">
+              <div className="border-border-subtle flex items-start justify-between border-b pb-3">
                 <div className="flex flex-col gap-2">
                   <span className="text-sm font-bold">{event.patient}</span>
 
-                  <Chip variant="muted" className="w-fit">{TYPE_LABELS[event.type]}</Chip>
+                  <Tag className="w-fit">{TYPE_LABELS[event.type]}</Tag>
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <TooltipButton title="Reschedule" type="button" variant="ghost" size="icon-sm" onClick={onClose}>
+                  <IconButton size="sm" type="button" aria-label="Reschedule" onClick={onClose}>
                     <CalendarClock size={16} />
-                  </TooltipButton>
+                  </IconButton>
 
-                  <TooltipButton title="Close" type="button" variant="ghost" size="icon-sm" onClick={onClose}>
+                  <IconButton size="sm" type="button" aria-label="Close" onClick={onClose}>
                     <X size={16} />
-                  </TooltipButton>
+                  </IconButton>
                 </div>
               </div>
 
-              <div className="border-muted-200 flex flex-col gap-2 border-b pb-3">
-                <MetaCard
-                  direction="horizontal"
-                  title={<span className="flex items-center gap-2"><Stethoscope size={14} /> Doctor</span>}
-                  description={event.doctor}
-                />
+              <DescriptionList
+                layout="inline"
+                className="border-border-subtle border-b pb-3"
+                items={[
+                  { term: <><Stethoscope aria-hidden /> Doctor</>, value: event.doctor },
+                  { term: <><MapPin aria-hidden /> Location</>, value: event.location },
+                ]}
+              />
 
-                <MetaCard
-                  direction="horizontal"
-                  title={<span className="flex items-center gap-2"><MapPin size={14} /> Location</span>}
-                  description={event.location}
-                />
-              </div>
-
-              <MetaCard
-                title={<span className="flex items-center gap-2"><Clock size={14} /> Date & Time</span>}
-                description={`${new Date(event.start).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })} ${formatTime(event.start)} - ${formatTime(event.end)}`}
+              <DescriptionList
+                items={[
+                  {
+                    term: <><Clock aria-hidden /> Date & Time</>,
+                    numeric: true,
+                    value: `${new Date(event.start).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })} ${formatTime(event.start)} - ${formatTime(event.end)}`,
+                  },
+                ]}
               />
             </div>
           )}
@@ -221,7 +218,7 @@ export const CalendarGridDemo = () => {
         <CalendarGrid.MonthView />
 
         <Conditional.If condition={viewMode === 'list'}>
-          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto [scrollbar-color:var(--color-muted-200)_transparent] [scrollbar-width:thin]">
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto [scrollbar-color:var(--color-border-strong)_transparent] [scrollbar-width:thin]">
             <Table className={cn(!hasSlots && !hasEvents && 'flex-1')}>
               <Table.Header>
                 <Table.Row>
@@ -260,15 +257,13 @@ export const CalendarGridDemo = () => {
                   }
 
                   return dayEvents.map((event, idx) => {
-                    const tone = TONES[event.type];
                     return (
                       <Table.Row key={`${dayKey}-${event.id}`}>
                         <Table.Cell className="font-semibold">{idx === 0 ? dayLabel : ''}</Table.Cell>
                         <Table.Cell>
-                          <span className={`text-2xs inline-flex items-center gap-1 rounded-md px-2 py-0.5 ${tone.bg} ${tone.text}`}>
-                            <span className={`size-1.5 rounded-full ${tone.dotClass}`} />
+                          <CalendarEvent tone={TONES[event.type]} className="h-auto w-fit">
                             {TYPE_LABELS[event.type]}
-                          </span>
+                          </CalendarEvent>
                         </Table.Cell>
                         <Table.Cell>{formatTime(event.start)}</Table.Cell>
                         <Table.Cell>{formatTime(event.end)}</Table.Cell>
@@ -287,7 +282,9 @@ export const CalendarGridDemo = () => {
   );
 };
 
-<CalendarGridDemo />
+<Example title="Clinic schedule" code={demoSource('CalendarGridDemo', pageSource)}>
+  <CalendarGridDemo />
+</Example>
 
 ## Imports
 
@@ -312,36 +309,24 @@ CalendarGrid.MonthView        — Month grid with overflow popover for >3 events
 (any custom child)            — Renders alongside the views inside the body region. Use this to show alternative content (e.g., a list/table) when the calendar views self-guard out (viewMode === 'list'). See "List mode" example below.
 ```
 
-## Props (root)
+## API
 
-```
-events            TEvent[]                                 Required   Event objects (generic over TEvent)
-eventAccessors    CalendarAccessors<TEvent>                Required   { getId, getStartTime, getEndTime }
-children          ReactNode                                Required   Slot sub-components. Include <CalendarGrid.EventTemplate> when events are provided; <CalendarGrid.PopoverTemplate> for clickable event popovers; plus Header / Legend / DayView / WeekView / MonthView as needed.
+<PropsTable
+  rows={[
+    { prop: 'events', type: 'TEvent[]', required: true, description: 'Event objects; the grid is generic over TEvent.' },
+    { prop: 'eventAccessors', type: 'CalendarAccessors<TEvent>', required: true, description: '{ getId, getStartTime, getEndTime } returning ISO strings.' },
+    { prop: 'initialView · initialDate · initialViewMode', type: "'day' | 'week' | 'month' · Date · 'calendar' | 'list'", default: "'month' · now · 'calendar'", description: 'Uncontrolled starting state.' },
+    { prop: 'view · date · viewMode', type: 'same as above', description: 'Controlled state; pair with onViewChange, onDateChange, onViewModeChange.' },
+    { prop: 'onRangeChange', type: '(range: { startDate, endDate }) => void', description: 'Fires when the visible window changes; drive data fetching from it.' },
+    { prop: 'slots', type: 'Record<string, TimeRange[]> | null', description: 'Availability keyed by ISO date (YYYY-MM-DD).' },
+    { prop: 'startHour · endHour · stepMinutes', type: 'number', default: '8 · 24 · 30', description: 'Time-grid window and row step (15, 30 or 60).' },
+    { prop: 'showStepLabels', type: 'boolean', default: 'false', description: 'Label every step, not only hour marks.' },
+    { prop: 'nowLine', type: "'in-range' | 'always' | 'off'", default: "'in-range'", description: 'Now-indicator on today’s column.' },
+    { prop: 'isLoading', type: 'boolean', default: 'false', description: 'Skeleton until events arrive.' },
+  ]}
+/>
 
-initialView       'day' | 'week' | 'month'                 Optional   Uncontrolled initial view; default 'month'
-initialDate       Date                                     Optional   Uncontrolled initial focused date; default now
-initialViewMode   'calendar' | 'list'                      Optional   Uncontrolled initial mode; default 'calendar'
-
-view              'day' | 'week' | 'month'                 Optional   Controlled view (pair with onViewChange)
-date              Date                                     Optional   Controlled focused date (pair with onDateChange)
-viewMode          'calendar' | 'list'                      Optional   Controlled mode (pair with onViewModeChange)
-onViewChange      (view) => void                           Optional   Fires on user-initiated view change
-onDateChange      (date) => void                           Optional   Fires on user-initiated date navigation
-onViewModeChange  (mode) => void                           Optional   Fires on user-initiated mode toggle
-onRangeChange     (range) => void                          Optional   Fires whenever the visible range changes; { startDate, endDate }
-
-slots             Record<string, TimeRange[]> | null       Optional   Availability slots keyed by ISO date string (YYYY-MM-DD)
-
-startHour         number (default 8)                       Optional   First hour of the time grid (0–23)
-endHour           number (default 24)                      Optional   Last hour of the time grid (1–24, exclusive)
-stepMinutes       number (default 30)                      Optional   Row step in minutes (15 / 30 / 60)
-showStepLabels    boolean (default false)                  Optional   Show labels on every step instead of hour marks only
-nowLine           NowLineMode (default 'in-range')         Optional   Now-indicator visibility on today's column. 'in-range' = show only when current time is between startHour and endHour; 'always' = clamp to top/bottom when out of range; 'off' = never show
-
-isLoading         boolean (default false)                  Optional   Show skeleton; renders calendar once events arrive
-className         string                                   Optional   Forwarded to the root container
-```
+Children are the slot parts listed under Sub-Components; include `EventTemplate` whenever there are events.
 
 ## Types
 
@@ -364,7 +349,7 @@ type TimeRange = { startTime: string; endTime: string }; // 'HH:mm' format
 type CalendarLegendItem = { label: string; colorClass: string }; // colorClass is a Tailwind bg-* utility
 ```
 
-## Code
+## Recipes
 
 ### Basic — minimal compound
 
@@ -374,7 +359,7 @@ type CalendarLegendItem = { label: string; colorClass: string }; // colorClass i
   eventAccessors={{ getId: (e) => e.id, getStartTime: (e) => e.start, getEndTime: (e) => e.end }}
 >
   <CalendarGrid.EventTemplate>
-    {(event) => <div className="bg-secondary-100 text-secondary text-2xs h-full w-full truncate px-1.5 py-0.5">{event.title}</div>}
+    {(event) => <CalendarEvent tone="info">{event.title}</CalendarEvent>}
   </CalendarGrid.EventTemplate>
 
   <CalendarGrid.Header>
@@ -393,7 +378,7 @@ type CalendarLegendItem = { label: string; colorClass: string }; // colorClass i
 
 ### With availability slots
 
-Slots are passed as an object keyed by ISO date (`YYYY-MM-DD`), with each value an array of `{ startTime, endTime }` (`HH:mm`). Cells outside any slot render as "Not Available" (`bg-muted-100`); cells inside a slot render as "Available" (`bg-background`).
+Slots are passed as an object keyed by ISO date (`YYYY-MM-DD`), with each value an array of `{ startTime, endTime }` (`HH:mm`). Cells outside any slot render as "Not Available" (`bg-surface-sunken`); cells inside a slot render as "Available" (`bg-surface`).
 
 ```tsx
 const slots = {
@@ -432,8 +417,8 @@ When the calendar visualizes availability only (no appointments), pass `events={
 
   <CalendarGrid.Legend
     items={[
-      { label: 'Available', colorClass: 'bg-background' },
-      { label: 'Not Available', colorClass: 'bg-muted-100' },
+      { label: 'Available', colorClass: 'bg-surface' },
+      { label: 'Not Available', colorClass: 'bg-surface-sunken' },
     ]}
   />
 
@@ -455,12 +440,12 @@ The header row's right-side group uses a `<Divider orientation="vertical">` to s
 
 ```tsx
 const LEGEND_ITEMS: CalendarLegendItem[] = [
-  { label: 'Available', colorClass: 'bg-background' },
-  { label: 'Not Available', colorClass: 'bg-muted-100' },
-  { label: 'Initial Evaluation', colorClass: 'bg-secondary-100' },
-  { label: 'Re Evaluation', colorClass: 'bg-primary-100' },
-  { label: 'Supplemental', colorClass: 'bg-accent-200' },
-  { label: 'Deposition', colorClass: 'bg-destructive-200' },
+  { label: 'Available', colorClass: 'bg-surface' },
+  { label: 'Not Available', colorClass: 'bg-surface-sunken' },
+  { label: 'Initial Evaluation', colorClass: 'bg-info-subtle' },
+  { label: 'Re Evaluation', colorClass: 'bg-accent-subtle' },
+  { label: 'Supplemental', colorClass: 'bg-info-subtle' },
+  { label: 'Deposition', colorClass: 'bg-danger-subtle' },
 ];
 
 <CalendarGrid {...props}>
@@ -488,7 +473,7 @@ const LEGEND_ITEMS: CalendarLegendItem[] = [
 
 ### With event popover
 
-`<CalendarGrid.PopoverTemplate>` is an optional slot. Function-as-children receives the event and an `onClose` callback. Omit the slot to disable click-to-popover (events become non-interactive).
+`<CalendarGrid.PopoverTemplate>` is an optional slot. Function-as-children receives the event and an `onClose` callback. Omit the slot to disable the click popover (events become non-interactive).
 
 ```tsx
 <CalendarGrid {...props}>
@@ -500,14 +485,12 @@ const LEGEND_ITEMS: CalendarLegendItem[] = [
         <div className="flex items-start justify-between">
           <span className="text-sm font-bold">{event.patient}</span>
 
-          <TooltipButton title="Close" type="button" variant="ghost" size="icon-sm" onClick={onClose}>
+          <IconButton size="sm" type="button" aria-label="Close" onClick={onClose}>
             <X size={16} />
-          </TooltipButton>
+          </IconButton>
         </div>
 
-        <MetaCard direction="horizontal" title="Doctor" description={event.doctor} />
-
-        <MetaCard direction="horizontal" title="Location" description={event.location} />
+        <DescriptionList layout="inline" items={[{ term: 'Doctor', value: event.doctor }, { term: 'Location', value: event.location }]} />
       </div>
     )}
   </CalendarGrid.PopoverTemplate>
@@ -523,12 +506,10 @@ const LEGEND_ITEMS: CalendarLegendItem[] = [
 ```tsx
 <CalendarGrid.EventTemplate>
   {(event, status) => {
-    const tone = APPOINTMENT_TYPE_TONES[event.appointmentType];
     return (
-      <div className={cn('text-2xs h-full w-full truncate px-1.5 py-0.5', tone.bg, tone.text, status === 'past' && 'line-through')}>
-        <span className={cn('me-1 inline-block size-1.5 rounded-full', tone.dotClass)} />
+      <CalendarEvent tone={APPOINTMENT_TYPE_TONES[event.appointmentType]} past={status === 'past'}>
         {event.title}
-      </div>
+      </CalendarEvent>
     );
   }}
 </CalendarGrid.EventTemplate>
@@ -656,7 +637,7 @@ events  — booked appointments (each one becomes an event card / row).
 
 slots   — availability windows (the "open" hours per day).
           Just startTime/endTime per day. Affects the calendar BACKDROP only:
-            - Calendar mode: bg-muted-100 on cells outside any slot's window
+            - Calendar mode: bg-surface-sunken on cells outside any slot's window
             - Calendar mode: legend "Available" / "Not Available" tints
             - List mode (consumer): together with events drives the empty state
               ("No schedule data" — only when BOTH are absent) AND optionally
@@ -758,11 +739,20 @@ The `<CalendarGrid.Header>` container is `flex items-center justify-between`. Pa
 - **Pure Composable API**: `EventTemplate` (required when events are provided; omit for slot-only calendars) and `PopoverTemplate` (optional) are slot sub-components. No render-prop on the root, no IoC stacking — every slot is a child.
 - **Accessor strings only**: `getStartTime` / `getEndTime` return ISO 8601 strings. The internal helpers parse them via `useDate().toLocalDate()`. If your DTO uses `Date` objects, convert at the accessor.
 - **Slots shape is BE-driven**: `slots: Record<string, TimeRange[]>` lets you pass the API response directly with no transformation. The grid computes per-cell availability via interval overlap (no negative-space derivation needed).
-- **Now indicator**: a 1px destructive line shows the current time on today's column in day / week views. No setInterval — it refreshes on natural re-renders.
+- **Now indicator**: a 1px accent line shows the current time on today's column in day / week views. No setInterval — it refreshes on natural re-renders.
 - **Month overflow**: in month view, events past the third per day collapse into a "+N more" popover.
 - **Scrollbar gutter**: header row reserves an invisible scrollbar gutter to match the body's scrollbar width — keeps day-column dividers aligned with day-header dividers across the week.
 - **Range callback fires on window shifts**: use `onRangeChange` to drive query refetching. The callback dedupes via the start/end date keys (does not fire when the range object is recomputed but the window is the same).
 - **Legend tokens must match cell tokens**: pass the same Tailwind `bg-*` class the renderer uses for the card background. Don't use `var(--color-*)` for tokens that may not exist in the theme — verify with `bg-*` first.
 - **Loading state**: pass `isLoading` from your query. The component renders a skeleton when loading AND no events; once events arrive, the calendar replaces the skeleton even if the query is still pending.
-- **Accessibility**: root has `role="application"` + `aria-roledescription="calendar"`. Today's day-cell carries `aria-current="date"` in month view.
-- **RTL**: uses logical properties throughout (`border-e`, `pe-*`, `inset-x-*`).
+
+## Accessibility
+
+- The root has `role="application"` and `aria-roledescription="calendar"`; today's month cell carries `aria-current="date"`.
+- Event cards and chips are buttons; give `EventTemplate` content a readable label (time and title), since short cards may truncate.
+
+## RTL notes
+
+- Built on logical properties (`border-e`, `pe-*`, `inset-inline-start`), so columns, lanes and navigation mirror in Arabic.
+- Times and dates use Western digits; navigation arrows point along the reading direction.
+

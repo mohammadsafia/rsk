@@ -23,9 +23,7 @@ export function createGenerateStep(): PipelineStep {
       const codeGen = new CodeGenerator(registry);
       const barrelGen = new BarrelGenerator();
 
-      const spinner = logger.spinner(
-        `Generating code for ${ctx.selectedSchemas.length} schema(s)...`
-      );
+      const spinner = logger.spinner(`Generating code for ${ctx.selectedSchemas.length} schema(s)...`);
 
       try {
         // Group selected schemas by endpoint
@@ -44,9 +42,7 @@ export function createGenerateStep(): PipelineStep {
         const generatedFiles: GeneratedFile[] = [];
 
         for (const [endpointName, schemas] of byEndpoint.entries()) {
-          const endpoint = ctx.config.endpoints.find(
-            (e) => e.name === endpointName
-          );
+          const endpoint = ctx.config.endpoints.find((e) => e.name === endpointName);
           if (!endpoint) continue;
 
           const modelsDir = resolveFromRoot(endpoint.outputDir, 'models');
@@ -71,9 +67,7 @@ export function createGenerateStep(): PipelineStep {
 
           // Generate barrel index.ts — merge generated schemas with existing disk files
           const generatedNames = new Set(schemas.map((s) => s.name));
-          const enumNames = new Set(
-            schemas.filter((s) => s.kind === 'enum').map((s) => s.name)
-          );
+          const enumNames = new Set(schemas.filter((s) => s.kind === 'enum').map((s) => s.name));
 
           // Discover existing model files on disk not covered by this generation
           if (fs.existsSync(modelsDir)) {
@@ -86,11 +80,7 @@ export function createGenerateStep(): PipelineStep {
             }
           }
 
-          const barrelContent = barrelGen.generateFromFilenames(
-            [...generatedNames],
-            ctx.config.enumStrategy,
-            enumNames
-          );
+          const barrelContent = barrelGen.generateFromFilenames([...generatedNames], ctx.config.enumStrategy, enumNames);
           const barrelPath = resolveFromRoot(endpoint.outputDir, 'index.ts');
 
           generatedFiles.push({
@@ -106,9 +96,7 @@ export function createGenerateStep(): PipelineStep {
         ctx.generatedFiles = generatedFiles;
         ctx.stats.filesGenerated = generatedFiles.length;
 
-        spinner.succeed(
-          `Generated ${generatedFiles.length} file(s) across ${byEndpoint.size} endpoint(s).`
-        );
+        spinner.succeed(`Generated ${generatedFiles.length} file(s) across ${byEndpoint.size} endpoint(s).`);
       } catch (error) {
         spinner.fail('Code generation failed.');
         throw error;

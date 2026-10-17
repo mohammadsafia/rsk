@@ -1,0 +1,65 @@
+---
+id: description-list
+title: DescriptionList
+section: Components
+category: Shared
+description: 'Term and value pairs for detail views, stacked or inline, in one to three columns.'
+tags: [shared, list, details, key-value]
+---
+
+import { Card } from '@components/ui';
+import { DescriptionList } from '@components/shared';
+
+## Stacked in columns
+
+<Example title="Patient summary">
+  <Card className="w-full" title="Patient summary" description="Registered 3 March 2024">
+    <Card.Content>
+      <DescriptionList
+        columns={2}
+        items={[
+          { term: 'Full name', value: 'Sara Haddad' },
+          { term: 'File number', value: 'MRN-20391', numeric: true },
+          { term: 'Date of birth', value: '1991-07-14', numeric: true },
+          { term: 'Insurer', value: 'Jordan Health Mutual' },
+          { term: 'Mobile', value: null },
+        ]}
+      />
+    </Card.Content>
+  </Card>
+</Example>
+
+An empty value (`null`, `undefined`, `''`) renders an em dash, as for Mobile above.
+
+## Inline
+
+`layout="inline"` puts each value at the end of its term's row; good for narrow side panels.
+
+<Example title="Visit details">
+  <div className="border-border w-full max-w-sm rounded-lg border p-4">
+    <DescriptionList layout="inline">
+      <DescriptionList.Item term="Doctor" value="Dr. Lina Khoury" />
+      <DescriptionList.Item term="Room" value="B-204" numeric />
+      <DescriptionList.Item term="Duration" value="30 min" numeric />
+    </DescriptionList>
+  </div>
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'items', type: '{ term, value?, numeric? }[]', description: 'The pairs; or pass DescriptionList.Item children.' },
+    { prop: 'columns', type: '1 | 2 | 3', default: '1', description: 'Responsive: one column on phones, two from sm, three from lg.' },
+    { prop: 'layout', type: "'stacked' | 'inline'", default: "'stacked'", description: 'Value under the term, or at the end of its row.' },
+    { prop: 'Item · numeric', type: 'boolean', default: 'false', description: 'LTR-isolated tabular mono, for IDs, amounts and dates.' },
+  ]}
+/>
+
+## Accessibility
+
+- Renders a native `<dl>` with `<dt>` and `<dd>`, so screen readers announce each term with its value.
+
+## RTL notes
+
+- Terms align to the start; numeric values are wrapped in `dir="ltr"` so IDs and dates keep their order.

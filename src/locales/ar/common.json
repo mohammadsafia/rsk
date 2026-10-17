@@ -16,7 +16,12 @@
   "clearFilters": "مسح عوامل التصفية",
   "clearAll": "مسح الكل",
   "filter": "تصفية",
-  "selectedCount": "{{count}} محدد",
+  "selectedCount_zero": "لم يُحدَّد شيء",
+  "selectedCount_one": "عنصر واحد محدد",
+  "selectedCount_two": "عنصران محددان",
+  "selectedCount_few": "{{count}} عناصر محددة",
+  "selectedCount_many": "{{count}} عنصرًا محددًا",
+  "selectedCount_other": "{{count}} عنصر محدد",
   "yes": "نعم",
   "no": "لا",
   "actions": "إجراءات",
@@ -38,15 +43,180 @@
     "root": "لوحة التحكم"
   },
   "table": {
-    "total": "الإجمالي: {{count}} {{label}}",
+    "total_zero": "لا توجد نتائج",
+    "total_one": "نتيجة واحدة",
+    "total_two": "نتيجتان",
+    "total_few": "{{count}} نتائج",
+    "total_many": "{{count}} نتيجةً",
+    "total_other": "{{count}} نتيجة",
+    "totalWithLabel": "{{label}}: {{count}}",
     "rowsPerPage": "صفوف لكل صفحة",
     "emptyTitle": "لا توجد نتائج",
-    "emptyDescription": "لا توجد نتائج لبحثك. يرجى المحاولة مرة أخرى بكلمات مختلفة."
+    "emptyDescription": "لا توجد نتائج لبحثك. يرجى المحاولة مرة أخرى بكلمات مختلفة.",
+    "filteredWithLabel": "{{label}}: {{count}} من {{total}}",
+    "filtered": "{{count}} من {{total}} نتيجة",
+    "selectPage": "تحديد كل صفوف هذه الصفحة",
+    "selectRow": "تحديد الصف",
+    "selectRowNamed": "تحديد {{name}}",
+    "selected_zero": "لم يُحدَّد شيء",
+    "selected_one": "تم تحديد عنصر واحد",
+    "selected_two": "تم تحديد عنصرين",
+    "selected_few": "تم تحديد {{count}} عناصر",
+    "selected_many": "تم تحديد {{count}} عنصرًا",
+    "selected_other": "تم تحديد {{count}} عنصر",
+    "selectAllResults_zero": "لا توجد نتائج",
+    "selectAllResults_one": "تحديد النتيجة",
+    "selectAllResults_two": "تحديد النتيجتين",
+    "selectAllResults_few": "تحديد كل النتائج ({{count}})",
+    "selectAllResults_many": "تحديد كل النتائج ({{count}})",
+    "selectAllResults_other": "تحديد كل النتائج ({{count}})",
+    "clearSelection": "إلغاء التحديد",
+    "bulkActions": "إجراءات الصفوف المحددة",
+    "selectionCleared": "تم إلغاء التحديد"
   },
   "pagination": {
+    "label": "التنقل بين الصفحات",
     "previous": "السابق",
     "next": "التالي",
+    "previousPage": "الانتقال إلى الصفحة السابقة",
+    "nextPage": "الانتقال إلى الصفحة التالية",
+    "morePages": "صفحات أخرى",
     "rowsPerPage": "صفوف لكل صفحة",
     "pageOf": "صفحة {{current}} من {{total}}"
+  },
+  "openCalendar": "فتح التقويم",
+  "remove": "إزالة",
+  "removeItem": "إزالة {{item}}",
+  "moreInfo": "مزيد من المعلومات",
+  "calendar": {
+    "previousMonth": "الشهر السابق",
+    "nextMonth": "الشهر التالي",
+    "day": "يوم",
+    "week": "أسبوع",
+    "month": "شهر",
+    "views": "طرق العرض",
+    "listView": "عرض القائمة",
+    "calendarView": "عرض التقويم",
+    "jumpToDate": "الانتقال إلى تاريخ",
+    "today": "اليوم",
+    "more": "+{{count}} أخرى",
+    "allResources": "كل الموارد",
+    "resource": "المورد",
+    "allDay": "طوال اليوم",
+    "agenda": "جدول الأعمال",
+    "agendaEmpty": "لا توجد مواعيد",
+    "agendaEmptyHint": "لا توجد أحداث في هذه الأيام.",
+    "timeRange": "من {{start}} إلى {{end}}",
+    "moved": "نُقل إلى {{when}}",
+    "resized": "تغيّرت المدة إلى {{when}}",
+    "cancelled": "أُلغي التغيير",
+    "changeFailed": "تعذّر حفظ التغيير",
+    "changeFailedHint": "أُعيد الحدث إلى مكانه.",
+    "unavailable": "غير متاح",
+    "moving": "نقل الحدث. تغيّر الأسهم الوقت واليوم، Enter للحفظ وEscape للإلغاء.",
+    "resizing": "تغيير المدة. تغيّر الأسهم وقت الانتهاء، Enter للحفظ وEscape للإلغاء."
+  },
+  "timePicker": {
+    "placeholder": "اختر الوقت",
+    "hours": "الساعات",
+    "minutes": "الدقائق",
+    "period": "صباحًا أو مساءً"
+  },
+  "number": {
+    "increment": "زيادة",
+    "decrement": "إنقاص"
+  },
+  "toast": {
+    "label": "إشعار",
+    "region": "الإشعارات ({hotkey})",
+    "action": "إجراء الإشعار"
+  },
+  "command": {
+    "suggestions": "اقتراحات"
+  },
+  "form": {
+    "discardTitle": "تجاهل التغييرات غير المحفوظة؟",
+    "discardDescription": "ستفقد التغييرات التي أجريتها على هذا النموذج.",
+    "discardConfirm": "تجاهل",
+    "keepEditing": "متابعة التعديل",
+    "selectPlaceholder": "اختر",
+    "noOptions": "لا توجد خيارات"
+  },
+  "card": {
+    "toggle": "إظهار المحتوى أو إخفاؤه"
+  },
+  "emptyState": {
+    "firstUse": {
+      "title": "لا يوجد شيء بعد",
+      "description": "ستظهر العناصر هنا عند إضافتها."
+    },
+    "noResults": {
+      "title": "لا توجد نتائج",
+      "description": "جرّب كلمات مختلفة أو امسح عوامل التصفية."
+    },
+    "error": {
+      "title": "حدث خطأ ما",
+      "description": "تعذّر تحميل هذا المحتوى. يُرجى المحاولة مرة أخرى."
+    }
+  },
+  "pageHeader": {
+    "back": "رجوع"
+  },
+  "loadingMore": "جارٍ تحميل المزيد…",
+  "filters": "عوامل التصفية",
+  "fileCard": {
+    "approve": "اعتماد",
+    "reject": "رفض",
+    "selectStatus": "اختر الحالة",
+    "noOptions": "لا توجد خيارات",
+    "unassigned": "غير مُسند",
+    "noAssignees": "لا يوجد مُسند إليهم",
+    "documents_zero": "مستند",
+    "documents_one": "مستند",
+    "documents_two": "مستند",
+    "documents_few": "مستندات",
+    "documents_many": "مستندًا",
+    "documents_other": "مستند"
+  },
+  "filterBar": {
+    "remove": "إزالة عامل التصفية {{label}}",
+    "min": "الحد الأدنى",
+    "max": "الحد الأقصى",
+    "apply": "تطبيق",
+    "textPlaceholder": "يحتوي على…"
+  },
+  "statCard": {
+    "up": "ارتفاع",
+    "down": "انخفاض",
+    "flat": "دون تغيير",
+    "trend": "{{direction}} {{value}}",
+    "trendWithCaption": "{{direction}} {{value}} {{caption}}"
+  },
+  "timeline": {
+    "today": "اليوم",
+    "yesterday": "أمس",
+    "loadMore": "عرض المزيد",
+    "empty": "لا يوجد نشاط بعد"
+  },
+  "charts": {
+    "viewTable": "عرض كجدول",
+    "viewChart": "عرض كرسم بياني",
+    "empty": "لا توجد بيانات لهذه الفترة",
+    "legend": "السلاسل"
+  },
+  "wizard": {
+    "next": "التالي",
+    "back": "رجوع",
+    "skip": "تخطي",
+    "submit": "إرسال",
+    "edit": "تعديل",
+    "review": "المراجعة",
+    "stepOf": "الخطوة {{current}} من {{total}}",
+    "stepAnnounce": "الخطوة {{current}} من {{total}}، {{title}}",
+    "optional": "اختياري",
+    "draftRestored": "تمت استعادة المسودة من زيارتك الأخيرة.",
+    "discardDraft": "تجاهل",
+    "submitFailed": "بعض التفاصيل تحتاج إلى مراجعة قبل الإرسال.",
+    "steps": "الخطوات"
   }
 }

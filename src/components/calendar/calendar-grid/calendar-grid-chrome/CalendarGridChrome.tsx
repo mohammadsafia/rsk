@@ -1,10 +1,15 @@
 import { type ComponentPropsWithoutRef, type FC, useMemo } from 'react';
 
-import { Tabs, ToggleGroup } from '@components/ui';
-import { TooltipButton } from '@components/shared';
-import { type CalendarLegendItem, CalendarPicker, type CalendarPickerSelected, useCalendarGridContext } from '@components/calendar';
+import { IconButton, Select, Tabs, ToggleGroup } from '@components/ui';
+import {
+  type CalendarLegendItem,
+  CalendarPicker,
+  type CalendarView,
+  type CalendarPickerSelected,
+  useCalendarGridContext,
+} from '@components/calendar';
 
-import { useDate } from '@hooks/shared';
+import { useAppTranslation, useDate } from '@hooks/shared';
 
 import { cn } from '@utils';
 
@@ -17,16 +22,17 @@ type LegendProps = ComponentPropsWithoutRef<'div'> & { items: CalendarLegendItem
 type CalendarGridChromeComponents = FC & {
   Header: FC<HeaderProps>;
   Navigation: FC;
-  ViewTabs: FC;
+  ViewTabs: FC<{ views?: CalendarView[] }>;
   ViewToggle: FC;
   Picker: FC;
   Legend: FC<LegendProps>;
+  ResourceFilter: FC;
 };
 
 const Header: FC<HeaderProps> = ({ className, children, ...props }) => (
   <div
     data-slot="calendar-grid-header"
-    className={cn('border-muted-200 flex items-center justify-between gap-4 border-b px-4 py-3', className)}
+    className={cn('border-border-subtle flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b px-4 py-3', className)}
     {...props}
   >
     {children}
@@ -34,24 +40,29 @@ const Header: FC<HeaderProps> = ({ className, children, ...props }) => (
 );
 
 const Navigation: FC = () => {
+  const { t } = useAppTranslation('common');
   const { navigationLabel, goPrev, goNext } = useCalendarGridContext();
 
   return (
     <div data-slot="calendar-grid-navigation" className="flex items-center gap-2">
-      <TooltipButton title="Previous" type="button" variant="ghost" size="icon-sm" onClick={goPrev}>
-        <ChevronLeft size={20} className="text-muted-400" />
-      </TooltipButton>
+      <IconButton size="sm" type="button" aria-label={t('previous')} onClick={goPrev}>
+        <ChevronLeft size={20} className="text-fg-muted rtl:rotate-180" />
+      </IconButton>
 
-      <span className="text-foreground text-sm font-bold">{navigationLabel}</span>
+      <span className="text-fg text-sm font-bold">{navigationLabel}</span>
 
-      <TooltipButton title="Next" type="button" variant="ghost" size="icon-sm" onClick={goNext}>
-        <ChevronRight size={20} className="text-muted-400" />
-      </TooltipButton>
+      <IconButton size="sm" type="button" aria-label={t('next')} onClick={goNext}>
+        <ChevronRight size={20} className="text-fg-muted rtl:rotate-180" />
+      </IconButton>
     </div>
   );
 };
 
-const ViewTabs: FC = () => {
+const DEFAULT_VIEWS: CalendarView[] = ['day', 'week', 'month'];
+
+/** View tabs. Agenda is opt-in: `views={['day', 'week', 'month', 'agenda']}`. */
+const ViewTabs: FC<{ views?: CalendarView[] }> = ({ views = DEFAULT_VIEWS }) => {
+  const { t } = useAppTranslation('common');
   const { view, setView } = useCalendarGridContext();
 
   return (
@@ -59,48 +70,52 @@ const ViewTabs: FC = () => {
       className="min-w-1/3"
       value={view}
       onValueChange={(value) => {
-        if (value === 'day' || value === 'week' || value === 'month') setView(value);
+        const next = views.find((candidate) => candidate === value);
+        if (next) setView(next);
       }}
     >
-      <Tabs.List>
-        <Tabs.Trigger value="day">Day</Tabs.Trigger>
-
-        <Tabs.Trigger value="week">Week</Tabs.Trigger>
-
-        <Tabs.Trigger value="month">Month</Tabs.Trigger>
+      <Tabs.List variant="contained" fullWidth aria-label={t('calendar.views')}>
+        {views.map((candidate) => (
+          <Tabs.Trigger key={candidate} value={candidate}>
+            {t(`calendar.${candidate}`)}
+          </Tabs.Trigger>
+        ))}
       </Tabs.List>
     </Tabs>
   );
 };
 
 const ViewToggle: FC = () => {
+  const { t } = useAppTranslation('common');
   const { viewMode, setViewMode } = useCalendarGridContext();
 
   return (
     <ToggleGroup
       type="single"
+      variant="ghost"
       value={viewMode}
       onValueChange={(value) => {
         if (value === 'calendar' || value === 'list') setViewMode(value);
       }}
     >
-      <ToggleGroup.Item value="list" aria-label="List view">
-        <ListIcon size={16} />
+      <ToggleGroup.Item value="list" aria-label={t('calendar.listView')}>
+        <ListIcon aria-hidden="true" />
       </ToggleGroup.Item>
 
-      <ToggleGroup.Item value="calendar" aria-label="Calendar view">
-        <CalendarIcon size={16} />
+      <ToggleGroup.Item value="calendar" aria-label={t('calendar.calendarView')}>
+        <CalendarIcon aria-hidden="true" />
       </ToggleGroup.Item>
     </ToggleGroup>
   );
 };
 
 const Picker: FC = () => {
+  const { t } = useAppTranslation('common');
   const { date, setDate, view } = useCalendarGridContext();
   const { toStartAndEndOf, toBoundaryDate, addDuration, toDate, constants } = useDate();
 
   const selected = useMemo<CalendarPickerSelected>(() => {
-    if (view === 'day') return date;
+    if (view === 'day' || view === 'agenda') return date;
 
     const { startOf, endOf } = toStartAndEndOf(date, view === 'week' ? constants.UnitOfTime.WEEK : constants.UnitOfTime.MONTH);
 
@@ -111,7 +126,7 @@ const Picker: FC = () => {
     <CalendarPicker
       value={date}
       selected={selected}
-      triggerTooltip="Jump to date"
+      triggerTooltip={t('calendar.jumpToDate')}
       calendarProps={{ captionLayout: 'dropdown', endMonth: toBoundaryDate(addDuration(toDate(), 10, constants.UnitOfTime.YEAR)) }}
       onChange={setDate}
     />
@@ -122,13 +137,41 @@ const Legend: FC<LegendProps> = ({ items, className, ...props }) => (
   <div data-slot="calendar-grid-legend" className={cn('flex flex-wrap items-center gap-3 px-3 py-2', className)} {...props}>
     {items.map((item) => (
       <div key={item.label} data-slot="calendar-grid-legend-item" className="flex items-center gap-2">
-        <span aria-hidden="true" className={cn('border-muted-200 size-3 shrink-0 rounded-full border', item.colorClass)} />
+        <span aria-hidden="true" className={cn('border-border-subtle size-3 shrink-0 rounded-full border', item.colorClass)} />
 
-        <span className="text-muted-foreground text-xs">{item.label}</span>
+        <span className="text-fg-muted text-xs">{item.label}</span>
       </div>
     ))}
   </div>
 );
+
+const ALL_RESOURCES = '__all__';
+
+/** Week view: pick one resource or all of them. Renders nothing in other views or without resources. */
+const ResourceFilter: FC = () => {
+  const { t } = useAppTranslation('common');
+  const { resources, resourceFilter, setResourceFilter, view } = useCalendarGridContext();
+
+  if (view !== 'week' || resources.length === 0) return null;
+
+  return (
+    <Select value={resourceFilter ?? ALL_RESOURCES} onValueChange={(value) => setResourceFilter(value === ALL_RESOURCES ? null : value)}>
+      <Select.Trigger size="sm" aria-label={t('calendar.resource')} className="w-48">
+        <Select.Value />
+      </Select.Trigger>
+
+      <Select.Content>
+        <Select.Item value={ALL_RESOURCES}>{t('calendar.allResources')}</Select.Item>
+
+        {resources.map((resource) => (
+          <Select.Item key={resource.id} value={resource.id}>
+            {resource.label}
+          </Select.Item>
+        ))}
+      </Select.Content>
+    </Select>
+  );
+};
 
 const CalendarGridChrome: CalendarGridChromeComponents = () => null;
 
@@ -138,5 +181,6 @@ CalendarGridChrome.ViewTabs = ViewTabs;
 CalendarGridChrome.ViewToggle = ViewToggle;
 CalendarGridChrome.Picker = Picker;
 CalendarGridChrome.Legend = Legend;
+CalendarGridChrome.ResourceFilter = ResourceFilter;
 
 export default CalendarGridChrome;

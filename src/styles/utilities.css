@@ -1,0 +1,106 @@
+/*
+ * Foundation utilities — elevation, motion and the single interaction-state rule set (spec §7.4–7.6).
+ * Components compose these instead of re-deriving hover/focus/press styles.
+ */
+
+/* Elevation: resting elements have no shadow; only floating layers do. */
+@utility shadow-raised {
+  box-shadow: var(--elevation-raised);
+}
+
+@utility shadow-overlay {
+  box-shadow: var(--elevation-overlay);
+}
+
+/* Motion durations */
+@utility duration-fast {
+  --tw-duration: var(--duration-fast);
+  transition-duration: var(--duration-fast);
+}
+
+@utility duration-base {
+  --tw-duration: var(--duration-base);
+  transition-duration: var(--duration-base);
+}
+
+@utility duration-slow {
+  --tw-duration: var(--duration-slow);
+  transition-duration: var(--duration-slow);
+}
+
+/* Focus: buttons, links, toggles — solid 2px ring with offset, keyboard focus only. */
+@utility focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+
+  &:focus-visible {
+    outline-color: var(--ring);
+  }
+}
+
+/* Focus: text inputs and input-like triggers — ring border + soft glow. */
+@utility focus-ring-input {
+  /* transparent (not none) so forced-colors mode can still paint a focus outline */
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+
+  &:focus-visible,
+  &:focus-within {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px var(--ring-subtle);
+  }
+}
+
+/* Invalid: danger border + glow (components always pair this with a text message). */
+@utility state-invalid {
+  &[aria-invalid='true'] {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px var(--danger-subtle);
+  }
+}
+
+/* Press feedback: subtle scale, transform-only. */
+@utility state-press {
+  transition-property: transform, background-color, color, border-color;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--ease-out);
+
+  &:active:not(:disabled, [aria-disabled='true']) {
+    transform: scale(0.98);
+  }
+}
+
+/* Reduced motion: keep opacity fades, remove all movement (spec §7.5). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    --tw-enter-scale: 1 !important;
+    --tw-enter-rotate: 0 !important;
+    --tw-enter-translate-x: 0 !important;
+    --tw-enter-translate-y: 0 !important;
+    --tw-exit-scale: 1 !important;
+    --tw-exit-rotate: 0 !important;
+    --tw-exit-translate-x: 0 !important;
+    --tw-exit-translate-y: 0 !important;
+    scroll-behavior: auto !important;
+  }
+
+  .state-press:active {
+    transform: none !important;
+  }
+}
+
+/* Scrollable without visible scrollbar chrome (tab strips, chip rows): wheel, touch and keys still scroll. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* A hairline under a strip, painted behind its children so an indicator at bottom-0 can sit on top of it. */
+@utility rule-bottom {
+  box-shadow: inset 0 -1px 0 var(--color-border-subtle);
+}

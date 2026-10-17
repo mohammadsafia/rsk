@@ -1,0 +1,361 @@
+{
+  "patients": {
+    "title": "المرضى",
+    "description": "جميع المسجّلين في العيادة.",
+    "newPatient": "مريض جديد",
+    "searchPlaceholder": "ابحث بالاسم أو رقم الملف أو الهاتف",
+    "totalLabel": "مريض",
+    "selfPay": "دفع ذاتي",
+    "columns": {
+      "name": "الاسم",
+      "mrn": "رقم الملف",
+      "phone": "الهاتف",
+      "doctor": "الطبيب المعالج",
+      "insurer": "شركة التأمين",
+      "lastVisit": "آخر زيارة",
+      "balance": "الرصيد",
+      "registered": "تاريخ التسجيل"
+    },
+    "empty": {
+      "title": "لا يوجد مرضى بعد",
+      "description": "سجّل أول مريض لتبدأ بحجز الزيارات."
+    },
+    "noResults": {
+      "title": "لا يوجد مرضى مطابقون",
+      "description": "جرّب بحثًا آخر أو امسح عوامل التصفية."
+    },
+    "error": {
+      "title": "تعذّر تحميل المرضى",
+      "description": "حدث خطأ ما. حاول مرة أخرى بعد قليل."
+    }
+  },
+  "retry": "إعادة المحاولة",
+  "dashboard": {
+    "title": "العمليات",
+    "description": "كيف تسير العيادة",
+    "range": "الفترة",
+    "ranges": {
+      "7": "آخر 7 أيام",
+      "30": "آخر 30 يومًا",
+      "90": "آخر 90 يومًا"
+    },
+    "stats": {
+      "visits": "الزيارات",
+      "newPatients": "مرضى جدد",
+      "noShowRate": "نسبة عدم الحضور",
+      "revenue": "الإيرادات"
+    },
+    "sparkline": {
+      "visits": "الزيارات يوميًا",
+      "newPatients": "المرضى الجدد يوميًا",
+      "noShowRate": "نسبة عدم الحضور يوميًا",
+      "revenue": "الإيرادات يوميًا"
+    },
+    "charts": {
+      "visits": "الزيارات يوميًا",
+      "completed": "مكتملة",
+      "noShows": "لم يحضروا",
+      "payerMix": "توزيع الدافعين",
+      "insured": "مؤمَّن",
+      "selfPay": "دفع ذاتي",
+      "payerCenter": "الزيارات",
+      "revenueByDoctor": "الإيرادات حسب الطبيب",
+      "revenue": "الإيرادات"
+    },
+    "today": {
+      "title": "زيارات اليوم",
+      "empty": "لا زيارات أخرى اليوم",
+      "viewSchedule": "عرض الجدول",
+      "error": "تعذّر تحميل زيارات اليوم"
+    },
+    "error": {
+      "title": "تعذّر تحميل لوحة التحكم",
+      "description": "حدث خطأ ما. حاول مرة أخرى بعد قليل."
+    },
+    "vsPrevious": "مقارنة بالـ {{days}} يومًا السابقة"
+  },
+  "billing": {
+    "title": "الفواتير",
+    "description": "الفواتير والمدفوعات والمبالغ المستحقة.",
+    "summary": {
+      "outstanding": "المستحق",
+      "overdue": "المتأخر",
+      "collected": "المحصّل هذا الشهر",
+      "overdueCaption_zero": "لا فواتير",
+      "overdueCaption_one": "فاتورة واحدة",
+      "overdueCaption_two": "فاتورتان",
+      "overdueCaption_few": "{{count}} فواتير",
+      "overdueCaption_many": "{{count}} فاتورة",
+      "overdueCaption_other": "{{count}} فاتورة"
+    },
+    "tabs": {
+      "label": "حالة الفاتورة",
+      "all": "الكل"
+    },
+    "status": {
+      "draft": "مسودة",
+      "sent": "مُرسلة",
+      "overdue": "متأخرة",
+      "paid": "مدفوعة",
+      "void": "ملغاة"
+    },
+    "columns": {
+      "number": "الرقم",
+      "patient": "المريض",
+      "issued": "تاريخ الإصدار",
+      "due": "تاريخ الاستحقاق",
+      "status": "الحالة",
+      "total": "الإجمالي",
+      "balance": "الرصيد"
+    },
+    "searchPlaceholder": "ابحث بالرقم أو اسم المريض",
+    "totalLabel": "فاتورة",
+    "bulk": {
+      "remind": "إرسال تذكيرات",
+      "markPaid": "تعليم كمدفوعة",
+      "export": "تصدير CSV",
+      "confirmDescription": "يُسجَّل رصيدها المستحق كدفعة بالبطاقة اليوم.",
+      "reminded": "أُرسلت التذكيرات إلى {{done}}",
+      "markedPaid": "عُلّمت {{done}} كمدفوعة",
+      "skipped": "، وتُخطّيت {{skipped}} (غير مفتوحة)",
+      "failed": "تعذّر إكمال الإجراء",
+      "confirmTitle_zero": "لا فواتير لتعليمها",
+      "confirmTitle_one": "تعليم فاتورة واحدة كمدفوعة؟",
+      "confirmTitle_two": "تعليم فاتورتين كمدفوعتين؟",
+      "confirmTitle_few": "تعليم {{count}} فواتير كمدفوعة؟",
+      "confirmTitle_many": "تعليم {{count}} فاتورة كمدفوعة؟",
+      "confirmTitle_other": "تعليم {{count}} فاتورة كمدفوعة؟"
+    },
+    "empty": {
+      "title": "لا توجد فواتير بعد",
+      "description": "تظهر الفواتير هنا بعد اكتمال الزيارات."
+    },
+    "noResults": {
+      "title": "لا توجد فواتير مطابقة",
+      "description": "جرّب حالة أو بحثًا آخر."
+    },
+    "error": {
+      "title": "تعذّر تحميل الفواتير",
+      "description": "حدث خطأ ما. حاول مرة أخرى بعد قليل."
+    },
+    "sheet": {
+      "issuedDue": "صدرت {{issued}} · تستحق {{due}}",
+      "lines": "الخدمات",
+      "service": "الخدمة",
+      "quantity": "الكمية",
+      "unitPrice": "سعر الوحدة",
+      "amount": "المبلغ",
+      "total": "الإجمالي",
+      "payments": "المدفوعات",
+      "noPayments": "لا توجد مدفوعات بعد",
+      "balance": "الرصيد",
+      "record": {
+        "title": "تسجيل دفعة",
+        "amount": "المبلغ",
+        "method": "طريقة الدفع",
+        "date": "التاريخ",
+        "submit": "تسجيل الدفعة",
+        "success": "سُجّلت الدفعة",
+        "amountRequired": "أدخل مبلغًا أكبر من 0",
+        "amountTooHigh": "لا يمكن أن يتجاوز الرصيد ({{balance}})",
+        "dateRequired": "أدخل تاريخ الدفعة",
+        "dateFuture": "لا يمكن أن يكون تاريخ الدفعة في المستقبل"
+      },
+      "send": "إرسال الفاتورة",
+      "sent": "أُرسلت الفاتورة",
+      "void": "إلغاء الفاتورة",
+      "voidTitle": "إلغاء {{number}}؟",
+      "voidDescription": "لا يمكن دفع الفاتورة الملغاة أو إرسالها.",
+      "voided": "أُلغيت الفاتورة",
+      "notFound": "الفاتورة غير موجودة",
+      "notFoundDescription": "ربما حُذفت. اختر فاتورة أخرى من القائمة.",
+      "close": "إغلاق",
+      "loadingTitle": "الفاتورة",
+      "loadError": "تعذّر تحميل هذه الفاتورة"
+    }
+  },
+  "errors": {
+    "conflict": "لم يعد هذا الوقت متاحًا",
+    "not-found": "لم يعد موجودًا",
+    "invalid-transition": "هذا غير ممكن في حالته الحالية",
+    "duplicate-phone": "رقم الهاتف هذا مسجّل مسبقًا",
+    "forced": "حدث خطأ ما. حاول مرة أخرى.",
+    "invalid": "بعض القيم غير صالحة",
+    "closed": "الطبيب لا يعمل في هذا الوقت"
+  },
+  "services": {
+    "consultation": "استشارة",
+    "follow-up": "مراجعة",
+    "procedure": "إجراء",
+    "check-up": "فحص دوري"
+  },
+  "methods": {
+    "cash": "نقدًا",
+    "card": "بطاقة",
+    "insurance": "تأمين"
+  },
+  "schedule": {
+    "title": "الجدول",
+    "description": "الزيارات حسب الطبيب",
+    "onLeave": "في إجازة",
+    "conference": "مؤتمر",
+    "types": {
+      "consultation": "استشارة",
+      "follow-up": "مراجعة",
+      "procedure": "إجراء",
+      "check-up": "فحص دوري"
+    },
+    "status": {
+      "scheduled": "مجدولة",
+      "arrived": "وصل",
+      "completed": "مكتملة",
+      "no-show": "لم يحضر",
+      "cancelled": "ملغاة"
+    },
+    "actions": {
+      "arrived": "تسجيل الوصول",
+      "noShow": "تسجيل عدم الحضور",
+      "complete": "إنهاء الزيارة",
+      "openProfile": "فتح الملف",
+      "updated": "حُدّثت الزيارة"
+    },
+    "error": {
+      "title": "تعذّر تحميل الجدول",
+      "description": "حدث خطأ ما. حاول مرة أخرى بعد قليل."
+    },
+    "newVisit": {
+      "title": "زيارة جديدة",
+      "patient": "المريض",
+      "patientPlaceholder": "ابحث عن مريض",
+      "type": "نوع الزيارة",
+      "notes": "ملاحظات",
+      "submit": "حجز الزيارة",
+      "booked": "حُجزت الزيارة",
+      "patientRequired": "اختر مريضًا",
+      "when": "{{day}}، {{start}} – {{end}} · {{doctor}}",
+      "cancel": "إلغاء",
+      "doctor": "الطبيب",
+      "doctorRequired": "اختر الطبيب"
+    }
+  },
+  "profile": {
+    "bookVisit": "حجز زيارة",
+    "edit": "تعديل",
+    "backToPatients": "العودة إلى المرضى",
+    "age_zero": "أقل من سنة",
+    "age_one": "سنة واحدة",
+    "age_two": "سنتان",
+    "age_few": "{{count}} سنوات",
+    "age_many": "{{count}} سنة",
+    "age_other": "{{count}} سنة",
+    "stats": {
+      "visitsThisYear": "زيارات هذا العام",
+      "balanceDue": "الرصيد المستحق",
+      "lastVisit": "آخر زيارة"
+    },
+    "tabs": {
+      "label": "سجل المريض",
+      "overview": "نظرة عامة",
+      "timeline": "السجل الزمني",
+      "invoices": "الفواتير"
+    },
+    "fields": {
+      "dob": "تاريخ الميلاد",
+      "sex": "الجنس",
+      "email": "البريد الإلكتروني",
+      "insurer": "شركة التأمين",
+      "policy": "رقم البوليصة",
+      "doctor": "الطبيب المعالج",
+      "allergies": "الحساسية"
+    },
+    "sex": {
+      "female": "أنثى",
+      "male": "ذكر"
+    },
+    "allergies": {
+      "penicillin": "البنسلين",
+      "latex": "اللاتكس",
+      "peanuts": "الفول السوداني",
+      "aspirin": "الأسبرين",
+      "pollen": "حبوب اللقاح",
+      "none": "لا حساسية معروفة"
+    },
+    "timeline": {
+      "payment": "دفعة مستلمة",
+      "empty": "لا شيء بعد"
+    },
+    "invoices": {
+      "empty": "لا توجد فواتير"
+    },
+    "notFound": {
+      "title": "المريض غير موجود",
+      "description": "ربما حُذف هذا السجل."
+    },
+    "error": {
+      "title": "تعذّر تحميل بيانات المريض",
+      "description": "حدث خطأ ما. حاول مرة أخرى بعد قليل."
+    },
+    "editSheet": {
+      "title": "تعديل بيانات الاتصال",
+      "phone": "الهاتف",
+      "email": "البريد الإلكتروني",
+      "insurer": "شركة التأمين",
+      "policy": "رقم البوليصة",
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "saved": "حُفظت بيانات الاتصال",
+      "phoneRequired": "أدخل رقم الهاتف",
+      "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا",
+      "policyRequired": "أدخل رقم البوليصة",
+      "phoneInvalid": "أدخل رقم هاتف صالحًا"
+    }
+  },
+  "intake": {
+    "title": "مريض جديد",
+    "description": "سجّل مريضًا في خطوات قصيرة.",
+    "steps": {
+      "patient": "المريض",
+      "patientDescription": "من هو المريض ومن سيتابعه.",
+      "contact": "التواصل",
+      "insurance": "التأمين",
+      "documents": "المستندات",
+      "documentsDescription": "رسائل التحويل أو الهوية أو التقارير السابقة.",
+      "review": "المراجعة"
+    },
+    "fields": {
+      "firstNameEn": "الاسم الأول",
+      "lastNameEn": "اسم العائلة",
+      "firstNameAr": "الاسم الأول (بالعربية)",
+      "lastNameAr": "اسم العائلة (بالعربية)",
+      "sex": "الجنس",
+      "dob": "تاريخ الميلاد",
+      "doctor": "الطبيب المعالج",
+      "insured": "المريض لديه تأمين",
+      "phone": "الهاتف",
+      "email": "البريد الإلكتروني",
+      "insurer": "شركة التأمين",
+      "policy": "رقم البوليصة",
+      "documents": "المستندات"
+    },
+    "errors": {
+      "firstNameRequired": "أدخل الاسم الأول",
+      "lastNameRequired": "أدخل اسم العائلة",
+      "dobRequired": "أدخل تاريخ الميلاد",
+      "dobFuture": "لا يمكن أن يكون تاريخ الميلاد في المستقبل",
+      "doctorRequired": "اختر الطبيب المعالج",
+      "phoneRequired": "أدخل رقم الهاتف",
+      "phoneInvalid": "أدخل رقم هاتف صالحًا",
+      "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا",
+      "insurerRequired": "اختر شركة التأمين",
+      "policyRequired": "أدخل رقم البوليصة"
+    },
+    "files_zero": "لا ملفات",
+    "files_one": "ملف واحد",
+    "files_two": "ملفان",
+    "files_few": "{{count}} ملفات",
+    "files_many": "{{count}} ملفًا",
+    "files_other": "{{count}} ملف",
+    "submit": "تسجيل المريض",
+    "registered": "سُجّل المريض"
+  }
+}

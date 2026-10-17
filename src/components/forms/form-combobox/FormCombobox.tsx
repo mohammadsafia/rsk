@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useState, useId } from 'react';
 
 import { type FieldValues, useController } from 'react-hook-form';
 
 import { Combobox } from '@components/shared';
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
+import { FormField } from '@components/forms';
 
 import { cn } from '@utils';
 
-import { type AsyncOptionsFn, useAsyncOptionsInfiniteQuery, useDebounce, useInfiniteScroll } from '@hooks/shared';
+import { type AsyncOptionsFn, useAsyncOptionsInfiniteQuery, useDebounce, useInfiniteScroll, useAppTranslation } from '@hooks/shared';
 
 import type { ControlledFieldBaseProps, FormSelectOption, ResolvedOption } from '@app-types';
 
@@ -38,11 +38,9 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
   rules,
   control,
   label,
+  description,
   tooltip,
-  containerClassName,
-  labelClassName,
   className,
-  errorClassName,
   required,
   disabled,
   options,
@@ -52,12 +50,19 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
   optionMapper,
   onOptionChange,
   valueType = 'flat',
-  placeholder = 'Select...',
-  noOptionsText = 'No options',
+  placeholder: placeholderProp,
+  noOptionsText: noOptionsProp,
   urlSearchParams,
   debounceMs = 500,
   pageSize = 20,
 }: FormComboboxProps<TFieldValues, TOption>) {
+  // Defaults follow the app language (a literal 'Select' showed in English on Arabic pages).
+  const { t: tCommon } = useAppTranslation('common');
+  const placeholder = placeholderProp ?? tCommon('form.selectPlaceholder');
+  const noOptionsText = noOptionsProp ?? tCommon('form.noOptions');
+  // Unique per instance: two forms on one page may share a field name.
+  const fieldId = `${name}-${useId()}`;
+
   const {
     field: { ref, value, onChange, ...field },
     fieldState: { error },
@@ -131,24 +136,10 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
   };
 
   return (
-    <FormControl className={containerClassName}>
-      <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
-        {label}
-      </FormLabel>
-
-      <div className="relative">
+    <FormField id={fieldId} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+      {(fieldControl) => (
         <Combobox open={open} onOpenChange={setOpen}>
-          <Combobox.Trigger
-            ref={ref}
-            id={name}
-            className={cn(
-              error &&
-                'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive text-destructive ps-8',
-              className,
-            )}
-            disabled={field.disabled || disabled}
-            onBlur={field.onBlur}
-          >
+          <Combobox.Trigger ref={ref} {...fieldControl} className={className} disabled={field.disabled || disabled} onBlur={field.onBlur}>
             <Combobox.Value className="truncate" placeholder={placeholder}>
               {selectedOption ? getOptionLabel(selectedOption) : undefined}
             </Combobox.Value>
@@ -193,10 +184,8 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
             </Combobox.List>
           </Combobox.Content>
         </Combobox>
-
-        <FormMessage className={errorClassName} hidden={!error} error={error!} />
-      </div>
-    </FormControl>
+      )}
+    </FormField>
   );
 }
 

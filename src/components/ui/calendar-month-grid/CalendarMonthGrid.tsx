@@ -30,7 +30,7 @@ type CalendarMonthGridComponents = FC<CalendarMonthGridProps> & {
 const Weekdays: FC<WeekdaysProps> = ({ className, ...props }) => (
   <div
     data-slot="calendar-month-grid-weekdays"
-    className={cn('border-muted-200 bg-muted-50 grid grid-cols-7 border-b', className)}
+    className={cn('border-border-subtle bg-surface grid grid-cols-7 border-b', className)}
     {...props}
   />
 );
@@ -38,7 +38,7 @@ const Weekdays: FC<WeekdaysProps> = ({ className, ...props }) => (
 const Weekday: FC<WeekdayProps> = ({ className, ...props }) => (
   <div
     data-slot="calendar-month-grid-weekday"
-    className={cn('text-muted-foreground border-muted-200 border-e border-t py-2 text-center text-sm font-semibold last:border-e-0', className)}
+    className={cn('text-fg-muted border-border-subtle border-e py-2 text-center text-xs font-medium last:border-e-0', className)}
     {...props}
   />
 );
@@ -60,15 +60,19 @@ const DayCell: FC<DayCellProps> = ({ dayNumber, isToday, isCurrentMonth, availab
   <div
     data-slot="calendar-month-grid-day-cell"
     {...(isToday ? { 'aria-current': 'date' as const } : {})}
-    className={cn('border-muted-200 flex min-h-25 flex-col overflow-hidden border-e border-b p-1', !available && 'bg-muted-100', className)}
+    className={cn(
+      'border-border-subtle flex min-h-25 flex-col overflow-hidden border-e border-b p-1',
+      !available && 'bg-surface-sunken',
+      className,
+    )}
     {...props}
   >
     <span
       className={cn(
-        'mb-1 flex size-7 items-center justify-center rounded-full text-xs',
-        isToday && 'bg-primary-400 text-primary-foreground font-bold',
-        !isToday && isCurrentMonth && 'text-foreground',
-        !isToday && !isCurrentMonth && 'text-muted-400',
+        'mb-1 flex size-6 items-center justify-center rounded-md text-xs tabular-nums',
+        isToday && 'text-accent font-semibold',
+        !isToday && isCurrentMonth && 'text-fg',
+        !isToday && !isCurrentMonth && 'text-fg-subtle',
       )}
     >
       {dayNumber}
@@ -83,11 +87,7 @@ const EventChip: FC<EventChipProps> = ({ ref, className, type = 'button', ...pro
     ref={ref}
     type={type}
     data-slot="calendar-month-grid-event-chip"
-    className={cn(
-      'ring-offset-background block w-full cursor-pointer overflow-hidden rounded-md',
-      'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none',
-      className,
-    )}
+    className={cn('focus-ring block w-full cursor-pointer overflow-hidden rounded-md text-start', className)}
     {...props}
   />
 );
@@ -97,7 +97,7 @@ const CalendarMonthGrid: CalendarMonthGridComponents = ({ className, ...props })
     data-slot="calendar-month-grid"
     className={cn(
       'flex min-h-0 flex-1 flex-col overflow-y-auto',
-      '[scrollbar-color:var(--color-muted-200)_transparent] [scrollbar-width:thin]',
+      '[scrollbar-color:var(--color-border-strong)_transparent] [scrollbar-width:thin]',
       className,
     )}
     {...props}

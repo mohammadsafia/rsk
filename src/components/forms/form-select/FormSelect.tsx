@@ -1,15 +1,15 @@
-import { type ComponentPropsWithoutRef, Fragment } from 'react';
+import { type ComponentPropsWithoutRef, Fragment, useId } from 'react';
 import { Controller, type FieldValues } from 'react-hook-form';
 
 import { Select } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { TooltipButton } from '@components/shared';
-import { FormControl, FormLabel, FormMessage } from '@components/forms';
+import { FormField } from '@components/forms';
 
 import { cn } from '@utils';
 
 import { XIcon } from 'lucide-react';
 
+import { useAppTranslation } from '@hooks/shared';
 import type { ControlledFieldBaseProps, FormSelectOption, ResolvedOption } from '@app-types';
 
 type FormSelectProps<TFieldValues extends FieldValues, TOption = FormSelectOption> = ControlledFieldBaseProps<
@@ -32,15 +32,13 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
   rules,
   control,
   label,
+  description,
   tooltip,
-  containerClassName,
-  labelClassName,
   className,
-  errorClassName,
   required,
   options,
-  placeholder = 'Select',
-  noOptionsText = 'No Options',
+  placeholder: placeholderProp,
+  noOptionsText: noOptionsProp,
   valueType = 'flat',
   clearable = true,
   getOptionLabel,
@@ -48,6 +46,13 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
   optionMapper,
   ...props
 }: FormSelectProps<TFieldValues, TOption>) {
+  // Defaults follow the app language (a literal 'Select' showed in English on Arabic pages).
+  const { t: tCommon } = useAppTranslation('common');
+  const placeholder = placeholderProp ?? tCommon('form.selectPlaceholder');
+  const noOptionsText = noOptionsProp ?? tCommon('form.noOptions');
+  // Unique per instance: two forms on one page may share a field name.
+  const fieldId = `${name}-${useId()}`;
+
   const mappedOptions = options.map((option) => (optionMapper ? optionMapper(option) : option));
 
   const findOptionByValue = (value: string): TOption | undefined => {
@@ -71,40 +76,25 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
         };
 
         return (
-          <FormControl className={containerClassName}>
-            <FormLabel className={labelClassName} htmlFor={name} tooltip={tooltip} required={required} hidden={!label} error={error!}>
-              {label}
-            </FormLabel>
-
-            <div className="relative">
+          <FormField id={fieldId} label={label} description={description} tooltip={tooltip} required={required} error={error}>
+            {(fieldControl) => (
               <Select value={internalValue ?? ''} onValueChange={onValueChange} {...field} {...props}>
-                <Select.Trigger
-                  ref={ref}
-                  id={name}
-                  className={cn(
-                    !!error &&
-                      'border-destructive hover:not-disabled:border-destructive hover:not-disabled:ring-destructive focus-visible:border-destructive focus-visible:ring-destructive text-destructive ps-8',
-                    className,
-                  )}
-                  disabled={field.disabled || props.disabled}
-                >
+                <Select.Trigger ref={ref} {...fieldControl} className={className} disabled={field.disabled || props.disabled}>
                   <Select.Value placeholder={placeholder} />
 
                   <Conditional.If condition={!!internalValue && !field.disabled && !props.disabled && clearable}>
-                    <TooltipButton
-                      asChild
-                      title="Clear"
-                      variant="ghost-muted-destructive"
-                      size="unstyled"
+                    <XIcon
+                      size={16}
+                      role="button"
+                      aria-label="Clear"
+                      className="text-fg-muted hover:text-danger shrink-0 cursor-pointer"
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
                         onClear();
                       }}
-                    >
-                      <XIcon size={16} />
-                    </TooltipButton>
+                    />
                   </Conditional.If>
 
                   <Select.Icon />
@@ -124,10 +114,8 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
                   ))}
                 </Select.Content>
               </Select>
-
-              <FormMessage className={errorClassName} hidden={!error} error={error!} />
-            </div>
-          </FormControl>
+            )}
+          </FormField>
         );
       }}
     />

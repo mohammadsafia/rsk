@@ -3,30 +3,57 @@ id: form-input
 title: FormInput
 section: Components
 category: Forms
-description: 'Text input with form validation, error display, and label support.'
+description: 'Text input bound to react-hook-form, with label, help text, required mark and inline error.'
 tags: [forms, input, text]
 ---
 
-import { FormBasicDemo } from '@pages/components/components.data.demos';
-
-## Demo
-
-<FormBasicDemo />
-
-## Imports
-
-```tsx
-import { FormContainer, FormInput } from '@components/forms';
 import { useForm } from 'react-hook-form';
-```
+import { FormContainer, FormInput } from '@components/forms';
 
-## Code
+export const InputDemo = () => {
+  const form = useForm({ defaultValues: { name: '', email: '', mrn: 'MRN-' } });
+  return (
+    <FormContainer formContext={form} onSuccess={() => {}} className="grid w-96 gap-3">
+      <FormInput name="name" label="Full name" required rules={{ required: 'Enter the patient’s name' }} />
+      <FormInput name="email" type="email" label="Email" description="Used for visit reminders" />
+      <FormInput name="mrn" label="Record number" tooltip="Printed on the patient card" />
+    </FormContainer>
+  );
+};
 
-```tsx
-const form = useForm({ defaultValues: { email: '' } });
+## Fields
 
-<FormContainer formContext={form} onSuccess={console.log}>
-  <FormInput name="email" label="Email" required />
-  <FormInput name="password" type="password" label="Password" />
-</FormContainer>;
-```
+`FormInput` registers itself with the surrounding `FormContainer`, so it needs no `control`.
+
+<Example
+  title="Label, description, tooltip"
+  code={`const form = useForm({ defaultValues: { name: '', email: '', mrn: 'MRN-' } });
+
+<FormContainer formContext={form} onSuccess={save}>
+  <FormInput name="name" label="Full name" required rules={{ required: 'Enter the patient’s name' }} />
+  <FormInput name="email" type="email" label="Email" description="Used for visit reminders" />
+  <FormInput name="mrn" label="Record number" tooltip="Printed on the patient card" />
+</FormContainer>`}
+>
+  <InputDemo />
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'name', type: 'Path<TFieldValues>', required: true, description: 'Field path in the form values.' },
+    { prop: 'type · placeholder · autoComplete · …', type: 'InputHTMLAttributes', description: 'Native input attributes pass through.' },
+  ]}
+/>
+
+Plus the [shared field props](/docs/components/form-field#shared-by-every-form-field): `label`, `description`, `tooltip`, `required`, `rules`, `disabled`.
+
+## Accessibility
+
+- The label is linked to the input, and the description or error is announced through `aria-describedby`.
+- Set `type` and `autoComplete` (`email`, `tel`, `name`) so browsers and assistive tech can help fill the field.
+
+## RTL notes
+
+- The input uses `dir="auto"`, so an email typed into an Arabic form still reads left to right.

@@ -1,24 +1,34 @@
 import {
-  Children,
   type ComponentPropsWithoutRef,
   type ComponentPropsWithRef,
   type FC,
   forwardRef,
-  isValidElement,
+  type KeyboardEvent,
   useEffect,
   useMemo,
   useState,
 } from 'react';
 
-import { Button, Popover, ScrollSelector } from '@components/ui';
+import { Button, fieldVariants, type FieldVariants, IconButton, Popover } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { TooltipButton } from '@components/shared';
 
-import { useDebounce, useTime } from '@hooks/shared';
+import { useAppTranslation, useDebounce } from '@hooks/shared';
 
 import { cn } from '@utils';
 
-import { Check, Clock4Icon, XIcon } from 'lucide-react';
+import { Clock4Icon, XIcon } from 'lucide-react';
+
+import {
+  availableTimes,
+  buildTimeColumns,
+  formatTime,
+  nearestTime,
+  parseTime,
+  selectHour,
+  selectMinute,
+  selectPeriod,
+  type TimePeriod,
+} from './timeColumns';
 
 export type TimePickerClearProps = {
   onClear?: () => void;
@@ -26,14 +36,15 @@ export type TimePickerClearProps = {
   hasValue?: boolean;
 };
 
-export type TimePickerTriggerProps = Omit<ComponentPropsWithRef<'button'>, 'value'> & {
-  error?: boolean;
-  placeholder?: string;
-  value?: string | null;
-  displayValue?: string | null;
-};
+export type TimePickerTriggerProps = Omit<ComponentPropsWithRef<'button'>, 'value'> &
+  FieldVariants & {
+    invalid?: boolean;
+    placeholder?: string;
+    displayValue?: string | null;
+  };
 
 export type TimePickerContentProps = ComponentPropsWithoutRef<typeof Popover.Content> & {
+  /** Accepted for compatibility (TimeFilter passes it); the columns follow `tempValue`. */
   value?: string | null;
   tempValue: string;
   onTempValueChange: (value: string) => void;
@@ -46,8 +57,9 @@ export type TimePickerContentProps = ComponentPropsWithoutRef<typeof Popover.Con
 
 export type TimePickerRootProps = ComponentPropsWithoutRef<typeof Popover>;
 
-export type TimePickerProps = {
+export type TimePickerProps = FieldVariants & {
   name: string;
+  id?: string;
   value?: string | null;
   onChange?: (value?: string) => void;
   className?: string;
@@ -59,80 +71,119 @@ export type TimePickerProps = {
   max?: string;
   step?: number;
   startAt?: string;
-  error?: boolean;
+  invalid?: boolean;
+  'aria-describedby'?: string;
+  'aria-required'?: boolean;
 };
 
-const TimePickerClear: FC<TimePickerClearProps> = ({ onClear, disabled, hasValue }) => {
-  if (!hasValue || !onClear || disabled) return null;
+type TimeColumnProps<TValue extends number | string> = {
+  label: string;
+  options: Array<{ label: string; value: TValue }>;
+  selected: TValue;
+  onSelect: (value: TValue) => void;
+};
 
-  const handleClear = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onClear();
+const scrollSelectedIntoView = (node: HTMLButtonElement | null) => node?.scrollIntoView?.({ block: 'nearest' });
+
+const NEXT_INDEX: Record<string, (index: number, last: number) => number> = {
+  ArrowDown: (index, last) => Math.min(index + 1, last),
+  ArrowUp: (index) => Math.max(index - 1, 0),
+  Home: () => 0,
+  End: (_index, last) => last,
+};
+
+// One tab stop per column (the selected option); arrows, Home and End move the selection.
+function TimeColumn<TValue extends number | string>({ label, options, selected, onSelect }: TimeColumnProps<TValue>) {
+  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const move = NEXT_INDEX[event.key];
+    if (!move) return;
+
+    event.preventDefault();
+    const next = move(index, options.length - 1);
+    onSelect(options[next].value);
+    (event.currentTarget.parentElement?.children[next] as HTMLElement | undefined)?.focus();
   };
 
   return (
-    <TooltipButton asChild title="Clear" variant="ghost-muted-destructive" size="unstyled" onClick={handleClear}>
-      <XIcon size={16} />
-    </TooltipButton>
+    <div
+      role="listbox"
+      aria-label={label}
+      data-slot="time-picker-column"
+      className="flex max-h-48 w-12 [scrollbar-width:thin] flex-col gap-0.5 overflow-y-auto font-mono text-sm"
+    >
+      {options.map((option, index) => (
+        <button
+          key={option.value}
+          type="button"
+          role="option"
+          aria-selected={option.value === selected}
+          tabIndex={option.value === selected ? 0 : -1}
+          ref={option.value === selected ? scrollSelectedIntoView : undefined}
+          className={cn(
+            'focus-ring text-fg-muted hover:bg-hover hover:text-fg h-7 shrink-0 cursor-pointer rounded-md tabular-nums transition-colors',
+            'aria-selected:bg-accent aria-selected:text-accent-fg aria-selected:hover:bg-accent aria-selected:hover:text-accent-fg',
+          )}
+          onClick={() => onSelect(option.value)}
+          onKeyDown={(event) => handleKeyDown(event, index)}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+const TimePickerClear: FC<TimePickerClearProps> = ({ onClear, disabled, hasValue }) => {
+  const { t } = useAppTranslation('common');
+
+  if (!hasValue || !onClear || disabled) return null;
+
+  return (
+    <IconButton
+      data-slot="time-picker-clear"
+      size="sm"
+      tooltip={false}
+      aria-label={t('clear')}
+      className="absolute inset-y-0 end-1 my-auto"
+      onClick={onClear}
+    >
+      <XIcon />
+    </IconButton>
   );
 };
 
 const TimePickerTrigger = forwardRef<HTMLButtonElement, TimePickerTriggerProps>(
-  ({ className, error, placeholder = 'Select time', value, displayValue, disabled, children, ...props }, ref) => {
-    // Separate TimePicker.Clear from other children
-    const childrenArray = Children.toArray(children);
-    const clearComponent = childrenArray.find((child) => isValidElement(child) && child.type === TimePickerClear);
-    const otherChildren = childrenArray.filter((child) => !(isValidElement(child) && child.type === TimePickerClear));
+  ({ className, size, invalid, placeholder, displayValue, disabled, ...props }, ref) => (
+    <button
+      ref={ref}
+      type="button"
+      disabled={disabled}
+      aria-invalid={invalid || undefined}
+      className={cn(fieldVariants({ size }), 'group cursor-pointer gap-2 text-start', className)}
+      {...props}
+      // After the spread: Popover.Trigger asChild injects its own data-slot.
+      data-slot="time-picker-trigger"
+    >
+      <Clock4Icon aria-hidden="true" className="text-fg-muted group-data-[state=open]:text-accent size-4 shrink-0" />
 
-    return (
-      <button
-        ref={ref}
-        type="button"
-        disabled={disabled}
-        data-slot="time-picker-trigger"
-        className={cn(
-          'group bg-background relative flex h-12 w-full cursor-pointer items-center justify-between rounded-md border px-3 py-3 text-xs shadow-xs',
-          'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
-          'transition-colors focus-visible:outline-none',
-          {
-            'border-muted-200 hover:border-muted-300 focus-visible:border-primary focus-visible:ring-primary focus-visible:ring-1': !error,
-            'border-destructive focus-visible:border-destructive focus-visible:ring-destructive focus-visible:ring-1': !!error,
-          },
-          className,
-        )}
-        aria-invalid={error}
-        {...props}
-      >
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <Clock4Icon
-            size={20}
-            className={cn('h-5 w-5 shrink-0 transition-colors', {
-              'text-destructive': !!error,
-              'text-muted-300 opacity-50': disabled,
-              'text-muted-400': !error && !disabled,
-              'group-data-[state=open]:text-primary': !error && !disabled,
-            })}
-          />
-          <Conditional>
-            <Conditional.If condition={!!displayValue}>
-              <span className="text-primary-900 line-clamp-1 min-w-[100px] text-start">{displayValue}</span>
-            </Conditional.If>
-            <Conditional.Else>
-              <span className="text-muted-400 line-clamp-1 min-w-[100px] text-start">{placeholder}</span>
-            </Conditional.Else>
-          </Conditional>
-          {otherChildren}
-        </div>
-        <div className="flex shrink-0 items-center gap-2">{clearComponent}</div>
-      </button>
-    );
-  },
+      <Conditional>
+        <Conditional.If condition={!!displayValue}>
+          <span className="text-fg min-w-0 flex-1 truncate font-mono tabular-nums">
+            <bdi dir="ltr">{displayValue}</bdi>
+          </span>
+        </Conditional.If>
+
+        <Conditional.Else>
+          <span className="text-fg-muted min-w-0 flex-1 truncate">{placeholder}</span>
+        </Conditional.Else>
+      </Conditional>
+    </button>
+  ),
 );
 
 const TimePickerContent: FC<TimePickerContentProps> = ({
   className,
-  value,
+  value: _value,
   tempValue,
   onTempValueChange,
   onConfirm,
@@ -142,199 +193,183 @@ const TimePickerContent: FC<TimePickerContentProps> = ({
   step = 1,
   ...props
 }) => {
-  const { getTimeOptions, parseTimeString } = useTime();
+  const { t } = useAppTranslation('common');
 
-  const [minHour] = useMemo(() => parseTimeString(min), [min, parseTimeString]);
-  const [maxHour] = useMemo(() => parseTimeString(max), [max, parseTimeString]);
+  const available = useMemo(() => availableTimes(min, max, step), [min, max, step]);
+  const selected = nearestTime(available, parseTime(tempValue));
 
-  const timeOptions = useMemo(() => getTimeOptions(min, max, step, !use24hFormat), [min, max, step, use24hFormat, getTimeOptions]);
+  const handleSelect = (next: number) => onTempValueChange(formatTime(next, use24hFormat));
 
-  const [valHour, valMinute, valAmPm] = useMemo(() => parseTimeString(tempValue), [tempValue, parseTimeString]);
-
-  const hourOptions = useMemo(
-    () =>
-      timeOptions
-        .filter((option) => option.toLowerCase().includes((valAmPm ?? 'am').toLowerCase()))
-        .reduce(
-          (prev, time) => {
-            const hour = time.split(':')[0];
-            if (prev.find((option) => option.value === parseInt(hour))) return prev;
-            return [
-              ...prev,
-              {
-                label: hour,
-                value: parseInt(hour),
-                hide: false,
-              },
-            ];
-          },
-          [] as { label: string; value: number }[],
-        ),
-    [timeOptions, valAmPm],
-  );
-
-  const minuteOptions = useMemo(
-    () =>
-      timeOptions
-        .filter(
-          (option) =>
-            option.toLowerCase().includes((valAmPm ?? 'am').toLowerCase()) &&
-            option.includes(`${(valHour - (valAmPm === 'PM' && valHour > 12 ? 12 : 0)).toString().padStart(2, '0')}:`),
-        )
-        .reduce(
-          (prev, time) =>
-            prev.find((option) => option.value === parseInt(time.split(':')[1]))
-              ? prev
-              : [
-                  ...prev,
-                  {
-                    label: time.split(':')[1].split(' ')[0],
-                    value: parseInt(time.split(':')[1].split(' ')[0]),
-                    hide: false,
-                  },
-                ],
-          [] as { label: string; value: number }[],
-        ),
-    [timeOptions, valHour, valAmPm],
-  );
-
-  const ampmOptions = useMemo(
-    () => [
-      { label: 'AM', value: 'AM', hide: minHour >= 12 },
-      { label: 'PM', value: 'PM', hide: maxHour < 12 },
-    ],
-    [minHour, maxHour],
-  );
+  // Snap a seed that is off the grid or out of range (e.g. TimeFilter's "08:00 AM" with min 09:00) to the option shown,
+  // so confirming without touching the columns emits exactly what is highlighted.
+  useEffect(() => {
+    if (tempValue === '' || selected === null) return;
+    const normalized = formatTime(selected, use24hFormat);
+    if (normalized !== tempValue) onTempValueChange(normalized);
+  }, [tempValue, selected, use24hFormat, onTempValueChange]);
 
   return (
-    <Popover.Content
-      data-slot="time-picker-content"
-      className={cn(
-        'bg-popover text-popover-foreground border-muted-200 relative z-50 w-fit overflow-hidden rounded-md border px-2 shadow-xs',
-        'data-[side=bottom]:slide-in-from-top-2 data-[state=open]:animate-in data-[state=closed]:animate-out',
-        'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-        'data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-        className,
-      )}
-      side="bottom"
-      align="start"
-      {...props}
-    >
-      <div className="flex gap-2 py-3">
-        <ScrollSelector
-          options={hourOptions}
-          value={parseInt(tempValue.split(':')[0])}
-          onSelect={(val) =>
-            onTempValueChange(
-              `${val.toString().padStart(2, '0')}:${valMinute.toString().padStart(2, '0')}${use24hFormat ? '' : ' ' + (valAmPm ?? 'AM')}`,
-            )
-          }
+    <Popover.Content data-slot="time-picker-content" side="bottom" align="start" className={cn('w-fit p-2', className)} {...props}>
+      <Conditional.If condition={selected !== null}>
+        <TimePickerColumns
+          available={available}
+          selected={selected ?? 0}
+          use24hFormat={use24hFormat}
+          labels={{ hours: t('timePicker.hours'), minutes: t('timePicker.minutes'), period: t('timePicker.period') }}
+          onSelect={handleSelect}
         />
-        <ScrollSelector
-          options={minuteOptions}
-          value={valMinute}
-          onSelect={(val) =>
-            onTempValueChange(`${tempValue.split(':')[0]}:${val.toString().padStart(2, '0')}${use24hFormat ? '' : ' ' + (valAmPm ?? 'AM')}`)
-          }
-        />
-        <Conditional.If condition={!use24hFormat}>
-          <ScrollSelector
-            options={ampmOptions}
-            value={valAmPm}
-            onSelect={(val) => onTempValueChange(`${tempValue.split(':')[0]}:${valMinute.toString().padStart(2, '0')} ${val}`)}
-          />
-        </Conditional.If>
-      </div>
-      <div className="mt-4 flex justify-end pb-2">
-        <Button size="sm" variant="ghost" className="h-auto px-2 py-1" onClick={onConfirm}>
-          <Check size={20} className="text-primary" />
+      </Conditional.If>
+
+      <div className="border-border-subtle mt-2 flex justify-end border-t pt-2">
+        <Button size="sm" tone="accent" onClick={onConfirm}>
+          {t('confirm')}
         </Button>
       </div>
     </Popover.Content>
   );
 };
 
-const TimePickerRoot: FC<TimePickerRootProps> = ({ children, ...props }) => {
+type TimePickerColumnsProps = {
+  available: number[];
+  selected: number;
+  use24hFormat: boolean;
+  labels: { hours: string; minutes: string; period: string };
+  onSelect: (time: number) => void;
+};
+
+const TimePickerColumns: FC<TimePickerColumnsProps> = ({ available, selected, use24hFormat, labels, onSelect }) => {
+  const columns = buildTimeColumns(available, selected, use24hFormat);
+  const periodOptions = columns.periods.map((period) => ({ label: period, value: period }));
+
   return (
-    <Popover data-slot="time-picker" modal {...props}>
-      {children}
-    </Popover>
+    <div className="flex gap-1">
+      <TimeColumn
+        label={labels.hours}
+        options={columns.hours}
+        selected={Math.floor(selected / 60)}
+        onSelect={(hour) => onSelect(selectHour(available, selected, hour))}
+      />
+
+      <TimeColumn
+        label={labels.minutes}
+        options={columns.minutes}
+        selected={selected % 60}
+        onSelect={(minute) => onSelect(selectMinute(available, selected, minute))}
+      />
+
+      <Conditional.If condition={!use24hFormat}>
+        <TimeColumn<TimePeriod>
+          label={labels.period}
+          options={periodOptions}
+          selected={selected >= 12 * 60 ? 'PM' : 'AM'}
+          onSelect={(period) => onSelect(selectPeriod(available, selected, period))}
+        />
+      </Conditional.If>
+    </div>
   );
 };
 
-const TimePicker = ({
+const TimePickerRoot: FC<TimePickerRootProps> = ({ children, ...props }) => (
+  <Popover data-slot="time-picker-root" modal {...props}>
+    {children}
+  </Popover>
+);
+
+type TimePickerComponent = FC<TimePickerProps> & {
+  Root: typeof TimePickerRoot;
+  Trigger: typeof TimePickerTrigger;
+  Content: typeof TimePickerContent;
+  Clear: typeof TimePickerClear;
+};
+
+const TimePicker: TimePickerComponent = ({
   name,
+  id,
   className,
   disabled,
-  placeholder = 'Select time',
+  placeholder,
   clearButton = true,
   min = '00:00',
-  startAt = '08:00 AM',
+  startAt,
   max = '23:59',
   step = 1,
   use24hFormat = false,
+  size,
   value,
   onChange,
-  error = false,
-}: TimePickerProps) => {
+  invalid = false,
+  'aria-describedby': ariaDescribedBy,
+  'aria-required': ariaRequired,
+}) => {
+  const { t } = useAppTranslation('common');
+
   const [isOpen, setIsOpen] = useState(false);
   const [tempValue, setTempValue] = useState('');
   const display = useDebounce(tempValue || value, 200);
 
+  const available = useMemo(() => availableTimes(min, max, step), [min, max, step]);
+
   useEffect(() => {
     if (!isOpen) {
       setTempValue('');
-    } else {
-      setTempValue(value || startAt || min);
+      return;
     }
-  }, [isOpen, value, startAt, min]);
+
+    // Seed on the step grid in the picker's own format, so confirming untouched never emits a 12h string in 24h mode.
+    const seed = nearestTime(available, parseTime(value) ?? parseTime(startAt) ?? parseTime(use24hFormat ? '08:00' : '08:00 AM'));
+    setTempValue(seed === null ? '' : formatTime(seed, use24hFormat));
+  }, [isOpen, value, startAt, available, use24hFormat]);
 
   const handleConfirm = () => {
-    onChange?.(tempValue);
+    onChange?.(tempValue || undefined);
     setIsOpen(false);
   };
 
-  const handleClear = () => {
-    onChange?.(undefined);
-  };
+  const handleClear = () => onChange?.(undefined);
+
+  const showClear = clearButton && !!value && !disabled;
 
   return (
-    <Popover onOpenChange={setIsOpen} open={isOpen} modal>
-      <Popover.Trigger id={name as string} asChild>
-        <TimePicker.Trigger
-          className={className}
-          disabled={disabled}
-          error={error}
-          placeholder={placeholder}
-          value={value}
-          displayValue={display}
-        >
-          {clearButton && <TimePicker.Clear onClear={handleClear} disabled={disabled} hasValue={!!value} />}
-        </TimePicker.Trigger>
-      </Popover.Trigger>
-      <TimePicker.Content
-        value={value}
-        tempValue={tempValue}
-        onTempValueChange={setTempValue}
-        onConfirm={handleConfirm}
-        use24hFormat={use24hFormat}
-        min={min}
-        max={max}
-        step={step}
-      />
-    </Popover>
+    <div data-slot="time-picker" className="relative w-full">
+      <Popover open={isOpen} onOpenChange={setIsOpen} modal>
+        <Popover.Trigger id={id ?? name} asChild>
+          <TimePickerTrigger
+            size={size}
+            aria-describedby={ariaDescribedBy}
+            aria-required={ariaRequired}
+            invalid={invalid}
+            disabled={disabled}
+            placeholder={placeholder ?? t('timePicker.placeholder')}
+            displayValue={display}
+            className={cn(showClear && 'pe-9', className)}
+          />
+        </Popover.Trigger>
+
+        <TimePickerContent
+          tempValue={tempValue}
+          onTempValueChange={setTempValue}
+          onConfirm={handleConfirm}
+          use24hFormat={use24hFormat}
+          min={min}
+          max={max}
+          step={step}
+        />
+      </Popover>
+
+      <Conditional.If condition={clearButton}>
+        <TimePickerClear onClear={handleClear} disabled={disabled} hasValue={!!value} />
+      </Conditional.If>
+    </div>
   );
 };
 
-TimePickerContent.displayName = 'TimePickerContent';
-TimePickerTrigger.displayName = 'TimePickerTrigger';
-TimePickerClear.displayName = 'TimePickerClear';
-TimePickerRoot.displayName = 'TimePickerRoot';
-TimePicker.displayName = 'TimePicker';
-
 TimePicker.Root = TimePickerRoot;
 TimePicker.Trigger = TimePickerTrigger;
-TimePicker.Clear = TimePickerClear;
 TimePicker.Content = TimePickerContent;
+TimePicker.Clear = TimePickerClear;
+
+TimePickerTrigger.displayName = 'TimePickerTrigger';
+TimePickerContent.displayName = 'TimePickerContent';
+TimePickerClear.displayName = 'TimePickerClear';
 
 export default TimePicker;

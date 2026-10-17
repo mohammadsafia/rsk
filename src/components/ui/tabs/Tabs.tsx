@@ -4,10 +4,41 @@ import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
-type TabsListProps = ComponentPropsWithoutRef<typeof TabsPrimitive.List> & VariantProps<typeof tabsListVariants>;
-type TabsTriggerProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> & VariantProps<typeof tabsTriggerVariants>;
-type TabsContentProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Content>;
+// Scrolls sideways when tabs overflow, but never vertically and without scrollbar chrome: a scrollbar used to
+// appear because overflow-x forces overflow-y to auto and the underline hung 1px below the list.
+const tabsListVariants = cva('group/tabs-list scrollbar-none flex min-w-0 items-center overflow-x-auto overflow-y-hidden', {
+  variants: {
+    variant: {
+      underline: 'rule-bottom gap-4',
+      contained: 'bg-surface-sunken gap-1 rounded-md p-1',
+    },
+    fullWidth: {
+      true: 'w-full',
+      false: 'w-fit',
+    },
+  },
+  defaultVariants: {
+    variant: 'underline',
+    fullWidth: false,
+  },
+});
+
+// Triggers read the list's data attributes, so the list's variant needs no React context.
+const triggerClassName = [
+  'focus-ring text-fg-muted hover:text-fg inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors',
+  'disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-fg [&_svg]:size-4',
+  'group-data-[full-width=true]/tabs-list:flex-1',
+  'group-data-[variant=underline]/tabs-list:relative group-data-[variant=underline]/tabs-list:h-9 group-data-[variant=underline]/tabs-list:px-1',
+  'group-data-[variant=underline]/tabs-list:after:absolute group-data-[variant=underline]/tabs-list:after:inset-x-0 group-data-[variant=underline]/tabs-list:after:bottom-0 group-data-[variant=underline]/tabs-list:after:h-0.5',
+  'group-data-[variant=underline]/tabs-list:data-[state=active]:after:bg-accent',
+  'group-data-[variant=contained]/tabs-list:h-7 group-data-[variant=contained]/tabs-list:rounded-sm group-data-[variant=contained]/tabs-list:px-3',
+  'group-data-[variant=contained]/tabs-list:data-[state=active]:bg-surface group-data-[variant=contained]/tabs-list:data-[state=active]:ring-border group-data-[variant=contained]/tabs-list:data-[state=active]:ring-1',
+].join(' ');
+
 type TabsProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Root>;
+type TabsListProps = ComponentPropsWithoutRef<typeof TabsPrimitive.List> & VariantProps<typeof tabsListVariants>;
+type TabsTriggerProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>;
+type TabsContentProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Content>;
 
 type TabsComponent = FC<TabsProps> & {
   List: FC<TabsListProps>;
@@ -15,49 +46,22 @@ type TabsComponent = FC<TabsProps> & {
   Content: FC<TabsContentProps>;
 };
 
-const tabsListVariants = cva('flex items-center rounded-2xl p-1 gap-1 min-w-0 overflow-x-auto', {
-  variants: {
-    variant: {
-      default: 'bg-background text-foreground w-full border border-muted-200',
-      compact: 'w-fit bg-background border border-muted-200 text-foreground',
-      plain: 'text-foreground bg-transparent',
-      compactPlain: 'w-fit text-foreground bg-transparent',
-    },
-  },
-  defaultVariants: {
-    variant: 'default',
-  },
-});
-
-const tabsTriggerVariants = cva(
-  `
-  inline-flex cursor-pointer items-center justify-center rounded-[inherit] px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors
-  focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50
-  data-[state=active]:bg-primary data-[state=active]:font-bold data-[state=active]:text-surface dark:data-[state=active]:bg-primary-300 hover:bg-primary-15 hover:text-foreground
-  `,
-  {
-    variants: {
-      variant: {
-        default: 'grow shrink-0 flex gap-1',
-        fitContent: '',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-    },
-  },
+const List: FC<TabsListProps> = ({ className, variant, fullWidth, ...props }) => (
+  <TabsPrimitive.List
+    data-slot="tabs-list"
+    data-variant={variant ?? 'underline'}
+    data-full-width={String(fullWidth ?? false)}
+    className={cn(tabsListVariants({ variant, fullWidth }), className)}
+    {...props}
+  />
 );
 
-const List: FC<TabsListProps> = ({ className, variant, ...props }) => (
-  <TabsPrimitive.List data-slot="tabs-list" className={cn(tabsListVariants({ variant }), className)} {...props} />
-);
-
-const Trigger: FC<TabsTriggerProps> = ({ className, variant, ...props }) => (
-  <TabsPrimitive.Trigger data-slot="tabs-trigger" className={cn(tabsTriggerVariants({ variant }), className)} {...props} />
+const Trigger: FC<TabsTriggerProps> = ({ className, ...props }) => (
+  <TabsPrimitive.Trigger data-slot="tabs-trigger" className={cn(triggerClassName, className)} {...props} />
 );
 
 const Content: FC<TabsContentProps> = ({ className, ...props }) => (
-  <TabsPrimitive.Content data-slot="tabs-content" className={cn('mt-6 focus-visible:outline-none', className)} {...props} />
+  <TabsPrimitive.Content data-slot="tabs-content" className={cn('focus-ring mt-4 rounded-sm', className)} {...props} />
 );
 
 const Tabs: TabsComponent = ({ className, ...props }) => (

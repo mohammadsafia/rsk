@@ -9,5 +9,6 @@
   "switchLanguage": "تغيير اللغة",
   "switchToLight": "التبديل إلى المظهر الفاتح",
   "switchToDark": "التبديل إلى المظهر الداكن",
-  "toggleTheme": "تبديل المظهر"
+  "toggleTheme": "تبديل المظهر",
+  "avatarAlt": "الصورة الشخصية لـ {{name}}"
 }

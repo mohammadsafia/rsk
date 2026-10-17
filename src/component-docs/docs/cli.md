@@ -1,6 +1,6 @@
 # CLI
 
-This document explains the MDX docs generator CLI (`yarn docs:new`): what it prompts for, what it creates, and common
+This document explains the MDX docs generator CLI (`pnpm docs:new`): what it prompts for, what it creates, and common
 failure cases.
 
 ---
@@ -22,7 +22,7 @@ failure cases.
 ## Command
 
 ```bash
-yarn docs:new
+pnpm docs:new
 ```
 
 ## What it generates
@@ -33,9 +33,9 @@ It also tries to open the created file in an editor.
 
 The CLI does not:
 
-* register docs manually anywhere
-* change registry behavior
-* modify existing docs
+- register docs manually anywhere
+- change registry behavior
+- modify existing docs
 
 ## Prompts
 
@@ -44,8 +44,8 @@ The generator asks for:
 1. Category folder
    Pick from folders under `src/component-docs/` excluding:
 
-    * folders starting with `_`
-    * `scripts`
+   - folders starting with `_`
+   - `scripts`
 
    Note: `docs` is **not** excluded from the category picker. If you do not want it treated as a category, do not place
    MDX files there.
@@ -70,10 +70,10 @@ Then it asks for confirmation before writing the file.
 
 The CLI normalizes the id by:
 
-* trimming whitespace
-* lowercasing
-* replacing non-alphanumerics with `-`
-* removing leading/trailing `-`
+- trimming whitespace
+- lowercasing
+- replacing non-alphanumerics with `-`
+- removing leading/trailing `-`
 
 So even if you type `Toggle Group`, the final id becomes `toggle-group`.
 
@@ -81,64 +81,64 @@ So even if you type `Toggle Group`, the final id becomes `toggle-group`.
 
 The generated file name is PascalCase derived from the id:
 
-* id: `toggle-group`
-* file: `ToggleGroup.mdx`
+- id: `toggle-group`
+- file: `ToggleGroup.mdx`
 
 ### Component name
 
 The generated component import name is also PascalCase from the id:
 
-* id: `toggle-group`
-* component name: `ToggleGroup`
+- id: `toggle-group`
+- component name: `ToggleGroup`
 
 ### Import path
 
 The import path is derived from the category folder:
 
-* folder: `ui`
-* import path: `@components/ui`
+- folder: `ui`
+- import path: `@components/ui`
 
 ### Output path
 
 The output path is:
 
-* `src/component-docs/<folderName>/<PascalCase(id)>.mdx`
+- `src/component-docs/<folderName>/<PascalCase(id)>.mdx`
 
 Example:
 
-* category folder: `ui`
-* id: `toggle-group`
-* output: `src/component-docs/ui/ToggleGroup.mdx`
+- category folder: `ui`
+- id: `toggle-group`
+- output: `src/component-docs/ui/ToggleGroup.mdx`
 
 ## Tags generation
 
 The CLI builds tags from:
 
-* category folder (lowercased)
-* the full id
-* id parts (split by `-`)
-* extra tags entered by the user
+- category folder (lowercased)
+- the full id
+- id parts (split by `-`)
+- extra tags entered by the user
 
 Then it:
 
-* trims each tag
-* removes empties
-* de-duplicates (preserves insertion order)
+- trims each tag
+- removes empties
+- de-duplicates (preserves insertion order)
 
 Example:
 
-* folder: `ui`
-* id: `toggle-group`
-* extra tags: `actions, buttons`
+- folder: `ui`
+- id: `toggle-group`
+- extra tags: `actions, buttons`
 
 Resulting tags:
 
-* `ui`
-* `toggle-group`
-* `toggle`
-* `group`
-* `actions`
-* `buttons`
+- `ui`
+- `toggle-group`
+- `toggle`
+- `group`
+- `actions`
+- `buttons`
 
 Tags are written to frontmatter as unquoted inline values: `tags: [ui, toggle-group, toggle, group, actions, buttons]`
 
@@ -156,19 +156,19 @@ If either matches the new id, the CLI aborts with a "Duplicate id" error and pri
 
 The CLI reads the shared template:
 
-* `src/component-docs/_template/component.mdx.tpl`
+- `src/component-docs/_template/component.mdx.tpl`
 
 It replaces these placeholders:
 
-| Placeholder         | Source                                  | Example value              |
-|---------------------|-----------------------------------------|----------------------------|
-| `{{id}}`            | Normalized id                           | `toggle-group`             |
-| `{{title}}`         | Title case from id                      | `Toggle Group`             |
-| `{{category}}`      | Uppercase folder name                   | `UI`                       |
-| `{{description}}`   | User input (trimmed)                    | `A group of toggleable buttons.` |
-| `{{tagsInline}}`    | Formatted tag list                      | `ui, toggle-group, toggle, group` |
-| `{{importPath}}`    | `@components/<folder>`                  | `@components/ui`           |
-| `{{componentName}}` | PascalCase from id                      | `ToggleGroup`              |
+| Placeholder         | Source                 | Example value                     |
+| ------------------- | ---------------------- | --------------------------------- |
+| `{{id}}`            | Normalized id          | `toggle-group`                    |
+| `{{title}}`         | Title case from id     | `Toggle Group`                    |
+| `{{category}}`      | Uppercase folder name  | `UI`                              |
+| `{{description}}`   | User input (trimmed)   | `A group of toggleable buttons.`  |
+| `{{tagsInline}}`    | Formatted tag list     | `ui, toggle-group, toggle, group` |
+| `{{importPath}}`    | `@components/<folder>` | `@components/ui`                  |
+| `{{componentName}}` | PascalCase from id     | `ToggleGroup`                     |
 
 The generated file includes three sections: **Demo**, **Imports**, and **Code** — each with a starter code block using
 the component name and import path.
@@ -179,11 +179,11 @@ If you change the template, you change the structure of every newly generated do
 
 After generating the file, the CLI tries to open it in this order:
 
-| Priority | Editor    | Detection                                                      |
-|----------|-----------|----------------------------------------------------------------|
-| 1        | WebStorm  | Multiple paths checked per platform (macOS, Linux, Windows)    |
-| 2        | VS Code   | `code --reuse-window`                                          |
-| 3        | Fallback  | `xdg-open` (Linux) or `open` (macOS)                          |
+| Priority | Editor   | Detection                                                   |
+| -------- | -------- | ----------------------------------------------------------- |
+| 1        | WebStorm | Multiple paths checked per platform (macOS, Linux, Windows) |
+| 2        | VS Code  | `code --reuse-window`                                       |
+| 3        | Fallback | `xdg-open` (Linux) or `open` (macOS)                        |
 
 If none work, the CLI still creates the file and prints its path so you can open it manually.
 
@@ -193,43 +193,43 @@ If none work, the CLI still creates the file and prints its path so you can open
 
 Cause:
 
-* no category folders exist under `src/component-docs/`, or all are excluded
+- no category folders exist under `src/component-docs/`, or all are excluded
 
 Fix:
 
-* create a category folder such as `src/component-docs/ui/`
+- create a category folder such as `src/component-docs/ui/`
 
 ### "Duplicate id already exists"
 
 Cause:
 
-* another doc already uses the same `id` (checked via frontmatter id or filename)
+- another doc already uses the same `id` (checked via frontmatter id or filename)
 
 Fix:
 
-* choose a different id
+- choose a different id
 
 ### File did not open
 
 Cause:
 
-* WebStorm launcher not installed / not on PATH
-* `code` command not installed
-* missing desktop opener tools
+- WebStorm launcher not installed / not on PATH
+- `code` command not installed
+- missing desktop opener tools
 
 Fix:
 
-* open the printed file path manually
-* ensure your editor CLI launcher works from the terminal
+- open the printed file path manually
+- ensure your editor CLI launcher works from the terminal
 
 ## Summary
 
-* Use `yarn docs:new` to create docs (do not create MDX manually)
-* Category comes from folder selection (excludes `_*` and `scripts` only)
-* File name, component name, and import path are derived from the id
-* Tags are auto-generated and de-duplicated
-* Duplicate detection checks both frontmatter id and filename
-* The CLI tries to open the created file, but file creation succeeds even if opening fails
+- Use `pnpm docs:new` to create docs (do not create MDX manually)
+- Category comes from folder selection (excludes `_*` and `scripts` only)
+- File name, component name, and import path are derived from the id
+- Tags are auto-generated and de-duplicated
+- Duplicate detection checks both frontmatter id and filename
+- The CLI tries to open the created file, but file creation succeeds even if opening fails
 
 ## Maintenance notes
 

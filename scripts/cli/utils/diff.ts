@@ -1,15 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import prettier from 'prettier';
 import type { IRSchema, EnumStrategy, DiffLine, SchemaDiffResult, DiffStatus } from '../types/index.js';
 import { CodeGenerator } from '../core/CodeGenerator.js';
 import { GeneratorRegistry } from '../generators/GeneratorRegistry.js';
 import { resolveFromRoot } from './path.js';
+import { formatTs } from './format.js';
 
 export async function computeSchemaDiffs(
   schemas: Map<string, IRSchema>,
   outputDir: string,
-  enumStrategy: EnumStrategy
+  enumStrategy: EnumStrategy,
 ): Promise<Map<string, SchemaDiffResult>> {
   const registry = GeneratorRegistry.createDefault();
   const codeGen = new CodeGenerator(registry);
@@ -26,14 +26,9 @@ export async function computeSchemaDiffs(
     const filePath = path.join(modelsDir, generated.filename);
 
     try {
-      const prettierConfig = await prettier.resolveConfig(filePath);
-      expectedContent = await prettier.format(expectedContent, {
-        ...(prettierConfig ?? {}),
-        parser: 'typescript',
-        filepath: filePath,
-      });
+      expectedContent = await formatTs(filePath, expectedContent);
     } catch {
-      // skip formatting if prettier fails
+      // skip formatting if oxfmt fails
     }
 
     if (!fs.existsSync(filePath)) {

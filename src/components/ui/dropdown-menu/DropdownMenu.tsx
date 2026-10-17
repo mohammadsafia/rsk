@@ -1,6 +1,9 @@
 import { type ComponentPropsWithoutRef, type FC, type HTMLAttributes } from 'react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 
+import { floatingMotionClassName, floatingSurfaceClassName } from '@components/ui';
+
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
 import { Check, ChevronRight, Circle } from 'lucide-react';
@@ -12,7 +15,8 @@ type DropdownMenuGroupProps = ComponentPropsWithoutRef<typeof DropdownMenuPrimit
 type DropdownMenuSubProps = ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Sub>;
 type DropdownMenuRadioGroupProps = ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioGroup>;
 type DropdownMenuContentProps = ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>;
-type DropdownMenuItemProps = ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & { inset?: boolean };
+type DropdownMenuItemProps = ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> &
+  VariantProps<typeof menuItemVariants> & { inset?: boolean };
 type DropdownMenuCheckboxItemProps = ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>;
 type DropdownMenuRadioItemProps = ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>;
 type DropdownMenuLabelProps = ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label>;
@@ -38,17 +42,30 @@ type DropdownMenuComponent = FC<DropdownMenuProps> & {
   Shortcut: FC<DropdownMenuShortcutProps>;
 };
 
+const menuItemBase =
+  'relative flex h-7 cursor-pointer items-center gap-2 rounded-sm px-2 text-sm outline-none select-none transition-colors focus:bg-hover data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0';
+
+const menuItemVariants = cva(menuItemBase, {
+  variants: {
+    tone: {
+      neutral: 'text-fg',
+      danger: 'text-danger',
+    },
+  },
+  defaultVariants: {
+    tone: 'neutral',
+  },
+});
+
 const DropdownMenuTrigger: FC<DropdownMenuTriggerProps> = ({ className, ...props }) => (
   <DropdownMenuPrimitive.Trigger
     data-slot="dropdown-trigger"
-    className={cn('flex items-center justify-center text-sm font-medium outline-none', className)}
+    className={cn('focus-ring flex items-center justify-center rounded-md text-sm font-medium', className)}
     {...props}
   />
 );
 
-const DropdownMenuPortal: FC<DropdownMenuPortalProps> = (...props) => (
-  <DropdownMenuPrimitive.Portal data-slot="dropdown-portal" {...props} />
-);
+const DropdownMenuPortal: FC<DropdownMenuPortalProps> = (props) => <DropdownMenuPrimitive.Portal {...props} />;
 
 const DropdownMenuGroup: FC<DropdownMenuGroupProps> = ({ className, ...props }) => (
   <DropdownMenuPrimitive.Group data-slot="dropdown-group" className={cn(className)} {...props} />
@@ -63,28 +80,18 @@ const DropdownMenuRadioGroup: FC<DropdownMenuRadioGroupProps> = ({ className, ..
 const SubTrigger: FC<DropdownMenuSubTriggerProps> = ({ className, inset, children, ...props }) => (
   <DropdownMenuPrimitive.SubTrigger
     data-slot="dropdown-subtrigger"
-    className={cn(
-      'focus:bg-accent data-[state=open]:bg-accent flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none',
-      inset && 'ps-8',
-      className,
-    )}
+    className={cn(menuItemBase, 'text-fg data-[state=open]:bg-hover cursor-default', inset && 'ps-8', className)}
     {...props}
   >
     {children}
-    <ChevronRight className="ms-auto h-4 w-4" />
+    <ChevronRight className="ms-auto rtl:rotate-180" />
   </DropdownMenuPrimitive.SubTrigger>
 );
 
 const SubContent: FC<DropdownMenuSubContentProps> = ({ className, ...props }) => (
   <DropdownMenuPrimitive.SubContent
     data-slot="dropdown-subcontent"
-    className={cn(
-      'border-primary bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out',
-      'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-      'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2',
-      'data-[side=top]:slide-in-from-bottom-2 z-50 min-w-32 overflow-hidden rounded-md border p-1 shadow-lg',
-      className,
-    )}
+    className={cn(floatingSurfaceClassName, floatingMotionClassName, 'min-w-32 overflow-hidden p-1', className)}
     {...props}
   />
 );
@@ -94,28 +101,17 @@ const Content: FC<DropdownMenuContentProps> = ({ className, sideOffset = 4, ...p
     <DropdownMenuPrimitive.Content
       data-slot="dropdown-content"
       sideOffset={sideOffset}
-      className={cn(
-        'bg-popover text-popover-foreground shadow-boundary-ghost z-50 min-w-32 overflow-hidden rounded-md',
-        'data-[state=open]:animate-in data-[state=closed]:animate-out',
-        'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-        'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2',
-        'data-[side=top]:slide-in-from-bottom-2',
-        className,
-      )}
+      className={cn(floatingSurfaceClassName, floatingMotionClassName, 'min-w-32 overflow-hidden p-1', className)}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>
 );
 
-const Item: FC<DropdownMenuItemProps> = ({ className, inset, ...props }) => (
+const Item: FC<DropdownMenuItemProps> = ({ className, inset, tone, ...props }) => (
   <DropdownMenuPrimitive.Item
     data-slot="dropdown-item"
-    className={cn(
-      'hover:bg-primary hover:text-primary-foreground dark:hover:bg-primary-300 text-foreground relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors',
-      'outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50',
-      inset && 'ps-8',
-      className,
-    )}
+    data-tone={tone ?? 'neutral'}
+    className={cn(menuItemVariants({ tone }), inset && 'ps-8', className)}
     {...props}
   />
 );
@@ -123,11 +119,7 @@ const Item: FC<DropdownMenuItemProps> = ({ className, inset, ...props }) => (
 const CheckboxItem: FC<DropdownMenuCheckboxItemProps> = ({ className, children, checked, ...props }) => (
   <DropdownMenuPrimitive.CheckboxItem
     data-slot="dropdown-checkbox-item"
-    className={cn(
-      'focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center rounded-sm py-1.5',
-      'ps-8 pe-2 text-sm transition-colors outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50',
-      className,
-    )}
+    className={cn(menuItemBase, 'text-fg cursor-default ps-8 pe-2', className)}
     checked={checked}
     {...props}
   >
@@ -144,11 +136,7 @@ const CheckboxItem: FC<DropdownMenuCheckboxItemProps> = ({ className, children, 
 const RadioItem: FC<DropdownMenuRadioItemProps> = ({ className, children, ...props }) => (
   <DropdownMenuPrimitive.RadioItem
     data-slot="dropdown-radio-item"
-    className={cn(
-      'focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center rounded-sm py-1.5',
-      'ps-8 pe-2 text-sm transition-colors outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50',
-      className,
-    )}
+    className={cn(menuItemBase, 'text-fg cursor-default ps-8 pe-2', className)}
     {...props}
   >
     <span className="absolute inset-s-2 flex h-3.5 w-3.5 items-center justify-center">
@@ -164,17 +152,21 @@ const RadioItem: FC<DropdownMenuRadioItemProps> = ({ className, children, ...pro
 const Label: FC<DropdownMenuLabelProps & { inset?: boolean }> = ({ className, inset, ...props }) => (
   <DropdownMenuPrimitive.Label
     data-slot="dropdown-label"
-    className={cn('px-2 py-1.5 text-sm font-semibold', inset && 'ps-8', className)}
+    className={cn('text-fg-muted px-2 py-1.5 text-xs font-medium', inset && 'ps-8', className)}
     {...props}
   />
 );
 
 const Separator: FC<DropdownMenuSeparatorProps> = ({ className, ...props }) => (
-  <DropdownMenuPrimitive.Separator data-slot="dropdown-separator" className={cn('bg-muted-200 -mx-1 my-1 h-px', className)} {...props} />
+  <DropdownMenuPrimitive.Separator
+    data-slot="dropdown-separator"
+    className={cn('bg-border-subtle -mx-1 my-1 h-px', className)}
+    {...props}
+  />
 );
 
 const Shortcut: FC<DropdownMenuShortcutProps> = ({ className, ...props }) => (
-  <span data-slot="dropdown-shortcut" className={cn('ms-auto text-xs tracking-widest opacity-60', className)} {...props} />
+  <span data-slot="dropdown-shortcut" className={cn('text-fg-subtle ms-auto font-mono text-xs', className)} {...props} />
 );
 
 const DropdownMenu: DropdownMenuComponent = (props) => <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;

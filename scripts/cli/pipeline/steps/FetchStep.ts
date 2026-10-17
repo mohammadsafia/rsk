@@ -15,9 +15,7 @@ export function createFetchStep(): PipelineStep {
       const fetcher = new SwaggerFetcher();
       const endpoints = ctx.config.endpoints;
 
-      const spinner = logger.spinner(
-        `Fetching swagger specs from ${endpoints.length} endpoint(s)...`
-      );
+      const spinner = logger.spinner(`Fetching swagger specs from ${endpoints.length} endpoint(s)...`);
 
       try {
         for (const endpoint of endpoints) {
@@ -25,9 +23,7 @@ export function createFetchStep(): PipelineStep {
           ctx.swagger.set(endpoint.name, doc);
         }
 
-        spinner.succeed(
-          `Fetched ${endpoints.length} swagger spec(s) successfully.`
-        );
+        spinner.succeed(`Fetched ${endpoints.length} swagger spec(s) successfully.`);
       } catch (error) {
         spinner.fail('Failed to fetch swagger specs.');
         throw error;

@@ -1,0 +1,72 @@
+---
+id: empty-state
+title: EmptyState
+section: Components
+category: Shared
+description: 'What to show when there is nothing to show: first use, no results, or an error, with an optional action.'
+tags: [shared, empty, feedback, error]
+---
+
+import { Button } from '@components/ui';
+import { EmptyState } from '@components/shared';
+
+## Kinds
+
+`kind` picks the icon and the default copy; `title` and `description` override it.
+
+<Example title="First use, no results, error">
+  <div className="grid w-full gap-4 md:grid-cols-3">
+    <div className="border-border rounded-lg border">
+      <EmptyState size="sm" kind="first-use" title="No patients yet" description="Patients you register will appear here." />
+    </div>
+    <div className="border-border rounded-lg border">
+      <EmptyState size="sm" kind="no-results" />
+    </div>
+    <div className="border-border rounded-lg border">
+      <EmptyState size="sm" kind="error" title="Couldn't load visits">
+        <EmptyState.Actions>
+          <Button size="sm" variant="outline">Try again</Button>
+        </EmptyState.Actions>
+      </EmptyState>
+    </div>
+  </div>
+</Example>
+
+## With an action
+
+Offer the one thing that fixes the empty state: create the first item, clear the filters, or retry.
+
+<Example title="First use with a primary action">
+  <div className="border-border w-full max-w-md rounded-lg border">
+    <EmptyState kind="first-use" title="No invoices yet" description="Invoices appear here once a visit is billed.">
+      <EmptyState.Actions>
+        <Button>Create invoice</Button>
+      </EmptyState.Actions>
+    </EmptyState>
+  </div>
+</Example>
+
+For full-page states use `titleAs="h1"` so the page keeps one top-level heading.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'kind', type: "'first-use' | 'no-results' | 'error'", default: "'first-use'", description: 'Icon and default copy (common.emptyState.<kind>).' },
+    { prop: 'title · description', type: 'ReactNode', description: 'Override the default copy.' },
+    { prop: 'icon', type: 'ReactNode', description: 'Replace the default icon.' },
+    { prop: 'size', type: "'sm' | 'md'", default: "'md'", description: 'sm is used inside tables (Table.Empty).' },
+    { prop: 'titleAs', type: "'h1' | 'h2' | 'h3'", default: "'h3'", description: 'Heading level of the title.' },
+  ]}
+/>
+
+`EmptyState.Actions` is a centred, wrapping row of buttons.
+
+## Accessibility
+
+- `kind="error"` sets `role="alert"` so the failure is announced; the other kinds are plain content.
+- The icon is decorative; the title carries the message.
+
+## RTL notes
+
+- Content is centred, so nothing needs mirroring; actions wrap in reading order.

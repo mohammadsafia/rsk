@@ -3,29 +3,55 @@ id: form-daterange
 title: FormDateRange
 section: Components
 category: Forms
-description: Pick a date range.
-tags: [forms, date]
+description: 'Date range field stored as one { from, to } value or as two separate fields.'
+tags: [forms, date, range, calendar]
 ---
 
-import { FormDateRangeDemo } from '@pages/components/components.data.demos';
-
-## Demo
-
-<FormDateRangeDemo />
-
-## Imports
-
-```tsx
-import { FormContainer, FormDateRange } from '@components/forms';
 import { useForm } from 'react-hook-form';
-```
+import { FormContainer, FormDateRange } from '@components/forms';
 
-## Code
+export const RangeDemo = () => {
+  const form = useForm({ defaultValues: { stay: undefined, admittedOn: undefined, dischargedOn: undefined } });
+  return (
+    <FormContainer formContext={form} onSuccess={() => {}} className="grid w-96 gap-3">
+      <FormDateRange name="stay" control={form.control} label="Stay" placeholder="Select dates" />
+      <FormDateRange fromName="admittedOn" toName="dischargedOn" control={form.control} label="Admission" required />
+    </FormContainer>
+  );
+};
 
-```tsx
-const form = useForm();
+## One value or two fields
 
-<FormContainer formContext={form} onSuccess={console.log}>
-  <FormDateRange name="range" control={form.control} label="Range" />
-</FormContainer>;
-```
+With `name`, the form stores `{ from, to }`. With `fromName` and `toName`, it writes two separate fields, which suits APIs that expect `startDate` and `endDate`.
+
+<Example
+  title="Composite and flat"
+  code={`<FormDateRange name="stay" control={form.control} label="Stay" placeholder="Select dates" />
+
+<FormDateRange fromName="admittedOn" toName="dischargedOn" control={form.control} label="Admission" required />`}
+>
+  <RangeDemo />
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'name', type: 'Path', description: 'Store one { from, to } value. Use either name or fromName/toName.' },
+    { prop: 'fromName · toName', type: 'Path · Path', description: 'Store the ends in two fields.' },
+    { prop: 'control', type: 'Control', required: true, description: 'form.control from useForm.' },
+    { prop: 'dateFormat', type: "'MM/dd/yyyy' | 'dd/MM/yyyy' | …", default: "'MM/dd/yyyy'", description: 'Typing mask for both ends.' },
+    { prop: 'formatDateValue', type: '(date) => unknown', description: 'Convert each end before storing, e.g. to ISO strings.' },
+    { prop: 'placeholder', type: 'string', description: 'Shown while empty.' },
+  ]}
+/>
+
+Plus the [shared field props](/docs/components/form-field#shared-by-every-form-field) and calendar props such as `disabled`.
+
+## Accessibility
+
+- One labelled text input takes both dates with a mask; the calendar button opens a two-month range picker.
+
+## RTL notes
+
+- The calendar runs right to left in Arabic; the typed range keeps its order with Western digits.

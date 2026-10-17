@@ -7,35 +7,34 @@ description: {{description}}
 tags: [{{tagsInline}}]
 ---
 
-## Demo
-
-Replace this with a live demo for the component.
-
-```tsx
 import { {{componentName}} } from '{{importPath}}';
 
-export function Demo() {
-  return (
-    <div className="space-y-4">
-      <{{componentName}} />
-    </div>
-  );
-}
-```
+## Basic
 
+One sentence on when to use it. The Example's Code tab shows its own source, so there is no separate Code section.
 
-## Imports
-```tsx
-import { {{componentName}} } from '{{importPath}}';
-```
+<Example title="Basic">
+  <{{componentName}} />
+</Example>
 
-## Code
+## Variants
 
-Write your code examples here.
+<Example title="Variants">
+  <{{componentName}} />
+</Example>
 
-```tsx
-import { {{componentName}} } from '{{importPath}}';
+## API
 
-// Example
-<{{componentName}} />
-```
+<PropsTable
+  rows={[
+    { prop: 'className', type: 'string', description: 'Merged with cn; style with semantic tokens (bg-surface, text-fg-muted), never palette or legacy names.' },
+  ]}
+/>
+
+## Accessibility
+
+- Role, keyboard support and labelling, as implemented in the source.
+
+## RTL notes
+
+- Mirrored icons, logical spacing, LTR-isolated values, or "No direction-specific behaviour".

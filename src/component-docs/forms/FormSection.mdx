@@ -1,0 +1,49 @@
+---
+id: form-section
+title: FormSection
+section: Components
+category: Forms
+description: 'A titled group of fields; consecutive sections are separated by a hairline.'
+tags: [forms, section, layout]
+---
+
+import { FormSection } from '@components/forms';
+import { Input } from '@components/ui';
+
+## Sections
+
+Split long forms into titled groups. Consecutive sections get a hairline between them.
+
+<Example title="Patient and insurance">
+  <div className="w-full max-w-lg">
+    <FormSection title="Patient" description="Who the visit is for">
+      <Input aria-label="Full name" placeholder="Full name" />
+      <Input aria-label="Phone" placeholder="Phone" />
+    </FormSection>
+    <FormSection title="Insurance">
+      <Input aria-label="Policy number" placeholder="Policy number" />
+    </FormSection>
+  </div>
+</Example>
+
+In a real form the children are `Form*` fields inside a [FormContainer](/docs/components/form-container).
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'title', type: 'ReactNode', description: 'Section heading.' },
+    { prop: 'description', type: 'ReactNode', description: 'Muted line under the heading.' },
+    { prop: 'children', type: 'ReactNode', description: 'Fields, laid out in a gap-4 grid.' },
+  ]}
+/>
+
+Other `<section>` attributes pass through.
+
+## Accessibility
+
+- Renders a `<section>`; the title is a heading, so keep the page's heading levels in order around it.
+
+## RTL notes
+
+- No direction-specific behaviour; the title and description align to the start.

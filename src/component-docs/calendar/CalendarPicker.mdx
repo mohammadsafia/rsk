@@ -8,6 +8,8 @@ tags: [calendar, calendar-picker, date-picker, range-picker, popover, compound, 
 ---
 
 import { useState } from 'react';
+import { demoSource } from '@component-docs/blocks';
+import pageSource from './CalendarPicker.mdx?raw';
 
 import { Button, Calendar } from '@components/ui';
 import { CalendarPicker } from '@components/calendar';
@@ -18,7 +20,7 @@ import { CalendarRange, Filter, X } from 'lucide-react';
 
 ## Default — single mode (zero config)
 
-The bare picker. TooltipButton with a calendar icon as the default trigger; clicking opens a single-mode Calendar; clicking a day fires `onChange(iso)` and auto-closes.
+The bare picker. An IconButton with a calendar icon as the default trigger; clicking opens a single-mode Calendar; clicking a day fires `onChange(iso)` and auto-closes.
 
 export const SingleDefaultDemo = () => {
   const [iso, setIso] = useState(null);
@@ -26,12 +28,14 @@ export const SingleDefaultDemo = () => {
     <div className="flex items-center gap-3">
       <CalendarPicker value={iso} onChange={setIso} />
 
-      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+      <span className="text-fg-muted text-sm">{iso ?? 'No date picked'}</span>
     </div>
   );
 };
 
-<SingleDefaultDemo />
+<Example title="Single date" code={demoSource('SingleDefaultDemo', pageSource)}>
+  <SingleDefaultDemo />
+</Example>
 
 ---
 
@@ -53,12 +57,14 @@ export const ShorthandDemo = () => {
         popoverSideOffset={8}
       />
 
-      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+      <span className="text-fg-muted text-sm">{iso ?? 'No date picked'}</span>
     </div>
   );
 };
 
-<ShorthandDemo />
+<Example title="Icon, tooltip, placement" code={demoSource('ShorthandDemo', pageSource)}>
+  <ShorthandDemo />
+</Example>
 
 ---
 
@@ -78,14 +84,16 @@ export const RangeDemo = () => {
         triggerTooltip="Pick a date range"
       />
 
-      <span className="text-muted text-sm">
+      <span className="text-fg-muted text-sm">
         {range ? `${range.from} → ${range.to}` : 'No range picked'}
       </span>
     </div>
   );
 };
 
-<RangeDemo />
+<Example title="Range" code={demoSource('RangeDemo', pageSource)}>
+  <RangeDemo />
+</Example>
 
 ---
 
@@ -106,15 +114,17 @@ export const RangeVisualizationDemo = () => {
           triggerTooltip="Jump to date"
         />
 
-        <span className="text-muted text-sm">Highlighted week: {weekRange.from} → {weekRange.to}</span>
+        <span className="text-fg-muted text-sm">Highlighted week: {weekRange.from} → {weekRange.to}</span>
       </div>
 
-      <span className="text-muted text-xs">Picked: {iso ?? 'None'} (single date — week is decoration only)</span>
+      <span className="text-fg-muted text-xs">Picked: {iso ?? 'None'} (single date — week is decoration only)</span>
     </div>
   );
 };
 
-<RangeVisualizationDemo />
+<Example title="Week highlighted, single pick" code={demoSource('RangeVisualizationDemo', pageSource)}>
+  <RangeVisualizationDemo />
+</Example>
 
 ---
 
@@ -137,7 +147,9 @@ export const TriggerPlainDemo = () => {
   );
 };
 
-<TriggerPlainDemo />
+<Example title="Custom trigger" code={demoSource('TriggerPlainDemo', pageSource)}>
+  <TriggerPlainDemo />
+</Example>
 
 ---
 
@@ -160,7 +172,9 @@ export const TriggerFunctionDemo = () => {
   );
 };
 
-<TriggerFunctionDemo />
+<Example title="Trigger reading state" code={demoSource('TriggerFunctionDemo', pageSource)}>
+  <TriggerFunctionDemo />
+</Example>
 
 ---
 
@@ -177,14 +191,14 @@ export const ContentFunctionDemo = () => {
         <CalendarPicker.Content side="bottom" align="start">
           {({ selected, onSelect, close }) => (
             <div className="flex flex-col gap-2 p-3">
-              <span className="text-muted text-xs">Currently picked: {String(selected ?? 'none')}</span>
+              <span className="text-fg-muted text-xs">Currently picked: {String(selected ?? 'none')}</span>
 
               <div className="flex flex-col gap-1">
                 {presets.map((date) => (
-                  <Button
+                  <Button variant="outline" size="sm"
                     key={date}
-                    size="sm"
-                    variant="outline"
+                   
+                   
                     onClick={() => {
                       onSelect(date);
                       close();
@@ -199,12 +213,14 @@ export const ContentFunctionDemo = () => {
         </CalendarPicker.Content>
       </CalendarPicker>
 
-      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+      <span className="text-fg-muted text-sm">{iso ?? 'No date picked'}</span>
     </div>
   );
 };
 
-<ContentFunctionDemo />
+<Example title="Custom content" code={demoSource('ContentFunctionDemo', pageSource)}>
+  <ContentFunctionDemo />
+</Example>
 
 ---
 
@@ -222,19 +238,21 @@ export const ControlledOpenDemo = () => {
       <CalendarPicker value={iso} onChange={setIso} open={open} onOpenChange={setOpen}>
         <CalendarPicker.Trigger>
           {({ isOpen }) => (
-            <Button size="sm" variant="outline">
+            <Button variant="outline" size="sm">
               {isOpen ? 'Close picker' : 'Open picker'}
             </Button>
           )}
         </CalendarPicker.Trigger>
       </CalendarPicker>
 
-      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+      <span className="text-fg-muted text-sm">{iso ?? 'No date picked'}</span>
     </div>
   );
 };
 
-<ControlledOpenDemo />
+<Example title="Controlled open" code={demoSource('ControlledOpenDemo', pageSource)}>
+  <ControlledOpenDemo />
+</Example>
 
 ---
 
@@ -259,19 +277,21 @@ export const NonDismissableDemo = () => {
       >
         <CalendarPicker.Trigger>
           {({ isOpen }) => (
-            <Button size="sm" variant="outline">
+            <Button variant="outline" size="sm">
               {isOpen ? 'Close picker' : 'Open picker'}
             </Button>
           )}
         </CalendarPicker.Trigger>
       </CalendarPicker>
 
-      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+      <span className="text-fg-muted text-sm">{iso ?? 'No date picked'}</span>
     </div>
   );
 };
 
-<NonDismissableDemo />
+<Example title="Not dismissable" code={demoSource('NonDismissableDemo', pageSource)}>
+  <NonDismissableDemo />
+</Example>
 
 Try clicking outside the popover or pressing `Esc` — the popover stays open. Only the toggle button dismisses it.
 
@@ -294,7 +314,9 @@ export const CalendarPropsDemo = () => {
   );
 };
 
-<CalendarPropsDemo />
+<Example title="Two months, dropdown caption" code={demoSource('CalendarPropsDemo', pageSource)}>
+  <CalendarPropsDemo />
+</Example>
 
 ---
 
@@ -316,16 +338,18 @@ export const CloseOnNeverDemo = () => {
         triggerTooltip="Stays open after pick"
       />
 
-      <Button size="sm" variant="outline" onClick={() => setOpen(false)}>
+      <Button variant="outline" size="sm" onClick={() => setOpen(false)}>
         Done
       </Button>
 
-      <span className="text-muted text-sm">{iso ?? 'No date picked'}</span>
+      <span className="text-fg-muted text-sm">{iso ?? 'No date picked'}</span>
     </div>
   );
 };
 
-<CloseOnNeverDemo />
+<Example title="Close only on Done" code={demoSource('CloseOnNeverDemo', pageSource)}>
+  <CloseOnNeverDemo />
+</Example>
 
 ---
 
@@ -353,10 +377,10 @@ export const BothSlotsRangeDemo = () => {
           {({ onSelect, close }) => (
             <div className="flex flex-col gap-1 p-3">
               {presets.map((preset) => (
-                <Button
+                <Button variant="outline" size="sm"
                   key={preset.label}
-                  size="sm"
-                  variant="outline"
+                 
+                 
                   onClick={() => {
                     onSelect(preset.range);
                     close();
@@ -370,12 +394,14 @@ export const BothSlotsRangeDemo = () => {
         </CalendarPicker.Content>
       </CalendarPicker>
 
-      <span className="text-muted text-sm">{range ? `${range.from} → ${range.to}` : 'No range picked'}</span>
+      <span className="text-fg-muted text-sm">{range ? `${range.from} → ${range.to}` : 'No range picked'}</span>
     </div>
   );
 };
 
-<BothSlotsRangeDemo />
+<Example title="Custom trigger and content" code={demoSource('BothSlotsRangeDemo', pageSource)}>
+  <BothSlotsRangeDemo />
+</Example>
 
 ---
 
@@ -395,19 +421,21 @@ export const FilterSingleClearDemo = () => {
       />
 
       {filterDate && (
-        <Button size="sm" variant="ghost" onClick={() => setFilterDate(null)}>
+        <Button variant="ghost" size="sm" onClick={() => setFilterDate(null)}>
           <X size={14} className="me-1" />
 
           Clear
         </Button>
       )}
 
-      <span className="text-muted text-sm">{filterDate ? `Filtering: ${filterDate}` : 'No filter applied'}</span>
+      <span className="text-fg-muted text-sm">{filterDate ? `Filtering: ${filterDate}` : 'No filter applied'}</span>
     </div>
   );
 };
 
-<FilterSingleClearDemo />
+<Example title="Date filter with clear" code={demoSource('FilterSingleClearDemo', pageSource)}>
+  <FilterSingleClearDemo />
+</Example>
 
 ---
 
@@ -430,21 +458,23 @@ export const FilterRangeClearDemo = () => {
       />
 
       {range && (
-        <Button size="sm" variant="ghost" onClick={() => setRange(null)}>
+        <Button variant="ghost" size="sm" onClick={() => setRange(null)}>
           <X size={14} className="me-1" />
 
           Clear
         </Button>
       )}
 
-      <span className="text-muted text-sm">
+      <span className="text-fg-muted text-sm">
         {range ? `Filtering: ${range.from} → ${range.to}` : 'No range filter'}
       </span>
     </div>
   );
 };
 
-<FilterRangeClearDemo />
+<Example title="Range filter with clear" code={demoSource('FilterRangeClearDemo', pageSource)}>
+  <FilterRangeClearDemo />
+</Example>
 
 ---
 
@@ -479,18 +509,18 @@ export const DateTimePickerDemo = () => {
               />
 
               <div className="flex items-center gap-2 px-1">
-                <span className="text-muted text-xs">Time</span>
+                <span className="text-fg-muted text-xs">Time</span>
 
                 <input
                   type="time"
                   value={pendingTime}
                   onChange={(e) => setPendingTime(e.target.value)}
-                  className="border-muted-200 rounded-md border px-2 py-1 text-sm"
+                  className="border-border rounded-md border px-2 py-1 text-sm"
                 />
               </div>
 
-              <Button
-                size="sm"
+              <Button size="sm"
+               
                 onClick={() => {
                   if (pendingDate) setDateTime(`${pendingDate}T${pendingTime}:00`);
                   close();
@@ -503,9 +533,40 @@ export const DateTimePickerDemo = () => {
         </CalendarPicker.Content>
       </CalendarPicker>
 
-      <span className="text-muted text-sm">{dateTime ?? 'Not set'}</span>
+      <span className="text-fg-muted text-sm">{dateTime ?? 'Not set'}</span>
     </div>
   );
 };
 
-<DateTimePickerDemo />
+<Example title="Date and time" code={demoSource('DateTimePickerDemo', pageSource)}>
+  <DateTimePickerDemo />
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'mode', type: "'single' | 'range'", default: "'single'", description: 'One date, or a two-click range.' },
+    { prop: 'value', type: 'DateInput | null · { from, to } | null', required: true, description: 'The picked date or range.' },
+    { prop: 'onChange', type: '(iso: string) => void · (range: { from, to }) => void', required: true, description: 'Called with ISO strings.' },
+    { prop: 'selected', type: 'CalendarPickerSelected', description: 'Highlight a range while staying in single mode (e.g. the current week).' },
+    { prop: 'closeOn', type: "'select' | 'complete' | 'never'", description: 'When the popover closes: on pick, after a full range, or never (you close it).' },
+    { prop: 'open · onOpenChange', type: 'boolean · (open) => void', description: 'Controlled open state.' },
+    { prop: 'dismissable', type: 'boolean', default: 'true', description: 'false ignores Escape and outside clicks.' },
+    { prop: 'triggerIcon · triggerTooltip', type: 'ReactNode · string', description: 'Default trigger icon and its label.' },
+    { prop: 'popoverSide · popoverAlign · popoverSideOffset', type: 'Popover props', description: 'Placement of the popover.' },
+    { prop: 'calendarProps', type: 'Calendar props', description: 'Passed to the inner Calendar (numberOfMonths, captionLayout, disabled, …).' },
+  ]}
+/>
+
+`CalendarPicker.Trigger` and `CalendarPicker.Content` replace the default trigger and body; both accept function children that receive the picker's state and API.
+
+## Accessibility
+
+- The default trigger is an icon button labelled by `triggerTooltip` (or "Open calendar"); a custom trigger must have its own label.
+- Focus moves into the calendar when it opens and returns to the trigger on close; the calendar grid is fully keyboard-operable.
+
+## RTL notes
+
+- The calendar runs right to left in Arabic with mirrored navigation; values are ISO strings and labels use Western digits.
+

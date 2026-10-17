@@ -21,15 +21,11 @@ export async function selectEnumStrategy(): Promise<EnumStrategy> {
   });
 }
 
-type AdditionalOption =
-  | 'prettier'
-  | 'eslint'
-  | 'dryRun'
-  | 'saveConfig';
+type AdditionalOption = 'format' | 'lint' | 'dryRun' | 'saveConfig';
 
 export type AdditionalOptions = {
-  prettier: boolean;
-  eslint: boolean;
+  format: boolean;
+  lint: boolean;
   dryRun: boolean;
   saveConfig: boolean;
 };
@@ -38,16 +34,16 @@ export async function selectAdditionalOptions(): Promise<AdditionalOptions> {
   const selected = await checkbox<AdditionalOption>({
     message: 'Additional options:',
     choices: [
-      { name: 'Format with Prettier', value: 'prettier', checked: true },
-      { name: 'Lint with ESLint', value: 'eslint', checked: true },
+      { name: 'Format with Oxfmt', value: 'format', checked: true },
+      { name: 'Lint with Oxlint', value: 'lint', checked: true },
       { name: 'Dry run (preview without writing)', value: 'dryRun', checked: false },
       { name: 'Save selection to config file', value: 'saveConfig', checked: false },
     ],
   });
 
   return {
-    prettier: selected.includes('prettier'),
-    eslint: selected.includes('eslint'),
+    format: selected.includes('format'),
+    lint: selected.includes('lint'),
     dryRun: selected.includes('dryRun'),
     saveConfig: selected.includes('saveConfig'),
   };

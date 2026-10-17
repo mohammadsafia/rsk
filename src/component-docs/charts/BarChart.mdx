@@ -1,0 +1,73 @@
+---
+id: bar-chart
+title: BarChart
+section: Components
+category: Charts
+description: 'Compare categories with columns or horizontal bars, grouped or stacked.'
+tags: [charts, bar, column, comparison]
+importFrom: '@components/charts'
+---
+
+import { BarChart } from '@components/charts';
+
+export const CLINICS = [
+  { clinic: 'Abdoun', paid: 18200, pending: 2400 },
+  { clinic: 'Khalda', paid: 14100, pending: 3900 },
+  { clinic: 'Sweifieh', paid: 16800, pending: 1200 },
+  { clinic: 'Zarqa', paid: 9800, pending: 2100 },
+];
+
+## Columns
+
+<Example title="Revenue by clinic">
+  <BarChart
+    className="w-full"
+    aria-label="Paid and pending revenue by clinic; Abdoun leads"
+    data={CLINICS}
+    series={[{ key: 'paid', label: 'Paid' }, { key: 'pending', label: 'Pending', tone: 'warning' }]}
+    x={{ key: 'clinic' }}
+    valueFormat="money"
+  />
+</Example>
+
+## Horizontal, stacked
+
+Horizontal bars suit long category names; `stacked` shows each total and its parts.
+
+<Example title="Stacked bars">
+  <BarChart
+    className="w-full"
+    aria-label="Total revenue by clinic, split into paid and pending"
+    data={CLINICS}
+    series={[{ key: 'paid', label: 'Paid' }, { key: 'pending', label: 'Pending', tone: 'warning' }]}
+    x={{ key: 'clinic' }}
+    valueFormat="money"
+    orientation="horizontal"
+    stacked
+  />
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'aria-label', type: 'string', required: true, description: 'One-line summary of what the chart shows.' },
+    { prop: 'data · series', type: 'T[] · { key; label; tone? }[]', required: true, description: 'Rows, and which keys to draw.' },
+    { prop: 'x', type: '{ key; format? }', required: true, description: 'The category key and its label formatter.' },
+    { prop: 'valueFormat · currency', type: "'number' | 'percent' | 'money' | (v) => string · string", default: "'number'", description: 'How values read on the axis, tooltip and table. percent expects fractions (0.12 → 12%).' },
+    { prop: 'height', type: 'number', default: '280', description: 'Plot height in px.' },
+    { prop: 'loading · empty', type: 'boolean · ReactNode', description: 'Skeleton, or content when there is no data.' },
+    { prop: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Direction the bars grow: columns or horizontal bars.' },
+    { prop: 'stacked', type: 'boolean', default: 'false', description: 'Stack series instead of grouping them.' },
+  ]}
+/>
+
+## Accessibility
+
+- A `figure` named by `aria-label`; the legend's buttons toggle series with `aria-pressed`, and the last visible series can't be hidden.
+- "View as table" swaps the chart for a table of the same values; arrow keys move between points (recharts accessibility layer).
+- Animation is off under `prefers-reduced-motion`.
+
+## RTL notes
+
+- In Arabic columns run right to left and the value axis sits on the right; horizontal bars grow from the right.

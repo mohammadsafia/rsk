@@ -1,0 +1,64 @@
+---
+id: data-tables
+title: Data tables
+section: Guides
+category: Guides
+description: Compose a DataTable, describe filters on columns, keep them across navigation, and filter on the server.
+order: 6
+tags: [guides, tables, filters]
+---
+
+## Composition
+
+`DataTable` takes a TanStack `table` and is composed from three parts. Put the page's `PageHeader` above it in a full-height column so the table body scrolls instead of the page:
+
+```tsx
+<div className="flex h-full min-h-0 flex-col">
+  <PageHeader title="Patients" />
+
+  <DataTable table={table} className="min-h-0 flex-1">
+    <DataTable.Toolbar totalCount={count} totalLabel="Patients" />
+    <DataTable.Content />
+    <DataTable.Pagination />
+  </DataTable>
+</div>
+```
+
+## Columns
+
+Column `meta` drives the UI: `numeric: true` end-aligns a column with tabular figures, and `filterMeta` (built with `createFilterMeta`) adds a filter pill to the toolbar. Pair each filter type with its client `filterFn`:
+
+| Filter | `filterFn` |
+|---|---|
+| `select` · `multiSelect` | `inListFilterFn` |
+| `date` · `dateRange` · `time` | `dateFilterFn` · `dateRangeFilterFn` · `timeFilterFn` |
+| `boolean` | `booleanFilterFn` |
+| `text` | `containsFilterFn` (ignores case and Arabic diacritics) |
+| `numberRange` | `numberRangeFilterFn` |
+
+The full reference, with examples of every type, is on the [DataTable page](/docs/components/data-table#filters).
+
+## Keeping filters
+
+`useDataTableFilters` keeps filters and search in sessionStorage so they survive navigating away and back, and — opt-in — in the URL so a filtered view can be shared. "Clear filters" clears both.
+
+```tsx
+const filters = useDataTableFilters({ columns, urlSync: true, storageKey: 'patients' });
+
+const table = useReactTable({
+  ...options,
+  state: filters.state,
+  onColumnFiltersChange: filters.onColumnFiltersChange,
+  onGlobalFilterChange: filters.onGlobalFilterChange,
+});
+```
+
+## Server-side filtering
+
+For API-backed tables set `manualFiltering: true` and send the filters with your request. `getFilterQueryParams(table)` returns them in the same readable format the URL uses:
+
+```tsx
+const params = getFilterQueryParams(table); // { role: 'admin,editor', amount: '10..250', q: 'sara' }
+
+useQuery({ queryKey: ['patients', params], queryFn: () => api.patients.list(params) });
+```

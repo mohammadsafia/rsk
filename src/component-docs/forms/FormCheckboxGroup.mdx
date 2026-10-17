@@ -3,43 +3,38 @@ id: form-checkbox-group
 title: FormCheckboxGroup
 section: Components
 category: Forms
-description: 'Controlled checkbox group with card-style items, label, and validation support.'
-tags: [forms, checkbox, checkbox-group]
+description: 'Several checkbox cards bound to one array value in react-hook-form.'
+tags: [forms, checkbox, group]
 ---
 
+import { demoSource } from '@component-docs/blocks';
 import { FormCheckboxGroupDemo } from '@pages/components/components.data.demos';
 
-## Demo
+## Options
 
-<FormCheckboxGroupDemo />
+The value is an array of the selected option values. Options can be strings or objects; `getOptionLabel` and `getOptionValue` read them.
 
-## Imports
+<Example title="Features" code={demoSource('FormCheckboxGroupDemo')}>
+  <FormCheckboxGroupDemo />
+</Example>
 
-```tsx
-import { FormContainer, FormCheckboxGroup } from '@components/forms';
-import { useForm } from 'react-hook-form';
-```
+## API
 
-## Code
+<PropsTable
+  rows={[
+    { prop: 'name', type: 'Path<TFieldValues>', required: true, description: 'Field path; the value is string[].' },
+    { prop: 'control', type: 'Control<TFieldValues>', required: true, description: 'form.control from useForm.' },
+    { prop: 'options', type: 'TOption[]', required: true, description: 'The choices.' },
+    { prop: 'getOptionLabel · getOptionValue', type: '(option) => string', required: true, description: 'How to read each option.' },
+  ]}
+/>
 
-```tsx
-const form = useForm({ defaultValues: { features: ['dark-mode'] } });
-const features = [
-  { id: 'dark-mode', name: 'Dark Mode' },
-  { id: 'notifications', name: 'Notifications' },
-  { id: 'analytics', name: 'Analytics' },
-];
+Plus the [shared field props](/docs/components/form-field#shared-by-every-form-field). The cards are [CheckboxGroup](/docs/components/checkbox-group) items.
 
-<FormContainer formContext={form} onSuccess={console.log}>
-  <FormCheckboxGroup
-    name="features"
-    control={form.control}
-    label="Select Features"
-    required
-    options={features}
-    getOptionLabel={(o) => o.name}
-    getOptionValue={(o) => o.id}
-  />
-  <Button type="submit">Submit</Button>
-</FormContainer>;
-```
+## Accessibility
+
+- The cards sit in a `role="group"` labelled by the field label; each card is a checkbox named by its text.
+
+## RTL notes
+
+- The cards wrap in reading order, and each card's indicator sits at its end.

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .tile { fill: oklch(0.928 0.003 264.5); }
+    .sq { fill: oklch(0.173 0.004 264.5); }
+    .ac { fill: oklch(0.698 0.125 12); }
+    @media (prefers-color-scheme: light) {
+      .tile { fill: oklch(0.205 0.006 271.1); }
+      .sq { fill: oklch(0.991 0.001 286.4); }
+      .ac { fill: oklch(0.43 0.141 14.9); }
+    }
+  </style>
+  <rect class="tile" width="32" height="32" rx="8"/>
+  <rect class="sq" x="7" y="7" width="8" height="8" rx="2.5"/>
+  <rect class="sq" x="17" y="7" width="8" height="8" rx="2.5"/>
+  <rect class="sq" x="7" y="17" width="8" height="8" rx="2.5"/>
+  <rect class="ac" x="17" y="17" width="8" height="8" rx="4"/>
+</svg>

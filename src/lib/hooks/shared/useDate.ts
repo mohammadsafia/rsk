@@ -90,6 +90,8 @@ export enum DateFormats {
 export enum TimeFormats {
   // Example: "12:00 PM" (12-hour format with AM/PM)
   HOUR_MINUTES_12 = 'h:mm a',
+  // Example: "9 AM" (hour only, 12-hour format)
+  HOUR_12 = 'h a',
   // Example: "12:00:30 PM" (12-hour format with seconds and AM/PM)
   HOUR_MINUTES_SECONDS_12 = 'h:mm:ss a',
   // Example: "12:00" (24-hour format)

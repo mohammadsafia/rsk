@@ -1,0 +1,43 @@
+---
+id: theming
+title: Theming & tokens
+section: Guides
+category: Guides
+description: The three token layers, dark mode, adding a token, and the guard that keeps the kit on tokens.
+order: 3
+tags: [guides, tokens, dark-mode, theme]
+---
+
+import { Badge, Tag } from '@components/ui';
+
+## Three layers
+
+1. **`palette.css`** — raw scales (graphite, oxblood, green, amber, …) in OKLCH. Never used directly by components.
+2. **`tokens.css`** — semantic roles for light (`:root, .light`) and dark (`.dark`): `canvas`, `surface`, `surface-raised`, `surface-sunken`, `fg`, `fg-muted`, `fg-subtle`, `border`, `border-strong`, `accent`, and the status roles `success`, `warning`, `danger`, `info`, each with a `-subtle` tint.
+3. **`theme.css`** — maps the roles to Tailwind utilities (`bg-surface`, `text-fg-muted`, …) and clears Tailwind's default palette, so only tokens generate colour classes.
+
+## Status colours
+
+<Example title="Status tones">
+  <Tag tone="success">Active</Tag>
+  <Tag tone="warning">Pending</Tag>
+  <Tag tone="danger">Overdue</Tag>
+  <Badge variant="soft" tone="info">Info</Badge>
+  <Badge variant="dot" tone="accent">New</Badge>
+</Example>
+
+The accent (oxblood) is for the one thing on a surface that matters most — a primary action, a selected range, the logo's corner. Use it sparingly.
+
+## Dark mode
+
+Dark is the default. `ThemeProvider` puts `dark` or `light` on `<html>`, and `ThemeSwitcher` toggles it. Because every component reads tokens, nothing needs a `dark:` variant. A subtree can force a theme by adding the class — this site's example frames do exactly that for their Dark toggle.
+
+## Adding a token
+
+1. Add the value to both blocks of `tokens.css`.
+2. Expose it in `theme.css` (`--color-<name>: var(--<name>)`).
+3. If it is text on a background, add the pair to `tests/design-system/contrast.test.ts` — the suite enforces WCAG AA (4.5:1 for text, 3:1 for UI).
+
+<Callout tone="note" title="The forbidden-pattern guard">
+  `tests/design-system/forbidden-patterns.test.ts` scans every source file for hex colours, palette classes, legacy names and arbitrary pixel values. The baseline is empty: any new violation fails the build.
+</Callout>

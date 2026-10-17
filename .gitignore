@@ -42,5 +42,10 @@ temp-api-types/
 /dist
 # Playwright MCP artifacts
 .playwright-mcp/
+.playwright-cli/
 
 i18n-*.png
+.vitest/
+
+# Generated app starter (pnpm starter:build)
+/.starter

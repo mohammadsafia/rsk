@@ -3,50 +3,93 @@ id: toast
 title: Toast
 section: Components
 category: UI
-description: 'Notification toasts with multiple variants: default, success, and destructive.'
+description: 'Notification toasts on the raised surface. tone (neutral, info, success, warning, danger) colors only the icon; no tinted backgrounds.'
 tags: [ui, toast, notification]
 ---
 
-import { ToastDemo } from '@pages/components/components.data.demos';
-
-## Demo
-
-<ToastDemo />
-
-## Imports
-
-```tsx
+import { Button, Toast } from '@components/ui';
 import { useToast } from '@hooks/shared';
-import { Toaster } from '@components/shared';
-```
 
-## Code
+export const TonesDemo = () => {
+  const { toast } = useToast();
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Button variant="outline" onClick={() => toast({ title: 'Draft saved', description: 'You can finish it later.' })}>Neutral</Button>
+      <Button variant="outline" onClick={() => toast({ tone: 'success', title: 'Invoice paid', description: 'The payment was received.' })}>Success</Button>
+      <Button variant="outline" onClick={() => toast({ tone: 'warning', title: 'Session expiring', description: 'Save your work.' })}>Warning</Button>
+      <Button variant="outline" onClick={() => toast({ tone: 'danger', title: 'Upload failed', description: 'The file is larger than 10 MB.' })}>Danger</Button>
+      <Button variant="outline" onClick={() => toast({ tone: 'info', title: 'New results', description: '3 lab results arrived.' })}>Info</Button>
+    </div>
+  );
+};
 
-```tsx
-// In your App root
-<Toaster />;
+export const ActionDemo = () => {
+  const { toast } = useToast();
+  return (
+    <Button
+      variant="outline"
+      onClick={() =>
+        toast({
+          title: 'Visit cancelled',
+          description: 'Layla Haddad · 10:30',
+          action: <Toast.Action altText="Undo cancellation">Undo</Toast.Action>,
+        })
+      }
+    >
+      Cancel visit
+    </Button>
+  );
+};
 
-// In your component
-const { toast } = useToast();
+## Tones
 
-// Default toast
-toast({
-  title: 'Default Toast',
-  description: 'This is a default toast notification.',
-  variant: 'default',
-});
+Call `toast()` from `useToast`. The tone colours only the icon; the surface stays neutral.
 
-// Success toast
-toast({
-  title: 'Success!',
-  description: 'Operation completed successfully.',
-  variant: 'success',
-});
+<Example
+  title="Tones"
+  code={`const { toast } = useToast();
 
-// Destructive toast
-toast({
-  title: 'Error',
-  description: 'Something went wrong.',
-  variant: 'destructive',
-});
-```
+toast({ title: 'Draft saved', description: 'You can finish it later.' });
+toast({ tone: 'success', title: 'Invoice paid', description: 'The payment was received.' });
+toast({ tone: 'danger', title: 'Upload failed', description: 'The file is larger than 10 MB.' });`}
+>
+  <TonesDemo />
+</Example>
+
+## With an action
+
+<Example
+  title="Undo"
+  code={`toast({
+  title: 'Visit cancelled',
+  description: 'Layla Haddad · 10:30',
+  action: <Toast.Action altText="Undo cancellation">Undo</Toast.Action>,
+});`}
+>
+  <ActionDemo />
+</Example>
+
+Toasts render in a [Toaster](/docs/components/toaster), which the app and docs layouts already mount.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'title', type: 'ReactNode', description: 'The headline.' },
+    { prop: 'description', type: 'ReactNode', description: 'One line of detail.' },
+    { prop: 'tone', type: "'neutral' | 'info' | 'success' | 'warning' | 'danger'", default: "'neutral'", description: 'Icon colour and meaning.' },
+    { prop: 'action', type: '<Toast.Action altText>', description: 'One button, such as Undo; altText describes it for screen readers.' },
+    { prop: 'position', type: "'top-end' | …", default: "'top-end'", description: 'Corner of the viewport.' },
+  ]}
+/>
+
+`toast()` returns `{ id, dismiss, update }`. Toasts close after 5 seconds.
+
+## Accessibility
+
+- The viewport is a labelled region; new toasts are announced politely, and F8 moves focus to it.
+- Don't put the only way to do something in a toast; it disappears.
+
+## RTL notes
+
+- Toasts appear in the top-end corner (top-left in Arabic) and swipe away toward the end.

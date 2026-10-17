@@ -27,9 +27,7 @@ export class SwaggerFetcher {
     return doc;
   }
 
-  async fetchMultiple(
-    endpoints: Array<{ name: string; url: string }>
-  ): Promise<Map<string, OpenAPIDocument>> {
+  async fetchMultiple(endpoints: Array<{ name: string; url: string }>): Promise<Map<string, OpenAPIDocument>> {
     const results = new Map<string, OpenAPIDocument>();
 
     for (const endpoint of endpoints) {
@@ -55,9 +53,7 @@ export class SwaggerFetcher {
     }
   }
 
-  private getSchemas(
-    doc: OpenAPIDocument
-  ): Record<string, unknown> | undefined {
+  private getSchemas(doc: OpenAPIDocument): Record<string, unknown> | undefined {
     // OpenAPI 3.x uses components.schemas, Swagger 2.x uses definitions
     return (doc.components?.schemas ?? doc.definitions) as Record<string, unknown> | undefined;
   }

@@ -3,40 +3,66 @@ id: accordion
 title: Accordion
 section: Components
 category: UI
-description: 'Expandable content panels.'
+description: 'Stacked sections that expand one at a time or several at once.'
 tags: [ui, accordion, disclosure]
 ---
 
 import { Accordion } from '@components/ui';
 
-## Demo
+## Single
 
-<Accordion type="single" collapsible className="w-80">
-    <Accordion.Item value="item-1">
-        <Accordion.Trigger>Section 1</Accordion.Trigger>
-        <Accordion.Content>Content for section 1.</Accordion.Content>
+One section open at a time; `collapsible` lets the open one close again.
+
+<Example title="Single, collapsible">
+  <Accordion type="single" collapsible className="w-80">
+    <Accordion.Item value="history">
+      <Accordion.Trigger>Medical history</Accordion.Trigger>
+      <Accordion.Content>Asthma since 2014, managed with an inhaler.</Accordion.Content>
     </Accordion.Item>
-
-    <Accordion.Item value="item-2">
-        <Accordion.Trigger>Section 2</Accordion.Trigger>
-        <Accordion.Content>Content for section 2.</Accordion.Content>
+    <Accordion.Item value="allergies">
+      <Accordion.Trigger>Allergies</Accordion.Trigger>
+      <Accordion.Content>Penicillin.</Accordion.Content>
     </Accordion.Item>
+    <Accordion.Item value="notes">
+      <Accordion.Trigger>Notes</Accordion.Trigger>
+      <Accordion.Content>Prefers morning appointments.</Accordion.Content>
+    </Accordion.Item>
+  </Accordion>
+</Example>
 
-</Accordion>
+## Multiple
 
-## Imports
+<Example title="Several open at once">
+  <Accordion type="multiple" defaultValue={['billing']} className="w-80">
+    <Accordion.Item value="billing">
+      <Accordion.Trigger>Billing</Accordion.Trigger>
+      <Accordion.Content>Invoices are sent on the first of each month.</Accordion.Content>
+    </Accordion.Item>
+    <Accordion.Item value="security">
+      <Accordion.Trigger>Security</Accordion.Trigger>
+      <Accordion.Content>Two-factor authentication is required for admins.</Accordion.Content>
+    </Accordion.Item>
+  </Accordion>
+</Example>
 
-```tsx
-import { Accordion } from '@components/ui';
-```
+## API
 
-## Code
+<PropsTable
+  rows={[
+    { prop: 'type', type: "'single' | 'multiple'", required: true, description: 'One open section at a time, or any number.' },
+    { prop: 'collapsible', type: 'boolean', default: 'false', description: 'With type="single", lets the open section close.' },
+    { prop: 'value · defaultValue', type: 'string | string[]', description: 'Open section(s), controlled or initial. An array for type="multiple".' },
+    { prop: 'onValueChange', type: '(value) => void', description: 'Called when sections open or close.' },
+  ]}
+/>
 
-```tsx
-<Accordion type="single" collapsible>
-  <Accordion.Item value="item-1">
-    <Accordion.Trigger>Section 1</Accordion.Trigger>
-    <Accordion.Content>Content here</Accordion.Content>
-  </Accordion.Item>
-</Accordion>
-```
+`Accordion.Item` takes a unique `value`; `Accordion.Trigger` and `Accordion.Content` go inside it.
+
+## Accessibility
+
+- Each trigger is a button inside a heading, with `aria-expanded` and `aria-controls` set by Radix.
+- Arrow keys move between triggers, Home and End jump to the first and last, Enter and Space toggle.
+
+## RTL notes
+
+- The chevron points down and only rotates, so it needs no mirroring; trigger text aligns to the start.

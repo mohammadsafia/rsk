@@ -1,0 +1,68 @@
+---
+id: line-chart
+title: LineChart
+section: Components
+category: Charts
+description: 'Trends over time: one line per series, token colours, kit tooltip, legend toggles and a table view.'
+tags: [charts, line, trend, time-series]
+importFrom: '@components/charts'
+---
+
+import { LineChart } from '@components/charts';
+
+export const WEEK = [
+  { day: 'Mon', visits: 32, booked: 40 },
+  { day: 'Tue', visits: 41, booked: 38 },
+  { day: 'Wed', visits: 28, booked: 35 },
+  { day: 'Thu', visits: 45, booked: 44 },
+  { day: 'Fri', visits: 39, booked: 42 },
+];
+
+export const REVENUE = [
+  { month: 'Jun', revenue: 18400 },
+  { month: 'Jul', revenue: 21900 },
+  { month: 'Aug', revenue: 19800 },
+  { month: 'Sep', revenue: 24600 },
+];
+
+## Two series
+
+<Example title="Visits per day">
+  <LineChart
+    className="w-full"
+    aria-label="Visits and bookings this week; visits peaked on Thursday"
+    data={WEEK}
+    series={[{ key: 'visits', label: 'Visits' }, { key: 'booked', label: 'Booked' }]}
+    x={{ key: 'day' }}
+  />
+</Example>
+
+## Money values
+
+<Example title="Revenue by month">
+  <LineChart className="w-full" aria-label="Revenue grew from June to September" data={REVENUE} series={[{ key: 'revenue', label: 'Revenue' }]} x={{ key: 'month' }} valueFormat="money" />
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'aria-label', type: 'string', required: true, description: 'One-line summary of what the chart shows.' },
+    { prop: 'data · series', type: 'T[] · { key; label; tone? }[]', required: true, description: 'Rows, and which keys to draw.' },
+    { prop: 'x', type: '{ key; format? }', required: true, description: 'The category key and its label formatter.' },
+    { prop: 'valueFormat · currency', type: "'number' | 'percent' | 'money' | (v) => string · string", default: "'number'", description: 'How values read on the axis, tooltip and table. percent expects fractions (0.12 → 12%).' },
+    { prop: 'height', type: 'number', default: '280', description: 'Plot height in px.' },
+    { prop: 'loading · empty', type: 'boolean · ReactNode', description: 'Skeleton, or content when there is no data.' },
+    { prop: 'curve', type: "'monotone' | 'linear'", default: "'monotone'", description: 'Line interpolation.' },
+  ]}
+/>
+
+## Accessibility
+
+- A `figure` named by `aria-label`; the legend's buttons toggle series with `aria-pressed`, and the last visible series can't be hidden.
+- "View as table" swaps the chart for a table of the same values; arrow keys move between points (recharts accessibility layer).
+- Animation is off under `prefers-reduced-motion`.
+
+## RTL notes
+
+- In Arabic the category axis runs right to left and the value axis sits on the right; values stay LTR-isolated with Western digits.

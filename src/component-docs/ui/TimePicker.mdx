@@ -3,24 +3,80 @@ id: time-picker
 title: TimePicker
 section: Components
 category: UI
-description: 'Time picker component.'
+description: 'Time field with hour, minute and AM/PM columns, a range and a step.'
 tags: [ui, time, picker]
 ---
 
-import { TimePickerDemo } from '@pages/components/components.data.demos';
-
-## Demo
-
-<TimePickerDemo />
-
-## Imports
-
-```tsx
+import { useState } from 'react';
 import { TimePicker } from '@components/ui';
-```
 
-## Code
+export const ControlledDemo = () => {
+  const [time, setTime] = useState('09:30 AM');
+  return (
+    <div className="grid w-60 gap-1.5">
+      <label htmlFor="visit-time" className="text-fg text-sm font-medium">Visit time</label>
+      <TimePicker id="visit-time" name="visit-time" step={15} value={time} onChange={(value) => setTime(value ?? null)} />
+      <p className="text-fg-muted text-xs">Value: <span dir="ltr" className="font-mono">{time ?? '—'}</span></p>
+    </div>
+  );
+};
 
-```tsx
-<TimePicker />
-```
+## Basic
+
+Pick the hour, minute and period; Confirm applies it, and the clear control empties the field.
+
+<Example
+  title="Controlled, 15-minute step"
+  code={`const [time, setTime] = useState<string | null>('09:30 AM');
+
+<label htmlFor="visit-time">Visit time</label>
+<TimePicker id="visit-time" name="visit-time" step={15} value={time} onChange={(value) => setTime(value ?? null)} />`}
+>
+  <ControlledDemo />
+</Example>
+
+## 24-hour and range
+
+<Example title="Clinic hours, 24h">
+  <div className="w-60">
+    <TimePicker name="clinic-time" use24hFormat min="08:00" max="17:00" step={30} placeholder="08:00 – 17:00" />
+  </div>
+</Example>
+
+## Sizes and states
+
+<Example title="Small, invalid, disabled">
+  <div className="grid w-60 gap-3">
+    <TimePicker name="t-sm" size="sm" placeholder="Small" />
+    <TimePicker name="t-invalid" invalid placeholder="Required" />
+    <TimePicker name="t-disabled" disabled placeholder="Disabled" />
+  </div>
+</Example>
+
+In forms, use [FormTimePicker](/docs/components/form-time-picker).
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'name', type: 'string', required: true, description: 'Field name.' },
+    { prop: 'value · onChange', type: 'string | null · (value?: string) => void', description: 'Controlled value; empty when cleared.' },
+    { prop: 'use24hFormat', type: 'boolean', default: 'false', description: 'Emits "HH:MM"; otherwise "hh:MM AM|PM".' },
+    { prop: 'min · max', type: 'string ("HH:MM")', default: '"00:00" · "23:59"', description: 'Inclusive range.' },
+    { prop: 'step', type: 'number', default: '1', description: 'Minutes between options, counted from min.' },
+    { prop: 'startAt', type: 'string', default: '"08:00"', description: 'Seed shown when there is no value.' },
+    { prop: 'clearButton', type: 'boolean', default: 'true', description: 'Clear control outside the trigger.' },
+    { prop: 'size · invalid · disabled', type: "'sm' | 'md' | 'lg' · boolean · boolean", description: 'Same field shape as Input.' },
+  ]}
+/>
+
+Use `TimePicker.Content` inside your own `Popover` for a custom trigger, as the table `TimeFilter` does.
+
+## Accessibility
+
+- Label it with `id` and a `<label htmlFor>` (or use the form field); `aria-describedby` and `aria-required` pass through.
+- The hour, minute and AM/PM columns are keyboard-reachable listboxes.
+
+## RTL notes
+
+- The control follows the page direction, while the time value itself stays left to right (`09:30 AM`) with Western digits.

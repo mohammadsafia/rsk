@@ -1,0 +1,64 @@
+---
+id: area-chart
+title: AreaChart
+section: Components
+category: Charts
+description: 'Volumes over time as filled areas, side by side or stacked to show the total.'
+tags: [charts, area, stacked, time-series]
+importFrom: '@components/charts'
+---
+
+import { AreaChart } from '@components/charts';
+
+export const VISITS = [
+  { month: 'May', inPerson: 410, video: 120 },
+  { month: 'Jun', inPerson: 380, video: 160 },
+  { month: 'Jul', inPerson: 420, video: 190 },
+  { month: 'Aug', inPerson: 395, video: 230 },
+  { month: 'Sep', inPerson: 450, video: 260 },
+];
+
+## Stacked
+
+`stacked` piles the series so the top edge reads as the total.
+
+<Example title="Visits by channel">
+  <AreaChart
+    className="w-full"
+    aria-label="Monthly visits by channel; video visits doubled since May"
+    data={VISITS}
+    series={[{ key: 'inPerson', label: 'In person' }, { key: 'video', label: 'Video' }]}
+    x={{ key: 'month' }}
+    stacked
+  />
+</Example>
+
+## Single series
+
+<Example title="Video visits">
+  <AreaChart className="w-full" aria-label="Video visits per month" data={VISITS} series={[{ key: 'video', label: 'Video', tone: 'info' }]} x={{ key: 'month' }} />
+</Example>
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'aria-label', type: 'string', required: true, description: 'One-line summary of what the chart shows.' },
+    { prop: 'data · series', type: 'T[] · { key; label; tone? }[]', required: true, description: 'Rows, and which keys to draw.' },
+    { prop: 'x', type: '{ key; format? }', required: true, description: 'The category key and its label formatter.' },
+    { prop: 'valueFormat · currency', type: "'number' | 'percent' | 'money' | (v) => string · string", default: "'number'", description: 'How values read on the axis, tooltip and table. percent expects fractions (0.12 → 12%).' },
+    { prop: 'height', type: 'number', default: '280', description: 'Plot height in px.' },
+    { prop: 'loading · empty', type: 'boolean · ReactNode', description: 'Skeleton, or content when there is no data.' },
+    { prop: 'stacked', type: 'boolean', default: 'false', description: 'Stack the series on top of each other.' },
+  ]}
+/>
+
+## Accessibility
+
+- A `figure` named by `aria-label`; the legend's buttons toggle series with `aria-pressed`, and the last visible series can't be hidden.
+- "View as table" swaps the chart for a table of the same values; arrow keys move between points (recharts accessibility layer).
+- Animation is off under `prefers-reduced-motion`.
+
+## RTL notes
+
+- In Arabic the time axis runs right to left and the value axis sits on the right; values stay LTR-isolated with Western digits.

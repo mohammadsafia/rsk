@@ -17,9 +17,7 @@ export function extractRefName(ref: string): string {
  * e.g. "my-value" → "MyValue", "MY_VALUE" → "MyValue"
  */
 export function toPascalCase(str: string): string {
-  return str
-    .replace(/[-_]+(.)?/g, (_, char) => (char ? char.toUpperCase() : ''))
-    .replace(/^(.)/, (_, char) => char.toUpperCase());
+  return str.replace(/[-_]+(.)?/g, (_, char) => (char ? char.toUpperCase() : '')).replace(/^(.)/, (_, char) => char.toUpperCase());
 }
 
 /**
@@ -36,11 +34,42 @@ export function isLikelyEnumName(name: string): boolean {
  */
 export function sanitizePropertyName(name: string): string {
   const reserved = new Set([
-    'break', 'case', 'catch', 'class', 'const', 'continue', 'debugger',
-    'default', 'delete', 'do', 'else', 'enum', 'export', 'extends',
-    'false', 'finally', 'for', 'function', 'if', 'import', 'in',
-    'instanceof', 'new', 'null', 'return', 'super', 'switch', 'this',
-    'throw', 'true', 'try', 'typeof', 'var', 'void', 'while', 'with',
+    'break',
+    'case',
+    'catch',
+    'class',
+    'const',
+    'continue',
+    'debugger',
+    'default',
+    'delete',
+    'do',
+    'else',
+    'enum',
+    'export',
+    'extends',
+    'false',
+    'finally',
+    'for',
+    'function',
+    'if',
+    'import',
+    'in',
+    'instanceof',
+    'new',
+    'null',
+    'return',
+    'super',
+    'switch',
+    'this',
+    'throw',
+    'true',
+    'try',
+    'typeof',
+    'var',
+    'void',
+    'while',
+    'with',
   ]);
 
   if (reserved.has(name) || /[^a-zA-Z0-9_$]/.test(name)) {

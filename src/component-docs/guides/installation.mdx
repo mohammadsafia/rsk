@@ -1,0 +1,57 @@
+---
+id: installation
+title: Installation
+section: Guides
+category: Guides
+description: Clone the starter, install dependencies and learn the everyday scripts.
+order: 2
+tags: [guides, setup, scripts]
+---
+
+## Get the code
+
+```bash
+git clone https://github.com/mohammadsafia/rsk.git
+cd rsk
+corepack pnpm@10.34.7 install
+corepack pnpm@10.34.7 dev
+```
+
+The app runs on Vite+ (`vp`). Pin pnpm through Corepack so everyone installs the same lockfile.
+
+## Everyday scripts
+
+| Command | What it does |
+|---|---|
+| `vp dev` | Start the dev server |
+| `vp check` | Format check, lint and type-aware lint |
+| `vp test --run` | Run the test suite once (happy-dom) |
+| `vp build` | Type-check and build for production |
+| `pnpm docs:new` | Scaffold a new docs page from the template |
+| `pnpm docs:lint` | Validate every docs page (frontmatter and page anatomy) |
+| `pnpm ds:baseline` | Re-record the forbidden-pattern baseline (it must stay empty) |
+| `pnpm ds:classes <files>` | Codemod legacy colour classes to semantic tokens |
+
+## Path aliases
+
+Imports use aliases instead of long relative paths:
+
+| Alias | Points to |
+|---|---|
+| `@components/*` | `src/components/*` (`ui`, `forms`, `shared`, `tables`, `calendar`, `utils`) |
+| `@hooks/*` | `src/lib/hooks/*` |
+| `@utils` | `src/lib/utils` |
+| `@contexts` | `src/lib/contexts` |
+| `@layouts` | `src/layouts` |
+| `@pages/*` · `@views/*` | `src/pages/*` · `src/views/*` |
+| `@routes` | `src/routes` |
+| `@component-docs` | `src/component-docs` |
+
+## Project layout
+
+- `src/components/ui` — primitives (no app knowledge).
+- `src/components/forms` — fields bound to react-hook-form.
+- `src/components/shared` — composites built from primitives.
+- `src/components/{tables,calendar}` — DataTable and CalendarGrid families.
+- `src/layouts` — app, auth, docs and error layouts.
+- `src/component-docs` — the MDX pages behind this site.

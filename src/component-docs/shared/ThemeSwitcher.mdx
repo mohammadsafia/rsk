@@ -3,24 +3,37 @@ id: theme-switcher
 title: ThemeSwitcher
 section: Components
 category: Shared
-description: 'Theme toggle button with Light/Dark/System modes.'
-tags: [shared, theme, theme-switcher, dark-mode]
+description: 'Icon button that toggles between the dark and light themes.'
+tags: [shared, theme, dark-mode]
 ---
 
 import { ThemeSwitcher } from '@components/shared';
 
-## Demo
+## Toggle
 
-<ThemeSwitcher />
+Switches the whole app: the sun and moon icons swap as the theme changes. This site's top bar uses the same button.
 
-## Imports
+<Example title="Theme toggle">
+  <ThemeSwitcher />
+</Example>
 
-```tsx
-import { ThemeSwitcher } from '@components/shared';
-```
+The choice is kept by `ThemeProvider`, which puts `dark` or `light` on `<html>`. See [Theming & tokens](/docs/theming#dark-mode).
 
-## Code
+## API
 
-```tsx
-<ThemeSwitcher />
-```
+ThemeSwitcher takes no props. To build your own control, use the context:
+
+<PropsTable
+  rows={[
+    { prop: 'useTheme().theme', type: "'dark' | 'light'", description: 'The current theme.' },
+    { prop: 'useTheme().setTheme', type: '(theme) => void', description: 'Change and remember the theme.' },
+  ]}
+/>
+
+## Accessibility
+
+- An `IconButton` whose label says what it will do ("Switch to light theme"), and which also shows as its tooltip.
+
+## RTL notes
+
+- No direction-specific behaviour.

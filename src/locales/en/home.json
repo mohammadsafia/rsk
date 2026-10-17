@@ -4,14 +4,18 @@
     "logoAlt": "RSK logo",
     "features": "Features",
     "components": "Components",
-    "github": "GitHub"
+    "github": "GitHub",
+    "primary": "Primary",
+    "docs": "Docs",
+    "cli": "CLI",
+    "getStarted": "Get Started"
   },
   "hero": {
     "eyebrow": "React · TypeScript · Vite",
     "titleLead": "The foundation for what's ",
     "titleEmphasis": "next",
     "titleTrail": ".",
-    "subtitle": "A considered starter for developers who value craft. 76 components, enterprise patterns, and zero compromise — wired together so you can ship on day one.",
+    "subtitle": "A considered starter for developers who value craft. {{count}} components, enterprise patterns, and zero compromise — wired together so you can ship on day one.",
     "ctaPrimary": "Get Started",
     "ctaSecondary": "Browse Components"
   },
@@ -21,49 +25,40 @@
     "mdxDocs": "MDX Docs",
     "sharedComponents": "Shared Components"
   },
-  "techStack": {
-    "builtOn": "Built on"
-  },
   "features": {
     "eyebrow": "What's inside",
     "title": "Everything wired, nothing in your way.",
     "componentLibrary": {
       "title": "Component Library",
-      "desc": "35 Radix UI primitives with CVA variants. Compound component patterns — Dialog.Header, Tabs.List, Card.Content. Dark mode ready. Fully typed with TypeScript generics."
+      "desc": "Radix primitives on one vocabulary — variant × tone × size, typed slots, dark mode by tokens."
     },
     "formSystem": {
       "title": "Form System",
-      "desc": "17 form components powered by React Hook Form and Zod. Input masks, number formatting, date pickers, file uploaders, and async comboboxes with infinite scroll."
+      "desc": "{{count}} fields with one contract: label, description, inline errors, React Hook Form + Zod."
     },
     "dataTables": {
       "title": "Data Tables",
-      "desc": "TanStack Table with headless sorting, filtering, and pagination. Server-side query integration via custom hooks. Faceted filters out of the box."
+      "desc": "Filters, sorting, pinning and pagination on TanStack Table, with numeric columns that read right in RTL."
     },
     "authentication": {
       "title": "Authentication",
-      "desc": "OIDC via oidc-client-ts with Azure AD support. AuthGuard layout, route-level protection, and withAuth HOC for component-level access control."
+      "desc": "Guards, layouts and permission-aware components."
     },
     "internationalization": {
       "title": "Internationalization",
-      "desc": "i18next with browser language detection. Namespace-organized translations, RTL layout support, and lazy-loaded locale bundles."
+      "desc": "English and Arabic with full RTL; digits stay Western, data stays readable."
     },
     "errorMonitoring": {
       "title": "Error Monitoring",
-      "desc": "Sentry integration with Vite source maps. React error boundaries with graceful fallback UI. Structured error tracking from day one."
+      "desc": "Boundaries and reporting wired in from the start."
     }
   },
   "showcase": {
     "eyebrow": "Documented",
     "title": "See exactly what you get.",
-    "desc": "79 MDX-powered documentation pages with live previews, code snippets, and usage guidelines. Browse the full gallery to explore every component.",
+    "desc": "{{count}} MDX pages with live previews, code and usage notes for every component.",
     "cta": "Open Gallery",
-    "browserUrl": "localhost:3000/components",
-    "searchPlaceholder": "Search…",
-    "buttonTitle": "Button",
-    "buttonDesc": "Displays a button or a component that looks like a button.",
-    "variantDefault": "Default",
-    "variantOutline": "Outline",
-    "variantGhost": "Ghost"
+    "browserUrl": "localhost:3000/components"
   },
   "cli": {
     "eyebrow": "Tooling",
@@ -72,8 +67,8 @@
     "logFetching": "Fetching OpenAPI spec…",
     "logParsing": "Parsing 42 schemas",
     "logGenerating": "Generating TypeScript DTOs",
-    "logFormatting": "Formatting with Prettier",
-    "logWritten": "Written 42 files"
+    "logFormatting": "Formatting with Oxfmt",
+    "logWritten": "Wrote 42 files · 1.8s"
   },
   "architecture": {
     "eyebrow": "Structure",
@@ -85,10 +80,57 @@
     "title": "Up and running in seconds.",
     "clone": "Clone",
     "install": "Install",
-    "start": "Start"
+    "start": "Start",
+    "copy": "Copy {{command}}",
+    "copied": "Copied"
   },
   "footer": {
     "builtBy": "Built by Mohammad Safia",
-    "github": "GitHub"
+    "github": "GitHub",
+    "license": "MIT licence"
+  },
+  "specimen": {
+    "label": "Component specimens",
+    "description": "A live sample of the kit: a day calendar with tinted events and the current-time line, a time field and an email field with an inline error, status tags, an invoice table with a selected row, a success toast and a delete confirmation.",
+    "calendar": "Calendar · Tue 13",
+    "fields": "Field family",
+    "status": "Status",
+    "table": "Table",
+    "rows": "1–10 of 248",
+    "events": {
+      "checkup": "Check-up · L. Haddad",
+      "consult": "Surgery consult",
+      "lab": "Lab review",
+      "insurance": "Insurance call"
+    },
+    "selectTime": "Select time",
+    "emailError": "Enter a complete email",
+    "tags": {
+      "active": "Active",
+      "pending": "Pending",
+      "urgent": "Urgent",
+      "cardiology": "Cardiology"
+    },
+    "columns": {
+      "invoice": "Invoice",
+      "patient": "Patient",
+      "amount": "Amount"
+    },
+    "toastTitle": "Appointment booked",
+    "toastBody": "Tue 13 Oct · 10:30",
+    "confirmTitle": "Delete record?",
+    "confirmBody": "This can't be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "structure": {
+    "aliases": {
+      "ui": "primitives",
+      "forms": "form fields",
+      "shared": "composites",
+      "hooks": "hooks",
+      "layouts": "app frame",
+      "routes": "routing"
+    }
   }
 }
