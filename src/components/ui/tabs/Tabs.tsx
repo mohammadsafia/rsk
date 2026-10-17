@@ -25,14 +25,12 @@ const tabsListVariants = cva('group/tabs-list scrollbar-none flex min-w-0 items-
 
 // Triggers read the list's data attributes, so the list's variant needs no React context.
 const triggerClassName = [
-  'focus-ring text-fg-muted hover:text-fg inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors',
+  'focus-ring text-fg-muted hover:text-fg inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 smallcaps text-xs font-medium whitespace-nowrap transition-colors',
   'disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-fg [&_svg]:size-4',
   'group-data-[full-width=true]/tabs-list:flex-1',
-  'group-data-[variant=underline]/tabs-list:relative group-data-[variant=underline]/tabs-list:h-9 group-data-[variant=underline]/tabs-list:px-1',
-  'group-data-[variant=underline]/tabs-list:after:absolute group-data-[variant=underline]/tabs-list:after:inset-x-0 group-data-[variant=underline]/tabs-list:after:bottom-0 group-data-[variant=underline]/tabs-list:after:h-0.5',
-  'group-data-[variant=underline]/tabs-list:data-[state=active]:after:bg-accent',
+  // Ledger: the active tab carries the ink bar (drawn in), never a fill.
+  'group-data-[variant=underline]/tabs-list:h-9 group-data-[variant=underline]/tabs-list:px-1 data-[state=active]:ink-block',
   'group-data-[variant=contained]/tabs-list:h-7 group-data-[variant=contained]/tabs-list:rounded-sm group-data-[variant=contained]/tabs-list:px-3',
-  'group-data-[variant=contained]/tabs-list:data-[state=active]:text-fg',
 ].join(' ');
 
 type TabsProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Root>;

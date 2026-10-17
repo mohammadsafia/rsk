@@ -98,7 +98,7 @@ const CommandItem: FC<CommandItemProps> = ({ className, ...props }) => (
     data-slot="command-item"
     className={cn(
       'group/command-item relative flex min-h-control-sm w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-none select-none',
-      'data-[selected=true]:bg-hover data-[checked=true]:font-medium',
+      'data-[selected=true]:bg-hover data-[checked=true]:ink',
       'data-[disabled=true]:pointer-events-none data-[disabled=true]:text-fg-subtle',
       className,
     )}
@@ -116,7 +116,7 @@ const CommandItemIndicator: FC<CommandIndicatorProps> = ({ className, children, 
     )}
     {...props}
   >
-    {children ?? <CheckIcon className="text-accent size-4" />}
+    {children ?? <CheckIcon className="text-fg-muted size-4" />}
   </span>
 );
 

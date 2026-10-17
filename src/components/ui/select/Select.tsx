@@ -46,7 +46,7 @@ const SelectTrigger: FC<SelectTriggerProps> = ({ ref, className, size, invalid, 
     aria-invalid={invalid || undefined}
     className={cn(
       fieldVariants({ size }),
-      'group/select-trigger relative cursor-pointer gap-2 text-start data-[placeholder]:text-fg-muted data-[state=open]:border-ring',
+      'group/select-trigger relative cursor-pointer gap-2 text-start data-[placeholder]:text-fg-muted data-[state=open]:border-fg',
       className,
     )}
     {...props}
@@ -135,7 +135,7 @@ const SelectItem: FC<SelectItemProps> = ({ className, children, ...props }) => (
     data-slot="select-item"
     className={cn(
       'relative flex h-control-sm w-full cursor-pointer items-center gap-2 rounded-md px-2 text-sm outline-none select-none',
-      'data-highlighted:bg-hover data-[state=checked]:font-medium',
+      'data-highlighted:bg-hover data-[state=checked]:text-fg data-[state=checked]:ink',
       'data-disabled:pointer-events-none data-disabled:text-fg-subtle',
       className,
     )}
@@ -147,7 +147,7 @@ const SelectItem: FC<SelectItemProps> = ({ className, children, ...props }) => (
         <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
 
         <SelectPrimitive.ItemIndicator className="ms-auto">
-          <CheckIcon aria-hidden="true" className="text-accent size-4" />
+          <CheckIcon aria-hidden="true" className="text-fg-muted size-4" />
         </SelectPrimitive.ItemIndicator>
       </Conditional.If>
 
@@ -162,7 +162,7 @@ const SelectItemText: FC<SelectItemTextProps> = ({ className, ...props }) => (
 
 const SelectIndicator: FC<SelectIndicatorProps> = ({ className, children, ...props }) => (
   <SelectPrimitive.ItemIndicator data-slot="select-item-indicator" {...props}>
-    {children ?? <CheckIcon className={cn('text-accent ms-auto size-4', className)} />}
+    {children ?? <CheckIcon className={cn('text-fg-muted ms-auto size-4', className)} />}
   </SelectPrimitive.ItemIndicator>
 );
 

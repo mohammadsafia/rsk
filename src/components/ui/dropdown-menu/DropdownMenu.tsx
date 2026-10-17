@@ -119,7 +119,7 @@ const Item: FC<DropdownMenuItemProps> = ({ className, inset, tone, ...props }) =
 const CheckboxItem: FC<DropdownMenuCheckboxItemProps> = ({ className, children, checked, ...props }) => (
   <DropdownMenuPrimitive.CheckboxItem
     data-slot="dropdown-checkbox-item"
-    className={cn(menuItemBase, 'text-fg cursor-default ps-8 pe-2', className)}
+    className={cn(menuItemBase, 'text-fg cursor-default ps-8 pe-2 data-[state=checked]:ink', className)}
     checked={checked}
     {...props}
   >
@@ -136,7 +136,7 @@ const CheckboxItem: FC<DropdownMenuCheckboxItemProps> = ({ className, children, 
 const RadioItem: FC<DropdownMenuRadioItemProps> = ({ className, children, ...props }) => (
   <DropdownMenuPrimitive.RadioItem
     data-slot="dropdown-radio-item"
-    className={cn(menuItemBase, 'text-fg cursor-default ps-8 pe-2', className)}
+    className={cn(menuItemBase, 'text-fg cursor-default ps-8 pe-2 data-[state=checked]:ink', className)}
     {...props}
   >
     <span className="absolute inset-s-2 flex h-3.5 w-3.5 items-center justify-center">

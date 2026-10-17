@@ -57,4 +57,13 @@ describe('Tabs', () => {
     // The active underline sits inside the trigger (it used to hang 1px below and overflow the list).
     expect(screen.getByRole('tab', { name: 'A' }).className).not.toContain('-bottom-px');
   });
+
+  it('marks the active tab with the ink bar, keeps aria-selected, and sets triggers in small caps', () => {
+    renderTabs();
+    const active = screen.getByRole('tab', { name: 'Notes' });
+    expect(active.getAttribute('aria-selected')).toBe('true');
+    expect(active.className).toContain('data-[state=active]:ink-block');
+    expect(active.className).toContain('smallcaps');
+    expect(active.className).not.toContain('after:bg-accent');
+  });
 });

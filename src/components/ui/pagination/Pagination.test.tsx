@@ -47,7 +47,8 @@ describe('Pagination', () => {
     const current = screen.getByRole('button', { name: '01' });
     const other = screen.getByRole('button', { name: '02' });
     expect(current.getAttribute('aria-current')).toBe('page');
-    expect(current.dataset.variant).toBe('solid');
+    expect(current.dataset.variant).toBe('ghost');
+    expect(current.className).toContain('aria-[current=page]:ink-block');
     expect(other.getAttribute('aria-current')).toBeNull();
     expect(other.dataset.variant).toBe('ghost');
   });

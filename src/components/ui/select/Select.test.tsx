@@ -35,5 +35,7 @@ describe('Select', () => {
     renderSelect(true);
     // Radix reserves aria-selected for the focused option; the chosen value is data-state="checked".
     expect(screen.getByRole('option', { name: 'Dr. Haddad' }).dataset.state).toBe('checked');
+    const chosen = screen.getByRole('option', { name: 'Dr. Haddad' });
+    expect(chosen.className).toContain('data-[state=checked]:ink');
   });
 });
