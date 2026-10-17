@@ -21,11 +21,9 @@ const Item: FC<CheckboxGroupItemProps> = ({ ref, className, children, ...props }
     ref={ref}
     data-slot="checkbox-group-item"
     className={cn(
-      'group/checkbox-item border-border bg-surface text-fg flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition-colors',
-      'focus-ring hover:not-disabled:border-border-strong',
-      'data-[state=checked]:border-accent data-[state=checked]:bg-accent-subtle',
-      'in-aria-invalid:border-danger',
-      'disabled:pointer-events-none disabled:opacity-50',
+      // A plain inline choice (control + label), never a field-like box; min-h keeps a 28px target (WCAG 2.5.8).
+      'group/checkbox-item text-fg min-h-control-sm inline-flex cursor-pointer items-center gap-2 rounded-sm text-start text-sm',
+      'focus-ring disabled:pointer-events-none disabled:opacity-50',
       className,
     )}
     {...props}

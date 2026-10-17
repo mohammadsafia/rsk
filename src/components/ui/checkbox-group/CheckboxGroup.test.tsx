@@ -15,4 +15,15 @@ describe('CheckboxGroup', () => {
     );
     expect(screen.getByRole('group', { name: 'Allergies' })).toBeTruthy();
   });
+
+  it('is a plain inline choice: no field-like box, no accent tint, still a 28px target', () => {
+    render(
+      <CheckboxGroup aria-label="Allergies">
+        <CheckboxGroup.Item defaultChecked aria-label="Penicillin" />
+      </CheckboxGroup>,
+    );
+    const item = screen.getByRole('checkbox', { name: 'Penicillin' });
+    expect(item.className).not.toMatch(/\bborder\b|\bp-3\b|\brounded-lg\b|\bbg-surface\b|accent/);
+    expect(item.className).toContain('min-h-control-sm');
+  });
 });

@@ -45,7 +45,7 @@ function FormRadioGroup<TFieldValues extends FieldValues, TOption = FormSelectOp
           {(fieldControl) => (
             <RadioGroup
               {...fieldControl}
-              className={cn('flex flex-wrap gap-3', className)}
+              className={cn('flex flex-wrap gap-x-6 gap-y-2', className)}
               value={field.value ?? ''}
               disabled={field.disabled || disabled}
               onValueChange={field.onChange}
@@ -55,16 +55,10 @@ function FormRadioGroup<TFieldValues extends FieldValues, TOption = FormSelectOp
                 const value = getOptionValue(option);
 
                 return (
-                  <RadioGroup.Item
-                    key={value}
-                    id={`${fieldControl.id}-${value}`}
-                    ref={index === 0 ? field.ref : undefined}
-                    className="min-w-40 flex-1"
-                    value={value}
-                  >
-                    <span className="flex-1">{getOptionLabel(option)}</span>
-
+                  <RadioGroup.Item key={value} id={`${fieldControl.id}-${value}`} ref={index === 0 ? field.ref : undefined} value={value}>
                     <RadioGroup.Indicator />
+
+                    <span>{getOptionLabel(option)}</span>
                   </RadioGroup.Item>
                 );
               })}
