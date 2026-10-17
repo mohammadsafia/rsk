@@ -95,9 +95,14 @@ export const ELEVATIONS: ReadonlyArray<FoundationScaleStep> = [
 ];
 
 export const DURATIONS: ReadonlyArray<FoundationScaleStep> = [
-  { token: 'duration-fast', value: '120ms', use: 'Hover, press' },
-  { token: 'duration-base', value: '180ms', use: 'Menus, popovers, tabs' },
-  { token: 'duration-slow', value: '260ms', use: 'Dialogs, sheets' },
+  { token: 'duration-instant', value: '100ms', use: 'Popover and tooltip exits' },
+  { token: 'duration-fast', value: '120ms', use: 'Hover, press, exits, popover entries' },
+  { token: 'duration-base', value: '180ms', use: 'Standard entries: dialogs, menus, slides' },
+  { token: 'duration-exit', value: '200ms', use: 'Large surface exits: sheets' },
+  { token: 'duration-slow', value: '260ms', use: 'Sheet entries, chart updates' },
+  { token: 'duration-spring', value: '380ms', use: 'Expressive arrivals (spring easing)' },
+  { token: 'duration-spring-long', value: '420ms', use: 'Sheet spring, section reveal' },
+  { token: 'duration-roll', value: '520ms', use: 'Rolling figures' },
 ];
 
 export const STATE_UTILITIES: ReadonlyArray<FoundationScaleStep> = [

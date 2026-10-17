@@ -28,6 +28,31 @@
   transition-duration: var(--duration-slow);
 }
 
+@utility duration-instant {
+  --tw-duration: var(--duration-instant);
+  transition-duration: var(--duration-instant);
+}
+
+@utility duration-exit {
+  --tw-duration: var(--duration-exit);
+  transition-duration: var(--duration-exit);
+}
+
+@utility duration-spring {
+  --tw-duration: var(--duration-spring);
+  transition-duration: var(--duration-spring);
+}
+
+@utility duration-spring-long {
+  --tw-duration: var(--duration-spring-long);
+  transition-duration: var(--duration-spring-long);
+}
+
+@utility duration-roll {
+  --tw-duration: var(--duration-roll);
+  transition-duration: var(--duration-roll);
+}
+
 /* Focus: buttons, links, toggles — solid 2px ring with offset, keyboard focus only. */
 @utility focus-ring {
   outline: 2px solid transparent;

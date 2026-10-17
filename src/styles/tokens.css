@@ -142,9 +142,18 @@
 }
 
 :root {
+  --duration-instant: 100ms;
   --duration-fast: 120ms;
   --duration-base: 180ms;
+  --duration-exit: 200ms;
   --duration-slow: 260ms;
+  --duration-spring: 380ms;
+  --duration-spring-long: 420ms;
+  --duration-roll: 520ms;
+  --motion-stagger: 32ms;
+  --motion-reveal-stagger: 60ms;
+  --motion-depth: 0.025;
+  --motion-ease-spring: cubic-bezier(0.34, 1.32, 0.64, 1);
   --leading-rtl-boost: 0em;
   --ink-thickness: 2px;
   --ink-offset: 4px;
