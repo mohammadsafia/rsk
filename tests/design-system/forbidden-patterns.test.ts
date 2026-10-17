@@ -89,6 +89,12 @@ describe('countPatterns — motion', () => {
     expect(countPatterns(source)).toEqual({ 'raw-motion': 6 });
   });
 
+  it('counts any numeric duration or delay, and arbitrary easings and animations', () => {
+    const source = '<a className="duration-250 duration-0 delay-150 ease-[cubic-bezier(0,0,1,1)] animate-[spin_1s_linear]" />';
+
+    expect(countPatterns(source)).toEqual({ 'raw-motion': 5 });
+  });
+
   it('allows the motion tokens', () => {
     const source =
       '<a className="duration-instant duration-fast duration-base duration-exit duration-slow duration-spring duration-spring-long duration-roll ease-out ease-in ease-spring" />';

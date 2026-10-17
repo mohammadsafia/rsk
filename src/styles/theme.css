@@ -107,6 +107,9 @@
   /* motion */
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  /* bare transition-* utilities default to the motion tokens, not Tailwind's 150ms */
+  --default-transition-duration: var(--duration-fast);
+  --default-transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
   /* swapped to ease-out in calm mode (src/styles/motion.css) */
   --ease-spring: var(--motion-ease-spring);
 }

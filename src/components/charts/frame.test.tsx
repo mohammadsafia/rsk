@@ -144,4 +144,21 @@ describe('ChartFrame', () => {
     expect(seen.every((value) => value === false)).toBe(true);
     vi.restoreAllMocks();
   });
+
+  it('stays still when data first arrives after loading, then animates later updates', () => {
+    const seen: boolean[] = [];
+    const Spy = ({ rows, loading }: { rows: Row[]; loading?: boolean }) => (
+      <ChartFrame<Row> aria-label="Visits" data={rows} series={series} xKey="month" formatValue={String} formatX={String} loading={loading}>
+        {({ animate }) => {
+          seen.push(animate);
+          return null;
+        }}
+      </ChartFrame>
+    );
+    const { rerender } = render(<Spy rows={[]} loading />);
+    rerender(<Spy rows={data} />);
+    expect(seen.at(-1)).toBe(false);
+    rerender(<Spy rows={[...data, { month: 'Mar', visits: 90, revenue: 0.1 }]} />);
+    expect(seen.at(-1)).toBe(true);
+  });
 });

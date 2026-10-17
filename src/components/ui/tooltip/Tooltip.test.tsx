@@ -22,6 +22,10 @@ describe('Tooltip', () => {
     expect((bubble as HTMLElement).className).toContain('rule-top-ink');
     expect((bubble as HTMLElement).className).toContain('origin-(--radix-tooltip-content-transform-origin)');
     expect((bubble as HTMLElement).className).toContain('data-[state=closed]:duration-instant');
+    expect((bubble as HTMLElement).className).toContain('transition-none');
+    // tw-animate only generates integer slide steps; 0.5 would silently render no travel.
+    expect((bubble as HTMLElement).className).toContain('data-[side=top]:slide-in-from-bottom-1');
+    expect((bubble as HTMLElement).className).not.toMatch(/slide-in-from-[a-z]+-0\.5/);
   });
 
   it('renders only the trigger when disabled', () => {

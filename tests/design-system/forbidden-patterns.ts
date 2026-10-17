@@ -74,7 +74,7 @@ export const FORBIDDEN_PATTERNS: ReadonlyArray<{ id: PatternId; regex: RegExp; w
   },
   {
     id: 'raw-motion',
-    regex: /\bduration-(?:75|100|150|200|300|500|700|1000)\b|\bduration-\[[^\]]+\]|\bease-(?:linear|in-out)\b/g,
+    regex: /\bduration-\d+\b|\bduration-\[[^\]]+\]|\bease-(?:linear|in-out)\b|\bease-\[[^\]]+\]|\bdelay-\d+\b|\banimate-\[[^\]]+\]/g,
     why: 'Motion timing comes from the motion tokens (duration-instant…roll, ease-out/in/spring)',
   },
 ];

@@ -1,8 +1,8 @@
 // @vitest-environment happy-dom
-import { cleanup, render } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
-import { Accordion, Collapsible } from '@components/ui';
+import { Accordion, Card, Collapsible } from '@components/ui';
 
 afterEach(cleanup);
 
@@ -48,5 +48,16 @@ describe('disclosure timing', () => {
       expect(className, slot).toContain('data-[state=open]:duration-base');
       expect(className, slot).toContain('data-[state=closed]:duration-fast');
     }
+  });
+
+  it('times the collapsible Card the same way', () => {
+    render(
+      <Card title="Visit notes" collapsible defaultOpen>
+        Body
+      </Card>,
+    );
+    const content = screen.getByText('Body').closest('[data-state]') as HTMLElement;
+    expect(content.className).toContain('data-[state=open]:duration-base');
+    expect(content.className).toContain('data-[state=closed]:duration-fast');
   });
 });

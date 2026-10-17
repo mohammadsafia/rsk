@@ -55,9 +55,10 @@ export function ChartFrame<T>({
   const [asTable, setAsTable] = useState(false);
   const { mode } = useMotion();
   // Charts paint still and morph on later data changes only (spec §4 Charts); never under reduced motion.
-  // The first paint stays still; a data update (a new data array) morphs. Never under reduced motion.
-  const [firstData] = useState(data);
-  const animate = data !== firstData && mode !== 'reduced';
+  // The "still" snapshot is taken when the plot is first shown, so data arriving after a loading state doesn't animate.
+  const [stillData, setStillData] = useState<typeof data | null>(loading || data.length === 0 ? null : data);
+  if (stillData === null && !loading && data.length > 0) setStillData(data);
+  const animate = stillData !== null && data !== stillData && mode !== 'reduced';
 
   const colored: VisibleSeries[] = series.map((item, index) => ({ ...item, color: toneColor(item.tone, index) }));
   // Hidden keys are reconciled with the current series: stale keys are ignored, and the plot never goes blank.

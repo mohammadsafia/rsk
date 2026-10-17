@@ -49,4 +49,9 @@ describe('motion tokens', () => {
   it('imports motion.css after utilities.css', () => {
     expect(indexCss.indexOf("@import './styles/motion.css';")).toBeGreaterThan(indexCss.indexOf("@import './styles/utilities.css';"));
   });
+
+  it("points the bare transition-* utilities at the motion tokens instead of Tailwind's 150ms default", () => {
+    expect(themeCss).toContain('--default-transition-duration: var(--duration-fast);');
+    expect(themeCss).toContain(`--default-transition-timing-function: ${MOTION_EASINGS.out};`);
+  });
 });

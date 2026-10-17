@@ -93,4 +93,11 @@ describe('MotionProvider', () => {
     );
     expect(screen.getByTestId('probe').textContent).toBe('expressive rtl 180');
   });
+
+  it('without a provider, still honours the OS reduced-motion setting', () => {
+    reduce = true;
+    mockMatchMedia();
+    render(<Probe />);
+    expect(screen.getByTestId('probe').textContent).toMatch(/^reduced/);
+  });
 });

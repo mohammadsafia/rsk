@@ -206,7 +206,7 @@ const Card: CardComponent = ({
         <Conditional.If condition={collapsible}>
           <CollapsiblePrimitive.Content
             data-slot="card-collapsible-content"
-            className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down overflow-hidden motion-reduce:animate-none"
+            className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down data-[state=open]:duration-base data-[state=closed]:duration-fast overflow-hidden motion-reduce:animate-none"
           >
             <Conditional>
               <Conditional.If condition={loading}>

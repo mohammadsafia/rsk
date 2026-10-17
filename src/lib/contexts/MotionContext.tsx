@@ -8,7 +8,7 @@ export type MotionPreference = Exclude<MotionMode, 'reduced'>;
 
 type MotionState = { mode: MotionMode; direction: 'ltr' | 'rtl'; tokens: typeof MOTION };
 
-const MotionContext = createContext<MotionState>({ mode: 'expressive', direction: 'ltr', tokens: MOTION });
+const MotionContext = createContext<MotionState | null>(null);
 
 const REDUCED_QUERY = '(prefers-reduced-motion: reduce)';
 
@@ -40,4 +40,10 @@ export function MotionProvider({ children, mode: preferred = 'expressive' }: { c
   return <MotionContext.Provider value={{ mode, direction, tokens: MOTION }}>{children}</MotionContext.Provider>;
 }
 
-export const useMotion = () => useContext(MotionContext);
+/** The motion mode. Without a MotionProvider (isolated renders, apps that skip it) the OS reduced-motion setting still wins. */
+export const useMotion = (): MotionState => {
+  const context = useContext(MotionContext);
+  const reduced = usePrefersReducedMotion();
+  const { direction } = useAppTranslation();
+  return context ?? { mode: reduced ? 'reduced' : 'expressive', direction, tokens: MOTION };
+};

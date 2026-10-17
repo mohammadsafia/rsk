@@ -9,7 +9,9 @@ export const floatingSurfaceClassName = 'bg-surface-raised text-fg shadow-raised
 
 /** Enter/exit motion for Radix floating layers: fade + 0.98 scale; reduced motion keeps only the fade. */
 export const floatingMotionClassName = [
-  'data-[state=open]:animate-in data-[state=closed]:animate-out',
+  // transition-none: the duration utilities also set transition-duration, and transform-origin would otherwise
+  // transition from the centre while Radix positions the layer.
+  'transition-none data-[state=open]:animate-in data-[state=closed]:animate-out',
   'data-[state=open]:duration-fast data-[state=closed]:duration-instant data-[state=closed]:ease-in',
   'data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
   'data-[state=open]:zoom-in-96 data-[state=closed]:zoom-out-96',

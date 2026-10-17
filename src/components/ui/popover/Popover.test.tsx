@@ -22,6 +22,8 @@ describe('Popover', () => {
     expect(content?.className).toContain('data-[state=closed]:ease-in');
     expect(content?.className).toContain('data-[side=top]:slide-in-from-bottom-1');
     expect(content?.className).toContain('origin-(--radix-popover-content-transform-origin)');
+    // The origin must not transition from the centre while Radix positions the layer.
+    expect(content?.className).toContain('transition-none');
     expect(content?.className).not.toContain('bg-popover');
   });
 });
