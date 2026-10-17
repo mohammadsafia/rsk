@@ -41,4 +41,20 @@ describe('Tabs', () => {
     // Radix roving focus moves focus in a timeout, so wait for activation.
     await waitFor(() => expect(screen.getByRole('tab', { name: 'Files' }).getAttribute('data-state')).toBe('active'));
   });
+
+  it('never shows a scrollbar for the underline: nothing overflows the list vertically and its scrollbar is hidden', () => {
+    render(
+      <Tabs defaultValue="a">
+        <Tabs.List aria-label="Sections">
+          <Tabs.Trigger value="a">A</Tabs.Trigger>
+          <Tabs.Trigger value="b">B</Tabs.Trigger>
+        </Tabs.List>
+      </Tabs>,
+    );
+    const list = screen.getByRole('tablist', { name: 'Sections' });
+    expect(list.className).toContain('overflow-y-hidden');
+    expect(list.className).toContain('scrollbar-none');
+    // The active underline sits inside the trigger (it used to hang 1px below and overflow the list).
+    expect(screen.getByRole('tab', { name: 'A' }).className).not.toContain('-bottom-px');
+  });
 });

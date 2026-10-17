@@ -90,3 +90,17 @@
     transform: none !important;
   }
 }
+
+/* Scrollable without visible scrollbar chrome (tab strips, chip rows): wheel, touch and keys still scroll. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* A hairline under a strip, painted behind its children so an indicator at bottom-0 can sit on top of it. */
+@utility rule-bottom {
+  box-shadow: inset 0 -1px 0 var(--color-border-subtle);
+}

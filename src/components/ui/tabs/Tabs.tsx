@@ -4,10 +4,12 @@ import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
-const tabsListVariants = cva('group/tabs-list flex min-w-0 items-center overflow-x-auto', {
+// Scrolls sideways when tabs overflow, but never vertically and without scrollbar chrome: a scrollbar used to
+// appear because overflow-x forces overflow-y to auto and the underline hung 1px below the list.
+const tabsListVariants = cva('group/tabs-list scrollbar-none flex min-w-0 items-center overflow-x-auto overflow-y-hidden', {
   variants: {
     variant: {
-      underline: 'border-border-subtle gap-4 border-b',
+      underline: 'rule-bottom gap-4',
       contained: 'bg-surface-sunken gap-1 rounded-md p-1',
     },
     fullWidth: {
@@ -27,7 +29,7 @@ const triggerClassName = [
   'disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-fg [&_svg]:size-4',
   'group-data-[full-width=true]/tabs-list:flex-1',
   'group-data-[variant=underline]/tabs-list:relative group-data-[variant=underline]/tabs-list:h-9 group-data-[variant=underline]/tabs-list:px-1',
-  'group-data-[variant=underline]/tabs-list:after:absolute group-data-[variant=underline]/tabs-list:after:inset-x-0 group-data-[variant=underline]/tabs-list:after:-bottom-px group-data-[variant=underline]/tabs-list:after:h-0.5',
+  'group-data-[variant=underline]/tabs-list:after:absolute group-data-[variant=underline]/tabs-list:after:inset-x-0 group-data-[variant=underline]/tabs-list:after:bottom-0 group-data-[variant=underline]/tabs-list:after:h-0.5',
   'group-data-[variant=underline]/tabs-list:data-[state=active]:after:bg-accent',
   'group-data-[variant=contained]/tabs-list:h-7 group-data-[variant=contained]/tabs-list:rounded-sm group-data-[variant=contained]/tabs-list:px-3',
   'group-data-[variant=contained]/tabs-list:data-[state=active]:bg-surface group-data-[variant=contained]/tabs-list:data-[state=active]:ring-border group-data-[variant=contained]/tabs-list:data-[state=active]:ring-1',
