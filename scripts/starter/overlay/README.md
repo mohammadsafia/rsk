@@ -2,6 +2,8 @@
 
 A React 18 + TypeScript app on [Vite+](https://viteplus.dev), started from the RSK UI kit.
 
+> This repository is generated from [mohammadsafia/rsk](https://github.com/mohammadsafia/rsk) on every push to its `main`. Changes to the kit belong there; changes pushed here are overwritten by the next sync.
+
 ## What's inside
 
 - **UI kit** (`src/components`): `ui` primitives, `shared` composites, `forms` (react-hook-form fields, FormWizard), `tables` (DataTable with filters and bulk selection), `charts` (recharts), `calendar` (CalendarGrid scheduler).
@@ -13,7 +15,7 @@ A React 18 + TypeScript app on [Vite+](https://viteplus.dev), started from the R
 ## Getting started
 
 ```bash
-vp create github:<owner>/rsk-starter -- my-app   # or clone this repository
+vp create github:mohammadsafia/rsk-starter -- my-app   # or clone this repository
 cd my-app
 cp .env.example .env    # fill in your API and auth settings
 vp install

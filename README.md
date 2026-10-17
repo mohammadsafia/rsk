@@ -307,11 +307,13 @@ pnpm starter:build [outDir]   # write the starter (default: .starter)
 pnpm starter:verify           # build it in a temp folder, install offline, run tsc, vp check, vp test and vp build
 ```
 
-`vp create` takes GitHub repositories and npm packages, not local folders. To publish, push the generated folder as its own repository (`rsk-starter`), and apps start with:
+`vp create` takes GitHub repositories and npm packages, not local folders. The starter is published to [mohammadsafia/rsk-starter](https://github.com/mohammadsafia/rsk-starter), and apps start with:
 
 ```bash
-vp create github:<owner>/rsk-starter -- my-app
+vp create github:mohammadsafia/rsk-starter -- my-app
 ```
+
+On every push to `main`, the `Starter sync` workflow (`.github/workflows/starter-sync.yml`) runs `pnpm starter:verify`, then builds the starter and commits it to `rsk-starter` as `sync: rsk@<sha> — <subject>`. A starter that fails verification is never published. The workflow pushes with the `STARTER_DEPLOY_KEY` secret, a deploy key with write access to `rsk-starter` only.
 
 The `-- my-app` names the folder. Without it, `vp create` names it after the repository. For a private registry, the starter can instead be bundled under `templates/` in an `@org/create` package, and apps start with `vp create @org:web`. Rename `.gitignore` to `_gitignore` there, because `npm publish` drops `.gitignore` files.
 
