@@ -156,5 +156,8 @@ describe('AppShell', () => {
     renderShell();
     const skip = screen.getByRole('link', { name: 'Skip to content' });
     expect(skip.getAttribute('href')).toBe(`#${screen.getByRole('main').id}`);
+    // The kit's outline ring: a box-shadow ring would be wiped out by shadow-overlay, leaving the browser default.
+    expect(skip.className).toContain('focus-ring');
+    expect(skip.className).not.toContain('focus-visible:ring-2');
   });
 });

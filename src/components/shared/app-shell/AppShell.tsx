@@ -190,7 +190,7 @@ const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY
       <div data-slot="app-shell" className={cn('bg-canvas text-fg flex h-dvh overflow-hidden', className)}>
         <a
           href={`#${contentId}`}
-          className="bg-surface-raised text-fg shadow-overlay focus-visible:ring-ring sr-only z-[60] rounded-md px-3 py-2 text-sm focus:not-sr-only focus:fixed focus:start-2 focus:top-2 focus-visible:ring-2"
+          className="bg-surface-raised text-fg shadow-overlay focus-ring sr-only z-[60] rounded-md px-3 py-2 text-sm focus:not-sr-only focus:fixed focus:start-2 focus:top-2"
         >
           {t('skipToContent')}
         </a>
