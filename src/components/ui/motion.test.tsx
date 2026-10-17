@@ -26,3 +26,27 @@ describe('reduced motion', () => {
     expect(document.querySelector('[data-slot="collapsible-content"]')?.className).toContain('motion-reduce:animate-none');
   });
 });
+
+describe('disclosure timing', () => {
+  it('opens at base and closes at fast (tw-animate would otherwise default to 200ms)', () => {
+    render(
+      <>
+        <Accordion type="single" defaultValue="a">
+          <Accordion.Item value="a">
+            <Accordion.Trigger>Visit notes</Accordion.Trigger>
+            <Accordion.Content>Body</Accordion.Content>
+          </Accordion.Item>
+        </Accordion>
+        <Collapsible defaultOpen>
+          <Collapsible.Trigger>More</Collapsible.Trigger>
+          <Collapsible.Content>Hidden</Collapsible.Content>
+        </Collapsible>
+      </>,
+    );
+    for (const slot of ['accordion-content', 'collapsible-content']) {
+      const className = document.querySelector(`[data-slot="${slot}"]`)?.className ?? '';
+      expect(className, slot).toContain('data-[state=open]:duration-base');
+      expect(className, slot).toContain('data-[state=closed]:duration-fast');
+    }
+  });
+});
