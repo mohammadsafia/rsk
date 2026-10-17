@@ -83,8 +83,9 @@ const SheetContent: FC<SheetContentProps> = ({
   const describedBy = description ? {} : { 'aria-describedby': undefined };
 
   return (
-    <DialogPrimitive.Portal>
-      <SectionsReset>
+    // Outside the portal: Portal wraps each direct child in Presence, which needs a DOM node to run exit animations.
+    <SectionsReset>
+      <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay
           data-slot="sheet-overlay"
           className="bg-overlay data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:duration-base data-[state=closed]:duration-fast fixed inset-0 z-50"
@@ -132,8 +133,8 @@ const SheetContent: FC<SheetContentProps> = ({
             </DialogPrimitive.Close>
           </Conditional.If>
         </DialogPrimitive.Content>
-      </SectionsReset>
-    </DialogPrimitive.Portal>
+      </DialogPrimitive.Portal>
+    </SectionsReset>
   );
 };
 

@@ -102,8 +102,9 @@ const DialogContent: FC<DialogContentProps> = ({
   const describedBy = description ? {} : { 'aria-describedby': undefined };
 
   return (
-    <DialogPrimitive.Portal>
-      <SectionsReset>
+    // Outside the portal: Portal wraps each direct child in Presence, which needs a DOM node to run exit animations.
+    <SectionsReset>
+      <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay
           data-slot="dialog-overlay"
           className={cn(
@@ -148,8 +149,8 @@ const DialogContent: FC<DialogContentProps> = ({
             </DialogPrimitive.Close>
           </Conditional.If>
         </DialogPrimitive.Content>
-      </SectionsReset>
-    </DialogPrimitive.Portal>
+      </DialogPrimitive.Portal>
+    </SectionsReset>
   );
 };
 
