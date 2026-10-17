@@ -26,10 +26,11 @@ export const usePatient = (id: string) => useQuery([CLINIC, PatientsHandler.get.
 export const usePatientVisits = (patientId: string) =>
   useQuery([CLINIC, VisitsHandler.byPatient.queryKey, patientId], () => VisitsHandler.byPatient.request(patientId));
 
-export const useVisits = (range: DayRange) =>
-  useQuery([CLINIC, VisitsHandler.list.queryKey, range.from, range.to], () => VisitsHandler.list.request(range));
-export const useLeave = (range: DayRange) =>
-  useQuery([CLINIC, VisitsHandler.leave.queryKey, range.from, range.to], () => VisitsHandler.leave.request(range));
+/** `keepPreviousData` keeps showing the last range while the next one loads (no flash when paging dates). */
+export const useVisits = (range: DayRange, options: { keepPreviousData?: boolean } = {}) =>
+  useQuery([CLINIC, VisitsHandler.list.queryKey, range.from, range.to], () => VisitsHandler.list.request(range), options);
+export const useLeave = (range: DayRange, options: { keepPreviousData?: boolean } = {}) =>
+  useQuery([CLINIC, VisitsHandler.leave.queryKey, range.from, range.to], () => VisitsHandler.leave.request(range), options);
 
 export const useInvoices = () => useQuery([CLINIC, InvoicesHandler.list.queryKey], InvoicesHandler.list.request);
 export const useInvoice = (id: string, options: { enabled?: boolean } = {}) =>

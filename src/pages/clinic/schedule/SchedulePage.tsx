@@ -17,11 +17,14 @@ import { useDoctors, useLeave, usePatients, useSetVisitStatus, useUpdateVisit, u
 import { VISIT_TONE } from '../shared/status';
 import { useClinicToday } from '../shared/useClinicToday';
 import { useLocalized } from '../shared/useLocalized';
-import { type ScheduleEvent, scheduleAccessors, toResources, toScheduleEvents, toSlots } from './adapters';
+import { isOpen, type ScheduleEvent, scheduleAccessors, toResources, toScheduleEvents, toSlots } from './adapters';
 import NewVisitSheet from './NewVisitSheet';
 
 const VIEWS = ['day', 'week', 'month', 'agenda'] as const;
 const VIEW_PARAM = parseAsStringLiteral(VIEWS).withDefault('day');
+
+/** A real yyyy-MM-dd day; anything else in the URL falls back to today instead of crashing the grid. */
+const isDayKey = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T12:00:00`));
 
 /** Status colours for visit blocks: soft semantic fills, never side stripes. */
 const STATUS_FILL: Record<VisitStatus, string> = {
@@ -101,13 +104,15 @@ function SchedulePage() {
   const localize = useLocalized();
   const { todayKey, now } = useClinicToday();
   const [view, setView] = useQueryState('view', VIEW_PARAM);
-  const [date, setDate] = useQueryState('date', parseAsString.withDefault(todayKey));
-  const [patientParam] = useQueryState('patient', parseAsString);
+  const [rawDate, setDate] = useQueryState('date', parseAsString.withDefault(todayKey));
+  const date = isDayKey(rawDate) ? rawDate : todayKey;
+  const [patientParam, setPatientParam] = useQueryState('patient', parseAsString);
   const [range, setRange] = useState<CalendarRange>({ startDate: date, endDate: date });
   const [slot, setSlot] = useState<CalendarSlot | null>(null);
 
-  const visits = useVisits({ from: range.startDate, to: range.endDate });
-  const leave = useLeave({ from: range.startDate, to: range.endDate });
+  // Paging dates keeps the last range on screen until the next arrives: no skeleton flash, focus stays put.
+  const visits = useVisits({ from: range.startDate, to: range.endDate }, { keepPreviousData: true });
+  const leave = useLeave({ from: range.startDate, to: range.endDate }, { keepPreviousData: true });
   const doctors = useDoctors();
   const patients = usePatients();
   const updateVisit = useUpdateVisit();
@@ -130,12 +135,14 @@ function SchedulePage() {
     [now],
   );
 
-  // A rejection (e.g. a double booking) makes CalendarGrid put the visit back and say so.
+  // A rejection (a double booking, or a time outside the doctor's opening hours) makes CalendarGrid put the visit back and say so.
   const onEventChange = useCallback(
     async ({ event, start, end, resourceId }: CalendarEventChange<ScheduleEvent>) => {
-      await updateVisit.mutateAsync({ id: event.id, patch: { start, end, doctorId: resourceId ?? event.doctorId } });
+      const doctorId = resourceId ?? event.doctorId;
+      if (!isOpen(slots, doctorId, start, end)) throw new Error('outside opening hours');
+      await updateVisit.mutateAsync({ id: event.id, patch: { start, end, doctorId } });
     },
-    [updateVisit],
+    [updateVisit, slots],
   );
 
   const failed = visits.isError || leave.isError || doctors.isError || patients.isError;
@@ -232,7 +239,14 @@ function SchedulePage() {
         <CalendarGrid.AgendaView />
       </CalendarGrid>
 
-      <NewVisitSheet slot={slot} preselectedPatientId={patientParam} onClose={() => setSlot(null)} />
+      <NewVisitSheet
+        slot={slot}
+        slots={slots}
+        preselectedPatientId={patientParam}
+        onClose={() => setSlot(null)}
+        // "Book visit" preselects a patient for the next slot only.
+        onBooked={() => void setPatientParam(null)}
+      />
     </div>
   );
 }

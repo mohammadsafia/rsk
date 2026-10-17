@@ -139,4 +139,63 @@ describe('SchedulePage', () => {
     fireEvent.click(within(await screen.findByRole('alert')).getByRole('button', { name: 'Retry' }));
     await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
   });
+
+  it('books from the unfiltered week view with a doctor choice defaulting to the patient’s doctor, then forgets ?patient=', async () => {
+    const patient = clinicStore.read().patients[3];
+    const doctorId = patient.primaryDoctorId;
+    const { visits } = clinicStore.read();
+    const busy = visits.filter((v) => v.doctorId === doctorId && v.start.startsWith('2026-10-17') && v.status !== 'cancelled');
+    const minute = (iso: string) => new Date(iso).getHours() * 60 + new Date(iso).getMinutes();
+    let free = 13 * 60;
+    while (busy.some((v) => free < minute(v.end) && free + 15 > minute(v.start))) free += 15;
+    renderPage(`/schedule?date=2026-10-17&view=week&patient=${patient.id}`);
+    await waitFor(() => expect(document.querySelectorAll('[data-calendar-column]')).toHaveLength(7));
+    const saturday = document.querySelector('[data-calendar-column][data-day="2026-10-17"]') as HTMLElement;
+    const index = Number(saturday.getAttribute('data-column-index'));
+    fireEvent.pointerDown(saturday, { button: 0, pointerId: 1, ...at(index, free) });
+    fireEvent.pointerUp(window, { pointerId: 1, ...at(index, free) });
+    const sheet = await screen.findByRole('dialog', { name: 'New visit' });
+    const doctorName = clinicStore.read().doctors.find((d) => d.id === doctorId)!.name.en;
+    expect(within(sheet).getByRole('combobox', { name: /Doctor/ }).textContent).toContain(doctorName);
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Book visit' }));
+    expect(await screen.findByText('Visit booked')).toBeTruthy();
+    expect(
+      clinicStore.read().visits.some((v) => v.patientId === patient.id && v.doctorId === doctorId && v.start.startsWith('2026-10-17')),
+    ).toBe(true);
+
+    // The next slot is a fresh booking: no patient carried over.
+    fireEvent.pointerDown(saturday, { button: 0, pointerId: 1, ...at(index, free + 60) });
+    fireEvent.pointerUp(window, { pointerId: 1, ...at(index, free + 60) });
+    const next = await screen.findByRole('dialog', { name: 'New visit' });
+    expect(within(next).queryByText(patient.name.en)).toBeNull();
+  });
+
+  it('survives an invalid ?date= and shows today', async () => {
+    renderPage('/schedule?date=garbage');
+    expect(await screen.findByText('Friday, Oct 16')).toBeTruthy();
+  });
+
+  it('keeps the grid (and its controls) while the next day loads', async () => {
+    renderPage();
+    await waitFor(() => expect(document.querySelectorAll('[data-calendar-column] [data-event-id]').length).toBeGreaterThan(0));
+    clinicStore.setLatency([150, 150]);
+    const nextButton = screen.getByRole('button', { name: 'Next' });
+    fireEvent.click(nextButton);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(document.querySelector('[data-slot="calendar-grid-skeleton"]')).toBeNull();
+    expect(document.body.contains(nextButton)).toBe(true);
+  });
+
+  it('refuses a move outside opening hours and puts the visit back', async () => {
+    renderPage('/schedule?date=2026-10-17');
+    const visit = clinicStore.read().visits.find((v) => v.start.startsWith('2026-10-17') && v.status === 'scheduled')!;
+    const card = await findCard(visit.id);
+    const columnIndex = Number(card.closest('[data-calendar-column]')!.getAttribute('data-column-index'));
+    const minute = (iso: string) => new Date(iso).getHours() * 60 + new Date(iso).getMinutes();
+    fireEvent.pointerDown(card, { button: 0, pointerId: 1, ...at(columnIndex, minute(visit.start) + 1) });
+    fireEvent.pointerMove(window, { pointerId: 1, ...at(columnIndex, 7 * 60 + 1) });
+    fireEvent.pointerUp(window, { pointerId: 1, ...at(columnIndex, 7 * 60 + 1) });
+    expect(await screen.findByText("Couldn't save the change")).toBeTruthy();
+    expect(clinicStore.read().visits.find((v) => v.id === visit.id)!.start).toBe(visit.start);
+  });
 });

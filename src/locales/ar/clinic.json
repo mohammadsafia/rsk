@@ -180,7 +180,8 @@
     "invalid-transition": "هذا غير ممكن في حالته الحالية",
     "duplicate-phone": "رقم الهاتف هذا مسجّل مسبقًا",
     "forced": "حدث خطأ ما. حاول مرة أخرى.",
-    "invalid": "بعض القيم غير صالحة"
+    "invalid": "بعض القيم غير صالحة",
+    "closed": "الطبيب لا يعمل في هذا الوقت"
   },
   "services": {
     "consultation": "استشارة",
@@ -232,7 +233,9 @@
       "booked": "حُجزت الزيارة",
       "patientRequired": "اختر مريضًا",
       "when": "{{day}}، {{start}} – {{end}} · {{doctor}}",
-      "cancel": "إلغاء"
+      "cancel": "إلغاء",
+      "doctor": "الطبيب",
+      "doctorRequired": "اختر الطبيب"
     }
   },
   "profile": {
@@ -303,7 +306,55 @@
       "saved": "حُفظت بيانات الاتصال",
       "phoneRequired": "أدخل رقم الهاتف",
       "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا",
-      "policyRequired": "أدخل رقم البوليصة"
+      "policyRequired": "أدخل رقم البوليصة",
+      "phoneInvalid": "أدخل رقم هاتف صالحًا"
     }
+  },
+  "intake": {
+    "title": "مريض جديد",
+    "description": "سجّل مريضًا في خطوات قصيرة.",
+    "steps": {
+      "patient": "المريض",
+      "patientDescription": "من هو المريض ومن سيتابعه.",
+      "contact": "التواصل",
+      "insurance": "التأمين",
+      "documents": "المستندات",
+      "documentsDescription": "رسائل التحويل أو الهوية أو التقارير السابقة.",
+      "review": "المراجعة"
+    },
+    "fields": {
+      "firstNameEn": "الاسم الأول",
+      "lastNameEn": "اسم العائلة",
+      "firstNameAr": "الاسم الأول (بالعربية)",
+      "lastNameAr": "اسم العائلة (بالعربية)",
+      "sex": "الجنس",
+      "dob": "تاريخ الميلاد",
+      "doctor": "الطبيب المعالج",
+      "insured": "المريض لديه تأمين",
+      "phone": "الهاتف",
+      "email": "البريد الإلكتروني",
+      "insurer": "شركة التأمين",
+      "policy": "رقم البوليصة",
+      "documents": "المستندات"
+    },
+    "errors": {
+      "firstNameRequired": "أدخل الاسم الأول",
+      "lastNameRequired": "أدخل اسم العائلة",
+      "dobRequired": "أدخل تاريخ الميلاد",
+      "dobFuture": "لا يمكن أن يكون تاريخ الميلاد في المستقبل",
+      "doctorRequired": "اختر الطبيب المعالج",
+      "phoneRequired": "أدخل رقم الهاتف",
+      "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا",
+      "insurerRequired": "اختر شركة التأمين",
+      "policyRequired": "أدخل رقم البوليصة"
+    },
+    "files_zero": "لا ملفات",
+    "files_one": "ملف واحد",
+    "files_two": "ملفان",
+    "files_few": "{{count}} ملفات",
+    "files_many": "{{count}} ملفًا",
+    "files_other": "{{count}} ملف",
+    "submit": "تسجيل المريض",
+    "registered": "سُجّل المريض"
   }
 }

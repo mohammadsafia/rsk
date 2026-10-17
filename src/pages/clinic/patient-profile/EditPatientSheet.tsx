@@ -44,7 +44,11 @@ function EditPatientSheet({ patient, onClose }: { patient: PatientSummary | null
     () =>
       z
         .object({
-          phone: z.string().trim().min(1, t('profile.editSheet.phoneRequired')),
+          phone: z
+            .string()
+            .trim()
+            .min(1, t('profile.editSheet.phoneRequired'))
+            .refine((phone) => phone.replace(/\D/g, '').length >= 7, t('profile.editSheet.phoneInvalid')),
           email: z.union([z.literal(''), z.string().trim().email(t('profile.editSheet.emailInvalid'))]),
           insurerId: z.string(),
           policyNumber: z.string().trim(),

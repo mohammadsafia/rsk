@@ -101,4 +101,15 @@ describe('PatientProfilePage', () => {
     await screen.findByRole('heading', { level: 1, name: patient.name.en });
     expect(await screen.findByText(doctor.name.en)).toBeTruthy();
   });
+
+  it('refuses a phone number without enough digits', async () => {
+    const patient = richPatient();
+    renderProfile(patient.id);
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Edit contact details' });
+    fireEvent.change(within(sheet).getByLabelText(/^Phone/), { target: { value: 'abc' } });
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Save' }));
+    expect(await within(sheet).findByText('Enter a valid phone number')).toBeTruthy();
+    expect(clinicStore.read().patients.find((p) => p.id === patient.id)!.phone).toBe(patient.phone);
+  });
 });

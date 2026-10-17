@@ -62,6 +62,9 @@ const ALLERGIES: Allergy[] = ['penicillin', 'latex', 'peanuts', 'aspirin', 'poll
 
 const pad = (value: number, length: number) => String(value).padStart(length, '0');
 
+/** Payments are never dated after today. */
+const notAfter = (day: string, today: string) => (day > today ? today : day);
+
 /** Every first/last pair once, shuffled: 60 patients never share a full name. */
 const uniqueNames = (rng: Random) => {
   const pairs = FIRST.flatMap((first) => LAST.map((last) => ({ first, last })));
@@ -173,14 +176,19 @@ function createInvoices(rng: Random, today: string, visits: Visit[], patients: P
     else if (roll < 0.04) invoice.status = 'void';
     else if (roll < 0.62) {
       invoice.status = 'paid';
-      invoice.payments.push({ id: `pay-${invoice.id}`, amount: invoiceTotal(invoice), method, date: shiftDay(issuedAt, rng.int(0, 10)) });
+      invoice.payments.push({
+        id: `pay-${invoice.id}`,
+        amount: invoiceTotal(invoice),
+        method,
+        date: notAfter(shiftDay(issuedAt, rng.int(0, 10)), today),
+      });
     } else {
       if (rng.chance(0.25))
         invoice.payments.push({
           id: `pay-${invoice.id}`,
           amount: Math.floor(invoiceTotal(invoice) / 2),
           method,
-          date: shiftDay(issuedAt, 3),
+          date: notAfter(shiftDay(issuedAt, 3), today),
         });
       invoice.status = dueAt < today ? 'overdue' : 'sent';
     }

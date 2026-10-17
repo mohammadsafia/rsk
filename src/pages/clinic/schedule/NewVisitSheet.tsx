@@ -12,22 +12,30 @@ import { toast, useAppTranslation, useDate } from '@hooks/shared';
 
 import { useCreateVisit, useDoctors, usePatients } from '../queries';
 import { useLocalized } from '../shared/useLocalized';
+import { isOpen } from './adapters';
 
 const TYPES: VisitType[] = ['consultation', 'follow-up', 'procedure', 'check-up'];
 
-type VisitForm = { patientId: string | null; type: VisitType; notes: string };
-type PatientOption = { id: string; name: string };
+type VisitForm = { patientId: string | null; doctorId: string; type: VisitType; notes: string };
+type PatientOption = { id: string; name: string; primaryDoctorId: string };
+type DoctorOption = { id: string; name: string };
+type Slots = Record<string, Record<string, { startTime: string; endTime: string }[]>>;
 
-/** Books a visit into the slot picked on the schedule; `preselectedPatientId` comes from ?patient=. */
-function NewVisitSheet({
-  slot,
-  preselectedPatientId,
-  onClose,
-}: {
+type NewVisitSheetProps = {
   slot: CalendarSlot | null;
+  /** Opening hours per doctor and day, to refuse a booking outside them. */
+  slots: Slots;
+  /** From ?patient=: preselected when that patient exists. */
   preselectedPatientId: string | null;
   onClose: () => void;
-}) {
+  onBooked: () => void;
+};
+
+/**
+ * Books a visit into the slot picked on the schedule. A slot from a doctor's column carries the doctor; one from the
+ * unfiltered week view doesn't, so the Sheet asks, starting from the patient's primary doctor.
+ */
+function NewVisitSheet({ slot, slots, preselectedPatientId, onClose, onBooked }: NewVisitSheetProps) {
   const { t } = useAppTranslation('clinic');
   const { toDate, constants } = useDate();
   const localize = useLocalized();
@@ -36,11 +44,18 @@ function NewVisitSheet({
   const create = useCreateVisit();
 
   const options = useMemo<PatientOption[]>(
-    () => (patients.data ?? []).map((patient) => ({ id: patient.id, name: localize(patient.name) })),
+    () =>
+      (patients.data ?? []).map((patient) => ({ id: patient.id, name: localize(patient.name), primaryDoctorId: patient.primaryDoctorId })),
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- localize follows the language, which `t` tracks
     [patients.data, t],
   );
+  const doctorOptions = useMemo<DoctorOption[]>(
+    () => (doctors.data ?? []).map((doctor) => ({ id: doctor.id, name: localize(doctor.name) })),
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- localize follows the language, which `t` tracks
+    [doctors.data, t],
+  );
   const knownPatient = preselectedPatientId && options.some((option) => option.id === preselectedPatientId) ? preselectedPatientId : null;
+  const askDoctor = !!slot && !slot.resourceId;
 
   const schema = useMemo(
     () =>
@@ -48,6 +63,7 @@ function NewVisitSheet({
         patientId: z
           .string({ required_error: t('schedule.newVisit.patientRequired'), invalid_type_error: t('schedule.newVisit.patientRequired') })
           .min(1, t('schedule.newVisit.patientRequired')),
+        doctorId: z.string().min(1, t('schedule.newVisit.doctorRequired')),
         type: z.enum(['consultation', 'follow-up', 'procedure', 'check-up']),
         notes: z.string(),
       }),
@@ -55,15 +71,18 @@ function NewVisitSheet({
   );
   const form = useForm<VisitForm>({
     resolver: zodResolver(schema),
-    defaultValues: { patientId: knownPatient, type: 'consultation', notes: '' },
+    defaultValues: { patientId: knownPatient, doctorId: '', type: 'consultation', notes: '' },
   });
 
-  // Each slot starts a fresh form, with the ?patient= preselection once the patients have loaded.
+  // Each slot starts a fresh form, with the ?patient= preselection (and their doctor) once the patients have loaded.
   useEffect(() => {
-    if (slot) form.reset({ patientId: knownPatient, type: 'consultation', notes: '' });
-  }, [slot, knownPatient, form]);
+    if (!slot) return;
+    const doctorId = slot.resourceId ?? options.find((option) => option.id === knownPatient)?.primaryDoctorId ?? '';
+    form.reset({ patientId: knownPatient, doctorId, type: 'consultation', notes: '' });
+  }, [slot, knownPatient, options, form]);
 
-  const doctor = localize(doctors.data?.find((d) => d.id === slot?.resourceId)?.name);
+  const doctorId = form.watch('doctorId');
+  const doctor = localize(doctors.data?.find((d) => d.id === doctorId)?.name);
   const when = slot
     ? t('schedule.newVisit.when', {
         day: toDate(slot.start, constants.DateFormats.DAY_SHORT_MONTH),
@@ -80,17 +99,22 @@ function NewVisitSheet({
           formContext={form}
           className="flex min-h-0 flex-1 flex-col"
           onSuccess={async (values) => {
-            if (!slot?.resourceId || !values.patientId) return;
+            if (!slot || !values.patientId) return;
+            if (!isOpen(slots, values.doctorId, slot.start, slot.end)) {
+              toast({ title: t('errors.closed'), tone: 'danger' });
+              return;
+            }
             try {
               await create.mutateAsync({
                 patientId: values.patientId,
-                doctorId: slot.resourceId,
+                doctorId: values.doctorId,
                 type: values.type,
                 start: slot.start,
                 end: slot.end,
                 notes: values.notes.trim() || null,
               });
               toast({ title: t('schedule.newVisit.booked'), tone: 'success' });
+              onBooked();
               onClose();
             } catch (error) {
               toast({ title: t(`errors.${error instanceof ClinicError ? error.code : 'forced'}`), tone: 'danger' });
@@ -106,8 +130,22 @@ function NewVisitSheet({
               options={options}
               getOptionLabel={(option) => option.name}
               getOptionValue={(option) => option.id}
+              onOptionChange={(option) => {
+                if (askDoctor && option) form.setValue('doctorId', option.primaryDoctorId, { shouldValidate: true });
+              }}
               required
             />
+            {askDoctor ? (
+              <FormSelect<VisitForm, DoctorOption>
+                name="doctorId"
+                control={form.control}
+                label={t('schedule.newVisit.doctor')}
+                options={doctorOptions}
+                getOptionLabel={(option) => option.name}
+                getOptionValue={(option) => option.id}
+                required
+              />
+            ) : null}
             <FormSelect<VisitForm, VisitType>
               name="type"
               control={form.control}

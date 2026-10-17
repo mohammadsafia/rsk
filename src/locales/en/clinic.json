@@ -172,7 +172,8 @@
     "invalid-transition": "That isn't possible in its current state",
     "duplicate-phone": "That phone number is already registered",
     "forced": "Something went wrong. Try again.",
-    "invalid": "Some values aren't valid"
+    "invalid": "Some values aren't valid",
+    "closed": "The doctor isn't working at that time"
   },
   "services": {
     "consultation": "Consultation",
@@ -224,7 +225,9 @@
       "booked": "Visit booked",
       "patientRequired": "Choose a patient",
       "when": "{{day}}, {{start}} – {{end}} · {{doctor}}",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "doctor": "Doctor",
+      "doctorRequired": "Choose a doctor"
     }
   },
   "profile": {
@@ -295,7 +298,55 @@
       "saved": "Contact details saved",
       "phoneRequired": "Enter a phone number",
       "emailInvalid": "Enter a valid email address",
-      "policyRequired": "Enter the policy number"
+      "policyRequired": "Enter the policy number",
+      "phoneInvalid": "Enter a valid phone number"
     }
+  },
+  "intake": {
+    "title": "New patient",
+    "description": "Register a patient in a few short steps.",
+    "steps": {
+      "patient": "Patient",
+      "patientDescription": "Who the patient is and who will see them.",
+      "contact": "Contact",
+      "insurance": "Insurance",
+      "documents": "Documents",
+      "documentsDescription": "Referral letters, ID or previous reports.",
+      "review": "Review"
+    },
+    "fields": {
+      "firstNameEn": "First name",
+      "lastNameEn": "Last name",
+      "firstNameAr": "First name (Arabic)",
+      "lastNameAr": "Last name (Arabic)",
+      "sex": "Sex",
+      "dob": "Date of birth",
+      "doctor": "Primary doctor",
+      "insured": "The patient has insurance",
+      "phone": "Phone",
+      "email": "Email",
+      "insurer": "Insurer",
+      "policy": "Policy number",
+      "documents": "Documents"
+    },
+    "errors": {
+      "firstNameRequired": "Enter the first name",
+      "lastNameRequired": "Enter the last name",
+      "dobRequired": "Enter the date of birth",
+      "dobFuture": "The date of birth can't be in the future",
+      "doctorRequired": "Choose a primary doctor",
+      "phoneRequired": "Enter a phone number",
+      "emailInvalid": "Enter a valid email address",
+      "insurerRequired": "Choose the insurer",
+      "policyRequired": "Enter the policy number"
+    },
+    "files_zero": "No files",
+    "files_one": "{{count}} file",
+    "files_two": "{{count}} files",
+    "files_few": "{{count}} files",
+    "files_many": "{{count}} files",
+    "files_other": "{{count}} files",
+    "submit": "Register patient",
+    "registered": "Patient registered"
   }
 }

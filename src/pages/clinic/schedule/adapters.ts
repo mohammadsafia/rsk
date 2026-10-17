@@ -54,3 +54,19 @@ export const toSlots = (doctors: Pick<Doctor, 'id'>[], leave: LeaveDay[], range:
     ]),
   ) as Record<string, Record<string, TimeRange[]>>;
 };
+
+const clockMinutes = (time: string) => {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+};
+
+const wallMinutes = (iso: string) => clockMinutes(iso.slice(11, 16));
+
+/** True when [start, end) sits inside one opening window of that doctor on that day (local wall times). */
+export const isOpen = (slots: Record<string, Record<string, TimeRange[]>>, doctorId: string, start: string, end: string) => {
+  const day = start.slice(0, 10);
+  if (end.slice(0, 10) !== day) return false;
+  const from = wallMinutes(start);
+  const to = wallMinutes(end);
+  return (slots[doctorId]?.[day] ?? []).some((range) => from >= clockMinutes(range.startTime) && to <= clockMinutes(range.endTime));
+};

@@ -66,5 +66,6 @@ describe('clinic seed', () => {
       if (invoice.status === 'overdue') expect(invoice.dueAt < today).toBe(true);
     }
     expect(new Set(invoices.map((i) => i.number)).size).toBe(invoices.length);
+    expect(invoices.flatMap((i) => i.payments).every((payment) => payment.date <= today)).toBe(true);
   });
 });
