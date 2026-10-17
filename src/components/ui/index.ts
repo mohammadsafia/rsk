@@ -6,6 +6,7 @@ export * from './avatar';
 export * from './pagination';
 export * from './popover';
 export * from './dropdown-menu';
+export * from './sections';
 export * from './card';
 export * from './tooltip';
 export * from './collapsible';
