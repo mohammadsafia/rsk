@@ -1,0 +1,8 @@
+{
+  "title": "Dashboard",
+  "description": "Your app starts here.",
+  "empty": {
+    "title": "Start building",
+    "description": "Add pages under src/pages, routes in src/routes and menu entries in APP_MENU. The UI kit is in src/components."
+  }
+}

@@ -72,9 +72,6 @@ interface ImportMetaEnv {
 
   // Build configuration
   readonly GENERATE_SOURCEMAP: string;
-
-  // MDX Component gallery (dev only)
-  readonly VITE_ENABLE_COMPONENT_GALLERY?: 'true' | 'false';
 }
 
 interface ImportMeta {

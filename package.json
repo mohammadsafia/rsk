@@ -86,7 +86,9 @@
     "docs:lint": "tsx src/component-docs/scripts/lint.ts",
     "ds:baseline": "tsx scripts/design-system/update-forbidden-baseline.ts",
     "ds:migrate": "tsx scripts/design-system/codemods/migrate.ts",
-    "ds:classes": "tsx scripts/design-system/codemods/migrate-classes.ts"
+    "ds:classes": "tsx scripts/design-system/codemods/migrate-classes.ts",
+    "starter:build": "tsx scripts/starter/build-starter.ts",
+    "starter:verify": "tsx scripts/starter/verify-starter.ts"
   },
   "devDependencies": {
     "@clack/prompts": "^0.11.0",

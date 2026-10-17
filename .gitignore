@@ -46,3 +46,6 @@ temp-api-types/
 
 i18n-*.png
 .vitest/
+
+# Generated app starter (pnpm starter:build)
+/.starter

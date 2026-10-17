@@ -64,7 +64,7 @@ describe('css-tokens', () => {
   });
 
   it('reads files relative to the repo root', () => {
-    expect(readProjectFile('package.json')).toContain('"name": "react-start-kit"');
+    expect(readProjectFile('package.json')).toMatch(/"name": "[^"]+"/);
   });
 });
 

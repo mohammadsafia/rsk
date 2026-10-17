@@ -1,0 +1,44 @@
+/**
+ * Proves the starter stands on its own: builds it into a temporary folder, installs (offline, from the pnpm store),
+ * then runs its type check, lint/format check, tests and production build, and looks for showcase leftovers.
+ *
+ *   pnpm starter:verify
+ */
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
+import { buildStarter } from './build-starter';
+import { LEFTOVER_PATTERNS } from './manifest';
+
+const run = (cwd: string, command: string, args: string[]) => {
+  console.log(`\n$ ${command} ${args.join(' ')}`);
+  execFileSync(command, args, { cwd, stdio: 'inherit', env: { ...process.env, CI: '1' } });
+};
+
+const walk = (dir: string): string[] =>
+  readdirSync(dir).flatMap((name) => {
+    const full = path.join(dir, name);
+    return statSync(full).isDirectory() ? walk(full) : [full];
+  });
+
+const out = buildStarter(mkdtempSync(path.join(os.tmpdir(), 'rsk-starter-')));
+const pnpm = ['pnpm@10.34.7'];
+
+try {
+  const leftovers = walk(path.join(out, 'src')).flatMap((file) => {
+    const text = readFileSync(file, 'utf8');
+    return LEFTOVER_PATTERNS.filter((pattern) => pattern.test(text)).map((pattern) => `${path.relative(out, file)}: ${pattern}`);
+  });
+  if (leftovers.length) throw new Error(`Showcase leftovers in the starter:\n${leftovers.join('\n')}`);
+
+  run(out, 'corepack', [...pnpm, 'install', '--offline', '--no-frozen-lockfile']);
+  run(out, 'corepack', [...pnpm, 'exec', 'tsc', '-b']);
+  run(out, 'corepack', [...pnpm, 'exec', 'vp', 'check']);
+  run(out, 'corepack', [...pnpm, 'exec', 'vp', 'test', '--run']);
+  run(out, 'corepack', [...pnpm, 'exec', 'vp', 'build']);
+  console.log(`\nStarter verified: ${out}`);
+} finally {
+  if (!process.env.KEEP_STARTER) rmSync(out, { recursive: true, force: true });
+}

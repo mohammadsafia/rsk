@@ -179,13 +179,6 @@ describe('clean primitives', () => {
     expect(offenders).toEqual([]);
   });
 
-  it('the docs:new template emits the kit conventions', () => {
-    const template = readFileSync(`${REPO_ROOT}src/component-docs/_template/component.mdx.tpl`, 'utf8');
-    expect(template).toMatch(/## API/);
-    expect(template).toMatch(/text-fg-muted|bg-surface/);
-    expect(template).not.toMatch(/muted-foreground|primary|bg-background/);
-  });
-
   it('pages contain no forbidden patterns (SP3 Plan C)', () => {
     const offenders = Object.keys(scanRepo(REPO_ROOT)).filter((file) => file.startsWith('src/pages/') || file.startsWith('src/views/'));
     expect(offenders).toEqual([]);

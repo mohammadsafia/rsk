@@ -1,4 +1,4 @@
-import { defineConfig, lazyPlugins } from 'vite-plus';
+import { configDefaults, defineConfig, lazyPlugins } from 'vite-plus';
 import type { Plugin as VitePlugin } from 'vite-plus';
 import path from 'path';
 import react from '@vitejs/plugin-react-swc';
@@ -49,7 +49,7 @@ export default defineConfig({
     env: {
       builtin: true,
     },
-    ignorePatterns: ['dist', 'src/types/api/**', 'src/types/api-v2/**'],
+    ignorePatterns: ['dist', '.starter', 'scripts/starter/overlay', 'src/types/api/**', 'src/types/api-v2/**'],
     overrides: [
       {
         files: ['**/*.{ts,tsx}'],
@@ -167,6 +167,8 @@ export default defineConfig({
     // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
     // https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
     clearMocks: false,
+    // `pnpm starter:build` writes a copy of the app to .starter; its tests run in the starter, not here.
+    exclude: [...configDefaults.exclude, '.starter/**', 'scripts/starter/overlay/**'],
   },
   fmt: {
     tabWidth: 2,

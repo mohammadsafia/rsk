@@ -11,5 +11,6 @@
     "strict": true,
     "types": ["node"]
   },
-  "include": ["scripts", "tests"]
+  "include": ["scripts", "tests"],
+  "exclude": ["scripts/starter/overlay"]
 }

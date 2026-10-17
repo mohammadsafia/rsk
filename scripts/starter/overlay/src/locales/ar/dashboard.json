@@ -1,0 +1,8 @@
+{
+  "title": "لوحة التحكم",
+  "description": "يبدأ تطبيقك من هنا.",
+  "empty": {
+    "title": "ابدأ البناء",
+    "description": "أضف الصفحات في src/pages والمسارات في src/routes وعناصر القائمة في APP_MENU. مكوّنات الواجهة في src/components."
+  }
+}
