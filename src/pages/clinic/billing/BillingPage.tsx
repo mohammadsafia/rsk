@@ -101,13 +101,13 @@ function BillingPage() {
         accessorKey: 'issuedAt',
         header: t('billing.columns.issued'),
         sortDescFirst: true,
-        cell: ({ row }) => <bdi className="text-fg-muted tabular-nums">{date(row.original.issuedAt)}</bdi>,
+        cell: ({ row }) => <bdi className="text-fg-muted">{date(row.original.issuedAt)}</bdi>,
         meta: { label: t('billing.columns.issued') },
       },
       {
         accessorKey: 'dueAt',
         header: t('billing.columns.due'),
-        cell: ({ row }) => <bdi className="text-fg-muted tabular-nums">{date(row.original.dueAt)}</bdi>,
+        cell: ({ row }) => <bdi className="text-fg-muted">{date(row.original.dueAt)}</bdi>,
         meta: { label: t('billing.columns.due') },
       },
       {
@@ -136,11 +136,14 @@ function BillingPage() {
   );
 
   const [globalFilter, setGlobalFilter] = useState('');
+  // Stable between renders: a new array each render reads as a filter change, which auto-resets paging,
+  // which renders again — an endless loop once a row is selected.
+  const columnFilters = useMemo(() => (status === ALL ? [] : [{ id: 'status', value: status }]), [status]);
 
   const table = useReactTable<InvoiceRow>({
     data: rows,
     columns,
-    state: { globalFilter, columnFilters: status === ALL ? [] : [{ id: 'status', value: status }] },
+    state: { globalFilter, columnFilters },
     onGlobalFilterChange: setGlobalFilter,
     enableGlobalFilter: true,
     globalFilterFn: searchInvoices,

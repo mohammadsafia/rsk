@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { Profiler } from 'react';
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test';
 
 import { clinicStore, invoiceBalance } from '@api/clinic';
@@ -86,5 +87,24 @@ describe('BillingPage', () => {
     const newest = [...clinicStore.read().invoices].sort((a, b) => b.issuedAt.localeCompare(a.issuedAt) || b.id.localeCompare(a.id))[0];
     await screen.findByText(newest.number);
     expect(document.body.textContent).not.toMatch(/[٠-٩]/);
+  });
+
+  it('settles after a row is selected (no render loop)', async () => {
+    let renders = 0;
+    renderClinic(
+      <Profiler id="billing" onRender={() => (renders += 1)}>
+        <BillingPage />
+      </Profiler>,
+      { route: '/billing', path: '/billing' },
+    );
+    await screen.findByText('Outstanding');
+    await waitFor(() => expect(document.querySelectorAll('tbody [role="checkbox"]').length).toBeGreaterThan(0));
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    const before = renders;
+    await act(async () => {
+      fireEvent.click(document.querySelector('tbody [role="checkbox"]')!);
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    });
+    expect(renders - before).toBeLessThan(20);
   });
 });

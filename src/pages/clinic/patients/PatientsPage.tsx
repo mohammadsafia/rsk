@@ -30,6 +30,9 @@ import { useLocalized } from '../shared/useLocalized';
 
 const SELF_PAY = 'self-pay';
 
+/** MRN stays searchable but hidden (it shows under the name). Stable, so the table never sees a state change. */
+const COLUMN_VISIBILITY = { mrn: false };
+
 /** Search covers what people type: names, MRNs and phones (not doctor or insurer ids, dates or balances). */
 const SEARCHABLE = new Set(['name', 'mrn', 'phone']);
 
@@ -143,7 +146,7 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }:
       filterFn: dateRangeFilterFn,
       cell: ({ row }) => (
         // Isolated, not forced LTR: Arabic dates carry Arabic month names.
-        <bdi data-slot="last-visit" className="text-fg-muted tabular-nums">
+        <bdi data-slot="last-visit" className="text-fg-muted">
           {formatVisit(row.original.lastVisit)}
         </bdi>
       ),
@@ -158,7 +161,7 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }:
       header: t('patients.columns.registered'),
       enableSorting: true,
       sortDescFirst: true,
-      cell: ({ row }) => <bdi className="text-fg-muted tabular-nums">{formatVisit(row.original.createdAt)}</bdi>,
+      cell: ({ row }) => <bdi className="text-fg-muted">{formatVisit(row.original.createdAt)}</bdi>,
       meta: { label: t('patients.columns.registered') },
     },
     {
@@ -197,7 +200,7 @@ function PatientsPage() {
   const table = useReactTable<PatientSummary>({
     data: patients.data ?? [],
     columns,
-    state: { ...filters.state, columnVisibility: { mrn: false } },
+    state: { ...filters.state, columnVisibility: COLUMN_VISIBILITY },
     onColumnFiltersChange: filters.onColumnFiltersChange,
     onGlobalFilterChange: filters.onGlobalFilterChange,
     enableGlobalFilter: true,

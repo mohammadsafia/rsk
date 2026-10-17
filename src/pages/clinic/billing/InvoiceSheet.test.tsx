@@ -76,4 +76,11 @@ describe('InvoiceSheet', () => {
     renderWith('inv-nope');
     expect(await screen.findByText('Invoice not found')).toBeTruthy();
   });
+
+  it('titles the sheet neutrally while the invoice loads, never "not found"', async () => {
+    clinicStore.setLatency([200, 200]);
+    renderWith(openInvoice().id);
+    expect(await screen.findByRole('dialog', { name: 'Invoice' })).toBeTruthy();
+    expect(screen.queryByText('Invoice not found')).toBeNull();
+  });
 });

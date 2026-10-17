@@ -204,7 +204,7 @@ function InvoiceSheet({ invoiceId, onClose }: { invoiceId: string | null; onClos
   return (
     <>
       <Sheet open={!!invoiceId} onOpenChange={(open) => !open && onClose()}>
-        <Sheet.Content side="end" size="md" title={data?.number ?? t('billing.sheet.notFound')} description={description}>
+        <Sheet.Content side="end" size="md" title={data?.number ?? t('billing.sheet.loadingTitle')} description={description}>
           <Sheet.Body>
             {invoice.isLoading ? (
               <div className="flex flex-col gap-3">

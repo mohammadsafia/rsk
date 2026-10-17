@@ -158,7 +158,8 @@
       "voided": "Invoice voided",
       "notFound": "Invoice not found",
       "notFoundDescription": "It may have been removed. Pick another invoice from the list.",
-      "close": "Close"
+      "close": "Close",
+      "loadingTitle": "Invoice"
     }
   },
   "errors": {
