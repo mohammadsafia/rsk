@@ -1,7 +1,7 @@
 import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
-import { IconButton, SectionMarker, type SectionMarkerValue, SectionsReset } from '@components/ui';
+import { IconButton, SectionsReset } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -43,8 +43,6 @@ export type DialogContentProps = Omit<ComponentProps<typeof DialogPrimitive.Cont
     description?: ReactNode;
     /** When false: no close button, Escape and outside interaction are ignored. */
     dismissible?: boolean;
-    /** Ledger mark before the title: § by default; false removes it. */
-    marker?: SectionMarkerValue;
   };
 
 type DialogComponent = FC<DialogProps> & {
@@ -80,7 +78,6 @@ const DialogContent: FC<DialogContentProps> = ({
   hideTitle = false,
   description,
   dismissible = true,
-  marker = 'auto',
   onEscapeKeyDown,
   onInteractOutside,
   children,
@@ -125,7 +122,6 @@ const DialogContent: FC<DialogContentProps> = ({
         >
           <header data-slot="dialog-header" className={cn('flex flex-col gap-1 pe-8', hideTitle && !description && 'sr-only')}>
             <DialogPrimitive.Title data-slot="dialog-title" className={cn('text-fg text-md font-semibold', hideTitle && 'sr-only')}>
-              <SectionMarker marker={marker} />
               {title}
             </DialogPrimitive.Title>
 

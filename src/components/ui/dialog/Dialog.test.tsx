@@ -61,7 +61,7 @@ describe('Dialog', () => {
     expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
   });
 
-  it('tops the dialog with the section rule and marks its title with §', () => {
+  it('tops the dialog with the section rule, with no marker before the title', () => {
     render(
       <Dialog>
         <Dialog.Trigger>Open</Dialog.Trigger>
@@ -76,7 +76,8 @@ describe('Dialog', () => {
     expect(dialog.className).toContain('data-[state=closed]:duration-fast');
     expect(dialog.className).toContain('data-[state=open]:slide-in-from-bottom-2');
     expect(dialog.className).not.toContain('duration-slow');
-    expect(dialog.querySelector('[data-slot="dialog-title"] [data-slot="section-marker"]')?.textContent).toBe('§');
+    expect(dialog.querySelector('[data-slot="section-marker"]')).toBeNull();
+    expect(dialog.querySelector('[data-slot="dialog-title"]')?.textContent).toBe('Edit patient');
   });
 
   it('keeps the accessible name without the marker', () => {
@@ -90,26 +91,15 @@ describe('Dialog', () => {
     expect(screen.getByRole('dialog', { name: 'Edit patient' })).toBeTruthy();
   });
 
-  it('a dialog opened inside Sections still shows §, and marker={false} removes it', () => {
-    const { unmount } = render(
+  it('a dialog opened inside a numbered Sections page shows no stray number', () => {
+    render(
       <Sections>
         <Dialog defaultOpen>
           <Dialog.Content title="Edit patient" />
         </Dialog>
       </Sections>,
     );
-    const edit = screen.getByRole('dialog', { name: 'Edit patient' });
-    expect(edit.querySelector<HTMLElement>('[data-slot="section-marker"]')?.dataset.kind).toBe('section');
-    unmount();
-
-    render(
-      <Sections>
-        <Dialog defaultOpen>
-          <Dialog.Content title="Delete patient" marker={false} />
-        </Dialog>
-      </Sections>,
-    );
-    expect(screen.getByRole('dialog', { name: 'Delete patient' }).querySelector('[data-slot="section-marker"]')).toBeNull();
+    expect(screen.getByRole('dialog', { name: 'Edit patient' }).querySelector('[data-slot="section-marker"]')).toBeNull();
   });
 
   it('scrolls an inner body, so the heavy rule and the title stay put in long dialogs', () => {

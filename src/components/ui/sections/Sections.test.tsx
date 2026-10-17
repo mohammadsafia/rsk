@@ -9,13 +9,9 @@ afterEach(cleanup);
 const markers = () => Array.from(document.querySelectorAll<HTMLElement>('[data-slot="section-marker"]'));
 
 describe('SectionMarker', () => {
-  it('outside Sections, marks a single titled block with §', () => {
+  it('outside Sections, renders no marker at all', () => {
     render(<SectionMarker />);
-    const [marker] = markers();
-    expect(marker.dataset.kind).toBe('section');
-    expect(marker.textContent).toBe('§');
-    expect(marker.className).toContain('section-mark');
-    expect(marker.getAttribute('aria-hidden')).toBe('true');
+    expect(markers()).toEqual([]);
   });
 
   it('inside Sections, renders an empty counter marker for each child (CSS supplies 01, 02, …)', () => {
@@ -38,17 +34,16 @@ describe('SectionMarker', () => {
     ]);
   });
 
-  it('renders nothing with marker={false}, and § when forced', () => {
+  it('renders nothing with marker={false}, even inside Sections', () => {
     render(
       <Sections>
         <SectionMarker marker={false} />
-        <SectionMarker marker="§" />
       </Sections>,
     );
-    expect(markers().map((marker) => marker.dataset.kind)).toEqual(['section']);
+    expect(markers()).toEqual([]);
   });
 
-  it('SectionsReset makes portalled content count as outside the group', () => {
+  it('SectionsReset makes portalled content count as outside the group (no stray 01)', () => {
     render(
       <Sections>
         <SectionsReset>
@@ -56,7 +51,7 @@ describe('SectionMarker', () => {
         </SectionsReset>
       </Sections>,
     );
-    expect(markers()[0].dataset.kind).toBe('section');
+    expect(markers()).toEqual([]);
   });
 
   it('nested Sections get their own counter-reset element', () => {

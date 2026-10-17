@@ -103,12 +103,12 @@ describe('Card collapsible header layout', () => {
     expect(screen.getByText('Draft').className).toContain('col-start-1');
   });
 
-  it('tops a card that has a header with the heavy rule and marks the title', () => {
+  it('tops a card that has a header with the heavy rule, with no marker outside Sections', () => {
     render(<Card title="Today's visits">Body</Card>);
     const card = document.querySelector<HTMLElement>('article')!;
     expect(card.className).toContain('has-data-[slot=card-header]:rule-top');
     expect(card.className).toContain('relative');
-    expect(screen.getByRole('heading', { name: "Today's visits" }).querySelector('[data-slot="section-marker"]')).not.toBeNull();
+    expect(screen.getByRole('heading', { name: "Today's visits" }).querySelector('[data-slot="section-marker"]')).toBeNull();
   });
 
   it('numbers card titles inside Sections', () => {

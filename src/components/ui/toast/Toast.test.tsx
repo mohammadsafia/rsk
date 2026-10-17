@@ -35,7 +35,8 @@ describe('Toast', () => {
     expect(toast?.getAttribute('data-tone')).toBe('success');
     expect(toast?.className).toContain('bg-surface-raised');
     expect(toast?.className).toContain('rule-top');
-    expect(toast?.querySelector('[data-slot="toast-title"] [data-slot="section-marker"]')?.textContent).toBe('§');
+    expect(toast?.querySelector('[data-slot="section-marker"]')).toBeNull();
+    expect(toast?.querySelector('[data-slot="toast-title"]')?.textContent).toBe('Saved');
     expect(screen.getByRole('button', { name: 'Close' })).toBeTruthy();
   });
 

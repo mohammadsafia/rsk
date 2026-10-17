@@ -1,7 +1,7 @@
 import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
-import { IconButton, SectionMarker, type SectionMarkerValue, SectionsReset } from '@components/ui';
+import { IconButton, SectionsReset } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -49,8 +49,6 @@ export type SheetContentProps = Omit<ComponentProps<typeof DialogPrimitive.Conte
     description?: ReactNode;
     /** When false: no close button, Escape and outside interaction are ignored. */
     dismissible?: boolean;
-    /** Ledger mark before the title: § by default; false removes it. */
-    marker?: SectionMarkerValue;
   };
 
 type SheetComponent = FC<SheetProps> & {
@@ -72,7 +70,6 @@ const SheetContent: FC<SheetContentProps> = ({
   title,
   hideTitle = false,
   description,
-  marker = 'auto',
   dismissible = true,
   onEscapeKeyDown,
   onInteractOutside,
@@ -112,7 +109,6 @@ const SheetContent: FC<SheetContentProps> = ({
             className={cn('border-border-subtle flex flex-col gap-1 border-b px-5 py-4 pe-12', hideTitle && !description && 'sr-only')}
           >
             <DialogPrimitive.Title data-slot="sheet-title" className={cn('text-fg text-md font-semibold', hideTitle && 'sr-only')}>
-              <SectionMarker marker={marker} />
               {title}
             </DialogPrimitive.Title>
 

@@ -124,5 +124,4 @@ export const SIGNATURE_MARKS: ReadonlyArray<FoundationScaleStep> = [
   { token: 'underline-tone', value: '1.5px underline in currentColor', use: 'Badges: status without a box' },
   { token: 'sections', value: 'counter-reset', use: 'A group whose children are numbered 01, 02, …' },
   { token: 'section-number', value: 'mono 10.5px counter, fg-subtle', use: 'The number of a structural section' },
-  { token: 'section-mark', value: 'mono 10.5px §, accent', use: 'A single titled block: dialog, sheet, card, toast' },
 ];

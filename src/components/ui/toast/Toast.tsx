@@ -3,8 +3,6 @@ import * as ToastPrimitives from '@radix-ui/react-toast';
 
 // !Direct import: toastVariants reads this at module load, before the ui barrel reaches ./popover
 import { floatingSurfaceClassName } from '@components/ui/popover/Popover';
-// !Direct import, like Popover above: the ui barrel may not have reached ./sections when this module loads
-import { SectionMarker } from '@components/ui/sections/Sections';
 
 import { useAppTranslation } from '@hooks/shared';
 
@@ -64,7 +62,7 @@ export type ToastProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
 };
 
 type ToastViewportProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport> & VariantProps<typeof viewportVariants>;
-type ToastTitleProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Title> & { marker?: '§' | false };
+type ToastTitleProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Title>;
 type ToastDescriptionProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Description>;
 type ToastCloseProps = ComponentPropsWithoutRef<typeof ToastPrimitives.Close>;
 type ToastIconProps = { tone?: ToastTone };
@@ -94,11 +92,8 @@ const ToastViewport: FC<ToastViewportProps> = ({ className, position, ...props }
   <ToastPrimitives.Viewport data-slot="toast-viewport" className={cn(viewportVariants({ position }), className)} {...props} />
 );
 
-const ToastTitle: FC<ToastTitleProps> = ({ className, children, marker = '§', ...props }) => (
-  <ToastPrimitives.Title data-slot="toast-title" className={cn('text-fg text-sm font-semibold', className)} {...props}>
-    <SectionMarker marker={marker} />
-    {children}
-  </ToastPrimitives.Title>
+const ToastTitle: FC<ToastTitleProps> = ({ className, ...props }) => (
+  <ToastPrimitives.Title data-slot="toast-title" className={cn('text-fg text-sm font-semibold', className)} {...props} />
 );
 
 const ToastDescription: FC<ToastDescriptionProps> = ({ className, ...props }) => (
