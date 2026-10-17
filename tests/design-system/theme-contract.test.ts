@@ -113,6 +113,15 @@ describe('shape, motion and states', () => {
     it(`defines ${step.token}`, () => expect(themeCss).toContain(`--${step.token}: ${step.value};`));
   }
 
+  it('defines the Ledger mark widths on :root', () => {
+    expect(extractBlock(tokensCss, ':root')).toMatchObject({
+      'ink-thickness': '2px',
+      'ink-offset': '4px',
+      'rule-width': '2px',
+      'rule-width-section': '3px',
+    });
+  });
+
   for (const size of CONTROL_SIZES) {
     it(`defines control size ${size.token}`, () => expect(themeCss).toContain(`--spacing-${size.token}: ${size.value};`));
   }

@@ -19,6 +19,7 @@ export const SEMANTIC_COLOR_ROLES: ReadonlyArray<SemanticColorRole> = [
   { token: 'border', group: 'line', description: 'Decorative lines: cards, dividers' },
   { token: 'border-strong', group: 'line', description: 'Control boundaries (≥3:1)' },
   { token: 'border-subtle', group: 'line', description: 'Table row lines' },
+  { token: 'rule-strong', group: 'line', description: 'Ledger heavy rule: the top edge of grouped surfaces (≥3:1)' },
   { token: 'fg-hover', group: 'action', description: 'Primary action fill on hover (bg-fg solid step)' },
   { token: 'fg-pressed', group: 'action', description: 'Primary action fill while pressed' },
   { token: 'accent', group: 'accent', description: 'Oxblood: links, selection, focus' },
@@ -27,6 +28,7 @@ export const SEMANTIC_COLOR_ROLES: ReadonlyArray<SemanticColorRole> = [
   { token: 'accent-subtle', group: 'accent', description: 'Selection tint' },
   { token: 'ring', group: 'accent', description: 'Focus outline (solid, ≥3:1)' },
   { token: 'ring-subtle', group: 'accent', description: 'Focus glow (decorative)' },
+  { token: 'ink', group: 'accent', description: 'Ledger ink: the one mark for current and selected (≥3:1)' },
   { token: 'success', group: 'status', description: 'Success text and fill' },
   { token: 'success-subtle', group: 'status', description: 'Success tint' },
   { token: 'success-fg', group: 'status', description: 'Text on success fill' },
@@ -61,6 +63,7 @@ export const TEXT_SCALE: ReadonlyArray<TextScaleStep> = [
   { token: 'text-lg', size: '1.125rem', lineHeight: '1.625rem', px: 18, use: 'Section titles' },
   { token: 'text-xl', size: '1.375rem', lineHeight: '1.75rem', px: 22, use: 'Page titles' },
   { token: 'text-2xl', size: '1.75rem', lineHeight: '2.125rem', px: 28, use: 'Stat values, display' },
+  { token: 'text-figure', size: '1.875rem', lineHeight: '2.0625rem', px: 30, use: 'Ledger figures: stat and progress values' },
 ];
 
 export const FONT_FAMILIES = {
@@ -75,9 +78,9 @@ export type FoundationScaleStep = Readonly<{
 }>;
 
 export const RADIUS_SCALE: ReadonlyArray<FoundationScaleStep> = [
-  { token: 'radius-sm', value: '0.25rem', use: 'Checkbox, kbd' },
-  { token: 'radius-md', value: '0.375rem', use: 'Controls' },
-  { token: 'radius-lg', value: '0.625rem', use: 'Cards, popovers, dialogs, sheets' },
+  { token: 'radius-sm', value: '0.125rem', use: 'Checkbox, kbd, menu items' },
+  { token: 'radius-md', value: '0.125rem', use: 'Controls: Ledger keeps edges square' },
+  { token: 'radius-lg', value: '0.25rem', use: 'Cards, popovers, dialogs, sheets' },
 ];
 
 export const CONTROL_SIZES: ReadonlyArray<FoundationScaleStep> = [

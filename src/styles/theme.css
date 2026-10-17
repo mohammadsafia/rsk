@@ -19,6 +19,7 @@
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-border-subtle: var(--border-subtle);
+  --color-rule-strong: var(--rule-strong);
 
   --color-fg-hover: var(--fg-hover);
   --color-fg-pressed: var(--fg-pressed);
@@ -35,6 +36,7 @@
   --color-chart-6: var(--chart-6);
   --color-ring: var(--ring);
   --color-ring-subtle: var(--ring-subtle);
+  --color-ink: var(--ink);
 
   --color-success: var(--success);
   --color-success-subtle: var(--success-subtle);
@@ -84,6 +86,9 @@
   --text-xl--line-height: calc(1.75rem + var(--leading-rtl-boost));
   --text-2xl: 1.75rem;
   --text-2xl--line-height: calc(2.125rem + var(--leading-rtl-boost));
+  /* Ledger figure — stat and progress values */
+  --text-figure: 1.875rem;
+  --text-figure--line-height: calc(2.0625rem + var(--leading-rtl-boost));
   /* display steps — landing hero only */
   --text-3xl: 2.25rem;
   --text-3xl--line-height: calc(2.625rem + var(--leading-rtl-boost));
@@ -91,9 +96,9 @@
   --text-4xl--line-height: calc(3rem + var(--leading-rtl-boost));
 
   /* shape + density */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.625rem;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.125rem;
+  --radius-lg: 0.25rem;
 
   --spacing-control-sm: 1.75rem;
   --spacing-control-md: 2rem;

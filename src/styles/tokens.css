@@ -28,6 +28,8 @@
   --accent-hover: oklch(0.37 0.13 14.9);
   --accent-subtle: oklch(0.953 0.013 5.8);
   --ring: var(--accent);
+  --ink: var(--accent);
+  --rule-strong: var(--fg);
   --ring-subtle: oklch(0.43 0.141 14.9 / 20%);
 
   --success: oklch(0.5 0.13 157.2);
@@ -93,6 +95,8 @@
   --accent-hover: oklch(0.75 0.11 12);
   --accent-subtle: oklch(0.698 0.125 12 / 11%);
   --ring: var(--accent);
+  --ink: var(--accent);
+  --rule-strong: var(--fg);
   --ring-subtle: oklch(0.698 0.125 12 / 25%);
 
   --success: oklch(0.735 0.136 159.3);
@@ -138,6 +142,10 @@
   --duration-base: 180ms;
   --duration-slow: 260ms;
   --leading-rtl-boost: 0em;
+  --ink-thickness: 2px;
+  --ink-offset: 4px;
+  --rule-width: 2px;
+  --rule-width-section: 3px;
 }
 
 [dir='rtl'] {

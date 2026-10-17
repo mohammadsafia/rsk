@@ -41,6 +41,10 @@ const PAIRS: ReadonlyArray<readonly [string, string, number]> = [
   ['chart-4', 'surface', UI],
   ['chart-5', 'surface', UI],
   ['chart-6', 'surface', UI],
+  ['ink', 'surface', UI],
+  ['ink', 'canvas', UI],
+  ['rule-strong', 'surface', UI],
+  ['rule-strong', 'surface-raised', UI],
 ];
 
 const tokensCss = readProjectFile('src/styles/tokens.css');
