@@ -72,4 +72,25 @@ describe('PatientProfilePage', () => {
     expect(await screen.findByRole('heading', { level: 1, name: patient.name.ar })).toBeTruthy();
     expect(document.body.textContent).not.toMatch(/[٠-٩]/);
   });
+
+  it('saves new contact details', async () => {
+    const patient = richPatient();
+    renderProfile(patient.id);
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Edit contact details' });
+    fireEvent.change(within(sheet).getByLabelText(/^Email/), { target: { value: 'updated@example.com' } });
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(clinicStore.read().patients.find((p) => p.id === patient.id)!.email).toBe('updated@example.com'));
+  });
+
+  it('shows a duplicate phone on the field and saves nothing', async () => {
+    const [patient, other] = clinicStore.read().patients;
+    renderProfile(patient.id);
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Edit contact details' });
+    fireEvent.change(within(sheet).getByLabelText(/^Phone/), { target: { value: other.phone } });
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Save' }));
+    expect(await within(sheet).findByText('That phone number is already registered')).toBeTruthy();
+    expect(clinicStore.read().patients.find((p) => p.id === patient.id)!.phone).toBe(patient.phone);
+  });
 });

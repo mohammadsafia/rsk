@@ -283,6 +283,19 @@
     "error": {
       "title": "This patient couldn't be loaded",
       "description": "Something went wrong. Try again in a moment."
+    },
+    "editSheet": {
+      "title": "Edit contact details",
+      "phone": "Phone",
+      "email": "Email",
+      "insurer": "Insurer",
+      "policy": "Policy number",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saved": "Contact details saved",
+      "phoneRequired": "Enter a phone number",
+      "emailInvalid": "Enter a valid email address",
+      "policyRequired": "Enter the policy number"
     }
   }
 }
