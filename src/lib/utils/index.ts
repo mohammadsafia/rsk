@@ -5,4 +5,5 @@ export * from './dataTable.ts';
 export * from './toLatinDigits';
 export * from './formatNumber';
 export * from './formatMoney';
+export * from './formatNumber';
 export * from './dataTableFilters';
