@@ -5,6 +5,7 @@ import { ChartFrame } from './ChartFrame';
 import { ChartTooltip } from './ChartTooltip';
 import type { ChartBaseProps } from './types';
 import { useChartFormat } from './useChartFormat';
+import { MOTION_DURATIONS } from '@constants';
 
 /** `orientation` is the direction the bars grow: `vertical` = columns. */
 export type BarChartProps<T> = ChartBaseProps<T> & { orientation?: 'vertical' | 'horizontal'; stacked?: boolean };
@@ -77,6 +78,7 @@ export function BarChart<T>({
                 stackId={stacked ? 'stack' : undefined}
                 maxBarSize={40}
                 isAnimationActive={animate}
+                animationDuration={MOTION_DURATIONS.slow}
               />
             ))}
           </RechartsBarChart>

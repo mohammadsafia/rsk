@@ -5,6 +5,7 @@ import { ChartFrame } from './ChartFrame';
 import { ChartTooltip } from './ChartTooltip';
 import type { ChartBaseProps } from './types';
 import { useChartFormat } from './useChartFormat';
+import { MOTION_DURATIONS } from '@constants';
 
 export type AreaChartProps<T> = ChartBaseProps<T> & { stacked?: boolean };
 
@@ -55,6 +56,7 @@ export function AreaChart<T>({
                 strokeWidth={2}
                 stackId={stacked ? 'stack' : undefined}
                 isAnimationActive={animate}
+                animationDuration={MOTION_DURATIONS.slow}
               />
             ))}
           </RechartsAreaChart>
