@@ -7,6 +7,7 @@ import {
   InvoicesHandler,
   MetricsHandler,
   type MetricsRange,
+  type PatientPatch,
   type PaymentInput,
   PatientsHandler,
   type VisitPatch,
@@ -21,6 +22,9 @@ export const useInsurers = () => useQuery([CLINIC, ClinicReferenceHandler.insure
 
 export const usePatients = () => useQuery([CLINIC, PatientsHandler.list.queryKey], PatientsHandler.list.request);
 export const usePatient = (id: string) => useQuery([CLINIC, PatientsHandler.get.queryKey, id], () => PatientsHandler.get.request(id));
+
+export const usePatientVisits = (patientId: string) =>
+  useQuery([CLINIC, VisitsHandler.byPatient.queryKey, patientId], () => VisitsHandler.byPatient.request(patientId));
 
 export const useVisits = (range: DayRange) =>
   useQuery([CLINIC, VisitsHandler.list.queryKey, range.from, range.to], () => VisitsHandler.list.request(range));
@@ -41,6 +45,8 @@ const useClinicMutation = <TInput, TResult>(request: (input: TInput) => Promise<
 };
 
 export const useRegisterPatient = () => useClinicMutation(PatientsHandler.register.request);
+export const useUpdatePatient = () =>
+  useClinicMutation(({ id, patch }: { id: string; patch: PatientPatch }) => PatientsHandler.update.request(id, patch));
 export const useCreateVisit = () => useClinicMutation(VisitsHandler.create.request);
 export const useUpdateVisit = () =>
   useClinicMutation(({ id, patch }: { id: string; patch: VisitPatch }) => VisitsHandler.update.request(id, patch));

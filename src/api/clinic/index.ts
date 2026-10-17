@@ -9,6 +9,7 @@ export {
   type DayRange,
   type NewPatientInput,
   type NewVisitInput,
+  type PatientPatch,
   type VisitPatch,
 } from './service';
 // The store is exported for tests and a dev reset only; pages go through the handlers.

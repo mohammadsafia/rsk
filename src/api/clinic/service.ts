@@ -21,6 +21,8 @@ export class ClinicError extends Error {
 
 export type NewPatientInput = Omit<Patient, 'id' | 'mrn' | 'createdAt'>;
 export type NewVisitInput = Omit<Visit, 'id' | 'status' | 'notes'> & { notes?: string | null };
+/** Contact details a patient's record can change after registration. */
+export type PatientPatch = Partial<Pick<Patient, 'phone' | 'email' | 'insurerId' | 'policyNumber'>>;
 export type VisitPatch = Pick<Visit, 'start' | 'end' | 'doctorId'>;
 export type DayRange = { from: string; to: string };
 export type BulkResult = { done: string[]; skipped: { id: string; reason: 'not-allowed' }[] };
@@ -131,6 +133,25 @@ export const clinicService = {
         createdAt: nowIso(),
       };
       data.patients.push(patient);
+      return patient;
+    }),
+
+  listPatientVisits: (patientId: string) =>
+    request('listPatientVisits', (data) => {
+      find(data.patients, patientId, 'Patient');
+      return data.visits.filter((visit) => visit.patientId === patientId).sort((a, b) => Date.parse(b.start) - Date.parse(a.start));
+    }),
+
+  updatePatient: (id: string, patch: PatientPatch) =>
+    mutation('updatePatient', (data) => {
+      const patient = find(data.patients, id, 'Patient');
+      if (
+        patch.phone !== undefined &&
+        data.patients.some((other) => other.id !== id && normalizePhone(other.phone) === normalizePhone(patch.phone!))
+      ) {
+        throw new ClinicError('duplicate-phone', 'Another patient has this phone', { phone: 'duplicate-phone' });
+      }
+      Object.assign(patient, patch);
       return patient;
     }),
 

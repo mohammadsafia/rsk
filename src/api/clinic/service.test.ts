@@ -164,3 +164,27 @@ describe('clinicService ids across page loads', () => {
     expect((await secondLoad.service.getPatient(second.id)).phone).toBe('+962 79 000 0002');
   });
 });
+
+describe('clinicService patient visits and updates', () => {
+  it('lists one patient’s visits newest first', async () => {
+    const patientId = clinicStore.read().visits[0].patientId;
+    const visits = await clinicService.listPatientVisits(patientId);
+    expect(visits.length).toBeGreaterThan(0);
+    expect(visits.every((v) => v.patientId === patientId)).toBe(true);
+    const starts = visits.map((v) => v.start);
+    expect(starts).toEqual(starts.toSorted().toReversed());
+    await expect(clinicService.listPatientVisits('nope')).rejects.toMatchObject({ code: 'not-found' });
+  });
+
+  it('updates contact details and refuses another patient’s phone', async () => {
+    const [a, b] = clinicStore.read().patients;
+    const updated = await clinicService.updatePatient(a.id, { email: 'new@example.com', phone: '+962 79 000 0009' });
+    expect(updated).toMatchObject({ email: 'new@example.com', phone: '+962 79 000 0009' });
+    await expect(clinicService.updatePatient(a.id, { phone: b.phone })).rejects.toMatchObject({
+      code: 'duplicate-phone',
+      fieldErrors: { phone: 'duplicate-phone' },
+    });
+    // Keeping your own phone is not a duplicate.
+    await expect(clinicService.updatePatient(a.id, { phone: '+962 79 000 0009' })).resolves.toBeTruthy();
+  });
+});

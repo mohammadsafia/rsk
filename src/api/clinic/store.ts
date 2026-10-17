@@ -10,6 +10,8 @@ export type ClinicOp =
   | 'listPatients'
   | 'getPatient'
   | 'registerPatient'
+  | 'listPatientVisits'
+  | 'updatePatient'
   | 'listVisits'
   | 'listLeave'
   | 'createVisit'
