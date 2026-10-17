@@ -13,6 +13,7 @@ const MembersPage = lazy(() => import('@pages/members/MembersPage'));
 const PatientsPage = lazy(() => import('@pages/clinic/patients/PatientsPage'));
 const BillingPage = lazy(() => import('@pages/clinic/billing/BillingPage'));
 const SchedulePage = lazy(() => import('@pages/clinic/schedule/SchedulePage'));
+const PatientProfilePage = lazy(() => import('@pages/clinic/patient-profile/PatientProfilePage'));
 
 export const router = createBrowserRouter([
   // Public documentation site (no auth) and redirects from the old /components gallery
@@ -66,6 +67,10 @@ export const router = createBrowserRouter([
           {
             path: FULL_ROUTES_PATH.PATIENTS.INDEX,
             element: <PatientsPage />,
+          },
+          {
+            path: FULL_ROUTES_PATH.PATIENTS.DETAIL,
+            element: <PatientProfilePage />,
           },
           {
             path: FULL_ROUTES_PATH.BILLING.INDEX,

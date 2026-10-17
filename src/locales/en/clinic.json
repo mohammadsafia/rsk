@@ -226,5 +226,63 @@
       "when": "{{day}}, {{start}} – {{end}} · {{doctor}}",
       "cancel": "Cancel"
     }
+  },
+  "profile": {
+    "bookVisit": "Book visit",
+    "edit": "Edit",
+    "backToPatients": "Back to patients",
+    "age_zero": "{{count}} years",
+    "age_one": "{{count}} year",
+    "age_two": "{{count}} years",
+    "age_few": "{{count}} years",
+    "age_many": "{{count}} years",
+    "age_other": "{{count}} years",
+    "stats": {
+      "visitsThisYear": "Visits this year",
+      "balanceDue": "Balance due",
+      "lastVisit": "Last visit"
+    },
+    "tabs": {
+      "label": "Patient record",
+      "overview": "Overview",
+      "timeline": "Timeline",
+      "invoices": "Invoices"
+    },
+    "fields": {
+      "dob": "Date of birth",
+      "sex": "Sex",
+      "email": "Email",
+      "insurer": "Insurer",
+      "policy": "Policy number",
+      "doctor": "Primary doctor",
+      "allergies": "Allergies"
+    },
+    "sex": {
+      "female": "Female",
+      "male": "Male"
+    },
+    "allergies": {
+      "penicillin": "Penicillin",
+      "latex": "Latex",
+      "peanuts": "Peanuts",
+      "aspirin": "Aspirin",
+      "pollen": "Pollen",
+      "none": "No known allergies"
+    },
+    "timeline": {
+      "payment": "Payment received",
+      "empty": "Nothing yet"
+    },
+    "invoices": {
+      "empty": "No invoices"
+    },
+    "notFound": {
+      "title": "Patient not found",
+      "description": "This record may have been removed."
+    },
+    "error": {
+      "title": "This patient couldn't be loaded",
+      "description": "Something went wrong. Try again in a moment."
+    }
   }
 }

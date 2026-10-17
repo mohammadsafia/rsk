@@ -234,5 +234,63 @@
       "when": "{{day}}، {{start}} – {{end}} · {{doctor}}",
       "cancel": "إلغاء"
     }
+  },
+  "profile": {
+    "bookVisit": "حجز زيارة",
+    "edit": "تعديل",
+    "backToPatients": "العودة إلى المرضى",
+    "age_zero": "أقل من سنة",
+    "age_one": "سنة واحدة",
+    "age_two": "سنتان",
+    "age_few": "{{count}} سنوات",
+    "age_many": "{{count}} سنة",
+    "age_other": "{{count}} سنة",
+    "stats": {
+      "visitsThisYear": "زيارات هذا العام",
+      "balanceDue": "الرصيد المستحق",
+      "lastVisit": "آخر زيارة"
+    },
+    "tabs": {
+      "label": "سجل المريض",
+      "overview": "نظرة عامة",
+      "timeline": "السجل الزمني",
+      "invoices": "الفواتير"
+    },
+    "fields": {
+      "dob": "تاريخ الميلاد",
+      "sex": "الجنس",
+      "email": "البريد الإلكتروني",
+      "insurer": "شركة التأمين",
+      "policy": "رقم البوليصة",
+      "doctor": "الطبيب المعالج",
+      "allergies": "الحساسية"
+    },
+    "sex": {
+      "female": "أنثى",
+      "male": "ذكر"
+    },
+    "allergies": {
+      "penicillin": "البنسلين",
+      "latex": "اللاتكس",
+      "peanuts": "الفول السوداني",
+      "aspirin": "الأسبرين",
+      "pollen": "حبوب اللقاح",
+      "none": "لا حساسية معروفة"
+    },
+    "timeline": {
+      "payment": "دفعة مستلمة",
+      "empty": "لا شيء بعد"
+    },
+    "invoices": {
+      "empty": "لا توجد فواتير"
+    },
+    "notFound": {
+      "title": "المريض غير موجود",
+      "description": "ربما حُذف هذا السجل."
+    },
+    "error": {
+      "title": "تعذّر تحميل بيانات المريض",
+      "description": "حدث خطأ ما. حاول مرة أخرى بعد قليل."
+    }
   }
 }
