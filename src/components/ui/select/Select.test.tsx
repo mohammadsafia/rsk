@@ -37,5 +37,6 @@ describe('Select', () => {
     expect(screen.getByRole('option', { name: 'Dr. Haddad' }).dataset.state).toBe('checked');
     const chosen = screen.getByRole('option', { name: 'Dr. Haddad' });
     expect(chosen.className).toContain('data-[state=checked]:ink');
+    expect(screen.getByRole('listbox').className).toContain('origin-(--radix-select-content-transform-origin)');
   });
 });

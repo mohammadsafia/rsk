@@ -20,6 +20,8 @@ describe('Tooltip', () => {
     expect(tip.textContent).toBe('Archive record');
     const bubble = tip.closest('[data-state]') ?? tip.parentElement;
     expect((bubble as HTMLElement).className).toContain('rule-top-ink');
+    expect((bubble as HTMLElement).className).toContain('origin-(--radix-tooltip-content-transform-origin)');
+    expect((bubble as HTMLElement).className).toContain('data-[state=closed]:duration-instant');
   });
 
   it('renders only the trigger when disabled', () => {

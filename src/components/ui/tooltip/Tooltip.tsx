@@ -45,8 +45,9 @@ const Tooltip: TooltipComponent = ({ content, disabled = false, side, align, sid
               sideOffset={sideOffset}
               className={cn(
                 'bg-fg text-fg-inverse relative rule-top rule-top-ink z-50 max-w-xs rounded-md px-2 pt-1.5 pb-1 text-xs',
-                'animate-in fade-in-0 zoom-in-98 duration-fast motion-reduce:zoom-in-100',
-                'data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
+                'origin-(--radix-tooltip-content-transform-origin) animate-in fade-in-0 zoom-in-98 duration-fast motion-reduce:zoom-in-100',
+                'data-[side=bottom]:slide-in-from-top-0.5 data-[side=top]:slide-in-from-bottom-0.5 data-[side=left]:slide-in-from-right-0.5 data-[side=right]:slide-in-from-left-0.5',
+                'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:duration-instant data-[state=closed]:ease-in',
                 className,
               )}
             >

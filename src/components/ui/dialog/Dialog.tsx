@@ -1,7 +1,7 @@
 import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
-import { floatingMotionClassName, IconButton, SectionMarker, type SectionMarkerValue, SectionsReset } from '@components/ui';
+import { IconButton, SectionMarker, type SectionMarkerValue, SectionsReset } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -63,6 +63,15 @@ const DialogTrigger: FC<DialogTriggerProps> = ({ ref, ...props }) => (
 
 const DialogClose: FC<DialogCloseProps> = ({ ref, ...props }) => <DialogPrimitive.Close ref={ref} data-slot="dialog-close" {...props} />;
 
+/** Calm dialog motion (spec §4): rise 8px into place at base, leave at fast. The expressive flight lands in Motion Plan C. */
+const dialogMotionClassName = [
+  'data-[state=open]:animate-in data-[state=closed]:animate-out',
+  'data-[state=open]:duration-base data-[state=closed]:duration-fast data-[state=closed]:ease-in',
+  'data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
+  'data-[state=open]:zoom-in-98 data-[state=closed]:zoom-out-98 data-[state=open]:slide-in-from-bottom-2',
+  'motion-reduce:data-[state=open]:zoom-in-100 motion-reduce:data-[state=closed]:zoom-out-100',
+].join(' ');
+
 const DialogContent: FC<DialogContentProps> = ({
   ref,
   className,
@@ -98,7 +107,7 @@ const DialogContent: FC<DialogContentProps> = ({
         <DialogPrimitive.Overlay
           data-slot="dialog-overlay"
           className={cn(
-            'bg-overlay fixed inset-0 z-50 duration-slow',
+            'bg-overlay fixed inset-0 z-50 data-[state=open]:duration-base data-[state=closed]:duration-fast',
             'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
           )}
         />
@@ -107,7 +116,7 @@ const DialogContent: FC<DialogContentProps> = ({
           ref={ref}
           data-slot="dialog-content"
           data-size={size ?? 'md'}
-          className={cn(dialogContentVariants({ size }), floatingMotionClassName, 'duration-slow', className)}
+          className={cn(dialogContentVariants({ size }), dialogMotionClassName, className)}
           onEscapeKeyDown={handleEscapeKeyDown}
           onInteractOutside={handleInteractOutside}
           {...describedBy}

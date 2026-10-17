@@ -37,6 +37,9 @@ describe('Sheet', () => {
     const sheet = screen.getByRole('dialog', { name: 'New appointment' });
     expect(sheet.querySelector('[data-slot="sheet-footer"]')?.textContent).toContain('Save');
     expect(sheet.className).toContain('rule-top-section');
+    expect(sheet.className).toContain('data-[state=open]:duration-slow');
+    expect(sheet.className).toContain('data-[state=closed]:duration-exit');
+    expect(sheet.className).toContain('data-[state=closed]:ease-in');
     expect(sheet.querySelector('[data-slot="sheet-title"] [data-slot="section-marker"]')?.textContent).toBe('§');
     expect(sheet.querySelector('[data-slot="sheet-body"]')?.className).toContain('overflow-y-auto');
     // A grid or flex body must pack its content to the top instead of stretching rows to fill the height.

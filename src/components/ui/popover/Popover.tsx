@@ -9,9 +9,11 @@ export const floatingSurfaceClassName = 'bg-surface-raised text-fg shadow-raised
 
 /** Enter/exit motion for Radix floating layers: fade + 0.98 scale; reduced motion keeps only the fade. */
 export const floatingMotionClassName = [
-  'duration-base data-[state=open]:animate-in data-[state=closed]:animate-out',
+  'data-[state=open]:animate-in data-[state=closed]:animate-out',
+  'data-[state=open]:duration-fast data-[state=closed]:duration-instant data-[state=closed]:ease-in',
   'data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
-  'data-[state=open]:zoom-in-98 data-[state=closed]:zoom-out-98',
+  'data-[state=open]:zoom-in-96 data-[state=closed]:zoom-out-96',
+  'data-[side=bottom]:slide-in-from-top-1 data-[side=top]:slide-in-from-bottom-1 data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1',
   'motion-reduce:data-[state=open]:zoom-in-100 motion-reduce:data-[state=closed]:zoom-out-100',
 ].join(' ');
 
@@ -36,7 +38,7 @@ const PopoverContent: FC<PopoverContentProps> = ({ className, align = 'center', 
       data-slot="popover-content"
       align={align}
       sideOffset={sideOffset}
-      className={cn(floatingSurfaceClassName, floatingMotionClassName, 'p-3', className)}
+      className={cn(floatingSurfaceClassName, floatingMotionClassName, 'origin-(--radix-popover-content-transform-origin) p-3', className)}
       {...props}
     />
   </PopoverPrimitive.Portal>

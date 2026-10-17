@@ -101,7 +101,7 @@ const SelectContent: FC<SelectContentProps> = ({ className, children, position =
       className={cn(
         floatingSurfaceClassName,
         floatingMotionClassName,
-        'relative max-h-96 overflow-hidden p-1',
+        'origin-(--radix-select-content-transform-origin) relative max-h-96 overflow-hidden p-1',
         position === 'popper' &&
           'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
         position === 'popper' && 'w-(--radix-select-trigger-width)',

@@ -17,7 +17,7 @@ const sheetContentVariants = cva(
     'bg-surface-raised text-fg shadow-overlay border-border rule-top rule-top-section fixed z-50 flex flex-col outline-none',
     'inset-x-0 bottom-0 max-h-[85dvh] rounded-t-lg border-t',
     'md:inset-y-0 md:max-h-none md:w-full md:rounded-none md:border-t-0',
-    'data-[state=open]:animate-in data-[state=closed]:animate-out duration-slow motion-reduce:animate-none',
+    'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:duration-slow data-[state=closed]:duration-exit data-[state=closed]:ease-in motion-reduce:animate-none',
     // The bottom slide belongs to the bottom sheet only: unscoped, it also sets vertical travel on the md side panel.
     'max-md:data-[state=open]:slide-in-from-bottom max-md:data-[state=closed]:slide-out-to-bottom',
   ],
@@ -87,7 +87,7 @@ const SheetContent: FC<SheetContentProps> = ({
       <SectionsReset>
         <DialogPrimitive.Overlay
           data-slot="sheet-overlay"
-          className="bg-overlay data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 duration-slow fixed inset-0 z-50"
+          className="bg-overlay data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:duration-base data-[state=closed]:duration-fast fixed inset-0 z-50"
         />
 
         <DialogPrimitive.Content

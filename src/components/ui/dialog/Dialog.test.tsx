@@ -72,6 +72,10 @@ describe('Dialog', () => {
     const dialog = screen.getByRole('dialog', { name: 'Edit patient' });
     expect(dialog.className).toContain('rule-top');
     expect(dialog.className).toContain('rule-top-section');
+    expect(dialog.className).toContain('data-[state=open]:duration-base');
+    expect(dialog.className).toContain('data-[state=closed]:duration-fast');
+    expect(dialog.className).toContain('data-[state=open]:slide-in-from-bottom-2');
+    expect(dialog.className).not.toContain('duration-slow');
     expect(dialog.querySelector('[data-slot="dialog-title"] [data-slot="section-marker"]')?.textContent).toBe('§');
   });
 

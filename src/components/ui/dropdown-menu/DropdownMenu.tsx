@@ -91,7 +91,12 @@ const SubTrigger: FC<DropdownMenuSubTriggerProps> = ({ className, inset, childre
 const SubContent: FC<DropdownMenuSubContentProps> = ({ className, ...props }) => (
   <DropdownMenuPrimitive.SubContent
     data-slot="dropdown-subcontent"
-    className={cn(floatingSurfaceClassName, floatingMotionClassName, 'min-w-32 overflow-hidden p-1', className)}
+    className={cn(
+      floatingSurfaceClassName,
+      floatingMotionClassName,
+      'origin-(--radix-dropdown-menu-content-transform-origin) min-w-32 overflow-hidden p-1',
+      className,
+    )}
     {...props}
   />
 );
@@ -101,7 +106,12 @@ const Content: FC<DropdownMenuContentProps> = ({ className, sideOffset = 4, ...p
     <DropdownMenuPrimitive.Content
       data-slot="dropdown-content"
       sideOffset={sideOffset}
-      className={cn(floatingSurfaceClassName, floatingMotionClassName, 'min-w-32 overflow-hidden p-1', className)}
+      className={cn(
+        floatingSurfaceClassName,
+        floatingMotionClassName,
+        'origin-(--radix-dropdown-menu-content-transform-origin) min-w-32 overflow-hidden p-1',
+        className,
+      )}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>
