@@ -47,7 +47,11 @@ export const buttonVariants = cva(
       { variant: 'outline', tone: 'neutral', className: 'border-border-strong text-fg hover:bg-hover' },
       { variant: 'outline', tone: 'accent', className: 'border-accent text-accent hover:bg-hover' },
       { variant: 'outline', tone: 'danger', className: 'border-danger text-danger hover:bg-hover' },
-      { variant: 'ghost', tone: 'neutral', className: 'text-fg-muted hover:bg-hover hover:text-fg' },
+      {
+        variant: 'ghost',
+        tone: 'neutral',
+        className: 'text-fg-muted hover:bg-hover hover:text-fg underline decoration-border-strong underline-offset-4',
+      },
       { variant: 'ghost', tone: 'accent', className: 'text-accent hover:bg-hover' },
       { variant: 'ghost', tone: 'danger', className: 'text-danger hover:bg-hover' },
       { variant: 'link', tone: 'neutral', className: 'text-fg' },

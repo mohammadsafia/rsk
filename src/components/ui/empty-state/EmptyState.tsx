@@ -69,12 +69,26 @@ const EmptyState: EmptyStateComponent = ({
       className={cn(emptyStateVariants({ size }), className)}
       {...props}
     >
-      <span data-slot="empty-state-icon" className="text-fg-subtle flex items-center justify-center [&_svg]:size-full">
+      <span
+        data-slot="empty-state-icon"
+        className={cn(
+          'text-fg-subtle flex items-center justify-center [&_svg]:size-full',
+          !icon && kind !== 'error' && 'figure text-fg relative rule-top w-14 pt-2 size-auto!',
+        )}
+      >
         <Conditional>
           <Conditional.If condition={!!icon}>{icon}</Conditional.If>
 
           <Conditional.Else>
-            <KindIcon aria-hidden="true" strokeWidth={1.5} />
+            <Conditional>
+              <Conditional.If condition={kind === 'error'}>
+                <KindIcon aria-hidden="true" strokeWidth={1.5} />
+              </Conditional.If>
+
+              <Conditional.Else>
+                <span aria-hidden="true">0</span>
+              </Conditional.Else>
+            </Conditional>
           </Conditional.Else>
         </Conditional>
       </span>
