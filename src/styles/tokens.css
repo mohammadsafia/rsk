@@ -5,6 +5,8 @@
  */
 :root,
 .light {
+  color-scheme: light;
+
   --canvas: oklch(0.991 0.001 286.4);
   --surface-sunken: oklch(0.974 0.003 286.4);
   --surface: oklch(1 0 0);
@@ -72,6 +74,8 @@
 }
 
 .dark {
+  color-scheme: dark;
+
   --canvas: oklch(0.173 0.004 264.5);
   --surface-sunken: oklch(0.159 0.005 264.4);
   --surface: oklch(0.196 0.006 271.1);

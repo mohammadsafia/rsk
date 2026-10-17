@@ -239,3 +239,31 @@ describe('Ledger signature marks', () => {
     expect(utilityBlock('section-number')).toContain('content: counter(rsk-section, decimal-leading-zero);');
   });
 });
+
+describe('browser-painted UI follows the theme', () => {
+  const utilitiesCss = readProjectFile('src/styles/utilities.css');
+  /** The raw body of the first `selector {` block (declarations, not just custom properties). */
+  const rawBlock = (css: string, selector: string) => {
+    const open = css.indexOf('{', css.indexOf(`${selector} {`));
+    return css.slice(open + 1, css.indexOf('}', open));
+  };
+
+  it('declares color-scheme per theme, so autofill, scrollbars and pickers match', () => {
+    expect(rawBlock(tokensCss, '.light')).toContain('color-scheme: light;');
+    expect(rawBlock(tokensCss, '.dark')).toContain('color-scheme: dark;');
+  });
+
+  it('repaints autofilled fields with the theme surface and text', () => {
+    const rule = utilitiesCss.slice(utilitiesCss.indexOf(':is(input, textarea, select):is(:autofill, :-webkit-autofill) {'));
+    expect(rule.length).toBeGreaterThan(0);
+    expect(rule).toContain('-webkit-text-fill-color: var(--fg);');
+    expect(rule).toContain('box-shadow: 0 0 0 100vmax var(--surface) inset;');
+  });
+
+  it('keeps the focus underline and the invalid glow on autofilled fields', () => {
+    expect(utilitiesCss).toContain(
+      ':is(input, textarea, select):is(:autofill, :-webkit-autofill):focus-visible {\n  box-shadow:\n    0 0 0 100vmax var(--surface) inset,\n    0 var(--ink-thickness) 0 0 var(--ink);',
+    );
+    expect(utilitiesCss).toContain(":is(input, textarea, select):is(:autofill, :-webkit-autofill)[aria-invalid='true']");
+  });
+});

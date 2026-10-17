@@ -260,3 +260,30 @@
   color: var(--accent);
   margin-inline-end: 0.375rem;
 }
+
+/*
+ * Browser autofill paints its own light background and dark text over fields, whatever the theme.
+ * Repaint it with the theme's surface and text. These rules are unlayered (they beat the utilities layer),
+ * so they also carry the focus underline and the invalid glow that focus-ring-input / state-invalid add.
+ * The long transition stops Chrome flashing its colour in before the repaint applies.
+ */
+:is(input, textarea, select):is(:autofill, :-webkit-autofill) {
+  -webkit-text-fill-color: var(--fg);
+  caret-color: var(--fg);
+  box-shadow: 0 0 0 100vmax var(--surface) inset;
+  transition:
+    background-color 600000s 0s,
+    color 600000s 0s;
+}
+
+:is(input, textarea, select):is(:autofill, :-webkit-autofill):focus-visible {
+  box-shadow:
+    0 0 0 100vmax var(--surface) inset,
+    0 var(--ink-thickness) 0 0 var(--ink);
+}
+
+:is(input, textarea, select):is(:autofill, :-webkit-autofill)[aria-invalid='true'] {
+  box-shadow:
+    0 0 0 100vmax var(--surface) inset,
+    0 0 0 3px var(--danger-subtle);
+}
