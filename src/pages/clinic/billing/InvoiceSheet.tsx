@@ -1,10 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
 import { ClinicError, type Invoice, invoiceBalance, invoiceTotal, type PaymentMethod } from '@api/clinic';
-import { Badge, Button, EmptyState, Money, Sheet, Skeleton } from '@components/ui';
+import { Alert, Badge, Button, EmptyState, Money, Sheet, Skeleton } from '@components/ui';
 import { ConfirmDialog } from '@components/shared';
 import { FormContainer, FormDatePicker, FormNumber, FormSelect } from '@components/forms';
 
@@ -16,6 +15,7 @@ import { useInvoice, usePatients, useRecordPayment, useSendInvoice, useVoidInvoi
 import { INVOICE_TONE } from '../shared/status';
 import { useClinicToday } from '../shared/useClinicToday';
 import { useLocalized } from '../shared/useLocalized';
+import { paymentSchema } from './paymentSchema';
 
 const METHODS: PaymentMethod[] = ['card', 'cash', 'insurance'];
 
@@ -35,20 +35,9 @@ function RecordPayment({ invoice }: { invoice: Invoice }) {
   const balance = invoiceBalance(invoice);
 
   const schema = useMemo(
-    () =>
-      z.object({
-        amount: z
-          .number({
-            invalid_type_error: t('billing.sheet.record.amountRequired'),
-            required_error: t('billing.sheet.record.amountRequired'),
-          })
-          .gt(0, t('billing.sheet.record.amountRequired'))
-          .max(balance, t('billing.sheet.record.amountTooHigh', { balance: formatMoney(balance) })),
-        method: z.enum(['card', 'cash', 'insurance']),
-        date: z.string().min(1),
-      }),
+    () => paymentSchema({ t, balance, balanceLabel: formatMoney(balance), todayKey }),
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- formatMoney follows the language, which `t` tracks
-    [balance, t],
+    [balance, t, todayKey],
   );
 
   const form = useForm<PaymentForm>({
@@ -86,7 +75,7 @@ function RecordPayment({ invoice }: { invoice: Invoice }) {
           getOptionLabel={(method) => t(`methods.${String(method)}`)}
           getOptionValue={(method) => String(method)}
         />
-        <FormDatePicker<PaymentForm> name="date" control={form.control} label={t('billing.sheet.record.date')} />
+        <FormDatePicker<PaymentForm> name="date" control={form.control} label={t('billing.sheet.record.date')} required />
         <div className="sm:col-span-3">
           <Button type="submit" loading={record.isLoading}>
             {t('billing.sheet.record.submit')}
@@ -211,6 +200,15 @@ function InvoiceSheet({ invoiceId, onClose }: { invoiceId: string | null; onClos
                 <Skeleton />
                 <Skeleton shape="block" size="lg" />
               </div>
+            ) : invoice.isError && !(invoice.error instanceof ClinicError && invoice.error.code === 'not-found') ? (
+              <Alert tone="danger">
+                <Alert.Description className="flex flex-wrap items-center gap-3">
+                  {t('billing.sheet.loadError')}
+                  <Button size="sm" variant="outline" onClick={() => void invoice.refetch()}>
+                    {t('retry')}
+                  </Button>
+                </Alert.Description>
+              </Alert>
             ) : !data ? (
               <EmptyState kind="no-results" title={t('billing.sheet.notFound')} description={t('billing.sheet.notFoundDescription')} />
             ) : (
@@ -254,12 +252,14 @@ function InvoiceSheet({ invoiceId, onClose }: { invoiceId: string | null; onClos
         title={t('billing.sheet.voidTitle', { number: data?.number ?? '' })}
         description={t('billing.sheet.voidDescription')}
         confirmLabel={t('billing.sheet.void')}
-        onConfirm={() => {
+        onConfirm={async () => {
           if (!data) return;
-          voidInvoice.mutate(data.id, {
-            onSuccess: () => toast({ title: t('billing.sheet.voided'), tone: 'success' }),
-            onError: (error) => errorToast(t, error),
-          });
+          try {
+            await voidInvoice.mutateAsync(data.id);
+            toast({ title: t('billing.sheet.voided'), tone: 'success' });
+          } catch (error) {
+            errorToast(t, error);
+          }
         }}
       >
         {null}

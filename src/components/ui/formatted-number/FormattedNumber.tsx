@@ -102,7 +102,8 @@ const FormattedNumber: FC<FormattedNumberProps> = ({
           className,
         )}
         getInputRef={ref}
-        value={value}
+        // react-number-format treats null/undefined as uncontrolled and keeps its old text; '' clears it.
+        value={value ?? ''}
         thousandSeparator={thousandSeparator}
         decimalScale={isDecimal ? decimalScale : 0}
         prefix={prefix ? `${prefix} ` : undefined}

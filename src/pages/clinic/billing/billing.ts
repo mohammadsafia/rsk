@@ -37,6 +37,9 @@ export const billingSummary = (invoices: Invoice[], todayKey: string) => {
 
 const field = (value: string) => `"${value.replaceAll('"', '""')}"`;
 
+/** Text that a spreadsheet would run as a formula (=, +, -, @, tab, CR) is prefixed with ' to stay text. */
+const safeText = (value: string) => (/^[=+\-@\t\r]/.test(value) ? `'${value}` : value);
+
 /** CSV for spreadsheets: every field quoted, CRLF lines, and a BOM so Excel reads UTF-8 (Arabic names) correctly. */
 export const invoicesToCsv = (
   rows: InvoiceRow[],
@@ -46,21 +49,24 @@ export const invoicesToCsv = (
   const lines = [
     [headers.number, headers.patient, headers.issued, headers.due, headers.status, headers.total, headers.balance],
     ...rows.map((row) => [
-      row.number,
-      row.patientName,
+      safeText(row.number),
+      safeText(row.patientName),
       row.issuedAt,
       row.dueAt,
-      statusLabel(row.status),
+      safeText(statusLabel(row.status)),
       row.total.toFixed(2),
       row.balance.toFixed(2),
     ]),
   ];
-  return `﻿${lines.map((cells) => cells.map(field).join(',')).join('\r\n')}`;
+  return `\uFEFF${lines.map((cells) => cells.map(field).join(',')).join('\r\n')}`;
 };
 
+/** Saves text as a file: the link is attached while clicked (some browsers ignore detached links) and the URL freed after. */
 export const downloadCsv = (filename: string, csv: string) => {
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-  const anchor = Object.assign(document.createElement('a'), { href: url, download: filename });
+  const anchor = Object.assign(document.createElement('a'), { href: url, download: filename, hidden: true });
+  document.body.append(anchor);
   anchor.click();
-  URL.revokeObjectURL(url);
+  anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
 };

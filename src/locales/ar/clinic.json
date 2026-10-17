@@ -71,7 +71,8 @@
     "error": {
       "title": "تعذّر تحميل لوحة التحكم",
       "description": "حدث خطأ ما. حاول مرة أخرى بعد قليل."
-    }
+    },
+    "vsPrevious": "مقارنة بالـ {{days}} يومًا السابقة"
   },
   "billing": {
     "title": "الفواتير",
@@ -79,9 +80,13 @@
     "summary": {
       "outstanding": "المستحق",
       "overdue": "المتأخر",
+      "collected": "المحصّل هذا الشهر",
+      "overdueCaption_zero": "لا فواتير",
       "overdueCaption_one": "فاتورة واحدة",
-      "overdueCaption_other": "{{count}} فواتير",
-      "collected": "المحصّل هذا الشهر"
+      "overdueCaption_two": "فاتورتان",
+      "overdueCaption_few": "{{count}} فواتير",
+      "overdueCaption_many": "{{count}} فاتورة",
+      "overdueCaption_other": "{{count}} فاتورة"
     },
     "tabs": {
       "label": "حالة الفاتورة",
@@ -109,13 +114,17 @@
       "remind": "إرسال تذكيرات",
       "markPaid": "تعليم كمدفوعة",
       "export": "تصدير CSV",
-      "confirmTitle_one": "تعليم فاتورة واحدة كمدفوعة؟",
-      "confirmTitle_other": "تعليم {{count}} فواتير كمدفوعة؟",
       "confirmDescription": "يُسجَّل رصيدها المستحق كدفعة بالبطاقة اليوم.",
       "reminded": "أُرسلت التذكيرات إلى {{done}}",
       "markedPaid": "عُلّمت {{done}} كمدفوعة",
       "skipped": "، وتُخطّيت {{skipped}} (غير مفتوحة)",
-      "failed": "تعذّر إكمال الإجراء"
+      "failed": "تعذّر إكمال الإجراء",
+      "confirmTitle_zero": "لا فواتير لتعليمها",
+      "confirmTitle_one": "تعليم فاتورة واحدة كمدفوعة؟",
+      "confirmTitle_two": "تعليم فاتورتين كمدفوعتين؟",
+      "confirmTitle_few": "تعليم {{count}} فواتير كمدفوعة؟",
+      "confirmTitle_many": "تعليم {{count}} فاتورة كمدفوعة؟",
+      "confirmTitle_other": "تعليم {{count}} فاتورة كمدفوعة؟"
     },
     "empty": {
       "title": "لا توجد فواتير بعد",
@@ -148,7 +157,9 @@
         "submit": "تسجيل الدفعة",
         "success": "سُجّلت الدفعة",
         "amountRequired": "أدخل مبلغًا أكبر من 0",
-        "amountTooHigh": "لا يمكن أن يتجاوز الرصيد ({{balance}})"
+        "amountTooHigh": "لا يمكن أن يتجاوز الرصيد ({{balance}})",
+        "dateRequired": "أدخل تاريخ الدفعة",
+        "dateFuture": "لا يمكن أن يكون تاريخ الدفعة في المستقبل"
       },
       "send": "إرسال الفاتورة",
       "sent": "أُرسلت الفاتورة",
@@ -159,7 +170,8 @@
       "notFound": "الفاتورة غير موجودة",
       "notFoundDescription": "ربما حُذفت. اختر فاتورة أخرى من القائمة.",
       "close": "إغلاق",
-      "loadingTitle": "الفاتورة"
+      "loadingTitle": "الفاتورة",
+      "loadError": "تعذّر تحميل هذه الفاتورة"
     }
   },
   "errors": {

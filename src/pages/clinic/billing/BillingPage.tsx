@@ -11,7 +11,7 @@ import {
   type Row,
   useReactTable,
 } from '@tanstack/react-table';
-import { parseAsString, useQueryState } from 'nuqs';
+import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs';
 
 import { type InvoiceStatus } from '@api/clinic';
 import { Alert, Badge, Button, EmptyState, Money, Tabs } from '@components/ui';
@@ -30,8 +30,10 @@ import { useLocalized } from '../shared/useLocalized';
 import { billingSummary, downloadCsv, type InvoiceRow, invoicesToCsv, toInvoiceRows } from './billing';
 import InvoiceSheet from './InvoiceSheet';
 
-const STATUSES: InvoiceStatus[] = ['draft', 'sent', 'overdue', 'paid', 'void'];
+const STATUSES = ['draft', 'sent', 'overdue', 'paid', 'void'] as const satisfies readonly InvoiceStatus[];
 const ALL = 'all';
+/** Only known tabs: an unknown ?status= falls back to All instead of emptying the table. */
+const STATUS_PARAM = parseAsStringLiteral([ALL, ...STATUSES]).withDefault(ALL);
 const NO_ROWS: InvoiceRow[] = [];
 
 /** Search covers what people type here: the invoice number and the patient's name. */
@@ -55,7 +57,7 @@ function BillingPage() {
   const invoices = useInvoices();
   const patients = usePatients();
   const bulk = useBulkInvoices();
-  const [status, setStatus] = useQueryState('status', parseAsString.withDefault(ALL));
+  const [status, setStatus] = useQueryState('status', STATUS_PARAM);
   const [invoiceId, setInvoiceId] = useQueryState('invoice', parseAsString);
   const [confirmIds, setConfirmIds] = useState<string[] | null>(null);
 
@@ -79,10 +81,16 @@ function BillingPage() {
       {
         accessorKey: 'number',
         header: t('billing.columns.number'),
+        // A real button, so keyboard users can open the invoice (the row click is a mouse shortcut).
         cell: ({ row }) => (
-          <span dir="ltr" className="text-fg font-medium tabular-nums">
+          <button
+            type="button"
+            dir="ltr"
+            className="text-fg focus-ring rounded-sm font-medium tabular-nums hover:underline"
+            onClick={() => void setInvoiceId(row.original.id)}
+          >
             {row.original.number}
-          </span>
+          </button>
         ),
         meta: { label: t('billing.columns.number') },
       },
@@ -132,7 +140,7 @@ function BillingPage() {
       },
     ],
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- date/statusLabel follow the language, which `t` tracks
-    [t],
+    [t, setInvoiceId],
   );
 
   const [globalFilter, setGlobalFilter] = useState('');
@@ -162,17 +170,17 @@ function BillingPage() {
   const report = (key: 'reminded' | 'markedPaid', done: number, skipped: number) =>
     toast({ title: `${t(`billing.bulk.${key}`, { done })}${skipped ? t('billing.bulk.skipped', { skipped }) : ''}` });
 
-  const runBulk = (ids: string[], action: 'mark-paid' | 'send-reminder') =>
-    bulk.mutate(
-      { ids, action },
-      {
-        onSuccess: (result) => {
-          report(action === 'mark-paid' ? 'markedPaid' : 'reminded', result.done.length, result.skipped.length);
-          table.resetRowSelection();
-        },
-        onError: () => toast({ title: t('billing.bulk.failed'), tone: 'danger' }),
-      },
-    );
+  /** Resolves when the action finishes, so the confirm dialog can stay busy until then. */
+  const runBulk = async (ids: string[], action: 'mark-paid' | 'send-reminder') => {
+    try {
+      const result = await bulk.mutateAsync({ ids, action });
+      report(action === 'mark-paid' ? 'markedPaid' : 'reminded', result.done.length, result.skipped.length);
+      table.resetRowSelection();
+    } catch {
+      toast({ title: t('billing.bulk.failed'), tone: 'danger' });
+    }
+  };
+  const reminding = bulk.isLoading && bulk.variables?.action === 'send-reminder';
 
   const exportRows = (selected: Row<InvoiceRow>[]) =>
     downloadCsv(
@@ -237,7 +245,14 @@ function BillingPage() {
           <EmptyState kind="first-use" title={t('billing.empty.title')} description={t('billing.empty.description')} />
         ) : (
           <div className="flex min-h-0 flex-1 flex-col gap-3">
-            <Tabs value={status} onValueChange={(value) => void setStatus(value === ALL ? null : value)}>
+            <Tabs
+              value={status}
+              onValueChange={(value) => {
+                // A selection made on one tab must not ride along, hidden, into bulk actions on another.
+                table.resetRowSelection();
+                void setStatus(value === ALL ? null : (value as (typeof STATUSES)[number]));
+              }}
+            >
               <Tabs.List aria-label={t('billing.tabs.label')} className="overflow-x-auto">
                 <Tabs.Trigger value={ALL}>
                   {t('billing.tabs.all')} <span className="text-fg-muted tabular-nums">{rows.length}</span>
@@ -265,7 +280,7 @@ function BillingPage() {
               <DataTable.BulkActions<InvoiceRow>>
                 {(selected, ids) => (
                   <>
-                    <Button size="sm" variant="outline" loading={bulk.isLoading} onClick={() => runBulk(ids, 'send-reminder')}>
+                    <Button size="sm" variant="outline" loading={reminding} onClick={() => void runBulk(ids, 'send-reminder')}>
                       <Send aria-hidden="true" />
                       {t('billing.bulk.remind')}
                     </Button>
@@ -303,10 +318,7 @@ function BillingPage() {
         title={t('billing.bulk.confirmTitle', { count: confirmIds?.length ?? 0 })}
         description={t('billing.bulk.confirmDescription')}
         confirmLabel={t('billing.bulk.markPaid')}
-        onConfirm={() => {
-          if (confirmIds) runBulk(confirmIds, 'mark-paid');
-          setConfirmIds(null);
-        }}
+        onConfirm={() => (confirmIds ? runBulk(confirmIds, 'mark-paid') : undefined)}
       >
         {null}
       </ConfirmDialog>

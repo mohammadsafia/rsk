@@ -69,4 +69,10 @@ describe('OperationsDashboard', () => {
     await screen.findAllByRole('link');
     expect(document.body.textContent).not.toMatch(/[٠-٩]/);
   });
+
+  it('says what a trend is compared with', async () => {
+    renderPage();
+    const visits = await screen.findByRole('link', { name: /^Visits/ });
+    await waitFor(() => expect(visits.textContent).toContain('vs previous 30 days'));
+  });
 });

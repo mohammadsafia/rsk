@@ -83,4 +83,23 @@ describe('InvoiceSheet', () => {
     expect(await screen.findByRole('dialog', { name: 'Invoice' })).toBeTruthy();
     expect(screen.queryByText('Invoice not found')).toBeNull();
   });
+
+  it('clears the amount after a payment is recorded', async () => {
+    const invoice = openInvoice();
+    renderWith(invoice.id);
+    const sheet = await screen.findByRole('dialog', { name: invoice.number });
+    fireEvent.change(within(sheet).getByLabelText(/^Amount/), { target: { value: '1' } });
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Record payment' }));
+    expect(await screen.findByText('Payment recorded')).toBeTruthy();
+    await waitFor(() => expect((within(sheet).getByLabelText(/^Amount/) as HTMLInputElement).value).toBe(''));
+  });
+
+  it('shows a load failure with Retry rather than "not found"', async () => {
+    clinicStore.failNext('getInvoice');
+    const invoice = openInvoice();
+    renderWith(invoice.id);
+    const alert = await screen.findByRole('alert');
+    fireEvent.click(within(alert).getByRole('button', { name: 'Retry' }));
+    expect(await screen.findByRole('dialog', { name: invoice.number })).toBeTruthy();
+  });
 });

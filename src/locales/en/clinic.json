@@ -71,7 +71,8 @@
     "error": {
       "title": "The dashboard couldn't be loaded",
       "description": "Something went wrong. Try again in a moment."
-    }
+    },
+    "vsPrevious": "vs previous {{days}} days"
   },
   "billing": {
     "title": "Billing",
@@ -148,7 +149,9 @@
         "submit": "Record payment",
         "success": "Payment recorded",
         "amountRequired": "Enter an amount above 0",
-        "amountTooHigh": "Can't be more than the balance ({{balance}})"
+        "amountTooHigh": "Can't be more than the balance ({{balance}})",
+        "dateRequired": "Enter the payment date",
+        "dateFuture": "A payment can't be dated in the future"
       },
       "send": "Send invoice",
       "sent": "Invoice sent",
@@ -159,7 +162,8 @@
       "notFound": "Invoice not found",
       "notFoundDescription": "It may have been removed. Pick another invoice from the list.",
       "close": "Close",
-      "loadingTitle": "Invoice"
+      "loadingTitle": "Invoice",
+      "loadError": "This invoice couldn't be loaded"
     }
   },
   "errors": {

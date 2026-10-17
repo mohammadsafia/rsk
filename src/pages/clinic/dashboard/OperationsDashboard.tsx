@@ -140,6 +140,8 @@ function OperationsDashboard() {
 
   const loading = metrics.isLoading;
   const trend = (value: number | null, positive: 'up' | 'down' = 'up') => (value === null ? undefined : { value, positive });
+  // Say what a trend compares with; no trend (90 days) means no caption either.
+  const caption = (value: number | null) => (value === null ? undefined : t('dashboard.vsPrevious', { days: range }));
   const shortDate = (value: unknown) =>
     formatDate(String(value), constants.DateFormats.DAY_OF_MONTH) + ' ' + formatDate(String(value), constants.DateFormats.SHORT_MONTH);
 
@@ -178,6 +180,7 @@ function OperationsDashboard() {
             <StatCard
               label={t('dashboard.stats.visits')}
               value={formatNumber(figures.visits.value)}
+              caption={caption(figures.visits.trend)}
               trend={trend(figures.visits.trend)}
               loading={loading}
               href="/schedule?view=agenda"
@@ -186,6 +189,7 @@ function OperationsDashboard() {
             <StatCard
               label={t('dashboard.stats.newPatients')}
               value={formatNumber(figures.newPatients.value)}
+              caption={caption(figures.newPatients.trend)}
               trend={trend(figures.newPatients.trend)}
               loading={loading}
               href="/patients?sort=created"
@@ -194,6 +198,7 @@ function OperationsDashboard() {
             <StatCard
               label={t('dashboard.stats.noShowRate')}
               value={formatNumber(figures.noShowRate.value, { style: 'percent', maximumFractionDigits: 1 })}
+              caption={caption(figures.noShowRate.trend)}
               trend={trend(figures.noShowRate.trend, 'down')}
               loading={loading}
               href="/schedule?view=agenda"
@@ -209,6 +214,7 @@ function OperationsDashboard() {
             <StatCard
               label={t('dashboard.stats.revenue')}
               value={<Money value={figures.revenue.value} compact tone="none" />}
+              caption={caption(figures.revenue.trend)}
               trend={trend(figures.revenue.trend)}
               loading={loading}
               href="/billing"

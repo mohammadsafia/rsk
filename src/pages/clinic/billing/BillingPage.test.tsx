@@ -107,4 +107,49 @@ describe('BillingPage', () => {
     });
     expect(renders - before).toBeLessThan(20);
   });
+
+  it('opens an invoice from the keyboard through its number', async () => {
+    renderPage();
+    const newest = [...clinicStore.read().invoices].sort((a, b) => b.issuedAt.localeCompare(a.issuedAt) || b.id.localeCompare(a.id))[0];
+    fireEvent.click(await screen.findByRole('button', { name: newest.number }));
+    expect(await screen.findByRole('dialog', { name: newest.number })).toBeTruthy();
+  });
+
+  it('clears the selection when the status tab changes', async () => {
+    renderPage();
+    await waitFor(() => expect(document.querySelectorAll('tbody [role="checkbox"]').length).toBeGreaterThan(0));
+    fireEvent.click(document.querySelector('tbody [role="checkbox"]')!);
+    expect(await screen.findByRole('button', { name: 'Mark paid' })).toBeTruthy();
+    fireEvent.mouseDown(screen.getByRole('tab', { name: /Void/ }));
+    fireEvent.click(screen.getByRole('tab', { name: /Void/ }));
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Mark paid' })).toBeNull());
+  });
+
+  it('keeps the confirm dialog busy until marking paid finishes', async () => {
+    const open = clinicStore.read().invoices.find((i) => i.status === 'sent' || i.status === 'overdue')!;
+    renderPage();
+    const search = screen.getByPlaceholderText('Search by number or patient');
+    await waitFor(() => expect(screen.getAllByRole('row').length).toBeGreaterThan(2));
+    fireEvent.change(search, { target: { value: open.number } });
+    await waitFor(() => expect(screen.getAllByRole('row')[1].textContent).toContain(open.number));
+    fireEvent.click(within(screen.getAllByRole('row')[1]).getByRole('checkbox'));
+    clinicStore.setLatency([150, 150]);
+    fireEvent.click(screen.getByRole('button', { name: 'Mark paid' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Mark 1 invoice paid?' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Mark paid' }));
+    // While busy the button's accessible name is the spinner's, so look for the busy flag itself.
+    await waitFor(() => expect(dialog.querySelector('button[aria-busy="true"]')?.textContent).toContain('Mark paid'));
+    expect(await screen.findByText('1 marked paid')).toBeTruthy();
+  });
+
+  it('falls back to All for an unknown status in the URL', async () => {
+    renderPage('/billing?status=bogus');
+    await waitFor(() => expect(screen.getByRole('tab', { name: /All/ }).getAttribute('aria-selected')).toBe('true'));
+  });
+
+  it('uses Arabic plural forms for invoice counts', async () => {
+    await act(() => i18n.changeLanguage('ar'));
+    expect(i18n.t('clinic:billing.summary.overdueCaption', { count: 2 })).toBe('فاتورتان');
+    expect(i18n.t('clinic:billing.summary.overdueCaption', { count: 11 })).toBe('11 فاتورة');
+  });
 });
