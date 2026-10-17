@@ -2,7 +2,7 @@
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
-import { Tooltip } from '@components/ui';
+import { Tooltip } from '../../src/components/ui';
 
 import { PropsTable } from '../../src/component-docs/blocks/PropsTable';
 import { CodeBlock } from '../../src/component-docs/code-block';
