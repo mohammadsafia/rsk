@@ -9,6 +9,7 @@ import { cn } from '@utils';
 
 import { XIcon } from 'lucide-react';
 
+import { useAppTranslation } from '@hooks/shared';
 import type { ControlledFieldBaseProps, FormSelectOption, ResolvedOption } from '@app-types';
 
 type FormSelectProps<TFieldValues extends FieldValues, TOption = FormSelectOption> = ControlledFieldBaseProps<
@@ -36,8 +37,8 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
   className,
   required,
   options,
-  placeholder = 'Select',
-  noOptionsText = 'No Options',
+  placeholder: placeholderProp,
+  noOptionsText: noOptionsProp,
   valueType = 'flat',
   clearable = true,
   getOptionLabel,
@@ -45,6 +46,10 @@ function FormSelect<TFieldValues extends FieldValues, TOption = FormSelectOption
   optionMapper,
   ...props
 }: FormSelectProps<TFieldValues, TOption>) {
+  // Defaults follow the app language (a literal 'Select' showed in English on Arabic pages).
+  const { t: tCommon } = useAppTranslation('common');
+  const placeholder = placeholderProp ?? tCommon('form.selectPlaceholder');
+  const noOptionsText = noOptionsProp ?? tCommon('form.noOptions');
   // Unique per instance: two forms on one page may share a field name.
   const fieldId = `${name}-${useId()}`;
 

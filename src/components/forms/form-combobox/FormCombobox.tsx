@@ -7,7 +7,7 @@ import { FormField } from '@components/forms';
 
 import { cn } from '@utils';
 
-import { type AsyncOptionsFn, useAsyncOptionsInfiniteQuery, useDebounce, useInfiniteScroll } from '@hooks/shared';
+import { type AsyncOptionsFn, useAsyncOptionsInfiniteQuery, useDebounce, useInfiniteScroll, useAppTranslation } from '@hooks/shared';
 
 import type { ControlledFieldBaseProps, FormSelectOption, ResolvedOption } from '@app-types';
 
@@ -50,12 +50,16 @@ function FormCombobox<TFieldValues extends FieldValues, TOption = FormSelectOpti
   optionMapper,
   onOptionChange,
   valueType = 'flat',
-  placeholder = 'Select...',
-  noOptionsText = 'No options',
+  placeholder: placeholderProp,
+  noOptionsText: noOptionsProp,
   urlSearchParams,
   debounceMs = 500,
   pageSize = 20,
 }: FormComboboxProps<TFieldValues, TOption>) {
+  // Defaults follow the app language (a literal 'Select' showed in English on Arabic pages).
+  const { t: tCommon } = useAppTranslation('common');
+  const placeholder = placeholderProp ?? tCommon('form.selectPlaceholder');
+  const noOptionsText = noOptionsProp ?? tCommon('form.noOptions');
   // Unique per instance: two forms on one page may share a field name.
   const fieldId = `${name}-${useId()}`;
 
