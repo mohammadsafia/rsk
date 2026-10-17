@@ -153,7 +153,8 @@ export function ChartFrame<T>({
           </div>
         </Conditional.If>
         <Conditional.Else>
-          <div data-slot="chart-plot" className="w-full" style={{ height }}>
+          {/* recharts' accessibility layer makes the svg focusable: give it the kit ring, not the browser default. */}
+          <div data-slot="chart-plot" className="[&_.recharts-surface]:focus-ring w-full" style={{ height }}>
             {children({ visible, isRTL, animate })}
           </div>
         </Conditional.Else>

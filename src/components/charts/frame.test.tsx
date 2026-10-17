@@ -161,4 +161,9 @@ describe('ChartFrame', () => {
     rerender(<Spy rows={[...data, { month: 'Mar', visits: 90, revenue: 0.1 }]} />);
     expect(seen.at(-1)).toBe(true);
   });
+
+  it('gives the keyboard-focusable chart surface the kit focus ring, not the browser default', () => {
+    render(<Frame />);
+    expect(document.querySelector('[data-slot="chart-plot"]')?.className).toContain('[&_.recharts-surface]:focus-ring');
+  });
 });
