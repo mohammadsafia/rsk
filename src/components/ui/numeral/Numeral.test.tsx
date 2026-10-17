@@ -19,6 +19,11 @@ describe('formatNumber', () => {
     expect(arabic).toMatch(/1,240\.5/);
     expect(arabic).not.toMatch(/[٠-٩]/);
   });
+
+  it('formats currency with the USD default (DataTable currency range filters)', () => {
+    expect(formatNumber(1240.5, 'en', { style: 'currency' })).toBe('$1,240.50');
+    expect(formatNumber(0.25, 'en', { style: 'percent' })).toBe('25%');
+  });
 });
 
 describe('Numeral', () => {

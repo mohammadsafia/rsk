@@ -14,7 +14,7 @@ import { XIcon } from 'lucide-react';
 const dialogContentVariants = cva(
   [
     'bg-surface-raised text-fg shadow-overlay rule-top rule-top-section fixed inset-x-4 top-1/2 z-50 mx-auto flex max-h-[85dvh] -translate-y-1/2 flex-col gap-4',
-    'overflow-y-auto rounded-lg p-5 outline-none',
+    'overflow-hidden rounded-lg p-5 outline-none',
   ],
   {
     variants: {
@@ -126,7 +126,10 @@ const DialogContent: FC<DialogContentProps> = ({
             </Conditional.If>
           </header>
 
-          {children}
+          {/* The body scrolls, not the panel, so the heavy rule and the title stay in place in long dialogs. */}
+          <div data-slot="dialog-body" className="-m-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1">
+            {children}
+          </div>
 
           <Conditional.If condition={dismissible}>
             <DialogPrimitive.Close asChild>

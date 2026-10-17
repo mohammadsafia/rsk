@@ -116,8 +116,9 @@ const Item: FC<ItemProps> = ({ href, icon: Icon, active = false, badge, classNam
         aria-current={active ? 'page' : undefined}
         className={cn(
           ROW,
-          'aria-[current=page]:text-fg aria-[current=page]:font-medium aria-[current=page]:ink',
-          collapsed && 'md:justify-center md:px-0',
+          'group/sidebar-item aria-[current=page]:text-fg aria-[current=page]:font-medium',
+          // Collapsed, the label is hidden: the ink bar under the icon marks the current item (not colour alone).
+          collapsed && 'md:justify-center md:px-0 md:aria-[current=page]:ink-block',
           className,
         )}
         onClick={handleClick}
@@ -125,7 +126,10 @@ const Item: FC<ItemProps> = ({ href, icon: Icon, active = false, badge, classNam
       >
         <Icon aria-hidden="true" />
 
-        <span data-slot="sidebar-item-label" className={cn('flex-1 truncate', collapsed && 'md:sr-only')}>
+        <span
+          data-slot="sidebar-item-label"
+          className={cn('-mb-1 flex-1 truncate pb-1 group-aria-[current=page]/sidebar-item:ink', collapsed && 'md:sr-only')}
+        >
           {children}
         </span>
 

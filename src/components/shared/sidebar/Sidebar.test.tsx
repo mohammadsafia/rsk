@@ -47,8 +47,11 @@ describe('Sidebar', () => {
     wrap(menu());
     const active = screen.getByRole('link', { name: 'Dashboard' });
     expect(active.getAttribute('aria-current')).toBe('page');
-    expect(active.className).toContain('aria-[current=page]:ink');
     expect(active.className).not.toContain('aria-[current=page]:bg-');
+    // The ink sits on the label (not the row), so it isn't clipped by truncate and doesn't spread to the count badge.
+    expect(active.className).not.toMatch(/aria-\[current=page\]:ink(?!-)/);
+    const label = active.querySelector<HTMLElement>('[data-slot="sidebar-item-label"]')!;
+    expect(label.className).toContain('group-aria-[current=page]/sidebar-item:ink');
     expect(active.className).not.toMatch(/border-s-|border-l-|before:/);
     expect(screen.getByRole('link', { name: /Members/ }).getAttribute('aria-current')).toBeNull();
     expect(screen.getByRole('navigation', { name: 'Navigation' })).toBeTruthy();
@@ -103,5 +106,11 @@ describe('Sidebar', () => {
     expect(screen.getByRole('button', { name: 'Billing' }).getAttribute('aria-expanded')).toBe('true');
     expect(screen.getByRole('link', { name: 'Invoices' })).toBeTruthy();
     localStorage.clear();
+  });
+
+  it('marks the current item without colour alone when collapsed: the ink bar sits under its icon', () => {
+    wrap(menu(true));
+    const active = document.querySelector<HTMLElement>('[data-slot="sidebar-item"][aria-current="page"]')!;
+    expect(active.className).toContain('md:aria-[current=page]:ink-block');
   });
 });

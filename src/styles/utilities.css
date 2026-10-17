@@ -136,7 +136,8 @@
     content: '';
     position: absolute;
     inset-inline: 0;
-    bottom: -1px;
+    /* inside the host: strips that clip overflow (scrolling tab lists) would cut a bar hung below it */
+    bottom: 0;
     height: var(--ink-thickness);
     background: var(--ink);
     transform-origin: left;
@@ -166,9 +167,10 @@
  * (relative / fixed / absolute) — this utility does not set position, so fixed overlays stay fixed.
  */
 @utility rule-top {
-  border-top-width: 0;
-  border-start-start-radius: 0;
-  border-start-end-radius: 0;
+  /* !important: the mark replaces the top edge, so it must beat border / rounded-* / border-t utilities emitted after it */
+  border-top-width: 0 !important;
+  border-start-start-radius: 0 !important;
+  border-start-end-radius: 0 !important;
 
   &::before {
     content: '';

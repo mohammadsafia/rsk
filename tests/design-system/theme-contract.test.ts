@@ -233,6 +233,22 @@ describe('Ledger signature marks', () => {
     expect(utilitiesCss.indexOf('@utility state-invalid {')).toBeGreaterThan(utilitiesCss.indexOf('@utility focus-ring-input {'));
   });
 
+  it('keeps the ink bar inside its host, so overflow-clipped strips (tabs) still show 2px', () => {
+    expect(utilityBlock('ink-block')).toContain('bottom: 0;');
+    expect(utilityBlock('ink-block')).not.toContain('bottom: -1px;');
+  });
+
+  it('wins the top edge over border, rounded-* and border-t on its host', () => {
+    const block = utilityBlock('rule-top');
+    for (const declaration of [
+      'border-top-width: 0 !important;',
+      'border-start-start-radius: 0 !important;',
+      'border-start-end-radius: 0 !important;',
+    ]) {
+      expect(block).toContain(declaration);
+    }
+  });
+
   it('numbers sections with Western leading-zero counters', () => {
     expect(utilityBlock('sections')).toContain('counter-reset: rsk-section;');
     expect(utilityBlock('section-number')).toContain('counter-increment: rsk-section;');

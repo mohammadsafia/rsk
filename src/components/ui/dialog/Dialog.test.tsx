@@ -107,4 +107,21 @@ describe('Dialog', () => {
     );
     expect(screen.getByRole('dialog', { name: 'Delete patient' }).querySelector('[data-slot="section-marker"]')).toBeNull();
   });
+
+  it('scrolls an inner body, so the heavy rule and the title stay put in long dialogs', () => {
+    render(
+      <Dialog defaultOpen>
+        <Dialog.Content title="Edit patient">
+          <p>Body</p>
+        </Dialog.Content>
+      </Dialog>,
+    );
+    const dialog = screen.getByRole('dialog', { name: 'Edit patient' });
+    expect(dialog.className).not.toContain('overflow-y-auto');
+    expect(dialog.className).toContain('overflow-hidden');
+    const body = dialog.querySelector<HTMLElement>('[data-slot="dialog-body"]')!;
+    expect(body.className).toContain('overflow-y-auto');
+    expect(body.textContent).toBe('Body');
+    expect(body.contains(dialog.querySelector('[data-slot="dialog-header"]'))).toBe(false);
+  });
 });

@@ -2,13 +2,13 @@ import { type ComponentPropsWithoutRef, type FC, type ReactNode } from 'react';
 
 import { Conditional } from '@components/utils';
 
-import { cn, useNumberFormat } from '@utils';
+import { cn, type FormatNumberOptions, useNumberFormat } from '@utils';
 
 export type NumeralProps = Omit<ComponentPropsWithoutRef<'span'>, 'children'> & {
   value: number | null | undefined;
   /** Set as a superscript after the value: `%`, `ms`, `/day`. */
   unit?: ReactNode;
-  options?: Intl.NumberFormatOptions;
+  options?: FormatNumberOptions;
   /** "figure" is the Ledger figure (stats, progress); "inline" sits in running text. */
   size?: 'inline' | 'figure';
 };
