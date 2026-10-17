@@ -79,6 +79,24 @@ describe('countPatterns — Ledger', () => {
   });
 });
 
+describe('countPatterns — motion', () => {
+  it('counts off-scale durations and easings', () => {
+    const source = [
+      '<a className="duration-150 duration-200 duration-[350ms] ease-linear ease-in-out" />',
+      "const fade = 'transition-opacity duration-300';",
+    ].join('\n');
+
+    expect(countPatterns(source)).toEqual({ 'raw-motion': 6 });
+  });
+
+  it('allows the motion tokens', () => {
+    const source =
+      '<a className="duration-instant duration-fast duration-base duration-exit duration-slow duration-spring duration-spring-long duration-roll ease-out ease-in ease-spring" />';
+
+    expect(countPatterns(source)).toEqual({});
+  });
+});
+
 describe('compareToBaseline', () => {
   const baseline: Baseline = { 'src/a.tsx': { 'hex-color': 2 } };
 

@@ -18,7 +18,8 @@ export type PatternId =
   | 'palette-color'
   | 'state-fill'
   | 'large-control-radius'
-  | 'typed-section-number';
+  | 'typed-section-number'
+  | 'raw-motion';
 
 export type PatternCounts = Partial<Record<PatternId, number>>;
 
@@ -70,6 +71,11 @@ export const FORBIDDEN_PATTERNS: ReadonlyArray<{ id: PatternId; regex: RegExp; w
     id: 'typed-section-number',
     regex: />\s*(?:0[1-9]|§)\s*</g,
     why: 'Section numbers come from <Sections>/<SectionMarker> (CSS counters), never typed',
+  },
+  {
+    id: 'raw-motion',
+    regex: /\bduration-(?:75|100|150|200|300|500|700|1000)\b|\bduration-\[[^\]]+\]|\bease-(?:linear|in-out)\b/g,
+    why: 'Motion timing comes from the motion tokens (duration-instant…roll, ease-out/in/spring)',
   },
 ];
 

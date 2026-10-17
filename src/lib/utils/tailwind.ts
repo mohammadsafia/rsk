@@ -9,4 +9,4 @@ export const FOCUS_RING =
 export const DISABLED_STYLES =
   'disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50';
 
-export const TRANSITION_DEFAULT = 'transition-colors duration-200 ease-out';
+export const TRANSITION_DEFAULT = 'transition-colors duration-base ease-out';
