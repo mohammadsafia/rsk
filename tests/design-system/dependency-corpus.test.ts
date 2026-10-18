@@ -9,9 +9,8 @@ const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 
 describe('corpusFiles', () => {
   it("skips the starter manifest, which names docs-only packages as data, so they can't pass for used", () => {
-    expect(corpusFiles(['scripts/starter/manifest.ts', 'scripts/starter/build-starter.ts'], ROOT)).toEqual([
-      'scripts/starter/build-starter.ts',
-    ]);
+    // vite.config.ts exists in the kit and the starter alike (the starter ships no scripts/starter/).
+    expect(corpusFiles(['scripts/starter/manifest.ts', 'vite.config.ts'], ROOT)).toEqual(['vite.config.ts']);
   });
 
   it('skips a file git still lists but that was deleted, instead of crashing on it', () => {
