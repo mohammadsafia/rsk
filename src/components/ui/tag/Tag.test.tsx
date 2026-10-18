@@ -93,6 +93,20 @@ describe('Tag', () => {
       expect(onRemove).toHaveBeenCalledTimes(1);
     });
 
+    it('keeps the folded state until the next frame, so a removal never flashes back before React commits it', () => {
+      const cancel = vi.fn();
+      Element.prototype.animate = vi.fn(() => ({ cancel, finished: new Promise(() => {}) })) as unknown as typeof Element.prototype.animate;
+      const onRemove = vi.fn();
+      render(<Tag onRemove={onRemove}>Cardiology</Tag>);
+      fireEvent.click(screen.getByRole('button', { name: 'Remove Cardiology' }));
+      vi.advanceTimersByTime(170); // the fallback: fast (120) + 50
+      expect(onRemove).toHaveBeenCalledTimes(1);
+      expect(cancel).not.toHaveBeenCalled();
+      // The parent kept the tag (declined the removal): on the next frame it shows again.
+      vi.advanceTimersByTime(32);
+      expect(cancel).toHaveBeenCalledTimes(1);
+    });
+
     it('calls onRemove at once under reduced motion', () => {
       reduced = true;
       const onRemove = vi.fn();

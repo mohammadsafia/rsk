@@ -23,22 +23,41 @@ export function planFlip(prev: Map<string, number>, next: Map<string, number>, m
 
 const rowsIn = (scope: HTMLElement) => Array.from(scope.querySelectorAll<HTMLElement>('[data-row-id]'));
 
+/** How long a sort may wait for its rows (server-driven tables answer later); after that the moment has passed. */
+const PENDING_MS = 3000;
+
+type Snapshot = { tops: Map<string, number>; order: string; sortKey: string; pendingSince?: number };
+
 /**
  * After a sort (when `sortKey` changes), rows that stayed glide to their new places and rows the sort brought onto
- * the page fade in; expressive mode only. Paging and filtering leave `sortKey` alone, so they stay still. Rows are
- * found by `data-row-id` in `scopeRef`.
+ * the page fade in; expressive mode only. Server-driven tables change the sort first and deliver the rows later, so a
+ * sort whose rows have not arrived waits (up to 3s) with the old places kept. Paging and filtering leave `sortKey`
+ * alone, so they stay still. Rows are found by `data-row-id` in `scopeRef`.
  */
 export function useFlip(scopeRef: RefObject<HTMLElement | null>, mode: MotionMode, sortKey: string) {
-  const prev = useRef<{ tops: Map<string, number>; sortKey: string } | null>(null);
+  const prev = useRef<Snapshot | null>(null);
 
   useLayoutEffect(() => {
     const scope = scopeRef.current;
     if (!scope) return;
     const rows = rowsIn(scope);
     const tops = new Map(rows.map((row) => [row.dataset.rowId ?? '', row.offsetTop]));
+    const order = Array.from(tops.keys()).join('|');
     const before = prev.current;
-    prev.current = { tops, sortKey };
-    if (!before || before.sortKey === sortKey || mode !== 'expressive') return;
+    if (!before) {
+      prev.current = { tops, order, sortKey };
+      return;
+    }
+
+    const sorted = before.sortKey !== sortKey;
+    const waiting = before.pendingSince !== undefined && performance.now() - before.pendingSince < PENDING_MS;
+    if (order === before.order && (sorted || waiting)) {
+      // The sort changed but its rows have not arrived yet: keep the old places until they do.
+      prev.current = { ...before, sortKey, pendingSince: sorted ? performance.now() : before.pendingSince };
+      return;
+    }
+    prev.current = { tops, order, sortKey };
+    if (!(sorted || waiting) || mode !== 'expressive') return;
 
     const rowById = (id: string) => rows.find((row) => row.dataset.rowId === id);
     const { moves, arrivals } = planFlip(before.tops, tops);

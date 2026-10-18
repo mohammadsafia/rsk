@@ -15,7 +15,7 @@ export const LEAVE_TIMING: KeyframeAnimationOptions = {
  * Plays an exit, then runs the callback once. `play` starts the animations on the scope element (or its parts) and
  * returns them. Under reduced motion the callback runs at once; calls while already leaving are ignored. The callback
  * also runs on a timeout in case an animation never reports finishing, and the animations are cancelled afterwards so
- * an element that stays mounted (a pill turning inactive, a removal the parent declined) shows again.
+ * an element that stays mounted (a pill turning inactive, a removal the parent declined) shows again on the next frame.
  */
 export function useLeave(scopeRef: RefObject<HTMLElement | null>, play: (element: HTMLElement) => Animation[]) {
   const { mode } = useMotion();
@@ -43,7 +43,11 @@ export function useLeave(scopeRef: RefObject<HTMLElement | null>, play: (element
         leaving.current = false;
         delete element.dataset.leaving;
         done();
-        animations.forEach((animation) => animation.cancel());
+        // React commits the removal in a later task; cancelling now would paint the element at full size for a frame.
+        // On the next frame, an element that is still here (a pill turning inactive, a declined removal) shows again.
+        requestAnimationFrame(() => {
+          if (element.isConnected) animations.forEach((animation) => animation.cancel());
+        });
       };
       const fallback = setTimeout(settle, MOTION_DURATIONS.fast + 50);
       void Promise.all(animations.map((animation) => animation.finished)).then(settle, settle);

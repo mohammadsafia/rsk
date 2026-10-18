@@ -52,6 +52,18 @@ const renderTabs = () =>
   );
 
 describe('InkBar', () => {
+  it('follows the active item when its label changes size (fonts, a language switch), at once and without a click', async () => {
+    renderTabs();
+    const bar = document.querySelector<HTMLElement>('[data-slot="ink-bar"]')!;
+    await waitFor(() => expect(bar.style.width).toBe('60px'));
+    const active = screen.getByRole('tab', { name: 'Overview' });
+    active.dataset.testWidth = '96';
+    act(() => {
+      active.textContent = 'نظرة عامة';
+    });
+    await waitFor(() => expect([bar.style.left, bar.style.width]).toEqual(['0px', '96px']));
+  });
+
   it('renders one decorative bar per tab list, placed on the active tab at mount', async () => {
     renderTabs();
     const bars = document.querySelectorAll<HTMLElement>('[data-slot="ink-bar"]');

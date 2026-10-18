@@ -1,6 +1,13 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { type ColumnDef, getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import {
+  type ColumnDef,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  type SortingState,
+  useReactTable,
+} from '@tanstack/react-table';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { DataTable } from '@components/tables';
@@ -32,6 +39,24 @@ function Harness({ data, pageSize = 10 }: { data: Visit[]; pageSize?: number }) 
     <DataTable table={table}>
       <DataTable.Content />
       <DataTable.Pagination />
+    </DataTable>
+  );
+}
+
+/** A server-driven table: the sort state changes first, the sorted rows arrive in a later render. */
+function ServerHarness({ data, sorting, onSort }: { data: Visit[]; sorting: SortingState; onSort: (sorting: SortingState) => void }) {
+  const table = useReactTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    getCoreRowModel: getCoreRowModel(),
+    manualSorting: true,
+    state: { sorting },
+    onSortingChange: (updater) => onSort(typeof updater === 'function' ? updater(sorting) : updater),
+  });
+  return (
+    <DataTable table={table}>
+      <DataTable.Content />
     </DataTable>
   );
 }
@@ -113,6 +138,26 @@ describe('DataTable motion', () => {
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
     expect(screen.getByText('Dana Khalil')).toBeTruthy();
     expect(calls().filter((c) => c.id)).toEqual([]);
+  });
+
+  it('server-driven: glides when the sorted rows arrive after the sort, and does not tint them', () => {
+    let sorting: SortingState = [];
+    const onSort = (next: SortingState) => (sorting = next);
+    const { rerender } = render(<ServerHarness data={BASE} sorting={sorting} onSort={onSort} />);
+    sortBy(/Amount/);
+    rerender(<ServerHarness data={BASE} sorting={sorting} onSort={onSort} />);
+    expect(glidingRows()).toEqual([]);
+    // The server answers with fresh objects in the new order (amount high-first).
+    const answer = [BASE[0], BASE[2], BASE[1]].map((row) => ({ ...row }));
+    rerender(<ServerHarness data={answer} sorting={sorting} onSort={onSort} />);
+    expect(glidingRows().sort()).toEqual(['v2', 'v3']);
+    expect(tintedRows()).toEqual([]);
+  });
+
+  it('never tints when most rows changed at once (fresh objects for the same rows)', () => {
+    const { rerender } = render(<Harness data={BASE} />);
+    rerender(<Harness data={BASE.map((row) => ({ ...row }))} />);
+    expect(tintedRows()).toEqual([]);
   });
 
   it('turns one arrow for the sort direction instead of swapping icons', () => {
