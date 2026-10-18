@@ -64,12 +64,46 @@
   }
 }
 
-/* Theme switch: colours cross-fade for one beat while ThemeContext holds .theme-switching (never on load). */
-@media (prefers-reduced-motion: no-preference) {
-  .theme-switching,
-  .theme-switching * {
-    transition-property: color, background-color, border-color, fill, stroke, box-shadow !important;
-    transition-duration: var(--duration-base) !important;
-    transition-timing-function: var(--ease-out) !important;
+/*
+ * Theme switch: ThemeContext swaps the theme inside a view transition, so the browser paints the old and new pages as
+ * two snapshots and every pixel changes together. The new theme spreads as a circle from where the switch was pressed
+ * (--theme-reveal-*); calm mode cross-fades instead. Never on load, and reduced motion switches at once (ThemeContext
+ * skips the transition).
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: rsk-theme-reveal var(--duration-roll) var(--ease-out);
+}
+
+:root[data-motion='calm']::view-transition-new(root) {
+  animation: rsk-theme-fade var(--duration-slow) var(--ease-out);
+}
+
+@keyframes rsk-theme-reveal {
+  from {
+    clip-path: circle(0 at var(--theme-reveal-x, 50%) var(--theme-reveal-y, 50%));
+  }
+
+  to {
+    clip-path: circle(var(--theme-reveal-r, 150%) at var(--theme-reveal-x, 50%) var(--theme-reveal-y, 50%));
+  }
+}
+
+@keyframes rsk-theme-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
