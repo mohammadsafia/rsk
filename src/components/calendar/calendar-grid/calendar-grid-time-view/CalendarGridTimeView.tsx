@@ -4,6 +4,7 @@ import { Conditional } from '@components/utils';
 import { Avatar, CalendarTimeGrid, type CalendarTimeGridAxisRow, Popover } from '@components/ui';
 import { type CalendarResource, useCalendarGridContext } from '@components/calendar';
 
+import { useTravel } from '@hooks/motion';
 import { type DateInput, useAppTranslation, useDate } from '@hooks/shared';
 
 import { cn } from '@utils';
@@ -284,10 +285,13 @@ const TimeGrid: FC<{ slot: string; columns: GridColumn[]; headers: ReactNode; wi
 }) => {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const gestures = useTimeGridGestures(columns, scrollerRef);
+  const { view, range } = useCalendarGridContext();
+  const bodyRef = useRef<HTMLDivElement>(null);
+  useTravel(bodyRef, range.startDate, view);
 
   return (
     <TimeGridGestureContext.Provider value={gestures}>
-      <div data-slot={slot} className="flex min-h-0 flex-1 flex-col">
+      <div ref={bodyRef} data-slot={slot} className="flex min-h-0 flex-1 flex-col">
         <div
           ref={scrollerRef}
           data-slot="calendar-grid-body"

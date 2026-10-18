@@ -1,9 +1,10 @@
-import { type FC, useMemo, useState } from 'react';
+import { type FC, useMemo, useRef, useState } from 'react';
 
 import { Button, CalendarMonthGrid, Popover } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { type EventTimeStatus, useCalendarGridContext } from '@components/calendar';
 
+import { useTravel } from '@hooks/motion';
 import { useAppTranslation, useDate } from '@hooks/shared';
 
 type MonthEventItemProps = {
@@ -45,7 +46,9 @@ const MonthEventItem: FC<MonthEventItemProps> = ({ event, status }) => {
 };
 
 const MonthView: FC = () => {
-  const { view, viewMode, date, events, eventAccessors, slotCoverageDates } = useCalendarGridContext();
+  const { view, viewMode, date, range, events, eventAccessors, slotCoverageDates } = useCalendarGridContext();
+  const bodyRef = useRef<HTMLDivElement>(null);
+  useTravel(bodyRef, range.startDate, view);
   const { formatDate, getMonthGrid, toDate, toDateUnits, isBefore, isAfter, constants } = useDate();
   const { t } = useAppTranslation('common');
 
@@ -83,58 +86,60 @@ const MonthView: FC = () => {
   if (view !== 'month' || viewMode !== 'calendar') return null;
 
   return (
-    <CalendarMonthGrid>
-      <CalendarMonthGrid.Weekdays>
-        {weekdays.map((day) => (
-          <CalendarMonthGrid.Weekday key={day}>{day}</CalendarMonthGrid.Weekday>
-        ))}
-      </CalendarMonthGrid.Weekdays>
+    <div ref={bodyRef} data-slot="calendar-grid-month-view" className="flex min-h-0 flex-1 flex-col">
+      <CalendarMonthGrid>
+        <CalendarMonthGrid.Weekdays>
+          {weekdays.map((day) => (
+            <CalendarMonthGrid.Weekday key={day}>{day}</CalendarMonthGrid.Weekday>
+          ))}
+        </CalendarMonthGrid.Weekdays>
 
-      <CalendarMonthGrid.Days>
-        {days.map((day) => {
-          const dayKey = toDate(day);
-          const isCurrentMonth = toDateUnits(day).months === monthInfo.month;
-          const isToday = dayKey === todayKey;
-          const hasCoverage = slotCoverageDates.has(dayKey);
-          const dayEvents = eventsByDayKey.get(dayKey) ?? [];
-          const visibleEvents = dayEvents.slice(0, MAX_VISIBLE_MONTH_EVENTS);
-          const overflowEvents = dayEvents.slice(MAX_VISIBLE_MONTH_EVENTS);
-          const dayNumber = Number(formatDate(day, constants.DateFormats.DAY_OF_MONTH));
+        <CalendarMonthGrid.Days>
+          {days.map((day) => {
+            const dayKey = toDate(day);
+            const isCurrentMonth = toDateUnits(day).months === monthInfo.month;
+            const isToday = dayKey === todayKey;
+            const hasCoverage = slotCoverageDates.has(dayKey);
+            const dayEvents = eventsByDayKey.get(dayKey) ?? [];
+            const visibleEvents = dayEvents.slice(0, MAX_VISIBLE_MONTH_EVENTS);
+            const overflowEvents = dayEvents.slice(MAX_VISIBLE_MONTH_EVENTS);
+            const dayNumber = Number(formatDate(day, constants.DateFormats.DAY_OF_MONTH));
 
-          return (
-            <CalendarMonthGrid.DayCell
-              key={dayKey}
-              dayNumber={dayNumber}
-              isToday={isToday}
-              isCurrentMonth={isCurrentMonth}
-              available={hasCoverage}
-            >
-              {visibleEvents.map(({ event, status }, idx) => (
-                <MonthEventItem key={`${eventAccessors.getId(event)}-${idx}`} event={event} status={status} />
-              ))}
+            return (
+              <CalendarMonthGrid.DayCell
+                key={dayKey}
+                dayNumber={dayNumber}
+                isToday={isToday}
+                isCurrentMonth={isCurrentMonth}
+                available={hasCoverage}
+              >
+                {visibleEvents.map(({ event, status }, idx) => (
+                  <MonthEventItem key={`${eventAccessors.getId(event)}-${idx}`} event={event} status={status} />
+                ))}
 
-              <Conditional.If condition={overflowEvents.length > 0}>
-                <Popover>
-                  <Popover.Trigger asChild>
-                    <Button variant="link" tone="accent" className="text-2xs h-auto p-0 font-medium">
-                      {t('calendar.more', { count: overflowEvents.length })}
-                    </Button>
-                  </Popover.Trigger>
+                <Conditional.If condition={overflowEvents.length > 0}>
+                  <Popover>
+                    <Popover.Trigger asChild>
+                      <Button variant="link" tone="accent" className="text-2xs h-auto p-0 font-medium">
+                        {t('calendar.more', { count: overflowEvents.length })}
+                      </Button>
+                    </Popover.Trigger>
 
-                  <Popover.Content className="w-60 p-2" side="bottom" align="start">
-                    <div className="flex flex-col gap-1">
-                      {overflowEvents.map(({ event, status }, idx) => (
-                        <MonthEventItem key={`${eventAccessors.getId(event)}-overflow-${idx}`} event={event} status={status} />
-                      ))}
-                    </div>
-                  </Popover.Content>
-                </Popover>
-              </Conditional.If>
-            </CalendarMonthGrid.DayCell>
-          );
-        })}
-      </CalendarMonthGrid.Days>
-    </CalendarMonthGrid>
+                    <Popover.Content className="w-60 p-2" side="bottom" align="start">
+                      <div className="flex flex-col gap-1">
+                        {overflowEvents.map(({ event, status }, idx) => (
+                          <MonthEventItem key={`${eventAccessors.getId(event)}-overflow-${idx}`} event={event} status={status} />
+                        ))}
+                      </div>
+                    </Popover.Content>
+                  </Popover>
+                </Conditional.If>
+              </CalendarMonthGrid.DayCell>
+            );
+          })}
+        </CalendarMonthGrid.Days>
+      </CalendarMonthGrid>
+    </div>
   );
 };
 
