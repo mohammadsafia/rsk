@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { cleanup, render } from '@testing-library/react';
+import { cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { MotionProvider } from '../../contexts/MotionContext';
@@ -50,8 +50,8 @@ const focusTrigger = () => {
 };
 
 describe('useFlight', () => {
-  it('flies the content out of the focused trigger: from its centre, scaled down, to rest on the spring', () => {
-    focusTrigger();
+  it('flies the content out of the control just pressed: from its centre, scaled down, to rest on the spring', () => {
+    fireEvent.pointerDown(focusTrigger());
     render(<Content />);
     expect(animate).toHaveBeenCalledTimes(1);
     const [[from, to], options] = animate.mock.calls[0] as [Keyframe[], KeyframeAnimationOptions];
@@ -74,6 +74,28 @@ describe('useFlight', () => {
     expect(animate).toHaveBeenCalledTimes(1);
   });
 
+  it('opened from code while something else has focus (a timer, Ctrl+K): no flight from the focused element', () => {
+    const field = focusTrigger();
+    fireEvent.keyDown(field, { key: 'k', ctrlKey: true });
+    render(<Content />);
+    expect(animate).not.toHaveBeenCalled();
+  });
+
+  it('a press older than a moment no longer counts as the trigger', () => {
+    vi.useFakeTimers();
+    fireEvent.pointerDown(focusTrigger());
+    vi.advanceTimersByTime(1000);
+    render(<Content />);
+    expect(animate).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it('Enter on a focused control counts as pressing it', () => {
+    fireEvent.keyDown(focusTrigger(), { key: 'Enter' });
+    render(<Content />);
+    expect(animate).toHaveBeenCalledTimes(1);
+  });
+
   it('opened from code (nothing focused): no flight, the calm rise stays', () => {
     render(<Content />);
     expect(animate).not.toHaveBeenCalled();
@@ -81,7 +103,7 @@ describe('useFlight', () => {
   });
 
   it('no flight in calm mode or under reduced motion', () => {
-    focusTrigger();
+    fireEvent.pointerDown(focusTrigger());
     render(
       <MotionProvider mode="calm">
         <Content />

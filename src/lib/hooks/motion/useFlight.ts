@@ -7,11 +7,33 @@ import { type MotionMode, useMotion } from '../../contexts/MotionContext';
 /** The smallest the content starts at, so a tiny trigger still reads as a flight rather than a pop from a dot. */
 const MIN_SCALE = 0.2;
 
-/** The control that opened `content`: the one that names it in aria-controls (Radix), else the focused element. */
+/** A press counts as opening the overlay only for a moment; after that, an overlay is "opened from code". */
+const PRESS_WINDOW_MS = 300;
+
+/** The element the person last activated (pointer press, or Enter/Space), and when. Shortcuts like Ctrl+K don't count. */
+let lastPress: { target: HTMLElement; at: number } | null = null;
+const recordPress = (event: Event) => {
+  if (event instanceof KeyboardEvent && event.key !== 'Enter' && event.key !== ' ') return;
+  if (event.target instanceof HTMLElement) lastPress = { target: event.target, at: performance.now() };
+};
+
+// Listen from load, not from a mounted hook: an overlay rendered only after the click ({open && <Dialog/>}) must still
+// know what was pressed.
+if (typeof document !== 'undefined') {
+  document.addEventListener('pointerdown', recordPress, true);
+  document.addEventListener('keydown', recordPress, true);
+}
+
+/**
+ * The control that opened `content`: the one that names it in aria-controls (Radix triggers), else the element the
+ * person pressed a moment ago. Never just whatever has focus — an overlay opened from code (a timer, a shortcut) has no
+ * trigger, and rises in place.
+ */
 const triggerOf = (content: HTMLElement) => {
   const named = content.id ? document.querySelector<HTMLElement>(`[aria-controls="${CSS.escape(content.id)}"]`) : null;
-  const focused = document.activeElement;
-  return named ?? (focused instanceof HTMLElement && focused !== document.body ? focused : null);
+  if (named) return named;
+  const pressed = lastPress && performance.now() - lastPress.at < PRESS_WINDOW_MS ? lastPress.target : null;
+  return pressed?.closest<HTMLElement>('button, a, [role="button"], [role="menuitem"]') ?? pressed;
 };
 
 const fly = (content: HTMLElement, mode: MotionMode) => {

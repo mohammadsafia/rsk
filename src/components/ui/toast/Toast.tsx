@@ -1,4 +1,5 @@
 import { type ComponentPropsWithoutRef, createContext, type FC, useContext } from 'react';
+import { createPortal } from 'react-dom';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 
 // !Direct import: toastVariants reads this at module load, before the ui barrel reaches ./popover
@@ -89,9 +90,16 @@ const TONE_ICON: Record<ToastTone, { Icon: typeof Info; className: string }> = {
   danger: { Icon: XCircle, className: 'text-danger' },
 };
 
-const ToastViewport: FC<ToastViewportProps> = ({ className, position, ...props }) => (
-  <ToastPrimitives.Viewport data-slot="toast-viewport" className={cn(viewportVariants({ position }), className)} {...props} />
-);
+/**
+ * Portalled to <body>: rendered inside the app shell, it would share the shell's stacking context, and while a dialog
+ * recedes the page (motion page depth) its toasts would sit dimmed under the dialog's overlay.
+ */
+const ToastViewport: FC<ToastViewportProps> = ({ className, position, ...props }) => {
+  const viewport = (
+    <ToastPrimitives.Viewport data-slot="toast-viewport" className={cn(viewportVariants({ position }), className)} {...props} />
+  );
+  return typeof document === 'undefined' ? viewport : createPortal(viewport, document.body);
+};
 
 const ToastTitle: FC<ToastTitleProps> = ({ className, ...props }) => (
   <ToastPrimitives.Title data-slot="toast-title" className={cn('text-fg text-sm font-semibold', className)} {...props} />

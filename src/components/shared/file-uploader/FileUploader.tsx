@@ -1,6 +1,7 @@
 import {
   type ChangeEvent,
   type ComponentProps,
+  type DragEvent,
   type ComponentPropsWithoutRef,
   createContext,
   type FC,
@@ -85,6 +86,20 @@ const getUniqueFiles = (existing: File[], incoming: File[]): File[] =>
 
 const FileUploaderContext = createContext<FileUploaderContextValue | null>(null);
 
+/** Whether `file` matches an input `accept` list: MIME types, wildcards (`image/*`) or extensions (`.pdf`). */
+const acceptsFile = (file: File, accept: string) => {
+  const rules = accept
+    .split(',')
+    .map((rule) => rule.trim().toLowerCase())
+    .filter(Boolean);
+  if (!rules.length) return true;
+  const name = file.name.toLowerCase();
+  const type = file.type.toLowerCase();
+  return rules.some((rule) =>
+    rule.startsWith('.') ? name.endsWith(rule) : rule.endsWith('/*') ? type.startsWith(rule.slice(0, -1)) : type === rule,
+  );
+};
+
 const useFileUploaderContext = () => {
   const context = useContext(FileUploaderContext);
 
@@ -94,9 +109,19 @@ const useFileUploaderContext = () => {
 };
 
 const FileUploaderDropzoneGroup: FC<FileUploaderDropzoneGroupProps> = ({ className, children, ...props }) => {
-  const { disabled, isUploading } = useFileUploaderContext();
+  const { files, onChange, accept, multiple, disabled, isUploading } = useFileUploaderContext();
   // Entering a child fires dragenter before the parent's dragleave, so count to know when the file has really left.
   const [dragDepth, setDragDepth] = useState(0);
+
+  // Always cancel the drop's default: otherwise the browser opens the dropped file in the tab and the form is lost.
+  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setDragDepth(0);
+    if (disabled || isUploading) return;
+    const incoming = Array.from(event.dataTransfer?.files ?? []).filter((file) => acceptsFile(file, accept));
+    if (!incoming.length) return;
+    onChange(multiple ? [...files, ...getUniqueFiles(files, incoming)] : [incoming[0]]);
+  };
 
   return (
     <div
@@ -104,7 +129,8 @@ const FileUploaderDropzoneGroup: FC<FileUploaderDropzoneGroupProps> = ({ classNa
       data-drag-over={(dragDepth > 0 && !disabled) || undefined}
       onDragEnter={() => setDragDepth((depth) => depth + 1)}
       onDragLeave={() => setDragDepth((depth) => Math.max(0, depth - 1))}
-      onDrop={() => setDragDepth(0)}
+      onDragOver={(event) => event.preventDefault()}
+      onDrop={handleDrop}
       className={cn(
         'border-border bg-surface text-fg-muted duration-fast relative flex items-center gap-2 rounded-lg border border-dashed p-3 text-sm transition-colors outline-none',
         // A file held over the zone: the dashed border turns into a solid ink line.

@@ -63,4 +63,38 @@ describe('FileUploader keyboard access', () => {
     const row = document.querySelector<HTMLElement>('[data-slot="file-uploader-file-list"] li')!;
     for (const name of ['animate-in', 'slide-in-from-bottom-1', 'duration-spring', 'ease-spring']) expect(row.className).toContain(name);
   });
+
+  it('a drop on the zone adds the files (never navigates away); files the zone does not accept are ignored', () => {
+    const handleChange = vi.fn();
+    render(
+      <FileUploader name="docs" value={[]} multiple accept="application/pdf,.png" onChange={handleChange}>
+        <FileUploader.DropzoneGroup>
+          <FileUploader.Dropzone placeholder="Upload" />
+        </FileUploader.DropzoneGroup>
+      </FileUploader>,
+    );
+    const group = document.querySelector<HTMLElement>('[data-slot="file-uploader-dropzone-group"]')!;
+    const pdf = new File(['x'], 'scan.pdf', { type: 'application/pdf' });
+    const png = new File(['x'], 'photo.png', { type: 'image/png' });
+    const exe = new File(['x'], 'setup.exe', { type: 'application/octet-stream' });
+    // Not cancelling dragover is what lets the browser open the dropped file in the tab.
+    expect(fireEvent.dragOver(group, { dataTransfer: { files: [pdf] } })).toBe(false);
+    expect(fireEvent.drop(group, { dataTransfer: { files: [pdf, png, exe] } })).toBe(false);
+    expect(handleChange).toHaveBeenCalledWith([pdf, png]);
+  });
+
+  it('a disabled zone still swallows a drop, adding nothing', () => {
+    const handleChange = vi.fn();
+    render(
+      <FileUploader name="docs" value={[]} disabled onChange={handleChange}>
+        <FileUploader.DropzoneGroup>
+          <FileUploader.Dropzone placeholder="Upload" />
+        </FileUploader.DropzoneGroup>
+      </FileUploader>,
+    );
+    const group = document.querySelector<HTMLElement>('[data-slot="file-uploader-dropzone-group"]')!;
+    const file = new File(['x'], 'a.png', { type: 'image/png' });
+    expect(fireEvent.drop(group, { dataTransfer: { files: [file] } })).toBe(false);
+    expect(handleChange).not.toHaveBeenCalled();
+  });
 });
