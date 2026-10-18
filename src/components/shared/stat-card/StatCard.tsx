@@ -1,10 +1,12 @@
-import { type FC, type ReactNode } from 'react';
+import { type FC, type ReactNode, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Skeleton } from '@components/ui';
+import { RollingText, Skeleton } from '@components/ui';
 import { Conditional } from '@components/utils';
 
+import { useMotion } from '@contexts';
 import { useAppTranslation } from '@hooks/shared';
+import { MOTION_DURATIONS, MOTION_EASINGS } from '@constants';
 
 import { cn, formatNumber } from '@utils';
 
@@ -41,6 +43,30 @@ const StatCard: FC<StatCardProps> = ({ label, value, trend, caption, sparkline, 
   const direction = trend ? (trend.direction ?? (trend.value > 0 ? 'up' : trend.value < 0 ? 'down' : 'flat')) : 'flat';
   const good = direction !== 'flat' && direction === (trend?.positive ?? 'up');
   const percent = trend ? formatNumber(Math.abs(trend.value) / 100, i18n.language, { style: 'percent', maximumFractionDigits: 1 }) : '';
+  const { mode } = useMotion();
+  const figure = typeof value === 'string' || typeof value === 'number' ? String(value) : null;
+  const trendRef = useRef<HTMLSpanElement>(null);
+  const firstTrend = useRef(true);
+  // The trend pops in after its figure changes (spec §4) — never on first paint, never under reduced motion.
+  useEffect(() => {
+    if (firstTrend.current) {
+      firstTrend.current = false;
+      return;
+    }
+    if (mode === 'reduced') return;
+    trendRef.current?.animate?.(
+      [
+        { transform: 'scale(0.9)', opacity: 0.6 },
+        { transform: 'scale(1)', opacity: 1 },
+      ],
+      {
+        duration: MOTION_DURATIONS.spring,
+        easing: MOTION_EASINGS.spring,
+      },
+    );
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- pop only when the trend itself changes
+  }, [percent, direction]);
+
   const trendLabel = trend
     ? t(caption ? 'statCard.trendWithCaption' : 'statCard.trend', { direction: t(`statCard.${direction}`), value: percent, caption })
     : '';
@@ -63,7 +89,13 @@ const StatCard: FC<StatCardProps> = ({ label, value, trend, caption, sparkline, 
         </Conditional.If>
         <Conditional.Else>
           <span dir="ltr" className="text-fg text-start font-mono text-2xl font-medium tabular-nums rtl:text-end">
-            {value}
+            <Conditional>
+              {/* Figures roll to their new value (spec §4); custom nodes render as given. */}
+              <Conditional.If condition={figure !== null}>
+                <RollingText text={figure ?? ''} />
+              </Conditional.If>
+              <Conditional.Else>{value}</Conditional.Else>
+            </Conditional>
           </span>
         </Conditional.Else>
       </Conditional>
@@ -71,6 +103,7 @@ const StatCard: FC<StatCardProps> = ({ label, value, trend, caption, sparkline, 
       <div className="flex items-end justify-between gap-3">
         <Conditional.If condition={!!trend && !loading}>
           <span
+            ref={trendRef}
             data-slot="stat-card-trend"
             className={cn(
               'inline-flex items-center gap-1 text-xs font-medium',

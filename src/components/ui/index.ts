@@ -28,6 +28,7 @@ export * from './scroll-area';
 export * from './formatted-number';
 export * from './money';
 export * from './numeral';
+export * from './rolling-text';
 export * from './input';
 export * from './textarea';
 export * from './select';
