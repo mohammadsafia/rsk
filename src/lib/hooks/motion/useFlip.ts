@@ -41,21 +41,27 @@ export function useFlip(scopeRef: RefObject<HTMLElement | null>, mode: MotionMod
     const scope = scopeRef.current;
     if (!scope) return;
     const rows = rowsIn(scope);
-    const tops = new Map(rows.map((row) => [row.dataset.rowId ?? '', row.offsetTop]));
-    const order = Array.from(tops.keys()).join('|');
+    const order = rows.map((row) => row.dataset.rowId ?? '').join('|');
+    // offsetTop forces layout, so places are read only when rows may have moved: on mount, and when the order changed.
+    const readTops = () => new Map(rows.map((row) => [row.dataset.rowId ?? '', row.offsetTop]));
     const before = prev.current;
     if (!before) {
-      prev.current = { tops, order, sortKey };
+      prev.current = { tops: readTops(), order, sortKey };
       return;
     }
 
     const sorted = before.sortKey !== sortKey;
     const waiting = before.pendingSince !== undefined && performance.now() - before.pendingSince < PENDING_MS;
-    if (order === before.order && (sorted || waiting)) {
-      // The sort changed but its rows have not arrived yet: keep the old places until they do.
-      prev.current = { ...before, sortKey, pendingSince: sorted ? performance.now() : before.pendingSince };
+    if (order === before.order) {
+      // The sort changed but its rows have not arrived yet: keep the old places until they do. Otherwise nothing
+      // moved (an edit, a selection) and the last places still hold.
+      prev.current =
+        sorted || waiting
+          ? { ...before, sortKey, pendingSince: sorted ? performance.now() : before.pendingSince }
+          : { ...before, pendingSince: undefined };
       return;
     }
+    const tops = readTops();
     prev.current = { tops, order, sortKey };
     if (!(sorted || waiting) || mode !== 'expressive') return;
 

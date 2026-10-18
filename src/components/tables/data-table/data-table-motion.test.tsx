@@ -54,13 +54,16 @@ function ServerHarness({ data, sorting, onSort }: { data: Visit[]; sorting: Sort
 }
 
 let animate: ReturnType<typeof vi.fn>;
+let topReads = 0;
 beforeEach(() => {
   animate = vi.fn(() => ({ cancel() {}, finished: Promise.resolve() }));
   Element.prototype.animate = animate as unknown as typeof Element.prototype.animate;
   // happy-dom has no layout: give each row a top from its place in the body, 40px apart.
+  topReads = 0;
   Object.defineProperty(HTMLElement.prototype, 'offsetTop', {
     configurable: true,
     get(this: HTMLElement) {
+      topReads += 1;
       return this.parentElement ? Array.from(this.parentElement.children).indexOf(this) * 40 : 0;
     },
   });
@@ -106,6 +109,13 @@ describe('DataTable motion', () => {
     const tint = animate.mock.calls.find((args) => 'backgroundColor' in (args[0] as Keyframe[])[0])!;
     // One keyframe: WAAPI animates from it to the element's underlying value.
     expect(tint[0] as Keyframe[]).toHaveLength(1);
+  });
+
+  it('reads no layout on a render that neither sorts nor reorders rows (an edit)', () => {
+    const { rerender } = render(<Harness data={BASE} />);
+    topReads = 0;
+    rerender(<Harness data={[BASE[0], { ...BASE[1], amount: 95 }, BASE[2]]} />);
+    expect(topReads).toBe(0);
   });
 
   it('tints an added row, but not when the whole page of rows changes', () => {
