@@ -46,13 +46,13 @@ const StatCard: FC<StatCardProps> = ({ label, value, trend, caption, sparkline, 
   const { mode } = useMotion();
   const figure = typeof value === 'string' || typeof value === 'number' ? String(value) : null;
   const trendRef = useRef<HTMLSpanElement>(null);
-  const firstTrend = useRef(true);
+  const trendKey = `${percent}|${direction}`;
+  // The trend last shown. Comparing against it (not a "first run" flag) keeps StrictMode's replayed mount effect still.
+  const shownTrend = useRef(trendKey);
   // The trend pops in after its figure changes (spec §4) — never on first paint, never under reduced motion.
   useEffect(() => {
-    if (firstTrend.current) {
-      firstTrend.current = false;
-      return;
-    }
+    if (shownTrend.current === trendKey) return;
+    shownTrend.current = trendKey;
     if (mode === 'reduced') return;
     trendRef.current?.animate?.(
       [
@@ -65,7 +65,7 @@ const StatCard: FC<StatCardProps> = ({ label, value, trend, caption, sparkline, 
       },
     );
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- pop only when the trend itself changes
-  }, [percent, direction]);
+  }, [trendKey]);
 
   const trendLabel = trend
     ? t(caption ? 'statCard.trendWithCaption' : 'statCard.trend', { direction: t(`statCard.${direction}`), value: percent, caption })

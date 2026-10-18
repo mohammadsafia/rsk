@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { cleanup, render, screen } from '@testing-library/react';
+import { StrictMode } from 'react';
 import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -63,6 +64,23 @@ describe('StatCard', () => {
     const { rerender } = render(<StatCard label="Visits" value="248" trend={{ value: 12.4 }} />);
     expect(animate).not.toHaveBeenCalled();
     rerender(<StatCard label="Visits" value="251" trend={{ value: 13.1 }} />);
+    expect(animate).toHaveBeenCalledTimes(1);
+  });
+
+  it("doesn't pop on mount under StrictMode, whose dev remount replays the effect", () => {
+    const animate = vi.fn();
+    Element.prototype.animate = animate as unknown as typeof Element.prototype.animate;
+    const { rerender } = render(
+      <StrictMode>
+        <StatCard label="Visits" value="248" trend={{ value: 12.4 }} />
+      </StrictMode>,
+    );
+    expect(animate).not.toHaveBeenCalled();
+    rerender(
+      <StrictMode>
+        <StatCard label="Visits" value="251" trend={{ value: 13.1 }} />
+      </StrictMode>,
+    );
     expect(animate).toHaveBeenCalledTimes(1);
   });
 });
