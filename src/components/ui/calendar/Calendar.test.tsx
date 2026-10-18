@@ -29,6 +29,29 @@ describe('Calendar', () => {
     await vi.waitFor(() => expect(root.getAttribute('dir')).toBe('rtl'));
   });
 
+  it('follows a section switched from RTL to LTR (dir and DirectionProvider together), without keeping the old direction', async () => {
+    const Section = ({ rtl }: { rtl: boolean }) => (
+      <div dir={rtl ? 'rtl' : 'ltr'}>
+        <DirectionProvider dir={rtl ? 'rtl' : 'ltr'}>
+          <Calendar mode="single" defaultMonth={OCTOBER_2026} />
+        </DirectionProvider>
+      </div>
+    );
+    const { container, rerender } = render(
+      <div dir="rtl">
+        <Section rtl />
+      </div>,
+    );
+    const root = () => container.querySelector('.rdp-root') as HTMLElement;
+    await vi.waitFor(() => expect(root().getAttribute('dir')).toBe('rtl'));
+    rerender(
+      <div dir="rtl">
+        <Section rtl={false} />
+      </div>,
+    );
+    await vi.waitFor(() => expect(root().getAttribute('dir')).toBe('ltr'));
+  });
+
   it('follows the surrounding direction, not only the language: an RTL section mirrors grid and arrows together', () => {
     const { container } = render(
       <DirectionProvider dir="rtl">
