@@ -133,7 +133,12 @@ const arg = (name, fallback) => {
 
 /** --redirects "/=/dashboard,/old=/new": routes expected to land somewhere else. */
 export function parseRedirects(value) {
-  return Object.fromEntries((value ?? '').split(',').filter(Boolean).map((pair) => pair.split('=')));
+  return Object.fromEntries(
+    (value ?? '')
+      .split(',')
+      .filter(Boolean)
+      .map((pair) => pair.split('=')),
+  );
 }
 
 /**

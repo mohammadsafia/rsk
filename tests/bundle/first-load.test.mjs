@@ -5,7 +5,16 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { BUNDLE_BUDGET_KB, localeKeys, rawKeysIn, failuresOf, parseRedirects, resolveBudget, resolveFile, serve } from '../../scripts/bundle/first-load.mjs';
+import {
+  BUNDLE_BUDGET_KB,
+  localeKeys,
+  rawKeysIn,
+  failuresOf,
+  parseRedirects,
+  resolveBudget,
+  resolveFile,
+  serve,
+} from '../../scripts/bundle/first-load.mjs';
 
 const locales = () => {
   const dir = mkdtempSync(path.join(tmpdir(), 'locales-'));
