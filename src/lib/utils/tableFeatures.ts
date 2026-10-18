@@ -13,19 +13,38 @@ import {
   type Header,
   type ReactTable,
   type Row,
-  stockFeatures,
+  columnFacetingFeature,
+  columnFilteringFeature,
+  columnOrderingFeature,
+  columnPinningFeature,
+  columnSizingFeature,
+  columnVisibilityFeature,
+  globalFilteringFeature,
+  rowPaginationFeature,
+  rowSelectionFeature,
+  rowSortingFeature,
   type Table,
   tableFeatures,
   type TableOptions,
 } from '@tanstack/react-table';
 
 /**
- * The feature set every kit table uses (TanStack Table v9): every stock feature (sorting, filtering, pagination,
- * selection, pinning, visibility, …) plus the row models the kit's tables and filters read. Pass it as
+ * The feature set every kit table uses (TanStack Table v9): only the features the kit's tables and filters use, so the
+ * rest (grouping, expanding, resizing, cell selection, …) is tree-shaken away, plus the row models they read. Pass it as
  * `useTable({ features: kitFeatures, … })`; the kit's components and types assume it.
  */
 export const kitFeatures = tableFeatures({
-  ...stockFeatures,
+  columnFilteringFeature,
+  globalFilteringFeature,
+  rowSortingFeature,
+  rowPaginationFeature,
+  rowSelectionFeature,
+  columnPinningFeature,
+  // getIsFirstColumn / getIsLastColumn (the pinned edge shadows) come from column ordering.
+  columnOrderingFeature,
+  columnSizingFeature,
+  columnVisibilityFeature,
+  columnFacetingFeature,
   filteredRowModel: createFilteredRowModel(),
   sortedRowModel: createSortedRowModel(),
   paginatedRowModel: createPaginatedRowModel(),
