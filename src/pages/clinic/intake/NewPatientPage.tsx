@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { z } from 'zod';
 
 import { ClinicError, type NewPatientInput } from '@api/clinic';
@@ -137,7 +137,7 @@ function NewPatientPage() {
     try {
       const patient = await register.mutateAsync(input);
       toast({ title: t('intake.registered'), tone: 'success' });
-      navigate(patientPath(patient.id), { replace: true });
+      void navigate(patientPath(patient.id), { replace: true });
     } catch (error) {
       // Field errors (e.g. a phone already registered) go back to the step that owns the field.
       if (error instanceof ClinicError && error.fieldErrors) {

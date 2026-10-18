@@ -1,6 +1,6 @@
 import { type ComponentPropsWithoutRef, type FC, type ReactNode, useState } from 'react';
 import { useFormContext, useFormState } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { Button } from '@components/ui';
 import { ConfirmDialog } from '@components/shared';

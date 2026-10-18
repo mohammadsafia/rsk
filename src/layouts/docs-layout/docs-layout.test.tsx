@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { act, cleanup, render, screen } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vite-plus/test';
 

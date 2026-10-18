@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { Command } from '@components/ui';
 import { getComponentDocsRegistry } from '@component-docs/registry';
@@ -62,7 +62,7 @@ export default function DocsSearch() {
                     value={`${item.keywords} ${item.id}`}
                     onSelect={() => {
                       setOpen(false);
-                      navigate(item.href);
+                      void navigate(item.href);
                     }}
                   >
                     <span className="flex min-w-0 flex-col">

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Navigate, type RouteObject, useParams } from 'react-router-dom';
+import { Navigate, type RouteObject, useParams } from 'react-router';
 
 import { Spinner } from '@components/ui';
 

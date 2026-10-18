@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router';
 
 import { Logo, Toaster } from '@components/shared';
 import { useAuth } from '@hooks/shared';

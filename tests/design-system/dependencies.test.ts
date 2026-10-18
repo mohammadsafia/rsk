@@ -88,4 +88,10 @@ describe('dependencies', () => {
     const read = readers.map((file) => readFileSync(`${ROOT}${file}`, 'utf8')).join('\n');
     expect([...new Set(declared)].filter((name) => !read.includes(name))).toEqual([]);
   });
+
+  it('routes come from react-router (v8 has no react-router-dom)', () => {
+    // Built in two pieces so this file doesn't match itself.
+    expect(corpus.includes(`from '${'react-router'}-dom'`)).toBe(false);
+    expect(pkg.dependencies?.['react-router']).toMatch(/^\^8/);
+  });
 });

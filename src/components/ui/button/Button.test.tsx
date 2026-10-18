@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { MemoryRouter, Link } from 'react-router-dom';
+import { MemoryRouter, Link } from 'react-router';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 

@@ -1,5 +1,5 @@
 import { Suspense, useMemo } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router';
 
 import { Avatar, Spinner } from '@components/ui';
 import { Conditional } from '@components/utils';

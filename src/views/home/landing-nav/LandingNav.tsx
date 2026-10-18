@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { Button } from '@components/ui';
 import { LanguageSwitcher, Logo, ThemeSwitcher } from '@components/shared';

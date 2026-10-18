@@ -1,5 +1,5 @@
 import { type ComponentType, lazy, type LazyExoticComponent, Suspense, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 
 import { MDXProvider } from '@mdx-js/react';
 
