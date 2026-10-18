@@ -1,4 +1,4 @@
-import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type ReactNode } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC, type ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
 import { IconButton, SectionsReset } from '@components/ui';
@@ -147,14 +147,12 @@ const SheetFooter: FC<SheetSectionProps> = ({ className, ...props }) => (
 // that shared object would replace Dialog.Content everywhere.
 const Sheet = ((props: SheetProps) => <DialogPrimitive.Root {...props} />) as SheetComponent;
 
-// React 18 bridge — remove forwardRef wrappers when upgrading to React 19
-Sheet.Trigger = forwardRef<HTMLButtonElement, SheetTriggerProps>((props, ref) => (
-  <DialogPrimitive.Trigger ref={ref} data-slot="sheet-trigger" {...props} />
-));
-Sheet.Content = forwardRef<HTMLDivElement, SheetContentProps>((props, ref) => SheetContent({ ...props, ref }));
-Sheet.Close = forwardRef<HTMLButtonElement, SheetCloseProps>((props, ref) => (
-  <DialogPrimitive.Close ref={ref} data-slot="sheet-close" {...props} />
-));
+const SheetTrigger: FC<SheetTriggerProps> = (props) => <DialogPrimitive.Trigger data-slot="sheet-trigger" {...props} />;
+const SheetClose: FC<SheetCloseProps> = (props) => <DialogPrimitive.Close data-slot="sheet-close" {...props} />;
+
+Sheet.Trigger = SheetTrigger;
+Sheet.Content = SheetContent;
+Sheet.Close = SheetClose;
 Sheet.Body = SheetBody;
 Sheet.Footer = SheetFooter;
 

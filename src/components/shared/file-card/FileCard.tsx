@@ -3,7 +3,6 @@ import {
   type ComponentPropsWithoutRef,
   createContext,
   type FC,
-  forwardRef,
   type ReactNode,
   useContext,
   useMemo,
@@ -445,10 +444,8 @@ FileCard.FileShape = FileShape;
 FileCard.FolderShape = FolderShape;
 FileCard.StatusPill = Badge;
 FileCard.ApprovalPrompt = ApprovalPrompt;
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-FileCard.Approve = forwardRef<HTMLButtonElement, ApproveProps>((props, ref) => Approve({ ...props, ref }));
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-FileCard.Reject = forwardRef<HTMLButtonElement, RejectProps>((props, ref) => Reject({ ...props, ref }));
+FileCard.Approve = Approve;
+FileCard.Reject = Reject;
 FileCard.Status = Status;
 FileCard.Footer = Footer;
 FileCard.Assignee = Assignee;

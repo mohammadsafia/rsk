@@ -1,4 +1,4 @@
-import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC } from 'react';
 
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 
@@ -71,8 +71,7 @@ const RadioGroup: RadioGroupComponent = ({ className, invalid, ...props }) => (
   />
 );
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-RadioGroup.Item = forwardRef<HTMLButtonElement, RadioGroupItemProps>((props, ref) => Item({ ...props, ref }));
+RadioGroup.Item = Item;
 RadioGroup.Indicator = Indicator;
 RadioGroup.Dot = Dot;
 

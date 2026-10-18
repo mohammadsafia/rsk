@@ -19,7 +19,8 @@ export type PatternId =
   | 'state-fill'
   | 'large-control-radius'
   | 'typed-section-number'
-  | 'raw-motion';
+  | 'raw-motion'
+  | 'forward-ref';
 
 export type PatternCounts = Partial<Record<PatternId, number>>;
 
@@ -76,6 +77,11 @@ export const FORBIDDEN_PATTERNS: ReadonlyArray<{ id: PatternId; regex: RegExp; w
     id: 'raw-motion',
     regex: /\bduration-\d+\b|\bduration-\[[^\]]+\]|\bease-(?:linear|in-out)\b|\bease-\[[^\]]+\]|\bdelay-\d+\b|\banimate-\[[^\]]+\]/g,
     why: 'Motion timing comes from the motion tokens (duration-instant…roll, ease-out/in/spring)',
+  },
+  {
+    id: 'forward-ref',
+    regex: /\bforwardRef\b/g,
+    why: 'React 19: ref is a normal prop; forwardRef is deprecated',
   },
 ];
 

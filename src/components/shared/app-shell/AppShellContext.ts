@@ -8,7 +8,7 @@ export type AppShellState = {
   openMobile: () => void;
   /** `restoreFocus` sends focus back to the menu button (Escape, scrim). */
   closeMobile: (restoreFocus?: boolean) => void;
-  menuButtonRef: RefObject<HTMLButtonElement>;
+  menuButtonRef: RefObject<HTMLButtonElement | null>;
   sidebarId: string;
   contentId: string;
   scrolled: boolean;

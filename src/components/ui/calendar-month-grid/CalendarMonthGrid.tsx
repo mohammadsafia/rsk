@@ -1,4 +1,4 @@
-import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC } from 'react';
 
 import { cn } from '@utils';
 
@@ -108,7 +108,6 @@ CalendarMonthGrid.Weekdays = Weekdays;
 CalendarMonthGrid.Weekday = Weekday;
 CalendarMonthGrid.Days = Days;
 CalendarMonthGrid.DayCell = DayCell;
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-CalendarMonthGrid.EventChip = forwardRef<HTMLButtonElement, EventChipProps>((props, ref) => EventChip({ ...props, ref }));
+CalendarMonthGrid.EventChip = EventChip;
 
 export default CalendarMonthGrid;

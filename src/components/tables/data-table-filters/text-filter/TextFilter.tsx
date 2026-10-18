@@ -17,7 +17,7 @@ function TextFilter<TData>({ column, filterMeta }: TextFilterProps<TData>) {
   const { t, direction } = useAppTranslation('common');
   const value = (column.getFilterValue() as string | undefined) ?? '';
   const [draft, setDraft] = useState(value);
-  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Only typing commits, after a short pause, so an outside clear can never be undone by a stale debounce.
   const onChange = (text: string) => {

@@ -12,4 +12,13 @@ describe('mergeRefs', () => {
     expect(object.current).toBe(node);
     expect(callback).toHaveBeenCalledWith(node);
   });
+
+  it('passes on the cleanup a React 19 callback ref returns', () => {
+    const cleanupA = vi.fn();
+    const merged = mergeRefs<HTMLDivElement>(() => cleanupA, createRef());
+    const dispose = merged({} as HTMLDivElement);
+    expect(typeof dispose).toBe('function');
+    (dispose as () => void)();
+    expect(cleanupA).toHaveBeenCalledTimes(1);
+  });
 });

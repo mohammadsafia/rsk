@@ -1,4 +1,4 @@
-import { type ComponentProps, type FC, forwardRef } from 'react';
+import { type ComponentProps, type FC } from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
@@ -43,5 +43,4 @@ const Input: FC<InputProps> = ({ ref, className, size, invalid, ...props }) => (
   />
 );
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-export default forwardRef<HTMLInputElement, InputProps>((props, ref) => Input({ ...props, ref }));
+export default Input;

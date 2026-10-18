@@ -1,4 +1,4 @@
-import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC } from 'react';
 
 import * as SelectPrimitive from '@radix-ui/react-select';
 
@@ -174,8 +174,7 @@ const SelectSeparator: FC<SelectSeparatorProps> = ({ className, ...props }) => (
 
 const Select = SelectPrimitive.Root as SelectComponent;
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-Select.Trigger = forwardRef<HTMLButtonElement, SelectTriggerProps>((props, ref) => SelectTrigger({ ...props, ref }));
+Select.Trigger = SelectTrigger;
 Select.Value = SelectValue;
 Select.Icon = SelectIcon;
 Select.Content = SelectContent;

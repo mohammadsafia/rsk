@@ -5,7 +5,6 @@ import {
   type ComponentPropsWithoutRef,
   createContext,
   type FC,
-  forwardRef,
   type PropsWithChildren,
   type ReactNode,
   useCallback,
@@ -423,8 +422,7 @@ const FileUploader: FileUploaderComponent = ({
 };
 
 FileUploader.DropzoneGroup = FileUploaderDropzoneGroup;
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-FileUploader.Dropzone = forwardRef<HTMLInputElement, FileUploaderDropzoneProps>((props, ref) => FileUploaderDropzone({ ...props, ref }));
+FileUploader.Dropzone = FileUploaderDropzone;
 FileUploader.Actions = FileUploaderActions;
 FileUploader.FileList = FileUploaderFileList;
 FileUploader.ImagePreview = FileUploaderImagePreview;

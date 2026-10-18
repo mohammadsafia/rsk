@@ -1,4 +1,4 @@
-import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type ReactNode } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC, type ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
 import { IconButton, SectionsReset } from '@components/ui';
@@ -163,12 +163,9 @@ const DialogFooter: FC<DialogFooterProps> = ({ className, ...props }) => (
 
 const Dialog = DialogPrimitive.Root as unknown as DialogComponent;
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-Dialog.Trigger = forwardRef<HTMLButtonElement, DialogTriggerProps>((props, ref) => DialogTrigger({ ...props, ref }));
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-Dialog.Content = forwardRef<HTMLDivElement, DialogContentProps>((props, ref) => DialogContent({ ...props, ref }));
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-Dialog.Close = forwardRef<HTMLButtonElement, DialogCloseProps>((props, ref) => DialogClose({ ...props, ref }));
+Dialog.Trigger = DialogTrigger;
+Dialog.Content = DialogContent;
+Dialog.Close = DialogClose;
 Dialog.Footer = DialogFooter;
 
 Dialog.Trigger.displayName = 'DialogTrigger';

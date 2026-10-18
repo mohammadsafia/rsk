@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef, type FC, type FocusEvent, forwardRef, type KeyboardEvent, type Ref } from 'react';
+import { type ComponentPropsWithoutRef, type FC, type FocusEvent, type KeyboardEvent, type Ref } from 'react';
 import { type NumberFormatValues, NumericFormat } from 'react-number-format';
 
 import { fieldVariants, type FieldVariants, IconButton } from '@components/ui';
@@ -151,5 +151,4 @@ const FormattedNumber: FC<FormattedNumberProps> = ({
 
 FormattedNumber.displayName = 'FormattedNumber';
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-export default forwardRef<HTMLInputElement, FormattedNumberProps>((props, ref) => FormattedNumber({ ...props, ref }));
+export default FormattedNumber;

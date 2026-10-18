@@ -1,4 +1,4 @@
-import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type ReactElement } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC, type ReactElement } from 'react';
 
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 
@@ -51,8 +51,7 @@ const PopoverContent: FC<PopoverContentProps> = ({ className, align = 'center', 
 
 const Popover: PopoverComponent = (props) => <PopoverPrimitive.Root data-slot="popover" {...props} />;
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-Popover.Trigger = forwardRef<HTMLButtonElement, PopoverTriggerProps>((props, ref) => PopoverTrigger({ ...props, ref }));
+Popover.Trigger = PopoverTrigger;
 Popover.Content = PopoverContent;
 
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;

@@ -1,4 +1,4 @@
-import { type ComponentProps, type FC, forwardRef } from 'react';
+import { type ComponentProps, type FC } from 'react';
 
 import { fieldVariants } from '@components/ui';
 
@@ -24,5 +24,4 @@ const Textarea: FC<TextareaProps> = ({ ref, className, invalid, ...props }) => (
   />
 );
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-export default forwardRef<HTMLTextAreaElement, TextareaProps>((props, ref) => Textarea({ ...props, ref }));
+export default Textarea;

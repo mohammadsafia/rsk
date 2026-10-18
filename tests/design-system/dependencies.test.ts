@@ -1,6 +1,7 @@
 // tests/design-system/dependencies.test.ts
 import { execSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vite-plus/test';
@@ -32,9 +33,27 @@ const IMPLICIT_DEPENDENCIES = new Set([
   'axe-core',
 ]);
 
-const tracked = execSync('git ls-files', { cwd: ROOT, encoding: 'utf8' })
-  .split('\n')
-  .filter((file) => /\.(ts|tsx|mts|mjs|js|css|mdx|json|ya?ml|html)$/.test(file) && !/(^|\/)(package\.json|pnpm-lock\.yaml)$/.test(file));
+const SOURCE = /\.(ts|tsx|mts|mjs|js|css|mdx|json|ya?ml|html)$/;
+const SKIP_DIRS = new Set(['node_modules', 'dist', '.git', '.starter', 'docs', '.superpowers', 'coverage']);
+
+/** Repo files: tracked ones in a git checkout, else a walk of the tree (the generated starter is not a git repo). */
+const listFiles = (): string[] => {
+  try {
+    return execSync('git ls-files', { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })
+      .split('\n')
+      .filter(Boolean);
+  } catch {
+    const walk = (dir: string): string[] =>
+      readdirSync(join(ROOT, dir), { withFileTypes: true }).flatMap((entry) => {
+        const path = dir ? `${dir}/${entry.name}` : entry.name;
+        if (entry.isDirectory()) return SKIP_DIRS.has(entry.name) ? [] : walk(path);
+        return [path];
+      });
+    return walk('');
+  }
+};
+
+const tracked = listFiles().filter((file) => SOURCE.test(file) && !/(^|\/)(package\.json|pnpm-lock\.yaml)$/.test(file));
 const corpus = tracked.map((file) => readFileSync(`${ROOT}${file}`, 'utf8')).join('\n') + JSON.stringify(pkg.scripts ?? {});
 
 const used = (name: string) =>
@@ -59,7 +78,9 @@ describe('dependencies', () => {
   });
 
   it('declares no environment variable that nothing reads', () => {
-    const declared = readFileSync(`${ROOT}src/vite-env.d.ts`, 'utf8').match(/\bVITE_[A-Z0-9_]+/g) ?? [];
+    // Comment lines are documentation (an example key), not declarations.
+    const declarations = readFileSync(`${ROOT}src/vite-env.d.ts`, 'utf8').replace(/^\s*\/\/.*$/gm, '');
+    const declared = declarations.match(/\bVITE_[A-Z0-9_]+/g) ?? [];
     const readers = tracked.filter((file) => file !== 'src/vite-env.d.ts' && file !== '.env' && !file.endsWith('.md'));
     const read = readers.map((file) => readFileSync(`${ROOT}${file}`, 'utf8')).join('\n');
     expect([...new Set(declared)].filter((name) => !read.includes(name))).toEqual([]);

@@ -1,4 +1,4 @@
-import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC } from 'react';
 
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible';
 
@@ -30,8 +30,7 @@ const CollapsibleContent: FC<CollapsibleContentProps> = ({ className, ...props }
 
 const Collapsible: CollapsibleComponent = (props) => <CollapsiblePrimitive.Root data-slot="collapsible" {...props} />;
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-Collapsible.Trigger = forwardRef<HTMLButtonElement, CollapsibleTriggerProps>((props, ref) => CollapsibleTrigger({ ...props, ref }));
+Collapsible.Trigger = CollapsibleTrigger;
 Collapsible.Content = CollapsibleContent;
 
 Collapsible.Trigger.displayName = 'CollapsibleTrigger';

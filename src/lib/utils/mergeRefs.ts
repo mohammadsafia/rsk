@@ -1,11 +1,18 @@
-import type { LegacyRef, MutableRefObject, RefCallback } from 'react';
+import type { Ref, RefCallback } from 'react';
 
-/** One ref callback that hands the node to every given ref (objects and callbacks; empty and legacy string refs are skipped). */
+/**
+ * One ref callback that hands the node to every given ref (objects and callbacks). React 19 callback refs may return
+ * a cleanup; the merged ref returns one that runs them all.
+ */
 export const mergeRefs =
-  <T>(...refs: Array<LegacyRef<T> | undefined>): RefCallback<T> =>
+  <T>(...refs: Array<Ref<T> | undefined>): RefCallback<T> =>
   (node) => {
+    const cleanups: Array<() => void> = [];
     for (const ref of refs) {
-      if (typeof ref === 'function') ref(node);
-      else if (ref && typeof ref !== 'string') (ref as MutableRefObject<T | null>).current = node;
+      if (typeof ref === 'function') {
+        const cleanup = ref(node);
+        if (typeof cleanup === 'function') cleanups.push(cleanup);
+      } else if (ref) ref.current = node;
     }
+    if (cleanups.length) return () => cleanups.forEach((cleanup) => cleanup());
   };

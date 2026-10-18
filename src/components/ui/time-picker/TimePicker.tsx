@@ -2,7 +2,6 @@ import {
   type ComponentPropsWithoutRef,
   type ComponentPropsWithRef,
   type FC,
-  forwardRef,
   type KeyboardEvent,
   useEffect,
   useMemo,
@@ -152,33 +151,40 @@ const TimePickerClear: FC<TimePickerClearProps> = ({ onClear, disabled, hasValue
   );
 };
 
-const TimePickerTrigger = forwardRef<HTMLButtonElement, TimePickerTriggerProps>(
-  ({ className, size, invalid, placeholder, displayValue, disabled, ...props }, ref) => (
-    <button
-      ref={ref}
-      type="button"
-      disabled={disabled}
-      aria-invalid={invalid || undefined}
-      className={cn(fieldVariants({ size }), 'group cursor-pointer gap-2 text-start', className)}
-      {...props}
-      // After the spread: Popover.Trigger asChild injects its own data-slot.
-      data-slot="time-picker-trigger"
-    >
-      <Clock4Icon aria-hidden="true" className="text-fg-muted group-data-[state=open]:text-accent size-4 shrink-0" />
+const TimePickerTrigger: FC<TimePickerTriggerProps> = ({
+  ref,
+  className,
+  size,
+  invalid,
+  placeholder,
+  displayValue,
+  disabled,
+  ...props
+}) => (
+  <button
+    ref={ref}
+    type="button"
+    disabled={disabled}
+    aria-invalid={invalid || undefined}
+    className={cn(fieldVariants({ size }), 'group cursor-pointer gap-2 text-start', className)}
+    {...props}
+    // After the spread: Popover.Trigger asChild injects its own data-slot.
+    data-slot="time-picker-trigger"
+  >
+    <Clock4Icon aria-hidden="true" className="text-fg-muted group-data-[state=open]:text-accent size-4 shrink-0" />
 
-      <Conditional>
-        <Conditional.If condition={!!displayValue}>
-          <span className="text-fg min-w-0 flex-1 truncate font-mono tabular-nums">
-            <bdi dir="ltr">{displayValue}</bdi>
-          </span>
-        </Conditional.If>
+    <Conditional>
+      <Conditional.If condition={!!displayValue}>
+        <span className="text-fg min-w-0 flex-1 truncate font-mono tabular-nums">
+          <bdi dir="ltr">{displayValue}</bdi>
+        </span>
+      </Conditional.If>
 
-        <Conditional.Else>
-          <span className="text-fg-muted min-w-0 flex-1 truncate">{placeholder}</span>
-        </Conditional.Else>
-      </Conditional>
-    </button>
-  ),
+      <Conditional.Else>
+        <span className="text-fg-muted min-w-0 flex-1 truncate">{placeholder}</span>
+      </Conditional.Else>
+    </Conditional>
+  </button>
 );
 
 const TimePickerContent: FC<TimePickerContentProps> = ({

@@ -1,4 +1,4 @@
-import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type PropsWithChildren } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC, type PropsWithChildren } from 'react';
 
 import { cn } from '@utils';
 
@@ -148,8 +148,7 @@ CalendarTimeGrid.Spacer = Spacer;
 CalendarTimeGrid.Header = Header;
 CalendarTimeGrid.Axis = Axis;
 CalendarTimeGrid.Cell = Cell;
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-CalendarTimeGrid.EventCard = forwardRef<HTMLButtonElement, EventCardProps>((props, ref) => EventCard({ ...props, ref }));
+CalendarTimeGrid.EventCard = EventCard;
 CalendarTimeGrid.NowLine = NowLine;
 CalendarTimeGrid.Column = Column;
 

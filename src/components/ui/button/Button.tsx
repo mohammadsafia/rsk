@@ -1,4 +1,4 @@
-import { type ComponentProps, type FC, forwardRef, type MouseEvent, type PointerEvent } from 'react';
+import { type ComponentProps, type FC, type MouseEvent, type PointerEvent } from 'react';
 
 import { Slot, Slottable } from '@radix-ui/react-slot';
 
@@ -148,5 +148,4 @@ const Button: FC<ButtonProps> = ({
   );
 };
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-export default forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => Button({ ...props, ref }));
+export default Button;
