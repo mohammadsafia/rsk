@@ -49,3 +49,6 @@ i18n-*.png
 
 # Generated app starter (pnpm starter:build)
 /.starter
+
+# pnpm a11y:audit output
+a11y-report.json

@@ -1,17 +1,17 @@
-import { type ComponentPropsWithoutRef, type FC, type HTMLAttributes } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC, type HTMLAttributes, useLayoutEffect, useRef } from 'react';
 
-import { Command as CommandPrimitive } from 'cmdk';
+import { Command as CommandPrimitive, useCommandState } from 'cmdk';
 import { Dialog } from '@components/ui';
 
 import { useAppTranslation } from '@hooks/shared';
 
-import { cn } from '@utils';
+import { cn, mergeRefs } from '@utils';
 
 import { CheckIcon, Search } from 'lucide-react';
 
 type CommandInputProps = ComponentPropsWithoutRef<typeof CommandPrimitive.Input>;
 
-type CommandListProps = ComponentPropsWithoutRef<typeof CommandPrimitive.List>;
+type CommandListProps = ComponentProps<typeof CommandPrimitive.List>;
 
 type CommandEmptyProps = ComponentPropsWithoutRef<typeof CommandPrimitive.Empty> & { when?: boolean };
 
@@ -23,7 +23,7 @@ type CommandIndicatorProps = ComponentPropsWithoutRef<'span'>;
 
 type CommandShortcutProps = HTMLAttributes<HTMLSpanElement>;
 
-type CommandSeparatorProps = ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>;
+type CommandSeparatorProps = ComponentProps<typeof CommandPrimitive.Separator>;
 
 type CommandDialogProps = ComponentPropsWithoutRef<typeof Dialog> & {
   title: string;
@@ -62,11 +62,20 @@ const CommandInput: FC<CommandInputProps> = ({ className, children, ...props }) 
   </div>
 );
 
-const CommandList: FC<CommandListProps> = ({ className, ...props }) => {
+const CommandList: FC<CommandListProps> = ({ ref, className, ...props }) => {
   const { t } = useAppTranslation('common');
+  // A listbox must hold options: while nothing matches, the list is announced as a plain region (its Empty text).
+  // cmdk hard-codes role="listbox" after our props, so the role is set on the element; React leaves it alone because
+  // cmdk's own prop never changes.
+  const matches = useCommandState((state) => state.filtered.count);
+  const listRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    listRef.current?.setAttribute('role', matches === 0 ? 'region' : 'listbox');
+  }, [matches]);
 
   return (
     <CommandPrimitive.List
+      ref={mergeRefs(ref, listRef)}
       data-slot="command-list"
       label={t('command.suggestions')}
       className={cn('flex max-h-96 flex-col overflow-x-hidden overflow-y-auto', className)}
@@ -124,8 +133,16 @@ const CommandShortcut: FC<CommandShortcutProps> = ({ className, ...props }) => (
   <span className={cn('text-fg-muted ms-auto font-mono text-2xs', className)} {...props} />
 );
 
-const CommandItemSeparator: FC<CommandSeparatorProps> = ({ className, ...props }) => (
-  <CommandPrimitive.Separator data-slot="command-separator" className={cn('bg-border-subtle -mx-1 my-1 h-px', className)} {...props} />
+/** A listbox may only hold options and groups, so the divider is decorative (cmdk hard-codes role="separator"). */
+const decorative = (node: HTMLDivElement | null) => node?.setAttribute('role', 'none');
+
+const CommandItemSeparator: FC<CommandSeparatorProps> = ({ ref, className, ...props }) => (
+  <CommandPrimitive.Separator
+    ref={mergeRefs(ref, decorative)}
+    data-slot="command-separator"
+    className={cn('bg-border-subtle -mx-1 my-1 h-px', className)}
+    {...props}
+  />
 );
 
 const CommandDialog: FC<CommandDialogProps> = ({ title, filter, children, ...props }) => (

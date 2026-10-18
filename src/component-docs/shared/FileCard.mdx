@@ -168,15 +168,11 @@ export const ApprovalRequiredDemo = () => {
 
             <div className="flex gap-2">
               <ConfirmDialog tone="danger" title="Reject Document" onConfirm={() => {}}>
-                <div>
-                  <FileCard.Reject>Reject</FileCard.Reject>
-                </div>
+                <FileCard.Reject>Reject</FileCard.Reject>
               </ConfirmDialog>
 
               <ConfirmDialog tone="success" title="Approve Document" onConfirm={() => {}}>
-                <div>
-                  <FileCard.Approve>Approve</FileCard.Approve>
-                </div>
+                <FileCard.Approve>Approve</FileCard.Approve>
               </ConfirmDialog>
             </div>
           </FileCard.FileShape>

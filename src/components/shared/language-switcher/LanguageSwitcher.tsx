@@ -11,7 +11,12 @@ function LanguageSwitcher() {
   const handleToggle = () => changeLanguage(nextLanguage.code as LANGUAGES);
 
   return (
-    <IconButton onClick={handleToggle} aria-label={t('switchLanguage')} className="text-xs font-semibold tracking-wider uppercase">
+    // The name starts with the visible code, so voice control users can say what they see (WCAG 2.5.3).
+    <IconButton
+      onClick={handleToggle}
+      aria-label={`${nextLanguage.code.toUpperCase()}, ${t('switchLanguage')}`}
+      className="text-xs font-semibold tracking-wider uppercase"
+    >
       {nextLanguage.code.toUpperCase()}
     </IconButton>
   );

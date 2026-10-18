@@ -56,4 +56,9 @@
   [data-rehype-pretty-code-figure] code [style*='--shiki-dark'] {
     color: var(--shiki-dark) !important;
   }
+
+  /* The GitHub theme's comment grey is too faint on the code surface; comments use the kit's code-muted token. */
+  [data-rehype-pretty-code-figure] code [style*='--shiki-dark: #6A737D'] {
+    color: var(--code-muted) !important;
+  }
 }
