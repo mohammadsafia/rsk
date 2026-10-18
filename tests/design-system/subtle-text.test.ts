@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -24,7 +24,10 @@ const ICON_OPENING = /<[A-Z][A-Za-z]+\s*$|size=\{|strokeWidth=\{/;
 
 describe('fg-subtle is never used for readable text', () => {
   it('every text-fg-subtle sits on an icon, separator or disabled state', () => {
-    const offenders = SCOPES.flatMap((scope) => walk(join(ROOT, scope)))
+    // The starter strips some scopes (src/views), so only walk the ones present.
+    const offenders = SCOPES.map((scope) => join(ROOT, scope))
+      .filter((dir) => existsSync(dir))
+      .flatMap(walk)
       .filter((file) => file.endsWith('.tsx') && !file.endsWith('.test.tsx'))
       .flatMap((file) =>
         readFileSync(file, 'utf8')
