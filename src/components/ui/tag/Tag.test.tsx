@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Tag } from '@components/ui';
@@ -113,6 +114,65 @@ describe('Tag', () => {
       render(<Tag onRemove={onRemove}>Cardiology</Tag>);
       fireEvent.click(screen.getByRole('button', { name: 'Remove Cardiology' }));
       expect(onRemove).toHaveBeenCalledTimes(1);
+    });
+    it('moves focus to the next tag when the focused one is removed, not to <body>', () => {
+      const Tags = () => {
+        const [items, setItems] = useState(['Cardiology', 'Dermatology', 'Oncology']);
+        return (
+          <div>
+            {items.map((item) => (
+              <Tag key={item} onRemove={() => setItems((current) => current.filter((other) => other !== item))}>
+                {item}
+              </Tag>
+            ))}
+          </div>
+        );
+      };
+      render(<Tags />);
+      const middle = screen.getByRole('button', { name: 'Remove Dermatology' });
+      middle.focus();
+      fireEvent.click(middle);
+      act(() => {
+        vi.advanceTimersByTime(200);
+      });
+      act(() => {
+        vi.advanceTimersByTime(32);
+      });
+      expect(screen.queryByText('Dermatology')).toBeNull();
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Remove Oncology' }));
+    });
+
+    it('moves focus to the previous tag when the last one is removed', () => {
+      reduced = true;
+      const Tags = () => {
+        const [items, setItems] = useState(['Cardiology', 'Oncology']);
+        return (
+          <div>
+            {items.map((item) => (
+              <Tag key={item} onRemove={() => setItems((current) => current.filter((other) => other !== item))}>
+                {item}
+              </Tag>
+            ))}
+          </div>
+        );
+      };
+      render(<Tags />);
+      const last = screen.getByRole('button', { name: 'Remove Oncology' });
+      last.focus();
+      fireEvent.click(last);
+      act(() => {
+        vi.advanceTimersByTime(32);
+      });
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Remove Cardiology' }));
+    });
+
+    it("doesn't call onRemove when the tag unmounts mid-exit (its parent went away)", () => {
+      const onRemove = vi.fn();
+      const { unmount } = render(<Tag onRemove={onRemove}>Cardiology</Tag>);
+      fireEvent.click(screen.getByRole('button', { name: 'Remove Cardiology' }));
+      unmount();
+      vi.advanceTimersByTime(400);
+      expect(onRemove).not.toHaveBeenCalled();
     });
   });
 });
