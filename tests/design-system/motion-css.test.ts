@@ -38,4 +38,12 @@ describe('motion CSS contract', () => {
     expect(shimmer).toMatch(/prefers-reduced-motion: reduce\)\s*\{[^@]*animation: none/);
     expect(read('src/styles/motion.css')).toMatch(/@keyframes rsk-shimmer/);
   });
+
+  it('the theme cross-fade only eases colours, and not under reduced motion; reveal rises sections in counting order', () => {
+    const css = read('src/styles/motion.css');
+    expect(css).toMatch(/\.theme-switching,\s*\.theme-switching \*[\s\S]*?transition-property: color, background-color, border-color/);
+    expect(css).toMatch(/prefers-reduced-motion: no-preference\)\s*\{\s*\.theme-switching/);
+    const utilities = read('src/styles/utilities.css');
+    expect(utilities).toMatch(/@utility reveal\s*\{[\s\S]*?--tw-enter-translate-y: 10px[\s\S]*?var\(--motion-reveal-stagger\) \* 5/);
+  });
 });

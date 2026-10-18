@@ -1,4 +1,4 @@
-import { Children, type ComponentPropsWithoutRef, type FC, Fragment } from 'react';
+import { Children, type ComponentPropsWithoutRef, type FC, Fragment, isValidElement } from 'react';
 
 import { Divider } from '@components/ui';
 import { Conditional } from '@components/utils';
@@ -10,7 +10,11 @@ import { StepCircleCheckedIcon, StepCircleEmptyIcon, StepCircleFilledIcon, StepC
 
 type StepStatus = 'done' | 'current' | 'error' | 'next';
 
-type StepProps = ComponentPropsWithoutRef<'div'>;
+type StepProps = ComponentPropsWithoutRef<'div'> & {
+  /** Lets the Stepper thicken the rule after a done step. */
+  status?: StepStatus;
+};
+type ConnectorProps = { done?: boolean; className?: string };
 type StepIconProps = { status: StepStatus; className?: string };
 type StepLabelProps = ComponentPropsWithoutRef<'span'>;
 type StepperProps = ComponentPropsWithoutRef<'div'>;
@@ -19,6 +23,7 @@ type StepperComponent = FC<StepperProps> & {
   Step: FC<StepProps>;
   Icon: FC<StepIconProps>;
   Label: FC<StepLabelProps>;
+  Connector: FC<ConnectorProps>;
 };
 
 const STEP_ICONS: Record<StepStatus, FC<ComponentPropsWithoutRef<'svg'>>> = {
@@ -42,8 +47,17 @@ const stepIconVariants = cva('size-6 shrink-0', {
   },
 });
 
-const Step: FC<StepProps> = ({ className, ...props }) => (
-  <div data-slot="stepper-step" className={cn('flex shrink-0 flex-col items-center gap-1', className)} {...props} />
+const Step: FC<StepProps> = ({ className, status, ...props }) => (
+  <div data-slot="stepper-step" data-status={status} className={cn('flex shrink-0 flex-col items-center gap-1', className)} {...props} />
+);
+
+/** The rule between two steps; after a done step it thickens into the strong section rule. */
+const Connector: FC<ConnectorProps> = ({ done = false, className }) => (
+  <div aria-hidden="true" data-slot="stepper-connector" className={cn('flex flex-1 items-center self-start pt-3', className)}>
+    <Divider
+      className={cn('duration-base ease-out transition-[height,background-color]', done && 'bg-rule-strong h-(--rule-width-section)')}
+    />
+  </div>
 );
 
 const Icon: FC<StepIconProps> = ({ status, className }) => {
@@ -66,9 +80,7 @@ const Stepper: StepperComponent = ({ className, children, ...props }) => {
           {step}
 
           <Conditional.If condition={index < steps.length - 1}>
-            <div className="flex flex-1 items-center self-start pt-3">
-              <Divider />
-            </div>
+            <Connector done={isValidElement<StepProps>(step) && step.props.status === 'done'} />
           </Conditional.If>
         </Fragment>
       ))}
@@ -81,5 +93,6 @@ Step.displayName = 'StepperStep';
 Stepper.Step = Step;
 Stepper.Icon = Icon;
 Stepper.Label = Label;
+Stepper.Connector = Connector;
 
 export default Stepper;

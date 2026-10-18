@@ -63,3 +63,13 @@
     scale: none !important;
   }
 }
+
+/* Theme switch: colours cross-fade for one beat while ThemeContext holds .theme-switching (never on load). */
+@media (prefers-reduced-motion: no-preference) {
+  .theme-switching,
+  .theme-switching * {
+    transition-property: color, background-color, border-color, fill, stroke, box-shadow !important;
+    transition-duration: var(--duration-base) !important;
+    transition-timing-function: var(--ease-out) !important;
+  }
+}

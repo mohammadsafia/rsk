@@ -64,4 +64,21 @@ describe('SectionMarker', () => {
     );
     expect(document.querySelectorAll('[data-slot="sections"]')).toHaveLength(2);
   });
+
+  it('reveals its sections on the first visit to a route in a session, never again', () => {
+    sessionStorage.clear();
+    const { unmount } = render(
+      <Sections>
+        <section>One</section>
+      </Sections>,
+    );
+    expect(document.querySelector('[data-slot="sections"]')?.className).toContain('reveal');
+    unmount();
+    render(
+      <Sections>
+        <section>One</section>
+      </Sections>,
+    );
+    expect(document.querySelector('[data-slot="sections"]')?.hasAttribute('data-reveal')).toBe(false);
+  });
 });

@@ -153,6 +153,48 @@
 }
 
 /*
+ * First visit to a numbered page: its sections rise 10px into place in counting order, --motion-reveal-stagger apart
+ * (Sections sets it once per route per session). Reduced motion keeps the fade and drops the delays.
+ */
+@utility reveal {
+  & > * {
+    --tw-enter-opacity: 0;
+    --tw-enter-translate-y: 10px;
+    animation: enter var(--duration-slow) var(--ease-out) both;
+  }
+
+  & > :nth-child(2) {
+    animation-delay: calc(var(--motion-reveal-stagger) * 1);
+  }
+
+  & > :nth-child(3) {
+    animation-delay: calc(var(--motion-reveal-stagger) * 2);
+  }
+
+  & > :nth-child(4) {
+    animation-delay: calc(var(--motion-reveal-stagger) * 3);
+  }
+
+  & > :nth-child(5) {
+    animation-delay: calc(var(--motion-reveal-stagger) * 4);
+  }
+
+  & > :nth-child(6) {
+    animation-delay: calc(var(--motion-reveal-stagger) * 5);
+  }
+
+  & > :nth-child(n + 7) {
+    animation-delay: calc(var(--motion-reveal-stagger) * 5);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    & > * {
+      animation-delay: 0s !important;
+    }
+  }
+}
+
+/*
  * Children arrive one after another: each fades in and rises 4px, --motion-stagger apart (0 in calm, so together).
  * Reduced motion keeps only the fade (the global rule zeroes the travel) and drops the delays.
  */
