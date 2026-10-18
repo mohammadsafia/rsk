@@ -27,13 +27,14 @@ type PaginationComponents = FC<PaginationProps> & {
 };
 
 const List: FC<PaginationListProps> = ({ className, children, ...props }) => (
-  // An <ol> may hold only list items, so the travelling ink sits beside it, in a wrapper that is its positioning scope.
-  <div data-slot="pagination-ink-scope" data-ink-scope className="relative flex">
-    <ol data-slot="pagination-content" className={cn('flex items-center gap-1', className)} {...props}>
-      {children}
-    </ol>
-    <InkBar selector='[aria-current="page"]' />
-  </div>
+  // The <ol> is the ink's positioning scope. An <ol> may hold only list items, so the travelling ink sits in a list item
+  // of its own: hidden from assistive tech, and absolute, so it takes no place in the row.
+  <ol data-slot="pagination-content" data-ink-scope className={cn('relative flex items-center gap-1', className)} {...props}>
+    {children}
+    <li aria-hidden="true" className="pointer-events-none absolute inset-0">
+      <InkBar selector='[aria-current="page"]' />
+    </li>
+  </ol>
 );
 
 const Item: FC<PaginationItemProps> = (props) => <li data-slot="pagination-item" {...props} />;
