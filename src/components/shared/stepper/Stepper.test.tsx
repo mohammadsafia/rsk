@@ -21,4 +21,20 @@ describe('Stepper', () => {
     expect(rules[1].className).not.toContain('h-(--rule-width-section)');
     expect(rules[0].className).toContain('duration-base');
   });
+
+  it('reads a step as done from its icon too, when the step itself carries no status', () => {
+    render(
+      <Stepper>
+        <Stepper.Step>
+          <Stepper.Icon status="done" />
+          <Stepper.Label>One</Stepper.Label>
+        </Stepper.Step>
+        <Stepper.Step>
+          <Stepper.Icon status="current" />
+        </Stepper.Step>
+      </Stepper>,
+    );
+    const [rule] = Array.from(document.querySelectorAll<HTMLElement>('[data-slot="stepper-connector"] [data-slot="divider"]'));
+    expect(rule.className).toContain('h-(--rule-width-section)');
+  });
 });

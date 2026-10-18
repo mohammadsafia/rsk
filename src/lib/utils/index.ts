@@ -7,6 +7,7 @@ export * from './formatNumber';
 export * from './formatMoney';
 export * from './dataTableFilters';
 export * from './mergeRefs';
+export * from './parseDateValue';
 export * from './formResolver';
 export * from './schemas';
 export * from './tableFeatures';

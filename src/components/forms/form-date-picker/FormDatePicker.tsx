@@ -6,7 +6,7 @@ import { Conditional } from '@components/utils';
 import { FormField } from '@components/forms';
 
 import { DATE_INPUT_FORMATS, type DateInputFormat, useAppTranslation, useDateMask } from '@hooks/shared';
-import { cn } from '@utils';
+import { cn, parseDateValue } from '@utils';
 
 import { CalendarIcon, XIcon } from 'lucide-react';
 
@@ -53,22 +53,13 @@ function FormDatePicker<TFieldValues extends FieldValues>({
     rules,
   });
 
-  const date = useMemo(() => {
-    if (!value) return undefined;
-    if (Object.prototype.toString.call(value) === '[object Date]') {
-      // An Invalid Date is no date (its time is NaN, which never equals itself, so syncing it would loop).
-      return isNaN((value as Date).getTime()) ? undefined : (value as Date);
-    }
-    if (typeof value === 'string') {
-      const parsed = new Date(value);
-      return isNaN(parsed.getTime()) ? undefined : parsed;
-    }
-    return undefined;
-  }, [value]);
+  // An Invalid Date is no date (its time is NaN, which never equals itself, so syncing it would loop).
+  const date = useMemo(() => parseDateValue(value), [value]);
 
-  // The form value the text box last took in, and whether the latest change came from typing (keep the person's text).
+  // The form value the text box last took in, and the value the person's typing last produced (undefined: none
+  // pending). Only that exact value counts as typed, so a different value set from outside still refills the box.
   const [syncedKey, setSyncedKey] = useState<number | null>(null);
-  const [typed, setTyped] = useState(false);
+  const [typedValue, setTypedValue] = useState<string | null | undefined>(undefined);
 
   const formatDateValue = useCallback(
     (dateValue: Date | undefined) => {
@@ -88,8 +79,9 @@ function FormDatePicker<TFieldValues extends FieldValues>({
 
   const handleDateChange = useCallback(
     (newDate: Date | undefined) => {
-      setTyped(true);
-      onChange(formatDateValue(newDate));
+      const next = formatDateValue(newDate);
+      setTypedValue(next ?? null);
+      onChange(next);
       if (newDate) {
         setCalendarMonth(newDate);
       }
@@ -116,8 +108,11 @@ function FormDatePicker<TFieldValues extends FieldValues>({
   const valueKey = date ? date.getTime() : null;
   if (valueKey !== syncedKey) {
     setSyncedKey(valueKey);
-    if (typed) setTyped(false);
-    else {
+    // Compared as the form holds it: a date-only string re-parsed and re-formatted can land on another day west of UTC.
+    const current = typeof value === 'string' ? value || null : (formatDateValue(date) ?? null);
+    const fromTyping = typedValue !== undefined && typedValue === current;
+    if (typedValue !== undefined) setTypedValue(undefined);
+    if (!fromTyping) {
       setFromDate(date);
       if (date) setCalendarMonth(date);
     }

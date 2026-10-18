@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vite-plus/test';
 
+import { corpusFiles } from './dependency-corpus';
+
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const pkg = JSON.parse(readFileSync(`${ROOT}package.json`, 'utf8')) as {
   dependencies?: Record<string, string>;
@@ -32,9 +34,10 @@ const IMPLICIT_DEPENDENCIES = new Set([
   // Babel peers of @rolldown/plugin-babel + the React Compiler preset (loaded by name, never imported).
   '@babel/core',
   'babel-plugin-react-compiler',
+  // The highlighter rehype-pretty-code (the docs' code blocks) requires as a peer and loads by name.
+  'shiki',
 ]);
 
-const SOURCE = /\.(ts|tsx|mts|mjs|js|css|mdx|json|ya?ml|html)$/;
 const SKIP_DIRS = new Set(['node_modules', 'dist', '.git', '.starter', 'docs', '.superpowers', 'coverage']);
 
 /** Repo files: tracked ones in a git checkout, else a walk of the tree (the generated starter is not a git repo). */
@@ -54,7 +57,7 @@ const listFiles = (): string[] => {
   }
 };
 
-const tracked = listFiles().filter((file) => SOURCE.test(file) && !/(^|\/)(package\.json|pnpm-lock\.yaml)$/.test(file));
+const tracked = corpusFiles(listFiles(), ROOT);
 const corpus = tracked.map((file) => readFileSync(`${ROOT}${file}`, 'utf8')).join('\n') + JSON.stringify(pkg.scripts ?? {});
 
 const used = (name: string) =>

@@ -1,4 +1,4 @@
-import { Children, type ComponentPropsWithoutRef, type FC, Fragment, isValidElement } from 'react';
+import { Children, type ComponentPropsWithoutRef, type FC, Fragment, isValidElement, type ReactNode } from 'react';
 
 import { Divider } from '@components/ui';
 import { Conditional } from '@components/utils';
@@ -70,6 +70,17 @@ const Label: FC<StepLabelProps> = ({ className, ...props }) => (
   <span data-slot="stepper-label" className={cn('truncate text-xs', className)} {...props} />
 );
 
+/** A step's status: its own, else the status of a <Stepper.Icon> inside it (searched a few levels down). */
+const statusOf = (node: ReactNode, depth = 0): StepStatus | undefined => {
+  if (!isValidElement<{ status?: StepStatus; children?: ReactNode }>(node) || depth > 3) return undefined;
+  if (node.props.status) return node.props.status;
+  for (const child of Children.toArray(node.props.children)) {
+    const found = statusOf(child, depth + 1);
+    if (found) return found;
+  }
+  return undefined;
+};
+
 const Stepper: StepperComponent = ({ className, children, ...props }) => {
   const steps = Children.toArray(children);
 
@@ -80,7 +91,7 @@ const Stepper: StepperComponent = ({ className, children, ...props }) => {
           {step}
 
           <Conditional.If condition={index < steps.length - 1}>
-            <Connector done={isValidElement<StepProps>(step) && step.props.status === 'done'} />
+            <Connector done={statusOf(step) === 'done'} />
           </Conditional.If>
         </Fragment>
       ))}

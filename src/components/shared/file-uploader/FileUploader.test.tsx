@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { StrictMode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { FileUploader } from '@components/shared';
@@ -96,5 +97,47 @@ describe('FileUploader keyboard access', () => {
     const file = new File(['x'], 'a.png', { type: 'image/png' });
     expect(fireEvent.drop(group, { dataTransfer: { files: [file] } })).toBe(false);
     expect(handleChange).not.toHaveBeenCalled();
+  });
+});
+
+describe('FileUploader row identity and previews', () => {
+  it('keeps the remaining rows mounted when an earlier file is removed, so they never replay their rise', () => {
+    const first = new File(['a'], 'a.pdf', { type: 'application/pdf' });
+    const second = new File(['b'], 'b.pdf', { type: 'application/pdf' });
+    const { rerender } = render(
+      <FileUploader name="docs" value={[first, second]} multiple onChange={vi.fn()}>
+        <FileUploader.FileList />
+      </FileUploader>,
+    );
+    const row = screen.getByText('b.pdf').closest('li');
+    rerender(
+      <FileUploader name="docs" value={[second]} multiple onChange={vi.fn()}>
+        <FileUploader.FileList />
+      </FileUploader>,
+    );
+    expect(screen.getByText('b.pdf').closest('li')).toBe(row);
+  });
+
+  it('keeps its preview URLs alive through the StrictMode dev remount, and revokes them on unmount', () => {
+    vi.useFakeTimers();
+    const revoked: string[] = [];
+    let made = 0;
+    URL.createObjectURL = vi.fn(() => `blob:preview-${(made += 1)}`);
+    URL.revokeObjectURL = vi.fn((url: string) => void revoked.push(url));
+    const image = new File(['x'], 'scan.png', { type: 'image/png' });
+    const { unmount } = render(
+      <StrictMode>
+        <FileUploader name="scan" value={[image]} onChange={vi.fn()}>
+          <FileUploader.ImagePreview />
+        </FileUploader>
+      </StrictMode>,
+    );
+    vi.runAllTimers();
+    const src = screen.getByRole('img', { name: 'scan.png' }).getAttribute('src')!;
+    expect(revoked).not.toContain(src);
+    unmount();
+    vi.runAllTimers();
+    expect(revoked).toContain(src);
+    vi.useRealTimers();
   });
 });

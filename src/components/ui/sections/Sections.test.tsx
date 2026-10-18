@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { cleanup, render } from '@testing-library/react';
+import { MemoryRouter, Route, Routes } from 'react-router';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { SectionMarker, Sections, SectionsReset } from '@components/ui';
@@ -79,6 +80,32 @@ describe('SectionMarker', () => {
         <section>One</section>
       </Sections>,
     );
+    expect(document.querySelector('[data-slot="sections"]')?.hasAttribute('data-reveal')).toBe(false);
+  });
+
+  it('counts a route once, whatever its parameters: a second patient profile does not replay the reveal', () => {
+    sessionStorage.clear();
+    const at = (path: string) => {
+      window.history.pushState({}, '', path);
+      return render(
+        <MemoryRouter initialEntries={[path]}>
+          <Routes>
+            <Route
+              path="/patients/:id"
+              element={
+                <Sections>
+                  <section>One</section>
+                </Sections>
+              }
+            />
+          </Routes>
+        </MemoryRouter>,
+      );
+    };
+    const first = at('/patients/dr-haddad');
+    expect(document.querySelector('[data-slot="sections"]')?.hasAttribute('data-reveal')).toBe(true);
+    first.unmount();
+    at('/patients/dr-khalil');
     expect(document.querySelector('[data-slot="sections"]')?.hasAttribute('data-reveal')).toBe(false);
   });
 });

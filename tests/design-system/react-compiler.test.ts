@@ -18,4 +18,11 @@ describe('React Compiler', () => {
       expect(config).toMatch(new RegExp(`'react/${rule}': 'error'`));
     }
   });
+
+  it("skips only this project's tests/ and test-utils/ folders, never a clone that happens to live under a tests/ path", () => {
+    const exclude = config.slice(config.indexOf('const COMPILER_EXCLUDE'), config.indexOf('];', config.indexOf('const COMPILER_EXCLUDE')));
+    expect(exclude).not.toContain(String.raw`/[\\/]tests[\\/]/`);
+    expect(exclude).toContain('new RegExp(`^${ROOT_ID}/tests/`)');
+    expect(exclude).toContain('new RegExp(`^${ROOT_ID}/(?:.+/)?test-utils/`)');
+  });
 });

@@ -1,5 +1,7 @@
 import { type ComponentPropsWithoutRef, createContext, type FC, type ReactNode, useContext } from 'react';
 
+import { UNSAFE_RouteContext as RouteContext } from 'react-router';
+
 import { useRevealOnce } from '@hooks/motion';
 
 import { cn } from '@utils';
@@ -12,8 +14,23 @@ const SectionsContext = createContext(false);
  * A group whose structural children are numbered 01, 02, … by CSS counters (hidden children are skipped). On the first
  * visit to a route in a session, the sections rise in counting order (never on back/forward or revisits).
  */
+/**
+ * Which page this is, for the once-per-session reveal: the matched route pattern ("/patients/:id"), so every patient's
+ * profile counts as one page; outside a router, the path without a trailing slash.
+ */
+const useRevealKey = () => {
+  const { matches } = useContext(RouteContext);
+  const pattern = matches
+    .map((match) => match.route.path)
+    .filter(Boolean)
+    .join('/')
+    .replace(/\/{2,}/g, '/');
+  if (pattern) return pattern;
+  return typeof window === 'undefined' ? '' : window.location.pathname.replace(/(.)\/+$/, '$1');
+};
+
 const Sections: FC<ComponentPropsWithoutRef<'div'>> = ({ className, ...props }) => {
-  const reveal = useRevealOnce(typeof window === 'undefined' ? '' : window.location.pathname);
+  const reveal = useRevealOnce(useRevealKey());
 
   return (
     <SectionsContext.Provider value={true}>

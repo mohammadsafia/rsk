@@ -15,6 +15,12 @@ describe('motion CSS contract', () => {
     expect(css).toContain('--tw-enter-translate-y: var(--cascade-rise, 4px);');
   });
 
+  it('cascade leaves a shimmering placeholder child its own shimmer instead of replacing it with the arrival', () => {
+    const css = read('src/styles/utilities.css');
+    const cascade = css.slice(css.indexOf('@utility cascade'));
+    expect(cascade).toMatch(/& > :not\(:where\(\.shimmer\)\)\s*\{[^}]*animation: enter/);
+  });
+
   it('the app shell recedes by --motion-depth while a modal surface is open, and never under reduced motion', () => {
     const css = read('src/styles/motion.css');
     expect(css).toMatch(
@@ -41,10 +47,13 @@ describe('motion CSS contract', () => {
     expect(read('src/styles/motion.css')).toMatch(/@keyframes rsk-shimmer/);
   });
 
-  it('the theme cross-fade only eases colours, and not under reduced motion; reveal rises sections in counting order', () => {
+  it('the theme switch reveals the new snapshot as a circle (a fade in calm), never per-element transitions; reveal rises sections in counting order', () => {
     const css = read('src/styles/motion.css');
-    expect(css).toMatch(/\.theme-switching,\s*\.theme-switching \*[\s\S]*?transition-property: color, background-color, border-color/);
-    expect(css).toMatch(/prefers-reduced-motion: no-preference\)\s*\{\s*\.theme-switching/);
+    expect(css).not.toMatch(/theme-switching/);
+    expect(css).toMatch(/::view-transition-new\(root\)\s*\{\s*animation: rsk-theme-reveal/);
+    expect(css).toMatch(/@keyframes rsk-theme-reveal[\s\S]*?clip-path: circle\(var\(--theme-reveal-r/);
+    expect(css).toMatch(/\[data-motion='calm'\]::view-transition-new\(root\)\s*\{\s*animation: rsk-theme-fade/);
+    expect(css).toMatch(/prefers-reduced-motion: reduce\)\s*\{\s*::view-transition-group\(\*\)/);
     const utilities = read('src/styles/utilities.css');
     expect(utilities).toMatch(/@utility reveal\s*\{[\s\S]*?--tw-enter-translate-y: 10px[\s\S]*?var\(--motion-reveal-stagger\) \* 5/);
   });

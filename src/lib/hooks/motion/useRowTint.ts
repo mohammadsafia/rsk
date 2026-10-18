@@ -48,9 +48,11 @@ export function useRowTint(scopeRef: RefObject<HTMLElement | null>, rows: TintRo
     const tint = getComputedStyle(document.documentElement).getPropertyValue('--accent-subtle').trim() || 'transparent';
     const elements = Array.from(scopeRef.current?.querySelectorAll<HTMLElement>('[data-row-id]') ?? []);
     for (const row of changed) {
+      // Only a start keyframe: WAAPI fades to the row's own background, so a selected row ends on its selection tint
+      // instead of fading to transparent and snapping back.
       elements
         .find((element) => element.dataset.rowId === row.id)
-        ?.animate?.([{ backgroundColor: tint }, { backgroundColor: 'transparent' }], { duration: TINT_MS, easing: MOTION_EASINGS.out });
+        ?.animate?.([{ backgroundColor: tint }], { duration: TINT_MS, easing: MOTION_EASINGS.out });
     }
   });
 }

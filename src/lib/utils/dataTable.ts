@@ -55,9 +55,10 @@ export const getCommonPinningStyles = <TData extends RowData>({
   return {
     boxShadow: withBorder
       ? isLastStartPinnedColumn
-        ? '-4px 0 4px -4px var(--border) inset'
+        ? // box-shadow has no logical offsets: --inline-sign (utilities.css) flips the x for RTL.
+          'calc(var(--inline-sign, 1) * -4px) 0 4px -4px var(--border) inset'
         : isFirstEndPinnedColumn
-          ? '4px 0 4px -4px var(--border) inset'
+          ? 'calc(var(--inline-sign, 1) * 4px) 0 4px -4px var(--border) inset'
           : undefined
       : undefined,
     insetInlineStart: isPinned === 'start' ? `${column.getStart('start')}px` : undefined,

@@ -41,4 +41,11 @@ describe('RollingText', () => {
     expect(units.className).toContain('motion-reduce:transition-none');
     expect([units.style.transitionDelay, tens.style.transitionDelay, hundreds.style.transitionDelay]).toEqual(['0ms', '40ms', '80ms']);
   });
+
+  it('keeps a character outside the BMP (a surrogate pair) whole, in one static cell', () => {
+    render(<RollingText text="𝑥12" />);
+    const statics = [...document.querySelectorAll('[data-slot="rolling-static"]')].map((cell) => cell.textContent);
+    expect(statics).toEqual(['𝑥']);
+    expect(document.querySelectorAll('[data-slot="rolling-digit"]')).toHaveLength(2);
+  });
 });

@@ -1,4 +1,4 @@
-import { type ChangeEvent, type ComponentProps, useEffect, useRef } from 'react';
+import { type ChangeEvent, type ComponentProps, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { type DateRange, DayButton, DayPicker, type DropdownProps, getDefaultClassNames } from 'react-day-picker';
 import { ar, enUS } from 'react-day-picker/locale';
 
@@ -6,7 +6,7 @@ import { buttonVariants, type ButtonVariants, Select } from '@components/ui';
 
 import { useAppTranslation } from '@hooks/shared';
 
-import { cn } from '@utils';
+import { cn, mergeRefs } from '@utils';
 
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useDirection } from '@radix-ui/react-direction';
@@ -147,7 +147,16 @@ function Calendar({
 }: CalendarProps) {
   const { t, isRTL } = useAppTranslation('common');
   // Layout follows the surrounding direction (an RTL section in an English app mirrors); month names follow the language.
-  const direction = useDirection();
+  const contextDirection = useDirection();
+  // Radix answers 'ltr' when there is no DirectionProvider at all, so a plain dir="rtl" ancestor counts too.
+  const rootElement = useRef<HTMLDivElement | null>(null);
+  const [inheritedDirection, setInheritedDirection] = useState<'ltr' | 'rtl'>('ltr');
+  useLayoutEffect(() => {
+    const inherited = rootElement.current?.parentElement?.closest('[dir]')?.getAttribute('dir') === 'rtl' ? 'rtl' : 'ltr';
+    setInheritedDirection(inherited);
+    // Re-read when the language (and with it the document's dir) changes.
+  }, [isRTL]);
+  const direction = contextDirection === 'rtl' ? 'rtl' : inheritedDirection;
   const defaultClassNames = getDefaultClassNames();
 
   const navButtonClassName = cn(buttonVariants({ variant: buttonVariant, size: 'sm' }), 'w-control-sm px-0 aria-disabled:opacity-50');
@@ -218,7 +227,7 @@ function Calendar({
       }}
       components={{
         Root: ({ className: rootClassName, rootRef, ...rootProps }) => (
-          <div data-slot="calendar" ref={rootRef} className={cn(rootClassName)} {...rootProps} />
+          <div data-slot="calendar" ref={mergeRefs(rootRef, rootElement)} className={cn(rootClassName)} {...rootProps} />
         ),
         Chevron: ({ className: chevronClassName, orientation, ...chevronProps }) => {
           if (orientation === 'left') return <ChevronLeftIcon className={cn('size-4', chevronClassName)} {...chevronProps} />;

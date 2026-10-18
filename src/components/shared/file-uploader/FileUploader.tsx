@@ -11,6 +11,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -239,6 +240,19 @@ const FileUploaderActions: FC<FileUploaderActionsProps> = ({ onDownload, clearab
   );
 };
 
+/** A key per File object, so removing one file leaves the other rows mounted (an index key would remount them all). */
+const fileKeys = new WeakMap<File, string>();
+let nextFileKey = 0;
+const fileKey = (file: File) => {
+  let key = fileKeys.get(file);
+  if (key === undefined) {
+    nextFileKey += 1;
+    key = `file-${nextFileKey}`;
+    fileKeys.set(file, key);
+  }
+  return key;
+};
+
 const FileUploaderFileList: FC<FileUploaderFileListProps> = ({ variant = 'list', className }) => {
   const { t } = useAppTranslation('common');
 
@@ -251,7 +265,7 @@ const FileUploaderFileList: FC<FileUploaderFileListProps> = ({ variant = 'list',
       <ScrollArea>
         <div data-slot="file-uploader-file-list" className={cn('flex max-h-16 flex-wrap items-center gap-1', className)}>
           {files.map((file, index) => (
-            <Conditional key={`${file.name}-${index}`}>
+            <Conditional key={fileKey(file)}>
               <Conditional.If condition={!disabled && !isUploading}>
                 <Tag size="sm" label={file.name} onRemove={() => onRemove(index)}>
                   <span className="max-w-36 truncate">{file.name}</span>
@@ -277,7 +291,7 @@ const FileUploaderFileList: FC<FileUploaderFileListProps> = ({ variant = 'list',
       <ul data-slot="file-uploader-file-list" className={cn('grid max-h-16 grid-cols-[minmax(0,1fr)] gap-1', className)}>
         {files.map((file, index) => (
           <li
-            key={`${file.name}-${index}`}
+            key={fileKey(file)}
             // A newly added file rises into the list.
             className="border-border animate-in fade-in-0 slide-in-from-bottom-1 duration-spring ease-spring flex items-center gap-2 rounded-lg border px-3 py-2 text-sm"
           >
@@ -320,7 +334,17 @@ const FileUploaderImagePreview: FC<FileUploaderImagePreviewProps> = ({ className
 
   // One object URL per previewed image, made with the list and revoked when it changes or unmounts.
   const urls = useMemo(() => imageEntries.map(({ file }) => URL.createObjectURL(file)), [imageEntries]);
-  useEffect(() => () => urls.forEach((url) => URL.revokeObjectURL(url)), [urls]);
+  const liveUrls = useRef<string[] | null>(null);
+  useEffect(() => {
+    liveUrls.current = urls;
+    return () => {
+      liveUrls.current = null;
+      // Revoke a task later: StrictMode's dev remount runs this cleanup and re-mounts at once with the same list.
+      setTimeout(() => {
+        if (liveUrls.current !== urls) urls.forEach((url) => URL.revokeObjectURL(url));
+      });
+    };
+  }, [urls]);
 
   if (imageEntries.length === 0) return null;
 
@@ -337,7 +361,7 @@ const FileUploaderImagePreview: FC<FileUploaderImagePreviewProps> = ({ className
           if (!url) return null;
 
           return (
-            <div key={`${file.name}-${file.size}`} className="group/file-uploader-image-preview relative overflow-hidden rounded-lg">
+            <div key={fileKey(file)} className="group/file-uploader-image-preview relative overflow-hidden rounded-lg">
               <img
                 src={url}
                 alt={file.name}

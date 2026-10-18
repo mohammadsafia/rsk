@@ -10,7 +10,7 @@ import { spawn } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { chromium } from 'playwright';
 
@@ -61,36 +61,52 @@ async function ensureServer() {
   };
 }
 
-/** Every same-site page reachable from "/" by links (breadth first, up to MAX_PAGES). */
-async function discoverRoutes(browser) {
+/**
+ * Every same-site page reachable from "/" by links (breadth first, up to `max`). A page that redirects is recorded where
+ * it lands, and links are resolved against it, so a "/" that redirects into the app still finds the app's pages.
+ * `truncated` is true when the cap stopped discovery with pages still unseen.
+ */
+export async function discoverRoutes(browser, { base, max }) {
   const page = await browser.newPage();
+  const origin = new URL(base).origin;
   const seen = new Set(['/']);
   const queue = ['/'];
-  while (queue.length && seen.size < MAX_PAGES) {
+  let truncated = false;
+  const add = (route) => {
+    if (seen.has(route)) return;
+    if (seen.size >= max) {
+      truncated = true;
+      return;
+    }
+    seen.add(route);
+    queue.push(route);
+  };
+  while (queue.length) {
     const route = queue.shift();
     try {
-      await page.goto(`${BASE}${route}`, { waitUntil: 'networkidle', timeout: 30000 });
+      await page.goto(`${base}${route}`, { waitUntil: 'networkidle', timeout: 30000 });
+      // A redirect: the page it landed on is the one to audit.
+      const landed = new URL(page.url());
+      if (landed.origin === origin && landed.pathname !== route) add(landed.pathname);
       // Pages render their links progressively (lazy routes, docs registry); read them once the count stops changing.
       let links = [];
       for (let stable = 0, previous = -1, tries = 0; stable < 2 && tries < 20; tries += 1) {
         await page.waitForTimeout(250);
-        links = await page.$$eval('a[href^="/"]', (anchors) => anchors.map((anchor) => anchor.getAttribute('href') ?? ''));
+        // anchor.href is already resolved against the page, so relative links count too.
+        links = await page.$$eval('a[href]', (anchors) => anchors.map((anchor) => anchor.href));
         stable = links.length === previous ? stable + 1 : 0;
         previous = links.length;
       }
       for (const href of links) {
-        const clean = href.split('#')[0].split('?')[0];
-        if (clean && !seen.has(clean) && seen.size < MAX_PAGES) {
-          seen.add(clean);
-          queue.push(clean);
-        }
+        const url = new URL(href);
+        if (url.origin === origin && /^https?:$/.test(url.protocol)) add(url.pathname);
       }
     } catch {
       // A page that fails to load is still audited below, where the error is reported.
     }
   }
   await page.close();
-  return [...seen];
+  return { routes: [...seen], truncated };
 }
 
 async function audit(context, route) {
@@ -118,40 +134,48 @@ async function audit(context, route) {
   }
 }
 
-const stopServer = await ensureServer();
-const browser = await chromium.launch();
-try {
-  const routes = await discoverRoutes(browser);
-  console.log(`Auditing ${routes.length} pages × ${COMBOS.length} (light/dark × en/ar)…`);
-  const results = [];
-  for (const combo of COMBOS) {
-    const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' });
-    await context.addInitScript(({ theme, lang }) => {
-      localStorage.setItem('vite-ui-theme', JSON.stringify(theme));
-      localStorage.setItem('i18nextLng', lang);
-    }, combo);
-    const queue = [...routes];
-    await Promise.all(
-      Array.from({ length: WORKERS }, async () => {
-        while (queue.length) results.push({ ...combo, ...(await audit(context, queue.shift())) });
-      }),
-    );
-    await context.close();
-  }
+async function main() {
+  const stopServer = await ensureServer();
+  let browser;
+  try {
+    browser = await chromium.launch();
+    const { routes, truncated } = await discoverRoutes(browser, { base: BASE, max: MAX_PAGES });
+    if (truncated) console.warn(`Stopped discovering at --max ${MAX_PAGES}: some pages are not audited. Raise --max to audit them all.`);
+    console.log(`Auditing ${routes.length} pages × ${COMBOS.length} (light/dark × en/ar)…`);
+    const results = [];
+    for (const combo of COMBOS) {
+      const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' });
+      await context.addInitScript(({ theme, lang }) => {
+        localStorage.setItem('vite-ui-theme', JSON.stringify(theme));
+        localStorage.setItem('i18nextLng', lang);
+      }, combo);
+      const queue = [...routes];
+      await Promise.all(
+        Array.from({ length: WORKERS }, async () => {
+          while (queue.length) results.push({ ...combo, ...(await audit(context, queue.shift())) });
+        }),
+      );
+      await context.close();
+    }
 
-  writeFileSync(path.join(ROOT, 'a11y-report.json'), `${JSON.stringify(results, null, 1)}\n`);
-  const failures = results.flatMap((result) => result.violations.map((violation) => ({ ...violation, ...result })));
-  const errors = results.filter((result) => result.error);
-  const byRule = new Map();
-  for (const failure of failures)
-    byRule.set(failure.id, [...(byRule.get(failure.id) ?? []), `${failure.route} (${failure.theme}/${failure.lang})`]);
-  for (const [rule, where] of byRule) console.log(`  ${rule}: ${where.length} × — ${[...new Set(where)].slice(0, 4).join(', ')}`);
-  console.log(
-    `violations: ${failures.reduce((sum, failure) => sum + failure.count, 0)} across ${results.length} page-states; ${errors.length} pages failed to load`,
-  );
-  console.log('Full report: a11y-report.json');
-  if (failures.length || errors.length) process.exitCode = 1;
-} finally {
-  await browser.close();
-  stopServer();
+    writeFileSync(path.join(ROOT, 'a11y-report.json'), `${JSON.stringify({ truncated, results }, null, 1)}\n`);
+    const failures = results.flatMap((result) => result.violations.map((violation) => ({ ...violation, ...result })));
+    const errors = results.filter((result) => result.error);
+    const byRule = new Map();
+    for (const failure of failures)
+      byRule.set(failure.id, [...(byRule.get(failure.id) ?? []), `${failure.route} (${failure.theme}/${failure.lang})`]);
+    for (const [rule, where] of byRule) console.log(`  ${rule}: ${where.length} × — ${[...new Set(where)].slice(0, 4).join(', ')}`);
+    console.log(
+      `violations: ${failures.reduce((sum, failure) => sum + failure.count, 0)} across ${results.length} page-states; ${errors.length} pages failed to load`,
+    );
+    console.log('Full report: a11y-report.json');
+    if (failures.length || errors.length) process.exitCode = 1;
+  } finally {
+    // The server stops even when the browser never launched.
+    await browser?.close();
+    stopServer();
+  }
 }
+
+// Run only as a script: tests import discoverRoutes without starting a server or a browser.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();
