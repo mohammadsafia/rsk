@@ -10,6 +10,17 @@
   --motion-depth: 0;
 }
 
+/* A checkbox's check drawing itself (draw-check in utilities.css). */
+@keyframes rsk-stroke {
+  from {
+    stroke-dashoffset: 24;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 /* The toast timer: its heavy top rule drains over the auto-close time (Toast.tsx). */
 @keyframes rsk-drain {
   from {

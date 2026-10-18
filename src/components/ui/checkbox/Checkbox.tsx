@@ -24,10 +24,10 @@ const Checkbox: FC<CheckboxProps> = ({ ref, className, checked, invalid, ...prop
     aria-invalid={invalid || undefined}
     data-slot="checkbox"
     checked={checked}
-    className={cn(checkboxBoxClassName, 'focus-ring cursor-pointer disabled:pointer-events-none disabled:opacity-50', className)}
+    className={cn(checkboxBoxClassName, 'tactile focus-ring cursor-pointer disabled:pointer-events-none disabled:opacity-50', className)}
     {...props}
   >
-    <CheckboxPrimitive.Indicator data-slot="checkbox-indicator" className="flex items-center justify-center">
+    <CheckboxPrimitive.Indicator data-slot="checkbox-indicator" className="draw-check flex items-center justify-center">
       <Conditional>
         <Conditional.If condition={checked === 'indeterminate'}>
           <Minus className="size-3" strokeWidth={3} />

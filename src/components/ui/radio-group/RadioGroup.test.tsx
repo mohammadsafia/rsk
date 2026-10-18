@@ -47,4 +47,12 @@ describe('RadioGroup.Item', () => {
     expect(item.className).not.toMatch(/\bborder\b|\bp-3\b|\brounded-lg\b|\bbg-surface\b/);
     expect(item.className).toContain('min-h-control-sm');
   });
+
+  it('the dot grows in on the spring when chosen', () => {
+    const { container } = render(<RadioGroup.Dot checked />);
+    const className = container.querySelector('[data-slot="radio-group-dot"]')!.className;
+    expect(className).toContain('after:scale-0');
+    expect(className).toContain('data-[state=checked]:after:scale-100');
+    expect(className).toContain('after:ease-spring');
+  });
 });

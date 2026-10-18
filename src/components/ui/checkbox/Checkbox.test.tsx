@@ -20,4 +20,11 @@ describe('Checkbox', () => {
     expect(box.className).toContain('text-fg-inverse');
     expect(box.className).not.toContain('bg-accent');
   });
+
+  it('feels tactile: squashes while pressed, and the check draws itself when it appears', () => {
+    render(<Checkbox aria-label="Agree" defaultChecked />);
+    const box = screen.getByRole('checkbox', { name: 'Agree' });
+    expect(box.className).toContain('tactile');
+    expect(box.querySelector('[data-slot="checkbox-indicator"]')?.className).toContain('draw-check');
+  });
 });
