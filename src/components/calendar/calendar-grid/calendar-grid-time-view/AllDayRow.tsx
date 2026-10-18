@@ -51,11 +51,11 @@ const AllDayItem: FC<AllDayItemProps> = ({ event, status, style }) => {
  */
 const AllDayRow: FC<{ columns: GridColumn[]; resourceMode: boolean }> = ({ columns, resourceMode }) => {
   const { t } = useAppTranslation('common');
-  const { events, eventAccessors } = useCalendarGridContext();
+  const { events, eventAccessors, now: clock } = useCalendarGridContext();
   const { toDate, isBefore, isAfter } = useDate();
 
   const { visible, hiddenByColumn, rows } = useMemo(() => {
-    const now = toDate();
+    const now = toDate(clock);
     const spans = events.flatMap((event) => {
       if (!isAllDayEvent(event, eventAccessors)) return [];
       const start = eventAccessors.getStartTime(event);
@@ -88,7 +88,7 @@ const AllDayRow: FC<{ columns: GridColumn[]; resourceMode: boolean }> = ({ colum
       hiddenByColumn: [...hidden.entries()],
       rows: laneCount > MAX_LANES ? MAX_LANES : laneCount,
     };
-  }, [events, eventAccessors, columns, toDate, isBefore, isAfter]);
+  }, [events, eventAccessors, columns, clock, toDate, isBefore, isAfter]);
 
   if (rows === 0) return null;
 

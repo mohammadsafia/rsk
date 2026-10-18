@@ -56,7 +56,8 @@ function FormDatePicker<TFieldValues extends FieldValues>({
   const date = useMemo(() => {
     if (!value) return undefined;
     if (Object.prototype.toString.call(value) === '[object Date]') {
-      return value as Date;
+      // An Invalid Date is no date (its time is NaN, which never equals itself, so syncing it would loop).
+      return isNaN((value as Date).getTime()) ? undefined : (value as Date);
     }
     if (typeof value === 'string') {
       const parsed = new Date(value);
