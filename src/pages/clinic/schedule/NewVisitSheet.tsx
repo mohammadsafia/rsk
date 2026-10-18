@@ -157,7 +157,7 @@ function NewVisitSheet({ slot, slots, preselectedPatientId, onClose, onBooked }:
             <FormTextarea<VisitForm> name="notes" label={t('schedule.newVisit.notes')} />
           </Sheet.Body>
           <Sheet.Footer>
-            <Button type="submit" loading={create.isLoading}>
+            <Button type="submit" loading={create.isPending}>
               {t('schedule.newVisit.submit')}
             </Button>
             <Sheet.Close asChild>

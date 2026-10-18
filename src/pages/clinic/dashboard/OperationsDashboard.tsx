@@ -78,7 +78,7 @@ function TodayPanel() {
         </Alert>
       ) : (
         <div className="flex flex-col gap-3">
-          <Timeline loading={visits.isLoading || patients.isLoading} empty={t('dashboard.today.empty')}>
+          <Timeline loading={visits.isPending || patients.isPending} empty={t('dashboard.today.empty')}>
             {upcoming.slice(0, MAX_TODAY).map((visit) => {
               const patient = patients.data?.find((p) => p.id === visit.patientId);
               const doctor = doctors.data?.find((d) => d.id === visit.doctorId);
@@ -138,7 +138,7 @@ function OperationsDashboard() {
     ];
   }, [data, range, t]);
 
-  const loading = metrics.isLoading;
+  const loading = metrics.isPending;
   const trend = (value: number | null, positive: 'up' | 'down' = 'up') => (value === null ? undefined : { value, positive });
   // Say what a trend compares with; no trend (90 days) means no caption either.
   const caption = (value: number | null) => (value === null ? undefined : t('dashboard.vsPrevious', { days: range }));
@@ -254,7 +254,7 @@ function OperationsDashboard() {
                 data={byDoctor}
                 orientation="horizontal"
                 valueFormat="money"
-                loading={loading || doctors.isLoading}
+                loading={loading || doctors.isPending}
                 x={{ key: 'doctor' }}
                 series={[{ key: 'revenue', label: t('dashboard.charts.revenue'), tone: 'chart-2' }]}
                 aria-label={t('dashboard.charts.revenueByDoctor')}

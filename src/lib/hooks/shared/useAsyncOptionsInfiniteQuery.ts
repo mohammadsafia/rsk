@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 
 import type { PaginatedDataTable } from '@app-types';
 
@@ -68,7 +68,7 @@ export function useAsyncOptionsInfiniteQuery<TOption>({
 }: UseAsyncOptionsInfiniteQueryOptions<TOption>) {
   return useInfiniteQuery({
     queryKey: [queryKey, searchTerm, urlSearchParams?.toString()],
-    queryFn: async ({ pageParam = 1 }) => {
+    queryFn: async ({ pageParam }) => {
       const queryParams = new URLSearchParams();
 
       // Parse urlSearchParams if provided as string
@@ -99,13 +99,14 @@ export function useAsyncOptionsInfiniteQuery<TOption>({
 
       return response;
     },
+    initialPageParam: 1,
     getNextPageParam: (lastPage, pages) => {
       const totalLoaded = pages.length * pageSize;
       return totalLoaded < lastPage.pagination.total ? pages.length + 1 : undefined;
     },
     enabled,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     staleTime: 0,
-    cacheTime: 0,
+    gcTime: 0,
   });
 }

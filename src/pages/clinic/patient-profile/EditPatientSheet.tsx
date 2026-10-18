@@ -111,7 +111,7 @@ function EditPatientSheet({ patient, onClose }: { patient: PatientSummary | null
             <FormInput<ContactForm> name="policyNumber" label={t('profile.editSheet.policy')} dir="ltr" />
           </Sheet.Body>
           <Sheet.Footer>
-            <Button type="submit" loading={update.isLoading}>
+            <Button type="submit" loading={update.isPending}>
               {t('profile.editSheet.save')}
             </Button>
             <Sheet.Close asChild>

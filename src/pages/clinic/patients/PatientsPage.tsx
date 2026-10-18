@@ -257,7 +257,7 @@ function PatientsPage() {
     return (
       <DataTable
         table={table}
-        isLoading={patients.isLoading || doctors.isLoading || insurers.isLoading}
+        isLoading={patients.isPending || doctors.isPending || insurers.isPending}
         onResetFilters={filters.reset}
         onRowClick={(row) => navigate(patientPath(row.original.id))}
         className="min-h-0 flex-1"

@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   type BulkInvoiceAction,
@@ -17,32 +17,45 @@ import {
 
 const CLINIC = 'clinic';
 
-export const useDoctors = () => useQuery([CLINIC, ClinicReferenceHandler.doctors.queryKey], ClinicReferenceHandler.doctors.request);
-export const useInsurers = () => useQuery([CLINIC, ClinicReferenceHandler.insurers.queryKey], ClinicReferenceHandler.insurers.request);
+export const useDoctors = () =>
+  useQuery({ queryKey: [CLINIC, ClinicReferenceHandler.doctors.queryKey], queryFn: ClinicReferenceHandler.doctors.request });
+export const useInsurers = () =>
+  useQuery({ queryKey: [CLINIC, ClinicReferenceHandler.insurers.queryKey], queryFn: ClinicReferenceHandler.insurers.request });
 
-export const usePatients = () => useQuery([CLINIC, PatientsHandler.list.queryKey], PatientsHandler.list.request);
-export const usePatient = (id: string) => useQuery([CLINIC, PatientsHandler.get.queryKey, id], () => PatientsHandler.get.request(id));
+export const usePatients = () => useQuery({ queryKey: [CLINIC, PatientsHandler.list.queryKey], queryFn: PatientsHandler.list.request });
+export const usePatient = (id: string) =>
+  useQuery({ queryKey: [CLINIC, PatientsHandler.get.queryKey, id], queryFn: () => PatientsHandler.get.request(id) });
 
 export const usePatientVisits = (patientId: string) =>
-  useQuery([CLINIC, VisitsHandler.byPatient.queryKey, patientId], () => VisitsHandler.byPatient.request(patientId));
+  useQuery({ queryKey: [CLINIC, VisitsHandler.byPatient.queryKey, patientId], queryFn: () => VisitsHandler.byPatient.request(patientId) });
+
+type RangeOptions = { keepPreviousData?: boolean };
 
 /** `keepPreviousData` keeps showing the last range while the next one loads (no flash when paging dates). */
-export const useVisits = (range: DayRange, options: { keepPreviousData?: boolean } = {}) =>
-  useQuery([CLINIC, VisitsHandler.list.queryKey, range.from, range.to], () => VisitsHandler.list.request(range), options);
-export const useLeave = (range: DayRange, options: { keepPreviousData?: boolean } = {}) =>
-  useQuery([CLINIC, VisitsHandler.leave.queryKey, range.from, range.to], () => VisitsHandler.leave.request(range), options);
+export const useVisits = (range: DayRange, options: RangeOptions = {}) =>
+  useQuery({
+    queryKey: [CLINIC, VisitsHandler.list.queryKey, range.from, range.to],
+    queryFn: () => VisitsHandler.list.request(range),
+    placeholderData: options.keepPreviousData ? keepPreviousData : undefined,
+  });
+export const useLeave = (range: DayRange, options: RangeOptions = {}) =>
+  useQuery({
+    queryKey: [CLINIC, VisitsHandler.leave.queryKey, range.from, range.to],
+    queryFn: () => VisitsHandler.leave.request(range),
+    placeholderData: options.keepPreviousData ? keepPreviousData : undefined,
+  });
 
-export const useInvoices = () => useQuery([CLINIC, InvoicesHandler.list.queryKey], InvoicesHandler.list.request);
+export const useInvoices = () => useQuery({ queryKey: [CLINIC, InvoicesHandler.list.queryKey], queryFn: InvoicesHandler.list.request });
 export const useInvoice = (id: string, options: { enabled?: boolean } = {}) =>
-  useQuery([CLINIC, InvoicesHandler.get.queryKey, id], () => InvoicesHandler.get.request(id), options);
+  useQuery({ queryKey: [CLINIC, InvoicesHandler.get.queryKey, id], queryFn: () => InvoicesHandler.get.request(id), ...options });
 
 export const useMetrics = (days: MetricsRange) =>
-  useQuery([CLINIC, MetricsHandler.list.queryKey, days], () => MetricsHandler.list.request(days));
+  useQuery({ queryKey: [CLINIC, MetricsHandler.list.queryKey, days], queryFn: () => MetricsHandler.list.request(days) });
 
 /** Every clinic write refreshes every clinic view: the dataset is small and nothing can go stale. */
 const useClinicMutation = <TInput, TResult>(request: (input: TInput) => Promise<TResult>) => {
   const client = useQueryClient();
-  return useMutation(request, { onSettled: () => client.invalidateQueries([CLINIC]) });
+  return useMutation({ mutationFn: request, onSettled: () => client.invalidateQueries({ queryKey: [CLINIC] }) });
 };
 
 export const useRegisterPatient = () => useClinicMutation(PatientsHandler.register.request);

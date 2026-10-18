@@ -181,7 +181,7 @@ function BillingPage() {
       toast({ title: t('billing.bulk.failed'), tone: 'danger' });
     }
   };
-  const reminding = bulk.isLoading && bulk.variables?.action === 'send-reminder';
+  const reminding = bulk.isPending && bulk.variables?.action === 'send-reminder';
 
   const exportRows = (selected: Row<InvoiceRow>[]) =>
     downloadCsv(
@@ -202,7 +202,7 @@ function BillingPage() {
     );
 
   const failed = invoices.isError || patients.isError;
-  const loading = invoices.isLoading || patients.isLoading;
+  const loading = invoices.isPending || patients.isPending;
 
   const content = () => {
     if (failed) {
