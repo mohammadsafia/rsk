@@ -19,7 +19,8 @@ function Probe() {
 }
 
 const root = document.documentElement;
-type Doc = Document & { startViewTransition?: (update: () => void) => unknown };
+// A test double for the View Transitions API, which happy-dom lacks: loose, so it need not build a full ViewTransition.
+type Doc = { startViewTransition?: unknown };
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -34,7 +35,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
-  delete (document as Doc).startViewTransition;
+  delete (document as unknown as Doc).startViewTransition;
   delete root.dataset.motion;
   root.classList.remove('light', 'dark');
 });
@@ -49,22 +50,22 @@ const renderProbe = () =>
 describe('ThemeProvider switch', () => {
   it('swaps the theme inside one view transition, so every pixel changes together', () => {
     const seen: string[] = [];
-    (document as Doc).startViewTransition = vi.fn((update: () => void) => {
+    (document as unknown as Doc).startViewTransition = vi.fn((update: () => void) => {
       seen.push(`before:${root.className}`);
       update();
       seen.push(`after:${root.className}`);
       return { finished: Promise.resolve(), ready: Promise.resolve(), updateCallbackDone: Promise.resolve() };
     });
     renderProbe();
-    expect((document as Doc).startViewTransition).not.toHaveBeenCalled(); // never on load
+    expect((document as unknown as Doc).startViewTransition).not.toHaveBeenCalled(); // never on load
     fireEvent.click(screen.getByRole('button', { name: 'Dark' }));
-    expect((document as Doc).startViewTransition).toHaveBeenCalledTimes(1);
+    expect((document as unknown as Doc).startViewTransition).toHaveBeenCalledTimes(1);
     expect(seen).toEqual(['before:light', 'after:dark']);
     expect(root.classList.contains('theme-switching')).toBe(false);
   });
 
   it('reveals the new theme as a circle from where the switch was pressed, wide enough to cover the far corner', () => {
-    (document as Doc).startViewTransition = vi.fn((update: () => void) => {
+    (document as unknown as Doc).startViewTransition = vi.fn((update: () => void) => {
       update();
       return { finished: Promise.resolve(), ready: Promise.resolve(), updateCallbackDone: Promise.resolve() };
     });
@@ -86,7 +87,7 @@ describe('ThemeProvider switch', () => {
     expect(root.classList.contains('dark')).toBe(true);
 
     const start = vi.fn();
-    (document as Doc).startViewTransition = start;
+    (document as unknown as Doc).startViewTransition = start;
     root.dataset.motion = 'reduced';
     fireEvent.click(screen.getByRole('button', { name: 'Light' }));
     expect(start).not.toHaveBeenCalled();
