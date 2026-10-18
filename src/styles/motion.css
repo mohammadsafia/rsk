@@ -67,9 +67,16 @@
 /*
  * Theme switch: ThemeContext swaps the theme inside a view transition, so the browser paints the old and new pages as
  * two snapshots and every pixel changes together. The new theme spreads as a circle from where the switch was pressed
- * (--theme-reveal-*); calm mode cross-fades instead. Never on load, and reduced motion switches at once (ThemeContext
+ * (--theme-reveal-*); calm mode cross-fades instead. ThemeContext holds .theme-switching for the length of it. Never on load, and reduced motion switches at once (ThemeContext
  * skips the transition).
  */
+/* The new snapshot is live: while the theme swaps, elements' own colour transitions are frozen so none fades in it. */
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;

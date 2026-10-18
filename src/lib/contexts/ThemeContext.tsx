@@ -64,6 +64,7 @@ export function ThemeProvider({ children, defaultTheme = THEME_TYPES.DARK, stora
   const [theme, setTheme] = useState<Theme>(storageTheme);
 
   const lastPress = useRef<{ x: number; y: number; at: number } | null>(null);
+  const switches = useRef(0);
   useEffect(() => {
     const remember = (event: PointerEvent) => {
       lastPress.current = { x: event.clientX, y: event.clientY, at: performance.now() };
@@ -94,11 +95,21 @@ export function ThemeProvider({ children, defaultTheme = THEME_TYPES.DARK, stora
       root.style.setProperty('--theme-reveal-x', `${x}px`);
       root.style.setProperty('--theme-reveal-y', `${y}px`);
       root.style.setProperty('--theme-reveal-r', `${radius}px`);
-      start.call(document, () => {
+      const switchId = (switches.current += 1);
+      const transition = start.call(document, () => {
+        // Freeze elements' own colour transitions first (motion.css): the new snapshot is live, so a border or button
+        // easing its colour would still fade inside the circle. Before the commit, as layout effects may read layout.
+        root.classList.add('theme-switching');
         // The new theme must be in the DOM before the callback returns, when the browser takes the new snapshot.
         flushSync(commit);
         applyTheme(newTheme);
-      });
+      }) as { finished?: Promise<unknown> } | undefined;
+      // Thaw once the reveal is over; a newer switch owns the class from then on.
+      void Promise.resolve(transition?.finished)
+        .catch(() => undefined)
+        .then(() => {
+          if (switches.current === switchId) root.classList.remove('theme-switching');
+        });
     },
     [setStorageTheme],
   );

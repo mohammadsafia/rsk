@@ -60,7 +60,28 @@ describe('ThemeProvider switch', () => {
     expect((document as unknown as Doc).startViewTransition).not.toHaveBeenCalled(); // never on load
     fireEvent.click(screen.getByRole('button', { name: 'Dark' }));
     expect((document as unknown as Doc).startViewTransition).toHaveBeenCalledTimes(1);
-    expect(seen).toEqual(['before:light', 'after:dark']);
+    expect(seen).toEqual(['before:light', 'after:theme-switching dark']);
+  });
+
+  it("freezes elements' own colour transitions while the theme swaps, so nothing fades inside the reveal", async () => {
+    let finish!: () => void;
+    const finished = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    let frozenDuringUpdate = false;
+    (document as unknown as Doc).startViewTransition = vi.fn((update: () => void) => {
+      update();
+      frozenDuringUpdate = root.classList.contains('theme-switching');
+      return { finished, ready: Promise.resolve(), updateCallbackDone: Promise.resolve() };
+    });
+    renderProbe();
+    fireEvent.click(screen.getByRole('button', { name: 'Dark' }));
+    expect(frozenDuringUpdate).toBe(true);
+    expect(root.classList.contains('theme-switching')).toBe(true);
+    await act(async () => {
+      finish();
+      await finished;
+    });
     expect(root.classList.contains('theme-switching')).toBe(false);
   });
 

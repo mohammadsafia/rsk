@@ -154,8 +154,8 @@ function Calendar({
   useLayoutEffect(() => {
     const inherited = rootElement.current?.parentElement?.closest('[dir]')?.getAttribute('dir') === 'rtl' ? 'rtl' : 'ltr';
     setInheritedDirection(inherited);
-    // Re-read when the language (and with it the document's dir) changes.
-  }, [isRTL]);
+    // Re-read when the language (and with it the document's dir) or the surrounding provider's direction changes.
+  }, [isRTL, contextDirection]);
   const direction = contextDirection === 'rtl' ? 'rtl' : inheritedDirection;
   const defaultClassNames = getDefaultClassNames();
 
