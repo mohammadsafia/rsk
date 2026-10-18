@@ -23,7 +23,7 @@ export class ManifestManager {
 
   save(): void {
     const sorted = Object.keys(this.manifest)
-      .sort()
+      .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
       .reduce<Manifest>((acc, key) => {
         acc[key] = this.manifest[key];
         return acc;

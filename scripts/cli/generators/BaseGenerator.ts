@@ -45,7 +45,8 @@ export abstract class BaseGenerator {
 
     const templatePath = path.join(getTemplatesDir(), `${name}.hbs`);
     const source = fs.readFileSync(templatePath, 'utf-8');
-    const compiled = Handlebars.compile(source, { noEscape: true });
+    // The templates emit TypeScript, not HTML: HTML-escaping would corrupt generics (<T>) and string literals.
+    const compiled = Handlebars.compile(source, { noEscape: true }); // NOSONAR
 
     this.templateCache.set(name, compiled);
     return compiled;
