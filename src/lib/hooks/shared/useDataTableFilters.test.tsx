@@ -110,11 +110,8 @@ describe('useDataTableFilters', () => {
     });
     expect(JSON.parse(sessionStorage.getItem('rsk:table:members') ?? '{}')).toEqual({ filters: { amount: '100..' } });
     fireEvent.click(screen.getByRole('button', { name: 'Remove Amount filter' }));
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    });
-    expect(updates.length).toBeGreaterThan(0);
-    expect(updates.at(-1)).not.toContain('amount=');
+    // The pill fades its values before clearing; the URL follows once it has.
+    await vi.waitFor(() => expect(updates.at(-1)).not.toContain('amount='));
   });
 
   it('reset clears filters, search, URL and session, and a remount stays clean', async () => {

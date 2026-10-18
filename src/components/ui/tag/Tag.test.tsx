@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Tag } from '@components/ui';
 
@@ -33,12 +33,12 @@ describe('Tag', () => {
     expect(screen.getByText('Asthma').tagName).toBe('SPAN');
   });
 
-  it('a removable tag names what it removes and calls onRemove', () => {
+  it('a removable tag names what it removes and calls onRemove once it has collapsed', async () => {
     const handleRemove = vi.fn();
     render(<Tag onRemove={handleRemove}>Penicillin</Tag>);
     const remove = screen.getByRole('button', { name: 'Remove Penicillin' });
     fireEvent.click(remove);
-    expect(handleRemove).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(handleRemove).toHaveBeenCalledTimes(1));
   });
 
   it('a toggle tag is a button exposing aria-pressed', () => {
@@ -61,5 +61,44 @@ describe('Tag', () => {
     expect(tag.className).toContain('ink');
     expect(tag.className).toContain('border-fg');
     expect(tag.className).not.toContain('bg-accent-subtle');
+  });
+
+  describe('removing', () => {
+    let reduced = false;
+    beforeEach(() => {
+      reduced = false;
+      vi.useFakeTimers();
+      window.matchMedia = ((query: string) => ({
+        matches: reduced && query.includes('reduce'),
+        addEventListener() {},
+        removeEventListener() {},
+      })) as unknown as typeof window.matchMedia;
+      // happy-dom has no WAAPI: an animation that never finishes leaves the timeout fallback in charge.
+      Element.prototype.animate = vi.fn(() => ({
+        cancel() {},
+        finished: new Promise(() => {}),
+      })) as unknown as typeof Element.prototype.animate;
+    });
+    afterEach(() => vi.useRealTimers());
+
+    it('collapses first, then calls onRemove exactly once even when double-clicked', () => {
+      const onRemove = vi.fn();
+      render(<Tag onRemove={onRemove}>Cardiology</Tag>);
+      const button = screen.getByRole('button', { name: 'Remove Cardiology' });
+      fireEvent.click(button);
+      fireEvent.click(button);
+      expect(onRemove).not.toHaveBeenCalled();
+      expect(button.closest('[data-slot="tag"]')?.hasAttribute('data-leaving')).toBe(true);
+      vi.advanceTimersByTime(400);
+      expect(onRemove).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onRemove at once under reduced motion', () => {
+      reduced = true;
+      const onRemove = vi.fn();
+      render(<Tag onRemove={onRemove}>Cardiology</Tag>);
+      fireEvent.click(screen.getByRole('button', { name: 'Remove Cardiology' }));
+      expect(onRemove).toHaveBeenCalledTimes(1);
+    });
   });
 });
