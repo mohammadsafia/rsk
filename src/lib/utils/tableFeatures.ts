@@ -13,6 +13,12 @@ import {
   type Header,
   type ReactTable,
   type Row,
+  sortFn_alphanumeric,
+  sortFn_alphanumericCaseSensitive,
+  sortFn_basic,
+  sortFn_datetime,
+  sortFn_text,
+  sortFn_textCaseSensitive,
   columnFacetingFeature,
   columnFilteringFeature,
   columnOrderingFeature,
@@ -52,6 +58,16 @@ export const kitFeatures = tableFeatures({
   facetedUniqueValues: createFacetedUniqueValues(),
   // The built-in filters the kit refers to by name ('equals' on a column, 'includesString' as the global search).
   filterFns: { equals: filterFn_equals, includesString: filterFn_includesString },
+  // The default (auto) sort picks one of these by name — datetime for dates, alphanumeric or text for strings — so they
+  // must be registered, or v9 falls back to a basic compare (uppercase first, "Item 10" before "Item 2").
+  sortFns: {
+    alphanumeric: sortFn_alphanumeric,
+    alphanumericCaseSensitive: sortFn_alphanumericCaseSensitive,
+    basic: sortFn_basic,
+    datetime: sortFn_datetime,
+    text: sortFn_text,
+    textCaseSensitive: sortFn_textCaseSensitive,
+  },
 });
 
 export type KitFeatures = typeof kitFeatures;

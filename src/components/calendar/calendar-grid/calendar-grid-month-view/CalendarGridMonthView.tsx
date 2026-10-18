@@ -46,7 +46,7 @@ const MonthEventItem: FC<MonthEventItemProps> = ({ event, status }) => {
 };
 
 const MonthView: FC = () => {
-  const { view, viewMode, date, range, events, eventAccessors, slotCoverageDates } = useCalendarGridContext();
+  const { view, viewMode, date, range, events, eventAccessors, slotCoverageDates, now: clock } = useCalendarGridContext();
   const bodyRef = useRef<HTMLDivElement>(null);
   useTravel(bodyRef, range.startDate, view);
   const { formatDate, getMonthGrid, toDate, toDateUnits, isBefore, isAfter, constants } = useDate();
@@ -57,7 +57,7 @@ const MonthView: FC = () => {
     [formatDate, constants.DateFormats.SHORT_DAY],
   );
 
-  const todayKey = toDate();
+  const todayKey = toDate(clock);
 
   const monthInfo = useMemo(() => {
     const units = toDateUnits(date);
@@ -68,7 +68,7 @@ const MonthView: FC = () => {
 
   const eventsByDayKey = useMemo(() => {
     const map = new Map<string, { event: (typeof events)[number]; status: EventTimeStatus }[]>();
-    const now = toDate();
+    const now = toDate(clock);
 
     for (const event of events) {
       const start = eventAccessors.getStartTime(event);
@@ -81,7 +81,7 @@ const MonthView: FC = () => {
     }
 
     return map;
-  }, [events, eventAccessors, toDate, isBefore, isAfter]);
+  }, [events, eventAccessors, clock, toDate, isBefore, isAfter]);
 
   if (view !== 'month' || viewMode !== 'calendar') return null;
 

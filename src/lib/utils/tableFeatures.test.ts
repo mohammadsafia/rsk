@@ -55,4 +55,18 @@ describe('kit table features on v9', () => {
     expect(ids([{ id: 'name', desc: false }])).toEqual(['c', 'b', 'a']);
     expect(ids([{ id: 'issuedAt', desc: true }])).toEqual(['b', 'a', 'c']);
   });
+
+  it('sorts text the way people expect: ignoring case, with numbers in natural order (v8 "alphanumeric")', () => {
+    const named = ['bob', 'Alice', 'Item 10', 'Item 2', 'carl'].map((name, index) => ({ id: String(index), name }));
+    const { result } = renderHook(() =>
+      useTable({
+        features: kitFeatures,
+        data: named,
+        columns: [{ accessorKey: 'name' }] as KitColumnDef<(typeof named)[number]>[],
+        getRowId: (row) => row.id,
+        initialState: { sorting: [{ id: 'name', desc: false }] },
+      }),
+    );
+    expect(result.current.getRowModel().rows.map((row) => row.original.name)).toEqual(['Alice', 'bob', 'carl', 'Item 2', 'Item 10']);
+  });
 });

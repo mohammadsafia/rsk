@@ -19,7 +19,7 @@ import { CalendarGridChrome } from './calendar-grid-chrome';
 import { CalendarGridMonthView } from './calendar-grid-month-view';
 import { CalendarGridTimeView } from './calendar-grid-time-view';
 
-import { type DateInput, toast, UnitOfTime, useAppTranslation, useDate } from '@hooks/shared';
+import { type DateInput, toast, UnitOfTime, useAppTranslation, useDate, useNow } from '@hooks/shared';
 
 import { cn } from '@utils';
 
@@ -143,6 +143,8 @@ type CalendarGridContextValue<T> = {
   stepMinutes: number;
   showStepLabels: boolean;
   nowLine: NowLineMode;
+  /** The current time, ticking once a minute (use it instead of a zero-argument toDate() while rendering). */
+  now: Date;
   isLoading: boolean;
   resources: CalendarResource[];
   resourceFilter: string | null;
@@ -330,6 +332,7 @@ function CalendarGridRoot<TEvent>({
   const [internalResourceFilter, setInternalResourceFilter] = useState<string | null>(null);
 
   const view = controlledView ?? internalView;
+  const now = useNow();
   const date = controlledDate !== undefined ? toDate(controlledDate) : internalDate;
   const viewMode = controlledViewMode ?? internalViewMode;
   const resourceFilter = controlledResourceFilter !== undefined ? controlledResourceFilter : internalResourceFilter;
@@ -448,6 +451,7 @@ function CalendarGridRoot<TEvent>({
       stepMinutes,
       showStepLabels,
       nowLine,
+      now,
       isLoading,
       resources: resourceList,
       resourceFilter,
@@ -482,6 +486,7 @@ function CalendarGridRoot<TEvent>({
       stepMinutes,
       showStepLabels,
       nowLine,
+      now,
       isLoading,
       resourceList,
       resourceFilter,

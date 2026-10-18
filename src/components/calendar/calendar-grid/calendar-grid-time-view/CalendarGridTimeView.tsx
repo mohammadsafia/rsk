@@ -32,8 +32,9 @@ const computeRowCount = (startHour: number, endHour: number, stepMinutes: number
 };
 
 const DayHeader: FC<{ day: DateInput }> = ({ day }) => {
+  const { now } = useCalendarGridContext();
   const { formatDate, toDate, constants } = useDate();
-  const isToday = toDate(day) === toDate();
+  const isToday = toDate(day) === toDate(now);
   const dayName = formatDate(day, constants.DateFormats.SHORT_DAY).toUpperCase();
   const dayNumber = Number(formatDate(day, constants.DateFormats.DAY_OF_MONTH));
 
@@ -145,12 +146,12 @@ const DraftGhost: FC<{ columnIndex: number }> = ({ columnIndex }) => {
 };
 
 const NowIndicator: FC<{ day: DateInput }> = ({ day }) => {
-  const { startHour, endHour, nowLine } = useCalendarGridContext();
+  const { startHour, endHour, nowLine, now } = useCalendarGridContext();
   const { toDate, toDateUnits } = useDate();
 
-  if (toDate(day) !== toDate()) return null;
+  if (toDate(day) !== toDate(now)) return null;
 
-  const { hours, minutes } = toDateUnits();
+  const { hours, minutes } = toDateUnits(now);
   const currentMinutes = hours * 60 + minutes;
   const totalMinutes = (endHour - startHour) * 60;
   const percent = ((currentMinutes - startHour * 60) / totalMinutes) * 100;
@@ -182,7 +183,7 @@ const ResourceHeader: FC<{ resource: CalendarResource }> = ({ resource }) => (
 
 const DayColumn: FC<{ column: GridColumn; index: number; wide: boolean }> = ({ column, index, wide }) => {
   const { t } = useAppTranslation('common');
-  const { events, eventAccessors, slots, startHour, endHour, stepMinutes, onSlotSelect } = useCalendarGridContext();
+  const { events, eventAccessors, slots, startHour, endHour, stepMinutes, onSlotSelect, now: clock } = useCalendarGridContext();
   const gestures = useTimeGridGestureContext();
   const { toDate, toDateUnits, isBefore, isAfter } = useDate();
 
@@ -218,12 +219,12 @@ const DayColumn: FC<{ column: GridColumn; index: number; wide: boolean }> = ({ c
         dayKeyOf(eventAccessors.getStartTime(event)) === dayKey &&
         (resourceId === undefined || eventAccessors.getResourceId?.(event) === resourceId) &&
         !isAllDayEvent(event, eventAccessors),
-      now: toDate(),
+      now: toDate(clock),
       toMinutes,
       isBefore,
       isAfter,
     });
-  }, [events, eventAccessors, startHour, endHour, dayKey, resourceId, toDate, toDateUnits, isBefore, isAfter]);
+  }, [events, eventAccessors, startHour, endHour, dayKey, resourceId, clock, toDate, toDateUnits, isBefore, isAfter]);
 
   return (
     <CalendarTimeGrid.Column

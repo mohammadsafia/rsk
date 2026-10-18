@@ -57,6 +57,7 @@ const AgendaRow: FC<AgendaItem> = ({ event, status }) => {
 
 const AgendaDay: FC<{ dayKey: string; items: AgendaItem[] }> = ({ dayKey, items }) => {
   const { t } = useAppTranslation('common');
+  const { now } = useCalendarGridContext();
   const { formatDate, toDate, constants } = useDate();
   const headingId = useId();
   const label = formatDate(dayKey, constants.DateFormats.DAY_SHORT_MONTH);
@@ -67,7 +68,7 @@ const AgendaDay: FC<{ dayKey: string; items: AgendaItem[] }> = ({ dayKey, items 
         id={headingId}
         className="bg-surface text-fg-muted border-border-subtle sticky top-0 z-10 border-b px-4 py-2 text-xs font-semibold"
       >
-        {dayKey === toDate() ? `${t('calendar.today')} · ${label}` : label}
+        {dayKey === toDate(now) ? `${t('calendar.today')} · ${label}` : label}
       </h3>
 
       <ul className="divide-border-subtle divide-y">
@@ -82,11 +83,11 @@ const AgendaDay: FC<{ dayKey: string; items: AgendaItem[] }> = ({ dayKey, items 
 /** List of the range's events grouped by day; days without events are left out. */
 const AgendaView: FC = () => {
   const { t } = useAppTranslation('common');
-  const { view, viewMode, range, events, eventAccessors } = useCalendarGridContext();
+  const { view, viewMode, range, events, eventAccessors, now: clock } = useCalendarGridContext();
   const { toDate, isBefore, isAfter } = useDate();
 
   const groups = useMemo(() => {
-    const now = toDate();
+    const now = toDate(clock);
     const sorted = [...events].sort((a, b) => Date.parse(eventAccessors.getStartTime(a)) - Date.parse(eventAccessors.getStartTime(b)));
 
     return dayKeysBetween(range.startDate, range.endDate).flatMap((dayKey) => {
@@ -98,7 +99,7 @@ const AgendaView: FC = () => {
       });
       return items.length ? [{ dayKey, items }] : [];
     });
-  }, [events, eventAccessors, range.startDate, range.endDate, toDate, isBefore, isAfter]);
+  }, [events, eventAccessors, range.startDate, range.endDate, clock, toDate, isBefore, isAfter]);
 
   if (view !== 'agenda' || viewMode !== 'calendar') return null;
 

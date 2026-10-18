@@ -65,4 +65,13 @@ describe('date fields keep the box and the form value in step', () => {
     fireEvent.click(screen.getByRole('button', { name: 'set stay' }));
     expect(box('Stay').value).toBe('03/03/2026 - 03/07/2026');
   });
+
+  it('an invalid Date value renders an empty box instead of looping (Too many re-renders)', () => {
+    render(
+      <Harness defaultValues={{ visit: new Date('not a date') }}>
+        <FormDatePicker name="visit" label="Visit" />
+      </Harness>,
+    );
+    expect(box('Visit').value).toBe('');
+  });
 });
