@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 
 // !Direct import: toastVariants reads this at module load, before the ui barrel reaches ./popover
-import { floatingSurfaceClassName } from '@components/ui/popover/Popover';
+import { floatingSurfaceClassName } from '@components/ui/popover/floating';
 
 import { useAppTranslation } from '@hooks/shared';
 
