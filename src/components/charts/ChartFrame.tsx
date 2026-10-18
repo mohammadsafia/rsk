@@ -153,8 +153,10 @@ export function ChartFrame<T>({
           </div>
         </Conditional.If>
         <Conditional.Else>
-          {/* recharts' accessibility layer makes the svg focusable: give it the kit ring, not the browser default. */}
-          <div data-slot="chart-plot" className="[&_.recharts-surface]:focus-ring w-full" style={{ height }}>
+          {/* recharts' accessibility layer makes the svg focusable: give it the kit ring, not the browser default.
+              dir="ltr": recharts mirrors the chart itself (reversed axes, axis on the right), so svg text must lay out left
+              to right, or an RTL page flips every text-anchor and the category labels land on top of the bars. */}
+          <div data-slot="chart-plot" dir="ltr" className="[&_.recharts-surface]:focus-ring w-full" style={{ height }}>
             {children({ visible, isRTL, animate })}
           </div>
         </Conditional.Else>

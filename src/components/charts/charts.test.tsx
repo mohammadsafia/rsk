@@ -52,7 +52,8 @@ const series = [
 
 const tickXs = () =>
   [...document.querySelectorAll('.recharts-cartesian-axis-tick-value')].map((node) => ({
-    text: node.textContent,
+    // Arabic labels are wrapped in direction isolates (U+2068…U+2069); compare the visible text.
+    text: node.textContent?.replace(/[\u2066\u2068\u2069]/g, ''),
     x: Number(node.getAttribute('x')),
   }));
 
@@ -109,6 +110,36 @@ describe('BarChart', () => {
     const money = ticks.filter((text) => text.includes('$'));
     expect(money.length).toBeGreaterThan(1);
     expect(money.every((text) => !text.includes('.00'))).toBe(true);
+  });
+
+  it('in Arabic, lays the svg text out left to right (so a label anchors outside the bars) and isolates each label', async () => {
+    await act(() => i18n.changeLanguage('ar'));
+    render(
+      <BarChart
+        aria-label="Revenue by doctor"
+        data={data}
+        series={series}
+        x={{ key: 'day' }}
+        orientation="horizontal"
+        valueFormat="money"
+      />,
+    );
+    expect(document.querySelector('[data-slot="chart-plot"]')?.getAttribute('dir')).toBe('ltr');
+    const text = (axis: 'xAxis' | 'yAxis') =>
+      [...document.querySelectorAll(`.recharts-${axis}-tick-labels .recharts-cartesian-axis-tick-value`)].map(
+        (node) => node.textContent ?? '',
+      );
+    // Horizontal bars: names on the y axis read in their own direction; amounts on the x axis read left to right, like <Money>.
+    expect(text('yAxis').length).toBeGreaterThan(0);
+    expect(text('yAxis').every((label) => label.startsWith('\u2068') && label.endsWith('\u2069'))).toBe(true);
+    expect(text('xAxis').length).toBeGreaterThan(0);
+    expect(text('xAxis').every((label) => label.startsWith('\u2066') && label.endsWith('\u2069'))).toBe(true);
+  });
+
+  it('leaves English axis labels untouched', () => {
+    render(<BarChart aria-label="Revenue by doctor" data={data} series={series} x={{ key: 'day' }} orientation="horizontal" />);
+    const labels = [...document.querySelectorAll('.recharts-cartesian-axis-tick-value')].map((node) => node.textContent ?? '');
+    expect(labels.some((label) => /[\u2066\u2068\u2069]/.test(label))).toBe(false);
   });
 
   it('draws a bar per datum and series, horizontally on request', () => {
