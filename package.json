@@ -38,7 +38,6 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.4.0",
-    "framer-motion": "^14.3.0",
     "i18next": "^26.5.2",
     "i18next-browser-languagedetector": "^8",
     "lucide-react": "^1.59.0",

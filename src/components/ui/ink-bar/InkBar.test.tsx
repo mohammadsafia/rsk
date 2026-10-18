@@ -85,6 +85,55 @@ describe('InkBar', () => {
     await waitFor(() => expect([bar.style.left, bar.style.width]).toEqual(['200px', '80px']));
   });
 
+  it('travels with one WAAPI animation from where the bar is, and rests on the new item', async () => {
+    const animate = vi.fn(() => ({ cancel() {}, finished: Promise.resolve() }));
+    Element.prototype.animate = animate as unknown as typeof Element.prototype.animate;
+    renderTabs();
+    const bar = document.querySelector<HTMLElement>('[data-slot="ink-bar"]')!;
+    await waitFor(() => expect(bar.style.width).toBe('60px'));
+    expect(animate).not.toHaveBeenCalled(); // first placement is instant
+    const notes = screen.getByRole('tab', { name: 'Notes' });
+    act(() => {
+      fireEvent.mouseDown(notes);
+      fireEvent.click(notes);
+    });
+    await waitFor(() => expect(animate).toHaveBeenCalledTimes(1));
+    const [frames, options] = animate.mock.calls[0] as unknown as [Keyframe[], KeyframeAnimationOptions];
+    expect(frames[0]).toMatchObject({ left: '0px', width: '60px' });
+    expect(frames.at(-1)).toMatchObject({ left: '200px', width: '80px' });
+    expect(options.easing).toBe('linear');
+    expect([bar.style.left, bar.style.width]).toEqual(['200px', '80px']);
+  });
+
+  it('starts an interrupted move from the position the running animation has reached', async () => {
+    const cancel = vi.fn();
+    const animate = vi.fn(() => ({ cancel, finished: new Promise(() => {}) }));
+    Element.prototype.animate = animate as unknown as typeof Element.prototype.animate;
+    renderTabs();
+    const bar = document.querySelector<HTMLElement>('[data-slot="ink-bar"]')!;
+    await waitFor(() => expect(bar.style.width).toBe('60px'));
+    const notes = screen.getByRole('tab', { name: 'Notes' });
+    act(() => {
+      fireEvent.mouseDown(notes);
+      fireEvent.click(notes);
+    });
+    await waitFor(() => expect(animate).toHaveBeenCalledTimes(1));
+    // Mid-flight: the computed style is where the animation has the bar now.
+    const computed = window.getComputedStyle.bind(window);
+    vi.spyOn(window, 'getComputedStyle').mockImplementation((element) =>
+      element === bar ? ({ left: '120px', width: '90px' } as CSSStyleDeclaration) : computed(element),
+    );
+    const overview = screen.getByRole('tab', { name: 'Overview' });
+    act(() => {
+      fireEvent.mouseDown(overview);
+      fireEvent.click(overview);
+    });
+    await waitFor(() => expect(animate).toHaveBeenCalledTimes(2));
+    expect(cancel).toHaveBeenCalled();
+    const [frames] = animate.mock.calls[1] as unknown as [Keyframe[]];
+    expect(frames[0]).toMatchObject({ left: '120px', width: '90px' });
+  });
+
   it('also marks the current page and the pressed toggle, without ink-block', () => {
     render(
       <Tooltip.Provider>
