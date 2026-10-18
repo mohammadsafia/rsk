@@ -133,6 +133,26 @@
 }
 
 /*
+ * Loading placeholders shimmer: a faint ink band sweeps along the inline direction (reversed in RTL). Reduced motion
+ * leaves a still placeholder.
+ */
+@utility shimmer {
+  background-image: linear-gradient(90deg, transparent 0%, color-mix(in oklab, var(--color-ink) 8%, transparent) 50%, transparent 100%);
+  background-repeat: no-repeat;
+  background-size: 50% 100%;
+  animation: rsk-shimmer var(--motion-shimmer-period) linear infinite;
+
+  :where([dir='rtl']) & {
+    animation-direction: reverse;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    background-image: none;
+  }
+}
+
+/*
  * Children arrive one after another: each fades in and rises 4px, --motion-stagger apart (0 in calm, so together).
  * Reduced motion keeps only the fade (the global rule zeroes the travel) and drops the delays.
  */

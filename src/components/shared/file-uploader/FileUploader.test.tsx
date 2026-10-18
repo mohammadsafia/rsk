@@ -40,4 +40,27 @@ describe('FileUploader keyboard access', () => {
     expect(screen.getByRole('button', { name: 'Download' }).tagName).toBe('BUTTON');
     expect(screen.getByRole('button', { name: 'Clear' }).tagName).toBe('BUTTON');
   });
+
+  it('shows the ink border while a file is held over the drop zone, and new file rows rise in', () => {
+    const file = new File(['x'], 'scan.pdf', { type: 'application/pdf' });
+    render(
+      <FileUploader name="scan" value={[file]} onChange={vi.fn()}>
+        <FileUploader.DropzoneGroup>
+          <FileUploader.Dropzone placeholder="Upload scan" />
+        </FileUploader.DropzoneGroup>
+        <FileUploader.FileList />
+      </FileUploader>,
+    );
+    const group = document.querySelector<HTMLElement>('[data-slot="file-uploader-dropzone-group"]')!;
+    expect(group.className).toContain('data-[drag-over]:border-ink');
+    fireEvent.dragEnter(group);
+    expect(group.hasAttribute('data-drag-over')).toBe(true);
+    fireEvent.dragLeave(group);
+    expect(group.hasAttribute('data-drag-over')).toBe(false);
+    fireEvent.dragEnter(group);
+    fireEvent.drop(group);
+    expect(group.hasAttribute('data-drag-over')).toBe(false);
+    const row = document.querySelector<HTMLElement>('[data-slot="file-uploader-file-list"] li')!;
+    for (const name of ['animate-in', 'slide-in-from-bottom-1', 'duration-spring', 'ease-spring']) expect(row.className).toContain(name);
+  });
 });

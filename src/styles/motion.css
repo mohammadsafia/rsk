@@ -10,6 +10,21 @@
   --motion-depth: 0;
 }
 
+/* Skeleton shimmer (utilities.css): one sweep of the ink band across the placeholder. */
+:root {
+  --motion-shimmer-period: 1.6s;
+}
+
+@keyframes rsk-shimmer {
+  from {
+    background-position: -100% 0;
+  }
+
+  to {
+    background-position: 200% 0;
+  }
+}
+
 /* A checkbox's check drawing itself (draw-check in utilities.css). */
 @keyframes rsk-stroke {
   from {

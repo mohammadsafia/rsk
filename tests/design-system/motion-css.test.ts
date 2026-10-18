@@ -29,4 +29,13 @@ describe('motion CSS contract', () => {
     const tactile = css.slice(css.indexOf('@utility tactile'), css.indexOf('@utility draw-check'));
     expect(tactile).toContain('prefers-reduced-motion: reduce');
   });
+
+  it('shimmer sweeps a faint ink band along the inline direction, reversed in RTL, still under reduced motion', () => {
+    const css = read('src/styles/utilities.css');
+    const shimmer = css.slice(css.indexOf('@utility shimmer'));
+    expect(shimmer).toMatch(/animation: rsk-shimmer/);
+    expect(shimmer).toMatch(/\[dir='rtl'\][\s\S]*?animation-direction: reverse/);
+    expect(shimmer).toMatch(/prefers-reduced-motion: reduce\)\s*\{[^@]*animation: none/);
+    expect(read('src/styles/motion.css')).toMatch(/@keyframes rsk-shimmer/);
+  });
 });

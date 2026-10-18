@@ -17,17 +17,21 @@ const KIND: Record<EmptyStateKind, { icon: typeof Inbox; key: 'firstUse' | 'noRe
   error: { icon: AlertTriangle, key: 'error' },
 };
 
-const emptyStateVariants = cva('flex flex-col items-center text-center', {
-  variants: {
-    size: {
-      sm: 'gap-1.5 px-4 py-8 [&_[data-slot=empty-state-icon]]:size-8',
-      md: 'gap-2 px-6 py-12 [&_[data-slot=empty-state-icon]]:size-10',
+// Fades in when it replaces content.
+const emptyStateVariants = cva(
+  'animate-in fade-in-0 duration-base ease-out motion-reduce:animate-none flex flex-col items-center text-center',
+  {
+    variants: {
+      size: {
+        sm: 'gap-1.5 px-4 py-8 [&_[data-slot=empty-state-icon]]:size-8',
+        md: 'gap-2 px-6 py-12 [&_[data-slot=empty-state-icon]]:size-10',
+      },
+    },
+    defaultVariants: {
+      size: 'md',
     },
   },
-  defaultVariants: {
-    size: 'md',
-  },
-});
+);
 
 export type EmptyStateProps = ComponentPropsWithoutRef<'div'> &
   VariantProps<typeof emptyStateVariants> & {
