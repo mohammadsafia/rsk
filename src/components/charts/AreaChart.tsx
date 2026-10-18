@@ -1,6 +1,6 @@
 import { Area, AreaChart as RechartsAreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-import { AXIS, GRID } from './chart-theme';
+import { AXIS, axisLabel, GRID } from './chart-theme';
 import { ChartFrame } from './ChartFrame';
 import { ChartTooltip } from './ChartTooltip';
 import type { ChartBaseProps } from './types';
@@ -41,8 +41,18 @@ export function AreaChart<T>({
         <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 640, height }}>
           <RechartsAreaChart data={data} accessibilityLayer margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
             <CartesianGrid vertical={false} {...GRID} />
-            <XAxis dataKey={x.key as string} reversed={isRTL} tickFormatter={formatX} {...AXIS} />
-            <YAxis orientation={isRTL ? 'right' : 'left'} width={64} tickFormatter={(value: number) => formatTick(value)} {...AXIS} />
+            <XAxis
+              dataKey={x.key as string}
+              reversed={isRTL}
+              tickFormatter={(value: unknown) => axisLabel(formatX(value), isRTL, 'category')}
+              {...AXIS}
+            />
+            <YAxis
+              orientation={isRTL ? 'right' : 'left'}
+              width={64}
+              tickFormatter={(value: number) => axisLabel(formatTick(value), isRTL, 'value')}
+              {...AXIS}
+            />
             <Tooltip content={<ChartTooltip formatValue={formatValue} formatX={formatX} />} cursor={{ stroke: 'var(--border-strong)' }} />
             {visible.map((item) => (
               <Area

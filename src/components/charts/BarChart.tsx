@@ -1,6 +1,6 @@
 import { Bar, BarChart as RechartsBarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-import { AXIS, GRID } from './chart-theme';
+import { AXIS, axisLabel, GRID } from './chart-theme';
 import { ChartFrame } from './ChartFrame';
 import { ChartTooltip } from './ChartTooltip';
 import type { ChartBaseProps } from './types';
@@ -51,20 +51,35 @@ export function BarChart<T>({
             <CartesianGrid vertical={horizontal} horizontal={!horizontal} {...GRID} />
             {horizontal ? (
               <>
-                <XAxis type="number" reversed={isRTL} tickFormatter={(value: number) => formatTick(value)} {...AXIS} />
+                <XAxis
+                  type="number"
+                  reversed={isRTL}
+                  tickFormatter={(value: number) => axisLabel(formatTick(value), isRTL, 'value')}
+                  {...AXIS}
+                />
                 <YAxis
                   type="category"
                   dataKey={x.key as string}
                   orientation={isRTL ? 'right' : 'left'}
                   width={96}
-                  tickFormatter={formatX}
+                  tickFormatter={(value: unknown) => axisLabel(formatX(value), isRTL, 'category')}
                   {...AXIS}
                 />
               </>
             ) : (
               <>
-                <XAxis dataKey={x.key as string} reversed={isRTL} tickFormatter={formatX} {...AXIS} />
-                <YAxis orientation={isRTL ? 'right' : 'left'} width={64} tickFormatter={(value: number) => formatTick(value)} {...AXIS} />
+                <XAxis
+                  dataKey={x.key as string}
+                  reversed={isRTL}
+                  tickFormatter={(value: unknown) => axisLabel(formatX(value), isRTL, 'category')}
+                  {...AXIS}
+                />
+                <YAxis
+                  orientation={isRTL ? 'right' : 'left'}
+                  width={64}
+                  tickFormatter={(value: number) => axisLabel(formatTick(value), isRTL, 'value')}
+                  {...AXIS}
+                />
               </>
             )}
             <Tooltip content={<ChartTooltip formatValue={formatValue} formatX={formatX} />} cursor={{ fill: 'var(--hover)' }} />
