@@ -1,7 +1,12 @@
 // tests/a11y/audit.test.mjs — route discovery of the a11y audit, against a fake browser.
 import { describe, expect, it } from 'vite-plus/test';
 
-import { discoverRoutes } from '../../scripts/a11y/audit.mjs';
+import { mkdtempSync, realpathSync, symlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+import { discoverRoutes, isEntry } from '../../scripts/a11y/audit.mjs';
 
 const BASE = 'http://localhost:5173';
 
@@ -41,5 +46,18 @@ describe('a11y audit route discovery', () => {
     expect(capped.truncated).toBe(true);
     const full = await discoverRoutes(browser, { base: BASE, max: 50 });
     expect(full.truncated).toBe(false);
+  });
+
+  it('knows it was run directly even through a symlinked path (Node resolves import.meta.url, not argv)', () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'audit-entry-'));
+    const real = path.join(dir, 'audit.mjs');
+    writeFileSync(real, '');
+    const link = path.join(dir, 'linked.mjs');
+    symlinkSync(real, link);
+    const metaUrl = pathToFileURL(realpathSync(real)).href;
+    expect(isEntry(metaUrl, link)).toBe(true);
+    expect(isEntry(metaUrl, real)).toBe(true);
+    expect(isEntry(metaUrl, path.join(dir, 'other.mjs'))).toBe(false);
+    expect(isEntry(metaUrl, undefined)).toBe(false);
   });
 });

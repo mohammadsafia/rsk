@@ -7,10 +7,10 @@
 // Pages are discovered by following same-site links from "/", so the kit audits its docs and showcase pages and an
 // app made from the starter audits its own routes, with nothing to keep in sync.
 import { spawn } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
+import { realpathSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright';
 
@@ -177,5 +177,19 @@ async function main() {
   }
 }
 
+/**
+ * Whether this module is the script Node was asked to run. Node resolves symlinks in import.meta.url but not in argv,
+ * so both sides are compared as real paths: a checkout reached through a symlink (/tmp on macOS, a linked workspace)
+ * still runs instead of silently auditing nothing.
+ */
+export function isEntry(metaUrl, argvPath) {
+  if (!argvPath) return false;
+  try {
+    return fileURLToPath(metaUrl) === realpathSync(argvPath);
+  } catch {
+    return false;
+  }
+}
+
 // Run only as a script: tests import discoverRoutes without starting a server or a browser.
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();
+if (isEntry(import.meta.url, process.argv[1])) await main();
