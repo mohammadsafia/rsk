@@ -48,7 +48,8 @@ const ALLOWED = new Set([
 /** The identifier a member chain starts from: Dialog.Content.displayName → Dialog. */
 const rootOf = (node) => {
   let current = node;
-  while (current.type === 'MemberExpression' || current.type === 'CallExpression') current = current.type === 'CallExpression' ? current.callee : current.object;
+  while (current.type === 'MemberExpression' || current.type === 'CallExpression')
+    current = current.type === 'CallExpression' ? current.callee : current.object;
   return current.type === 'Identifier' ? current.name : undefined;
 };
 
@@ -70,12 +71,15 @@ const effectsIn = (file) => {
   return ast.program.body.flatMap((node) => {
     if (node.type.startsWith('TS')) return [];
     if (node.type === 'ImportDeclaration')
-      return node.specifiers.length || node.importKind === 'type' || node.source.value.endsWith('.css') ? [] : [`bare import '${node.source.value}'`];
+      return node.specifiers.length || node.importKind === 'type' || node.source.value.endsWith('.css')
+        ? []
+        : [`bare import '${node.source.value}'`];
     if (ALLOWED.has(node.type)) return [];
     // X.Sub = …, X.Sub.displayName = …, instance.interceptors.request.use(…): acting on the file's own declaration only
     // matters when that declaration is used, and then the module is kept.
     const expression = node.expression;
-    const target = expression?.type === 'AssignmentExpression' ? expression.left : expression?.type === 'CallExpression' ? expression.callee : null;
+    const target =
+      expression?.type === 'AssignmentExpression' ? expression.left : expression?.type === 'CallExpression' ? expression.callee : null;
     if (target?.type === 'MemberExpression' && declared.has(rootOf(target))) return [];
     return [`${node.type} at line ${node.loc.start.line}`];
   });
@@ -85,7 +89,9 @@ describe('package.json sideEffects', () => {
   it('lists every module that does something when imported', () => {
     const unlisted = sources
       .map((file) => [rel(file), effectsIn(file)])
-      .filter(([file, effects]) => effects.length && !(file in TIED_TO_EXPORTS) && !listed.some((entry) => covers(entry, path.join(ROOT, file))));
+      .filter(
+        ([file, effects]) => effects.length && !(file in TIED_TO_EXPORTS) && !listed.some((entry) => covers(entry, path.join(ROOT, file))),
+      );
     expect(unlisted).toEqual([]);
   });
 
