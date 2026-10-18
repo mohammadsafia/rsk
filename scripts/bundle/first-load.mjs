@@ -54,22 +54,44 @@ export function rawKeysIn(text, keys) {
   return [...keys].filter((key) => new RegExp(`(^|[^\\w.@/-])${escape(key)}(?![\\w.@/-])`).test(text));
 }
 
-const serve = (dist) =>
+/**
+ * The file a request maps to inside dist: the asset itself, else index.html (an SPA route). A path that would leave
+ * dist (an escaped ../) also gets index.html; a malformed escape gets null (answered 400).
+ */
+export function resolveFile(dist, url) {
+  const root = path.resolve(dist);
+  let pathname;
+  try {
+    pathname = decodeURIComponent((url ?? '/').split('?')[0]);
+  } catch {
+    return null;
+  }
+  const file = path.resolve(root, `.${pathname}`);
+  const inside = file.startsWith(`${root}${path.sep}`);
+  return inside && existsSync(file) && !statSync(file).isDirectory() ? file : path.join(root, 'index.html');
+}
+
+/** Serves dist on loopback only: nothing else on the machine or the network can read through it. */
+export const serve = (dist) =>
   new Promise((resolve) => {
     const server = createServer((request, response) => {
-      let file = path.join(dist, decodeURIComponent((request.url ?? '/').split('?')[0]));
-      if (!existsSync(file) || statSync(file).isDirectory()) file = path.join(dist, 'index.html');
+      const file = resolveFile(dist, request.url);
+      if (!file) {
+        response.statusCode = 400;
+        response.end();
+        return;
+      }
       response.setHeader('content-type', TYPES[path.extname(file)] ?? 'text/html');
       response.end(readFileSync(file));
     });
-    server.listen(0, () => resolve(server));
+    server.listen(0, '127.0.0.1', () => resolve(server));
   });
 
 /** Per route: the gzipped JS the browser downloaded to show it, where it landed, page errors and raw keys on it. */
 export async function measureFirstLoad({ dist, routes, localesDir }) {
   const keys = localesDir && existsSync(localesDir) ? localeKeys(localesDir) : new Set();
   const server = await serve(dist);
-  const base = `http://localhost:${server.address().port}`;
+  const base = `http://127.0.0.1:${server.address().port}`;
   const browser = await chromium.launch();
   try {
     const list = routes ?? (await discoverRoutes(browser, { base, max: 50 })).routes;

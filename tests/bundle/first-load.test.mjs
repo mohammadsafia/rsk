@@ -1,11 +1,11 @@
 // tests/bundle/first-load.test.mjs — the pure parts of the first-load budget script.
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { BUNDLE_BUDGET_KB, localeKeys, rawKeysIn, resolveBudget } from '../../scripts/bundle/first-load.mjs';
+import { BUNDLE_BUDGET_KB, localeKeys, rawKeysIn, resolveBudget, resolveFile, serve } from '../../scripts/bundle/first-load.mjs';
 
 const locales = () => {
   const dir = mkdtempSync(path.join(tmpdir(), 'locales-'));
@@ -37,5 +37,24 @@ describe('first-load page check', () => {
     expect(resolveBudget('150')).toBe(150);
     expect(resolveBudget(undefined)).toBeUndefined();
     expect(() => resolveBudget('lots')).toThrow(/--budget/);
+  });
+
+  it('serves only files inside dist: an escaped ../ falls back to index.html, a malformed escape is refused', () => {
+    const dist = mkdtempSync(path.join(tmpdir(), 'dist-'));
+    mkdirSync(path.join(dist, 'assets'));
+    writeFileSync(path.join(dist, 'index.html'), '<html></html>');
+    writeFileSync(path.join(dist, 'assets', 'app.js'), '');
+    expect(resolveFile(dist, '/assets/app.js?v=1')).toBe(path.join(dist, 'assets', 'app.js'));
+    expect(resolveFile(dist, '/dashboard')).toBe(path.join(dist, 'index.html'));
+    expect(resolveFile(dist, '/..%2f..%2f..%2fetc%2fpasswd')).toBe(path.join(dist, 'index.html'));
+    expect(resolveFile(dist, '/%E0')).toBeNull();
+  });
+
+  it('listens on loopback only, never on every interface', async () => {
+    const dist = mkdtempSync(path.join(tmpdir(), 'dist-'));
+    writeFileSync(path.join(dist, 'index.html'), '');
+    const server = await serve(dist);
+    expect(server.address().address).toBe('127.0.0.1');
+    server.close();
   });
 });
