@@ -40,10 +40,35 @@ let animate: ReturnType<typeof vi.fn>;
 beforeEach(() => {
   animate = vi.fn(() => ({ cancel() {}, finished: Promise.resolve() }));
   Element.prototype.animate = animate as unknown as typeof Element.prototype.animate;
+  // happy-dom has no layout: give each row a top from its place in the body, 40px apart.
+  Object.defineProperty(HTMLElement.prototype, 'offsetTop', {
+    configurable: true,
+    get(this: HTMLElement) {
+      return this.parentElement ? Array.from(this.parentElement.children).indexOf(this) * 40 : 0;
+    },
+  });
 });
 afterEach(cleanup);
 
-const tintedRows = () => animate.mock.contexts.map((element) => (element as HTMLElement).dataset.rowId).filter(Boolean);
+type Call = { id?: string; first: Record<string, string | number> };
+const calls = (): Call[] =>
+  animate.mock.calls.map((args, index) => ({
+    id: (animate.mock.contexts[index] as HTMLElement).dataset.rowId,
+    first: (args[0] as Record<string, string | number>[])[0],
+  }));
+const tintedRows = () =>
+  calls()
+    .filter((c) => c.id && 'backgroundColor' in c.first)
+    .map((c) => c.id);
+const glidingRows = () =>
+  calls()
+    .filter((c) => c.id && String(c.first.transform ?? '').startsWith('translateY'))
+    .map((c) => c.id);
+const arrivingRows = () =>
+  calls()
+    .filter((c) => c.id && c.first.opacity === 0)
+    .map((c) => c.id);
+const sortBy = (name: RegExp) => fireEvent.click(screen.getByRole('button', { name }));
 
 describe('DataTable motion', () => {
   it('marks each row with its id', () => {
@@ -72,6 +97,22 @@ describe('DataTable motion', () => {
       />,
     );
     expect(tintedRows()).toEqual([]);
+  });
+
+  it('on a sort, glides rows that stay on the page and fades in the rows it brings', () => {
+    render(<Harness data={[...BASE, { id: 'v4', patient: 'Sami Odeh', amount: 2000 }]} pageSize={2} />);
+    // Page 1 shows Sara (v1), Omar (v2). Amount sorts high-first: Sami (v4, arriving), Sara (v1, moving down).
+    sortBy(/Amount/);
+    expect(glidingRows()).toEqual(['v1']);
+    expect(arrivingRows()).toEqual(['v4']);
+    expect(tintedRows()).toEqual([]);
+  });
+
+  it('stays still when paging: no glide, no fade, no tint', () => {
+    render(<Harness data={BASE} pageSize={2} />);
+    fireEvent.click(screen.getByRole('button', { name: /next/i }));
+    expect(screen.getByText('Dana Khalil')).toBeTruthy();
+    expect(calls().filter((c) => c.id)).toEqual([]);
   });
 
   it('turns one arrow for the sort direction instead of swapping icons', () => {

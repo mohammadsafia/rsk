@@ -28,8 +28,10 @@ function DataTableContent<TData>({ className, emptyState }: ContentProps) {
   // Rows explain changes (spec §4): a changed or new row flashes a tint; a sort glides rows to their new places.
   const scopeRef = useRef<HTMLDivElement>(null);
   const modelRows = table.getRowModel().rows;
-  useRowTint(scopeRef, modelRows, mode);
-  useFlip(scopeRef, mode);
+  const { sorting, columnFilters, globalFilter, pagination } = table.getState();
+  const sortKey = JSON.stringify(sorting);
+  useRowTint(scopeRef, modelRows, mode, JSON.stringify([sorting, columnFilters, globalFilter, pagination]));
+  useFlip(scopeRef, mode, sortKey);
 
   const isEmpty = !table.getRowModel().rows?.length && !isLoading;
   const visibleColumns = table.getVisibleLeafColumns();
