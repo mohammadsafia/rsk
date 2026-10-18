@@ -5,11 +5,13 @@ import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
+import InkBar from '../ink-bar/InkBar';
+
 const toggleVariants = cva(
   [
     'text-fg-muted inline-flex cursor-pointer items-center justify-center gap-2 rounded-md font-medium transition-colors [&_svg]:size-4',
     'focus-ring hover:bg-hover hover:text-fg disabled:pointer-events-none disabled:opacity-50',
-    'data-[state=on]:text-fg data-[state=on]:ink-block',
+    'data-[state=on]:text-fg',
   ],
   {
     variants: {
@@ -59,8 +61,9 @@ const Item: FC<ToggleGroupItemProps> = ({ className, children, variant, size, ..
 };
 
 const ToggleGroup: FC<ToggleGroupProps> & { Item: FC<ToggleGroupItemProps> } = ({ className, variant, size, children, ...props }) => (
-  <ToggleGroupPrimitive.Root data-slot="toggle-group" className={cn('flex items-center gap-1', className)} {...props}>
+  <ToggleGroupPrimitive.Root data-slot="toggle-group" className={cn('relative flex items-center gap-1', className)} {...props}>
     <ToggleGroupContext.Provider value={{ variant: variant ?? 'outline', size: size ?? 'md' }}>{children}</ToggleGroupContext.Provider>
+    <InkBar selector='[data-state="on"]' />
   </ToggleGroupPrimitive.Root>
 );
 

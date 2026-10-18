@@ -13,6 +13,7 @@ export * from './collapsible';
 export * from './accordion';
 export * from './dialog';
 export * from './sheet';
+export * from './ink-bar';
 export * from './tabs';
 export * from './divider';
 export * from './table';

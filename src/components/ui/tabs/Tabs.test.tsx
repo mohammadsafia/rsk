@@ -62,7 +62,7 @@ describe('Tabs', () => {
     renderTabs();
     const active = screen.getByRole('tab', { name: 'Notes' });
     expect(active.getAttribute('aria-selected')).toBe('true');
-    expect(active.className).toContain('data-[state=active]:ink-block');
+    expect(screen.getByRole('tablist').querySelector('[data-slot="ink-bar"]')).not.toBeNull();
     expect(active.className).toContain('smallcaps');
     expect(active.className).not.toContain('after:bg-accent');
   });

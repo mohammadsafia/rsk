@@ -48,7 +48,7 @@ describe('Pagination', () => {
     const other = screen.getByRole('button', { name: '02' });
     expect(current.getAttribute('aria-current')).toBe('page');
     expect(current.dataset.variant).toBe('ghost');
-    expect(current.className).toContain('aria-[current=page]:ink-block');
+    expect(current.closest('ol')?.querySelector('[data-slot="ink-bar"]')).not.toBeNull();
     expect(other.getAttribute('aria-current')).toBeNull();
     expect(other.dataset.variant).toBe('ghost');
     // Only the current page carries a mark (the ink bar); the ghost hairline underline would make every number look like a link.
