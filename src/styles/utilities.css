@@ -200,7 +200,8 @@
  * Reduced motion keeps only the fade (the global rule zeroes the travel) and drops the delays.
  */
 @utility cascade {
-  & > * {
+  /* A shimmering placeholder keeps its shimmer: the arrival would replace that animation, not add to it. */
+  & > :not(:where(.shimmer)) {
     --tw-enter-opacity: 0;
     /* 4px from below by default; a list that measures its own overflow sets --cascade-rise: -4px (from above). */
     --tw-enter-translate-y: var(--cascade-rise, 4px);
