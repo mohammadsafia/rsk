@@ -114,7 +114,8 @@ const SelectContent: FC<SelectContentProps> = ({ className, children, position =
 
       <SelectPrimitive.Viewport
         data-slot="select-viewport"
-        className={cn(position === 'popper' && 'h-(--radix-select-trigger-height) w-full')}
+        // Options cascade in as the list unfolds.
+        className={cn('cascade', position === 'popper' && 'h-(--radix-select-trigger-height) w-full')}
       >
         {children}
       </SelectPrimitive.Viewport>

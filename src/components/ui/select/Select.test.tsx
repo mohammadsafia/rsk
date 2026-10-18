@@ -39,4 +39,9 @@ describe('Select', () => {
     expect(chosen.className).toContain('data-[state=checked]:ink');
     expect(screen.getByRole('listbox').className).toContain('origin-(--radix-select-content-transform-origin)');
   });
+
+  it('its options cascade in as the list unfolds', () => {
+    renderSelect(true);
+    expect(document.querySelector('[data-slot="select-viewport"]')?.className).toContain('cascade');
+  });
 });

@@ -49,4 +49,9 @@ describe('DropdownMenu', () => {
     expect(item.getAttribute('aria-checked')).toBe('true');
     expect(item.className).toContain('data-[state=checked]:ink');
   });
+
+  it('its items cascade in as the menu unfolds', () => {
+    renderMenu();
+    expect(document.querySelector('[data-slot="dropdown-content"]')?.className).toContain('cascade');
+  });
 });

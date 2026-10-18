@@ -34,4 +34,11 @@ describe('Alert', () => {
     );
     expect(screen.getByRole('status').className).not.toMatch(/border-(s|l|inline-start)-/);
   });
+
+  it('fades in when it appears (and not under reduced motion)', () => {
+    render(<Alert tone="info">Saved</Alert>);
+    const className = screen.getByText('Saved').closest('[data-slot="alert"]')!.className;
+    for (const name of ['animate-in', 'fade-in-0', 'duration-base', 'ease-out', 'motion-reduce:animate-none'])
+      expect(className).toContain(name);
+  });
 });

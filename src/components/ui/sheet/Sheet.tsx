@@ -17,7 +17,7 @@ const sheetContentVariants = cva(
     'bg-surface-raised text-fg shadow-overlay border-border rule-top rule-top-section fixed z-50 flex flex-col outline-none',
     'inset-x-0 bottom-0 max-h-[85dvh] rounded-t-lg border-t',
     'md:inset-y-0 md:max-h-none md:w-full md:rounded-none md:border-t-0',
-    'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:duration-slow data-[state=closed]:duration-exit data-[state=closed]:ease-in motion-reduce:animate-none',
+    'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:duration-spring-long data-[state=open]:ease-spring data-[state=closed]:duration-exit data-[state=closed]:ease-in motion-reduce:animate-none',
     // The bottom slide belongs to the bottom sheet only: unscoped, it also sets vertical travel on the md side panel.
     'max-md:data-[state=open]:slide-in-from-bottom max-md:data-[state=closed]:slide-out-to-bottom',
   ],
@@ -135,7 +135,8 @@ const SheetContent: FC<SheetContentProps> = ({
 };
 
 const SheetBody: FC<SheetSectionProps> = ({ className, ...props }) => (
-  <div data-slot="sheet-body" className={cn('min-h-0 flex-1 content-start overflow-y-auto px-5 py-4', className)} {...props} />
+  // Its fields arrive one after another as the sheet springs in.
+  <div data-slot="sheet-body" className={cn('cascade min-h-0 flex-1 content-start overflow-y-auto px-5 py-4', className)} {...props} />
 );
 
 const SheetFooter: FC<SheetSectionProps> = ({ className, ...props }) => (

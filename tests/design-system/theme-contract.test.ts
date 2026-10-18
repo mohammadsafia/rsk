@@ -136,7 +136,8 @@ describe('shape, motion and states', () => {
   }
 
   it('neutralizes every tw-animate transform variable under reduced motion', () => {
-    const reduced = utilitiesCss.slice(utilitiesCss.indexOf('@media (prefers-reduced-motion: reduce)'));
+    // The global block (utilities may nest their own reduced-motion rules above it).
+    const reduced = utilitiesCss.slice(utilitiesCss.indexOf('/* Reduced motion: keep opacity fades'));
     for (const phase of ['enter', 'exit']) {
       for (const part of ['scale: 1', 'rotate: 0', 'translate-x: 0', 'translate-y: 0']) {
         expect(reduced).toContain(`--tw-${phase}-${part} !important;`);

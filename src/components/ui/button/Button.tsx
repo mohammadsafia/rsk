@@ -1,9 +1,10 @@
-import { type ComponentProps, type FC, forwardRef, type MouseEvent } from 'react';
+import { type ComponentProps, type FC, forwardRef, type MouseEvent, type PointerEvent } from 'react';
 
 import { Slot, Slottable } from '@radix-ui/react-slot';
 
 import { Conditional } from '@components/utils';
 
+import { useInkBleed } from '@hooks/motion';
 import { useAppTranslation } from '@hooks/shared';
 
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -87,6 +88,7 @@ const Button: FC<ButtonProps> = ({
   disabled,
   children,
   onClick,
+  onPointerDown,
   tabIndex,
   ...props
 }) => {
@@ -94,6 +96,7 @@ const Button: FC<ButtonProps> = ({
 
   const Comp = asChild ? Slot : 'button';
   const isDisabled = Boolean(disabled) || loading;
+  const bleed = useInkBleed<HTMLButtonElement>();
 
   // A slotted child (e.g. a link) cannot be natively disabled, so block activation and tab focus by hand.
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -115,11 +118,21 @@ const Button: FC<ButtonProps> = ({
       disabled={asChild ? undefined : isDisabled}
       tabIndex={asChild && isDisabled ? -1 : tabIndex}
       onClick={handleClick}
+      onPointerDown={(event: PointerEvent<HTMLButtonElement>) => {
+        if (!isDisabled) bleed(event);
+        onPointerDown?.(event);
+      }}
       className={cn(buttonVariants({ variant, tone, size, fullWidth }), className)}
       {...props}
     >
       <Conditional.If condition={loading}>
-        <Loader2Icon data-slot="button-spinner" className="absolute inset-0 m-auto animate-spin" aria-label={t('loading')} />
+        {/* Fades in over the label, which holds its width (invisible) underneath; the icon inside keeps spinning. */}
+        <span
+          data-slot="button-spinner-fade"
+          className="animate-in fade-in-0 duration-fast absolute inset-0 flex items-center justify-center"
+        >
+          <Loader2Icon data-slot="button-spinner" className="animate-spin" aria-label={t('loading')} />
+        </span>
       </Conditional.If>
 
       {/* Slot only finds a Slottable that is its direct child, so this branch can't go through Conditional.

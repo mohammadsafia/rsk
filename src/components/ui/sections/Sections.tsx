@@ -1,17 +1,26 @@
 import { type ComponentPropsWithoutRef, createContext, type FC, type ReactNode, useContext } from 'react';
 
+import { useRevealOnce } from '@hooks/motion';
+
 import { cn } from '@utils';
 
 export type SectionMarkerValue = 'auto' | false;
 
 const SectionsContext = createContext(false);
 
-/** A group whose structural children are numbered 01, 02, … by CSS counters (hidden children are skipped). */
-const Sections: FC<ComponentPropsWithoutRef<'div'>> = ({ className, ...props }) => (
-  <SectionsContext.Provider value={true}>
-    <div data-slot="sections" className={cn('sections', className)} {...props} />
-  </SectionsContext.Provider>
-);
+/**
+ * A group whose structural children are numbered 01, 02, … by CSS counters (hidden children are skipped). On the first
+ * visit to a route in a session, the sections rise in counting order (never on back/forward or revisits).
+ */
+const Sections: FC<ComponentPropsWithoutRef<'div'>> = ({ className, ...props }) => {
+  const reveal = useRevealOnce(typeof window === 'undefined' ? '' : window.location.pathname);
+
+  return (
+    <SectionsContext.Provider value={true}>
+      <div data-slot="sections" data-reveal={reveal || undefined} className={cn('sections', reveal && 'reveal', className)} {...props} />
+    </SectionsContext.Provider>
+  );
+};
 
 /** Portalled overlays (dialog, sheet, toast) are outside the page's counter, so they must not ask for a number. */
 const SectionsReset: FC<{ children: ReactNode }> = ({ children }) => (

@@ -3,7 +3,7 @@ import { type FC, type HTMLAttributes } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
-const skeletonVariants = cva('bg-border-subtle animate-pulse', {
+const skeletonVariants = cva('bg-border-subtle shimmer', {
   variants: {
     shape: {
       line: 'w-full rounded-sm',

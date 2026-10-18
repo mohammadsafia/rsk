@@ -95,6 +95,173 @@
   }
 }
 
+/*
+ * A pressed control squashes, then springs back on release (spec §4, checkbox 0.85). Colours stay quick. Calm swaps the
+ * spring for the out curve through --ease-spring; reduced motion keeps the colours and drops the squash.
+ */
+@utility tactile {
+  transition:
+    scale var(--duration-spring) var(--ease-spring),
+    color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+
+  &:active {
+    scale: 0.85;
+    transition-duration: var(--duration-instant);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &:active {
+      scale: none;
+    }
+  }
+}
+
+/* The check draws itself when it appears (the indicator mounts on check): its stroke runs in after a beat. */
+@utility draw-check {
+  & svg {
+    stroke-dasharray: 24;
+    animation: rsk-stroke var(--duration-base) var(--ease-out) var(--motion-stagger) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    & svg {
+      animation: none;
+    }
+  }
+}
+
+/*
+ * Loading placeholders shimmer: a faint ink band sweeps along the inline direction (reversed in RTL). Reduced motion
+ * leaves a still placeholder.
+ */
+@utility shimmer {
+  background-image: linear-gradient(90deg, transparent 0%, color-mix(in oklab, var(--color-ink) 8%, transparent) 50%, transparent 100%);
+  background-repeat: no-repeat;
+  background-size: 50% 100%;
+  animation: rsk-shimmer var(--motion-shimmer-period) linear infinite;
+
+  :where([dir='rtl']) & {
+    animation-direction: reverse;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    background-image: none;
+  }
+}
+
+/*
+ * First visit to a numbered page: its sections rise 10px into place in counting order, --motion-reveal-stagger apart
+ * (Sections sets it once per route per session). Reduced motion keeps the fade and drops the delays.
+ */
+@utility reveal {
+  & > * {
+    --tw-enter-opacity: 0;
+    --tw-enter-translate-y: 10px;
+    animation: enter var(--duration-slow) var(--ease-out) both;
+  }
+
+  & > :nth-child(2) {
+    animation-delay: calc(var(--motion-reveal-stagger) * 1);
+  }
+
+  & > :nth-child(3) {
+    animation-delay: calc(var(--motion-reveal-stagger) * 2);
+  }
+
+  & > :nth-child(4) {
+    animation-delay: calc(var(--motion-reveal-stagger) * 3);
+  }
+
+  & > :nth-child(5) {
+    animation-delay: calc(var(--motion-reveal-stagger) * 4);
+  }
+
+  & > :nth-child(6) {
+    animation-delay: calc(var(--motion-reveal-stagger) * 5);
+  }
+
+  & > :nth-child(n + 7) {
+    animation-delay: calc(var(--motion-reveal-stagger) * 5);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    & > * {
+      animation-delay: 0s !important;
+      animation-duration: var(--duration-fast) !important;
+    }
+  }
+}
+
+/*
+ * Children arrive one after another: each fades in and rises 4px, --motion-stagger apart (0 in calm, so together).
+ * Reduced motion keeps only the fade (the global rule zeroes the travel) and drops the delays.
+ */
+@utility cascade {
+  & > * {
+    --tw-enter-opacity: 0;
+    --tw-enter-translate-y: 4px;
+    animation: enter var(--duration-base) var(--ease-out) both;
+  }
+
+  & > :nth-child(2) {
+    animation-delay: calc(var(--motion-stagger) * 1);
+  }
+
+  & > :nth-child(3) {
+    animation-delay: calc(var(--motion-stagger) * 2);
+  }
+
+  & > :nth-child(4) {
+    animation-delay: calc(var(--motion-stagger) * 3);
+  }
+
+  & > :nth-child(5) {
+    animation-delay: calc(var(--motion-stagger) * 4);
+  }
+
+  & > :nth-child(6) {
+    animation-delay: calc(var(--motion-stagger) * 5);
+  }
+
+  & > :nth-child(7) {
+    animation-delay: calc(var(--motion-stagger) * 6);
+  }
+
+  & > :nth-child(8) {
+    animation-delay: calc(var(--motion-stagger) * 7);
+  }
+
+  & > :nth-child(9) {
+    animation-delay: calc(var(--motion-stagger) * 8);
+  }
+
+  & > :nth-child(10) {
+    animation-delay: calc(var(--motion-stagger) * 9);
+  }
+
+  & > :nth-child(11) {
+    animation-delay: calc(var(--motion-stagger) * 10);
+  }
+
+  & > :nth-child(12) {
+    animation-delay: calc(var(--motion-stagger) * 11);
+  }
+
+  & > :nth-child(n + 13) {
+    animation-delay: calc(var(--motion-stagger) * 11);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    & > * {
+      animation-delay: 0s !important;
+      animation-duration: var(--duration-fast) !important;
+    }
+  }
+}
+
 /* Reduced motion: keep opacity fades, remove all movement (spec §7.5). */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -113,6 +280,12 @@
 
   .state-press:active {
     transform: none !important;
+  }
+
+  /* Opening and closing surfaces keep their fade, but never slower than fast (spec §3: reduced fades ≤ 120ms). */
+  [data-state='open'],
+  [data-state='closed'] {
+    animation-duration: var(--duration-fast) !important;
   }
 }
 

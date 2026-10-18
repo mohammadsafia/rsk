@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { MemoryRouter, Link } from 'react-router-dom';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Button } from '@components/ui';
@@ -59,7 +59,8 @@ describe('Button', () => {
     const label = button.querySelector('[data-slot="button-label"]');
     expect(label?.textContent).toBe('Save');
     expect(label?.className).toMatch(/\binvisible\b/);
-    expect(button.querySelector('[data-slot="button-spinner"]')?.getAttribute('class')).toMatch(/\babsolute\b/);
+    // The spinner's fade wrapper overlays the label, out of flow.
+    expect(button.querySelector('[data-slot="button-spinner"]')?.parentElement?.className).toMatch(/\babsolute\b/);
   });
 
   it('asChild renders the child element with button styling', () => {
@@ -81,5 +82,16 @@ describe('Button', () => {
     const button = screen.getByRole('button', { name: 'Cancel' });
     expect(button.className).toContain('underline');
     expect(button.className).toContain('decoration-border-strong');
+  });
+
+  it("bleeds ink on press, keeps the caller's onPointerDown, and fades the loading spinner in", () => {
+    const onPointerDown = vi.fn();
+    const { rerender } = render(<Button onPointerDown={onPointerDown}>Save</Button>);
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'Save' }));
+    expect(onPointerDown).toHaveBeenCalledTimes(1);
+    rerender(<Button loading>Save</Button>);
+    const spinner = document.querySelector('[data-slot="button-spinner"]')!;
+    expect(spinner.parentElement?.className).toContain('fade-in-0');
+    expect(spinner.getAttribute('class')).toContain('animate-spin');
   });
 });
