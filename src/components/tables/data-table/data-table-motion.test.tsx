@@ -1,21 +1,15 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import {
-  type ColumnDef,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  type SortingState,
-  useReactTable,
-} from '@tanstack/react-table';
+import { type SortingState, useTable } from '@tanstack/react-table';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { DataTable } from '@components/tables';
 
 import '../../../i18n';
+import { type KitColumnDef, kitFeatures } from '@utils';
 
 type Visit = { id: string; patient: string; amount: number };
-const columns: ColumnDef<Visit>[] = [
+const columns: KitColumnDef<Visit>[] = [
   { accessorKey: 'patient', header: 'Patient' },
   { accessorKey: 'amount', header: 'Amount', meta: { numeric: true } },
 ];
@@ -26,13 +20,11 @@ const BASE: Visit[] = [
 ];
 
 function Harness({ data, pageSize = 10 }: { data: Visit[]; pageSize?: number }) {
-  const table = useReactTable({
+  const table = useTable({
+    features: kitFeatures,
     data,
     columns,
     getRowId: (row) => row.id,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     initialState: { pagination: { pageIndex: 0, pageSize } },
   });
   return (
@@ -45,11 +37,11 @@ function Harness({ data, pageSize = 10 }: { data: Visit[]; pageSize?: number }) 
 
 /** A server-driven table: the sort state changes first, the sorted rows arrive in a later render. */
 function ServerHarness({ data, sorting, onSort }: { data: Visit[]; sorting: SortingState; onSort: (sorting: SortingState) => void }) {
-  const table = useReactTable({
+  const table = useTable({
+    features: kitFeatures,
     data,
     columns,
     getRowId: (row) => row.id,
-    getCoreRowModel: getCoreRowModel(),
     manualSorting: true,
     state: { sorting },
     onSortingChange: (updater) => onSort(typeof updater === 'function' ? updater(sorting) : updater),

@@ -45,7 +45,8 @@ The full reference, with examples of every type, is on the [DataTable page](/doc
 ```tsx
 const filters = useDataTableFilters({ columns, urlSync: true, storageKey: 'patients' });
 
-const table = useReactTable({
+const table = useTable({
+  features: kitFeatures,
   ...options,
   state: filters.state,
   onColumnFiltersChange: filters.onColumnFiltersChange,

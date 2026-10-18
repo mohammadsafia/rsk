@@ -1,15 +1,6 @@
 import { useMemo } from 'react';
 
-import {
-  type ColumnDef,
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { useTable } from '@tanstack/react-table';
 
 import { Badge, Button } from '@components/ui';
 import { DataTable } from '@components/tables';
@@ -23,6 +14,9 @@ import {
   dateFilterFn,
   dateRangeFilterFn,
   inListFilterFn,
+  type KitColumnDef,
+  type KitFeatures,
+  kitFeatures,
   numberRangeFilterFn,
   timeFilterFn,
 } from '@utils';
@@ -91,7 +85,7 @@ const MEMBERS: Member[] = Array.from({ length: 24 }, (_, i) => {
 
 type TranslateFn = ReturnType<typeof useAppTranslation>['t'];
 
-const buildColumns = (t: TranslateFn): ColumnDef<Member>[] => {
+const buildColumns = (t: TranslateFn): KitColumnDef<Member>[] => {
   const roleOptions = ROLE_OPTIONS.map((option) => ({ id: option.id, name: t(option.labelKey) }));
   const statusOptions = STATUS_OPTIONS.map((option) => ({ id: option.id, name: t(option.labelKey) }));
 
@@ -238,7 +232,8 @@ function MembersPage() {
   const columns = useMemo(() => buildColumns(t), [t]);
   const filters = useDataTableFilters({ columns, urlSync: true, storageKey: 'members' });
 
-  const table = useReactTable<Member>({
+  const table = useTable<KitFeatures, Member>({
+    features: kitFeatures,
     data: MEMBERS,
     columns,
     state: filters.state,
@@ -247,13 +242,7 @@ function MembersPage() {
     enableGlobalFilter: true,
     globalFilterFn: 'includesString',
     enableSortingRemoval: true,
-    initialState: { pagination: { pageSize: 8 } },
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
+    initialState: { pagination: { pageIndex: 0, pageSize: 8 } },
   });
 
   const totalCount = table.getFilteredRowModel().rows.length;

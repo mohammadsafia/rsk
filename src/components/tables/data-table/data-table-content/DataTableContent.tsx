@@ -1,9 +1,10 @@
-// TanStack Table v8 hands out one mutable table object, so compiled memoization would render stale rows;
-// opted out of the React Compiler until Table 9 (compiler-compatible).
+// These parts read table state through stable TanStack objects (table / column / row from context and props), which
+// compiled memoization would reuse stale; TanStack v9's fix is a Subscribe boundary per reader. Until that refactor,
+// they opt out of the React Compiler.
 'use no memo';
 
 import { type MouseEvent, useRef } from 'react';
-import { flexRender, type Row, type SortDirection } from '@tanstack/react-table';
+import { flexRender, type SortDirection } from '@tanstack/react-table';
 
 import { ScrollArea, Table } from '@components/ui';
 import { Conditional } from '@components/utils';
@@ -12,9 +13,10 @@ import { useDataTableContext } from '@components/tables';
 import { useMotion } from '@contexts';
 import { useFlip, useRowTint } from '@hooks/motion';
 
-import { cn, getCommonPinningStyles, isInteractiveClick } from '@utils';
+import { cn, getCommonPinningStyles, isInteractiveClick, type KitRow } from '@utils';
 
 import { ArrowUp, ChevronsUpDown } from 'lucide-react';
+import type { RowData } from '@tanstack/react-table';
 
 const ARIA_SORT: Record<SortDirection, 'ascending' | 'descending'> = {
   asc: 'ascending',
@@ -26,13 +28,13 @@ type ContentProps = {
   emptyState?: { title?: string; description?: string };
 };
 
-function DataTableContent<TData>({ className, emptyState }: ContentProps) {
+function DataTableContent<TData extends RowData>({ className, emptyState }: ContentProps) {
   const { table, isLoading, onRowClick, getRowClassName } = useDataTableContext<TData>();
   const { mode } = useMotion();
   // Rows explain changes (spec §4): a changed or new row flashes a tint; a sort glides rows to their new places.
   const scopeRef = useRef<HTMLDivElement>(null);
   const modelRows = table.getRowModel().rows;
-  const { sorting, columnFilters, globalFilter, pagination } = table.getState();
+  const { sorting, columnFilters, globalFilter, pagination } = table.state;
   const sortKey = JSON.stringify(sorting);
   useRowTint(scopeRef, modelRows, mode, JSON.stringify([sorting, columnFilters, globalFilter, pagination]));
   useFlip(scopeRef, mode, sortKey);
@@ -40,7 +42,7 @@ function DataTableContent<TData>({ className, emptyState }: ContentProps) {
   const isEmpty = !table.getRowModel().rows?.length && !isLoading;
   const visibleColumns = table.getVisibleLeafColumns();
 
-  const onTableRowClick = (event: MouseEvent<HTMLTableRowElement>, row: Row<TData>) => {
+  const onTableRowClick = (event: MouseEvent<HTMLTableRowElement>, row: KitRow<TData>) => {
     if (isInteractiveClick(event)) return;
 
     onRowClick?.(row);
@@ -53,7 +55,7 @@ function DataTableContent<TData>({ className, emptyState }: ContentProps) {
       onKeyDown={(event) => {
         // A menu, popover or dialog that already handled Escape (Radix prevents default) keeps the selection.
         if (event.defaultPrevented) return;
-        if (event.key === 'Escape' && Object.keys(table.getState().rowSelection).length > 0) table.resetRowSelection();
+        if (event.key === 'Escape' && Object.keys(table.state.rowSelection).length > 0) table.resetRowSelection();
       }}
     >
       <div ref={scopeRef} data-slot="data-table-motion-scope" className="contents">

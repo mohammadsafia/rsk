@@ -1,30 +1,30 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { useState } from 'react';
-import { type ColumnDef, getCoreRowModel, getPaginationRowModel, type PaginationState, useReactTable } from '@tanstack/react-table';
+import { type PaginationState, useTable } from '@tanstack/react-table';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { Button } from '@components/ui';
 import { createSelectionColumn, DataTable } from '@components/tables';
 
 import '../../../../i18n';
+import { type KitColumnDef, kitFeatures } from '@utils';
 
 type Invoice = { id: string; patient: string };
 
 const rows: Invoice[] = Array.from({ length: 5 }, (_, index) => ({ id: `INV-${index + 1}`, patient: `Patient ${index + 1}` }));
 
-const columns: ColumnDef<Invoice>[] = [
+const columns: KitColumnDef<Invoice>[] = [
   createSelectionColumn<Invoice>({ getRowLabel: (row) => row.id }),
   { accessorKey: 'patient', header: 'Patient' },
 ];
 
 function Harness({ manualPagination = false }: { manualPagination?: boolean }) {
-  const table = useReactTable({
+  const table = useTable({
+    features: kitFeatures,
     data: rows,
     columns,
     getRowId: (row) => row.id,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     manualPagination,
     pageCount: manualPagination ? 3 : undefined,
     initialState: { pagination: { pageIndex: 0, pageSize: 2 } },
@@ -44,11 +44,11 @@ function Harness({ manualPagination = false }: { manualPagination?: boolean }) {
 function ServerHarness() {
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 2 });
   const page = rows.slice(pagination.pageIndex * 2, pagination.pageIndex * 2 + 2);
-  const table = useReactTable({
+  const table = useTable({
+    features: kitFeatures,
     data: page,
     columns,
     getRowId: (row) => row.id,
-    getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     pageCount: 3,
     state: { pagination },

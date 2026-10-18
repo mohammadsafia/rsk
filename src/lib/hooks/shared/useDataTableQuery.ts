@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { type QueryKey } from '@tanstack/query-core';
-import type { ColumnFiltersState, OnChangeFn, PaginationState, Updater } from '@tanstack/react-table';
+import { ColumnFiltersState, OnChangeFn, PaginationState, Updater } from '@tanstack/react-table';
 import { keepPreviousData, useQuery, type UseQueryOptions } from '@tanstack/react-query';
 import { type Options, parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 import type { AxiosRequestConfig } from 'axios';

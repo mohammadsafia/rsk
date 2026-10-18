@@ -1,10 +1,9 @@
-// TanStack Table v8 hands out one mutable table object, so compiled memoization would render stale rows;
-// opted out of the React Compiler until Table 9 (compiler-compatible).
+// These parts read table state through stable TanStack objects (table / column / row from context and props), which
+// compiled memoization would reuse stale; TanStack v9's fix is a Subscribe boundary per reader. Until that refactor,
+// they opt out of the React Compiler.
 'use no memo';
 
 import { useState } from 'react';
-
-import type { Column } from '@tanstack/react-table';
 
 import { RadioGroup } from '@components/ui';
 import { Combobox } from '@components/shared';
@@ -13,10 +12,12 @@ import { FilterPill } from '@components/tables/data-table-filters/filter-pill';
 import { useAppTranslation } from '@hooks/shared';
 
 import type { BooleanFilterMeta } from '@app-types';
+import { type KitColumn } from '@utils';
+import type { RowData } from '@tanstack/react-table';
 
-type BooleanFilterProps<TData> = { column: Column<TData>; filterMeta: BooleanFilterMeta };
+type BooleanFilterProps<TData extends RowData> = { column: KitColumn<TData>; filterMeta: BooleanFilterMeta };
 
-function BooleanFilter<TData>({ column, filterMeta }: BooleanFilterProps<TData>) {
+function BooleanFilter<TData extends RowData>({ column, filterMeta }: BooleanFilterProps<TData>) {
   const { t } = useAppTranslation('common');
   const [open, setOpen] = useState(false);
   const value = column.getFilterValue() as boolean | undefined;

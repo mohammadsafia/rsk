@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { type ColumnDef, getCoreRowModel, getFilteredRowModel, useReactTable } from '@tanstack/react-table';
+import { useTable } from '@tanstack/react-table';
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -10,13 +10,13 @@ import { Tooltip } from '@components/ui';
 
 import { useDataTableFilters } from '@hooks/shared';
 
-import { createFilterMeta, inListFilterFn, numberRangeFilterFn } from '@utils';
+import { createFilterMeta, inListFilterFn, type KitColumnDef, kitFeatures, numberRangeFilterFn } from '@utils';
 
 import '../../../i18n';
 
 type Row = { name: string; role: string; amount: number };
 
-const columns: ColumnDef<Row>[] = [
+const columns: KitColumnDef<Row>[] = [
   { accessorKey: 'name', header: 'Name' },
   {
     accessorKey: 'role',
@@ -45,14 +45,13 @@ const rows: Row[] = [
 
 function Page({ urlSync, storageKey }: { urlSync?: boolean; storageKey?: string }) {
   const filters = useDataTableFilters({ columns, urlSync, storageKey });
-  const table = useReactTable({
+  const table = useTable({
+    features: kitFeatures,
     data: rows,
     columns,
     state: filters.state,
     onColumnFiltersChange: filters.onColumnFiltersChange,
     onGlobalFilterChange: filters.onGlobalFilterChange,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     enableGlobalFilter: true,
   });
   return (
@@ -156,7 +155,7 @@ describe('useDataTableFilters', () => {
 });
 
 type Clinic = { name: string; clinic: { city: string } };
-const nestedColumns: ColumnDef<Clinic>[] = [
+const nestedColumns: KitColumnDef<Clinic>[] = [
   {
     accessorKey: 'clinic.city',
     filterFn: inListFilterFn,
@@ -174,7 +173,8 @@ const nestedColumns: ColumnDef<Clinic>[] = [
 
 function NestedPage() {
   const filters = useDataTableFilters({ columns: nestedColumns, storageKey: 'clinics' });
-  const table = useReactTable({
+  const table = useTable({
+    features: kitFeatures,
     data: [
       { name: 'Irbid', clinic: { city: 'irbid' } },
       { name: 'Amman', clinic: { city: 'amman' } },
@@ -182,8 +182,6 @@ function NestedPage() {
     columns: nestedColumns,
     state: filters.state,
     onColumnFiltersChange: filters.onColumnFiltersChange,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   });
   return (
     <p data-testid="nested">

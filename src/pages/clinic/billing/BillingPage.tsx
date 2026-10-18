@@ -1,16 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
-import {
-  type ColumnDef,
-  type FilterFn,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  type Row,
-  useReactTable,
-} from '@tanstack/react-table';
+import { useTable } from '@tanstack/react-table';
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs';
 
 import { type InvoiceStatus } from '@api/clinic';
@@ -30,6 +21,7 @@ import { useClinicToday } from '../shared/useClinicToday';
 import { useLocalized } from '../shared/useLocalized';
 import { billingSummary, downloadCsv, type InvoiceRow, invoicesToCsv, toInvoiceRows } from './billing';
 import InvoiceSheet from './InvoiceSheet';
+import { type KitColumnDef, type KitFeatures, kitFeatures, type KitFilterFn, type KitRow } from '@utils';
 
 const STATUSES = ['draft', 'sent', 'overdue', 'paid', 'void'] as const satisfies readonly InvoiceStatus[];
 const ALL = 'all';
@@ -40,7 +32,7 @@ const NO_ROWS: InvoiceRow[] = [];
 /** Search covers what people type here: the invoice number and the patient's name. */
 const SEARCHABLE = new Set(['number', 'patient']);
 
-const searchInvoices: FilterFn<InvoiceRow> = (row, columnId, filterValue) =>
+const searchInvoices: KitFilterFn<InvoiceRow> = (row, columnId, filterValue) =>
   String(row.getValue(columnId) ?? '')
     .toLowerCase()
     .includes(
@@ -76,7 +68,7 @@ function BillingPage() {
   const date = (value: string) => formatNullableDate(value, constants.DateFormats.SHORT_MONTH_DAY_YEAR, '—');
   const statusLabel = (value: InvoiceStatus) => t(`billing.status.${value}`);
 
-  const columns = useMemo<ColumnDef<InvoiceRow>[]>(
+  const columns = useMemo<KitColumnDef<InvoiceRow>[]>(
     () => [
       createSelectionColumn<InvoiceRow>({ getRowLabel: (row) => row.number }),
       {
@@ -149,7 +141,8 @@ function BillingPage() {
   // which renders again — an endless loop once a row is selected.
   const columnFilters = useMemo(() => (status === ALL ? [] : [{ id: 'status', value: status }]), [status]);
 
-  const table = useReactTable<InvoiceRow>({
+  const table = useTable<KitFeatures, InvoiceRow>({
+    features: kitFeatures,
     data: rows,
     columns,
     state: { globalFilter, columnFilters },
@@ -158,15 +151,17 @@ function BillingPage() {
     globalFilterFn: searchInvoices,
     getColumnCanGlobalFilter: (column) => SEARCHABLE.has(column.id),
     getRowId: (row) => row.id,
-    initialState: { pagination: { pageSize: 10 }, sorting: [{ id: 'issuedAt', desc: true }] },
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 }, sorting: [{ id: 'issuedAt', desc: true }] },
   });
 
-  // A new tab starts on its first page.
-  useEffect(() => table.setPageIndex(0), [status, table]);
+  // A new tab starts on its first page. Keyed on the tab alone: TanStack Table v9's `table` changes identity with every
+  // state change (paging included), so depending on it would snap every page turn back to page 1.
+  const pagedFor = useRef(status);
+  useEffect(() => {
+    if (pagedFor.current === status) return;
+    pagedFor.current = status;
+    table.setPageIndex(0);
+  }, [status, table]);
 
   const report = (key: 'reminded' | 'markedPaid', done: number, skipped: number) =>
     toast({ title: `${t(`billing.bulk.${key}`, { done })}${skipped ? t('billing.bulk.skipped', { skipped }) : ''}` });
@@ -183,7 +178,7 @@ function BillingPage() {
   };
   const reminding = bulk.isPending && bulk.variables?.action === 'send-reminder';
 
-  const exportRows = (selected: Row<InvoiceRow>[]) =>
+  const exportRows = (selected: KitRow<InvoiceRow>[]) =>
     downloadCsv(
       `invoices-${todayKey}.csv`,
       invoicesToCsv(

@@ -1,10 +1,9 @@
-// TanStack Table v8 hands out one mutable table object, so compiled memoization would render stale rows;
-// opted out of the React Compiler until Table 9 (compiler-compatible).
+// These parts read table state through stable TanStack objects (table / column / row from context and props), which
+// compiled memoization would reuse stale; TanStack v9's fix is a Subscribe boundary per reader. Until that refactor,
+// they opt out of the React Compiler.
 'use no memo';
 
 import { useEffect, useRef, useState } from 'react';
-
-import type { Column } from '@tanstack/react-table';
 
 import { Input, Popover } from '@components/ui';
 import { FilterPill } from '@components/tables/data-table-filters/filter-pill';
@@ -12,12 +11,14 @@ import { FilterPill } from '@components/tables/data-table-filters/filter-pill';
 import { useAppTranslation } from '@hooks/shared';
 
 import type { TextFilterMeta } from '@app-types';
+import { type KitColumn } from '@utils';
+import type { RowData } from '@tanstack/react-table';
 
-type TextFilterProps<TData> = { column: Column<TData>; filterMeta: TextFilterMeta };
+type TextFilterProps<TData extends RowData> = { column: KitColumn<TData>; filterMeta: TextFilterMeta };
 
 const COMMIT_DELAY = 300;
 
-function TextFilter<TData>({ column, filterMeta }: TextFilterProps<TData>) {
+function TextFilter<TData extends RowData>({ column, filterMeta }: TextFilterProps<TData>) {
   const { t, direction } = useAppTranslation('common');
   const value = (column.getFilterValue() as string | undefined) ?? '';
   const [draft, setDraft] = useState(value);

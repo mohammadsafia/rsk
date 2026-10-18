@@ -1,5 +1,6 @@
-// TanStack Table v8 hands out one mutable table object, so compiled memoization would render stale rows;
-// opted out of the React Compiler until Table 9 (compiler-compatible).
+// These parts read table state through stable TanStack objects (table / column / row from context and props), which
+// compiled memoization would reuse stale; TanStack v9's fix is a Subscribe boundary per reader. Until that refactor,
+// they opt out of the React Compiler.
 'use no memo';
 
 import { type FC, type ReactNode, useRef } from 'react';

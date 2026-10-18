@@ -2,26 +2,19 @@ import { useCallback, useMemo, useState } from 'react';
 
 import {
   type ColumnSort,
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   type OnChangeFn,
   type PaginationState,
   type RowSelectionState,
   type SortingState,
-  type TableOptions,
   type TableState,
   type Updater,
-  useReactTable,
-  type VisibilityState,
+  type ColumnVisibilityState,
+  useTable,
 } from '@tanstack/react-table';
 
 import { parseAsInteger, useQueryState, type UseQueryStateOptions } from 'nuqs';
 
-import { getSortingStateParser } from '@utils';
+import { getSortingStateParser, kitFeatures, type KitFeatures, type KitTableOptions } from '@utils';
 
 const PAGE_KEY = 'page';
 const PER_PAGE_KEY = 'pageSize';
@@ -30,11 +23,18 @@ const DEBOUNCE_MS = 300;
 const THROTTLE_MS = 50;
 
 type UseDataTableProps<TData extends Record<string, unknown>> = Omit<
-  TableOptions<TData>,
-  'initialState' | 'pageCount' | 'getCoreRowModel' | 'manualFiltering' | 'manualPagination' | 'manualSorting' | 'onSortingChange'
+  KitTableOptions<TData>,
+  | 'features'
+  | 'initialState'
+  | 'pageCount'
+  | 'getCoreRowModel'
+  | 'manualFiltering'
+  | 'manualPagination'
+  | 'manualSorting'
+  | 'onSortingChange'
 > &
-  Required<Pick<TableOptions<TData>, 'pageCount'>> & {
-    initialState?: Omit<Partial<TableState>, 'sorting'> & {
+  Required<Pick<KitTableOptions<TData>, 'pageCount'>> & {
+    initialState?: Omit<Partial<TableState<KitFeatures>>, 'sorting'> & {
       sorting?: ColumnSort[];
     };
     history?: 'push' | 'replace';
@@ -76,7 +76,7 @@ export const useDataTable = <TData extends Record<string, unknown>>(props: UseDa
   );
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>(initialState?.rowSelection ?? {});
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialState?.columnVisibility ?? {});
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>(initialState?.columnVisibility ?? {});
 
   // URL-synced pagination
   const [page, setPage] = useQueryState(PAGE_KEY, parseAsInteger.withOptions(queryStateOptions).withDefault(1));
@@ -131,7 +131,8 @@ export const useDataTable = <TData extends Record<string, unknown>>(props: UseDa
     [sorting, setSorting],
   ) as OnChangeFn<SortingState>;
 
-  const table = useReactTable({
+  const table = useTable({
+    features: kitFeatures,
     enableGlobalFilter: true,
     ...tableProps,
     columns,
@@ -151,12 +152,6 @@ export const useDataTable = <TData extends Record<string, unknown>>(props: UseDa
     onPaginationChange,
     onSortingChange,
     onColumnVisibilityChange: setColumnVisibility,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
     manualPagination: true,
     manualSorting: true,
     manualFiltering: true,

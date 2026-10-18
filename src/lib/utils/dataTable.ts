@@ -1,11 +1,13 @@
 import type { CSSProperties, MouseEvent } from 'react';
 
-import type { Column, ColumnSort, FilterFn } from '@tanstack/react-table';
+import { ColumnSort } from '@tanstack/react-table';
 import { createParser } from 'nuqs';
 
 import type { AsyncOptionsFn, DateFormat } from '@hooks/shared';
 
 import type { DataTableFilterMeta, DateRangeFilterValue } from '@app-types';
+import type { KitColumn, KitFilterFn } from './tableFeatures';
+import type { RowData } from '@tanstack/react-table';
 
 const INTERACTIVE_SELECTOR = [
   'button',
@@ -36,29 +38,30 @@ export const isInteractiveClick = (event: MouseEvent<HTMLElement>): boolean => {
 
 /**
  * Returns CSS styles for pinned (sticky) columns.
- * Handles left/right pinning with proper z-index and positioning.
+ * Handles start/end pinning (logical, so it mirrors in RTL) with proper z-index and positioning.
  */
-export const getCommonPinningStyles = <TData>({
+export const getCommonPinningStyles = <TData extends RowData>({
   column,
   withBorder = false,
 }: {
-  column: Column<TData>;
+  column: KitColumn<TData>;
   withBorder?: boolean;
 }): CSSProperties => {
   const isPinned = column.getIsPinned();
-  const isLastLeftPinnedColumn = isPinned === 'left' && column.getIsLastColumn('left');
-  const isFirstRightPinnedColumn = isPinned === 'right' && column.getIsFirstColumn('right');
+  // v9 pins to logical sides (start / end), so the sticky offsets are logical too and mirror in RTL.
+  const isLastStartPinnedColumn = isPinned === 'start' && column.getIsLastColumn('start');
+  const isFirstEndPinnedColumn = isPinned === 'end' && column.getIsFirstColumn('end');
 
   return {
     boxShadow: withBorder
-      ? isLastLeftPinnedColumn
+      ? isLastStartPinnedColumn
         ? '-4px 0 4px -4px var(--border) inset'
-        : isFirstRightPinnedColumn
+        : isFirstEndPinnedColumn
           ? '4px 0 4px -4px var(--border) inset'
           : undefined
       : undefined,
-    left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
-    right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
+    insetInlineStart: isPinned === 'start' ? `${column.getStart('start')}px` : undefined,
+    insetInlineEnd: isPinned === 'end' ? `${column.getAfter('end')}px` : undefined,
     opacity: isPinned ? 0.97 : 1,
     position: isPinned ? 'sticky' : 'relative',
     width: column.getSize(),
@@ -220,11 +223,11 @@ const toComparableMinutes = (input: unknown): number | null => {
   return hours * 60 + minutes;
 };
 
-// Filter predicates are loosely typed (`FilterFn<any>`) so a single shared fn stays
-// assignable to any column's `FilterFn<TData>` regardless of its row type.
+// Filter predicates are loosely typed (`KitFilterFn<any>`) so a single shared fn stays
+// assignable to any column's `KitFilterFn<TData>` regardless of its row type.
 
 /** Matches rows whose date cell equals the selected day. Pair with `variant: 'date'`. */
-export const dateFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
+export const dateFilterFn: KitFilterFn<any> = (row, columnId, filterValue) => {
   if (!filterValue) return true;
 
   const cell = toComparableDate(row.getValue(columnId));
@@ -233,7 +236,7 @@ export const dateFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
 };
 
 /** Matches rows whose date cell falls within the inclusive `[from, to]` range. Pair with `variant: 'dateRange'`. */
-export const dateRangeFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
+export const dateRangeFilterFn: KitFilterFn<any> = (row, columnId, filterValue) => {
   const range = filterValue as DateRangeFilterValue | undefined;
   if (!range || (!range.from && !range.to)) return true;
 
@@ -248,7 +251,7 @@ export const dateRangeFilterFn: FilterFn<any> = (row, columnId, filterValue) => 
 };
 
 /** Matches rows whose time cell equals the selected time. Pair with `variant: 'time'`. */
-export const timeFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
+export const timeFilterFn: KitFilterFn<any> = (row, columnId, filterValue) => {
   if (!filterValue) return true;
 
   const cell = toComparableMinutes(row.getValue(columnId));

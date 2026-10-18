@@ -1,23 +1,23 @@
-// TanStack Table v8 hands out one mutable table object, so compiled memoization would render stale rows;
-// opted out of the React Compiler until Table 9 (compiler-compatible).
+// These parts read table state through stable TanStack objects (table / column / row from context and props), which
+// compiled memoization would reuse stale; TanStack v9's fix is a Subscribe boundary per reader. Until that refactor,
+// they opt out of the React Compiler.
 'use no memo';
 
 import { useEffect, useState } from 'react';
-
-import type { Column } from '@tanstack/react-table';
 
 import { Button, FormattedNumber, Popover } from '@components/ui';
 import { FilterPill } from '@components/tables/data-table-filters/filter-pill';
 
 import { useAppTranslation } from '@hooks/shared';
 
-import { useNumberFormat } from '@utils';
+import { type KitColumn, useNumberFormat } from '@utils';
 
 import type { NumberRangeFilterMeta, NumberRangeFilterValue } from '@app-types';
+import type { RowData } from '@tanstack/react-table';
 
-type NumberRangeFilterProps<TData> = { column: Column<TData>; filterMeta: NumberRangeFilterMeta };
+type NumberRangeFilterProps<TData extends RowData> = { column: KitColumn<TData>; filterMeta: NumberRangeFilterMeta };
 
-function NumberRangeFilter<TData>({ column, filterMeta }: NumberRangeFilterProps<TData>) {
+function NumberRangeFilter<TData extends RowData>({ column, filterMeta }: NumberRangeFilterProps<TData>) {
   const { t } = useAppTranslation('common');
   const formatNumber = useNumberFormat();
   const value = (column.getFilterValue() as NumberRangeFilterValue | undefined) ?? {};

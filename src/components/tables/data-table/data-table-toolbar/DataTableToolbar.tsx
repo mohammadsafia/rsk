@@ -1,8 +1,9 @@
-// TanStack Table v8 hands out one mutable table object, so compiled memoization would render stale rows;
-// opted out of the React Compiler until Table 9 (compiler-compatible).
+// These parts read table state through stable TanStack objects (table / column / row from context and props), which
+// compiled memoization would reuse stale; TanStack v9's fix is a Subscribe boundary per reader. Until that refactor,
+// they opt out of the React Compiler.
 'use no memo';
 
-import { type FC, type PropsWithChildren, useEffect, useState } from 'react';
+import { type FC, type PropsWithChildren, useEffect, useRef, useState } from 'react';
 
 import { Button, Input } from '@components/ui';
 import { Conditional } from '@components/utils';
@@ -29,23 +30,28 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
   const { t, direction } = useAppTranslation('common');
   const { table, onResetFilters, bulkActionsMounted } = useDataTableContext();
   // While bulk actions show, the toolbar stays mounted (typed search survives) but hidden.
-  const hasSelection = bulkActionsMounted && Object.values(table.getState().rowSelection).some(Boolean);
+  const hasSelection = bulkActionsMounted && Object.values(table.state.rowSelection).some(Boolean);
 
-  const [search, setSearch] = useState(table.getState().globalFilter ?? '');
+  const [search, setSearch] = useState(table.state.globalFilter ?? '');
   const debouncedSearch = useDebounce(search, 500);
 
+  // Push the search only when the debounced text changes. In TanStack Table v9 the `table` object changes identity
+  // with every state change, so re-running on `table` would push stale text back over a reset.
+  const pushedSearch = useRef(debouncedSearch);
   useEffect(() => {
+    if (pushedSearch.current === debouncedSearch) return;
+    pushedSearch.current = debouncedSearch;
     table.setGlobalFilter(debouncedSearch);
   }, [debouncedSearch, table]);
 
   const filterableColumns = table.getAllColumns().filter((column) => column.getCanFilter() && column.columnDef.meta?.filterMeta);
   const activeCount = filterableColumns.filter((column) => column.getIsFiltered()).length;
   const hasActive = activeCount > 0;
-  const isSearching = !!table.getState().globalFilter;
+  const isSearching = !!table.state.globalFilter;
 
   // Client-side tables can say how much the list was narrowed; server-side ones only know the filtered total.
   const unfilteredTotal = table.options.manualFiltering ? undefined : table.getCoreRowModel().rows.length;
-  const isNarrowed = (hasActive || !!table.getState().globalFilter) && unfilteredTotal !== undefined && totalCount !== unfilteredTotal;
+  const isNarrowed = (hasActive || !!table.state.globalFilter) && unfilteredTotal !== undefined && totalCount !== unfilteredTotal;
 
   return (
     <div

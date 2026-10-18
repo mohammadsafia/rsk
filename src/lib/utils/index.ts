@@ -9,3 +9,4 @@ export * from './dataTableFilters';
 export * from './mergeRefs';
 export * from './formResolver';
 export * from './schemas';
+export * from './tableFeatures';

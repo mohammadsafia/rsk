@@ -1,14 +1,16 @@
-// TanStack Table v8 hands out one mutable table object, so compiled memoization would render stale rows;
-// opted out of the React Compiler until Table 9 (compiler-compatible).
+// These parts read table state through stable TanStack objects (table / column / row from context and props), which
+// compiled memoization would reuse stale; TanStack v9's fix is a Subscribe boundary per reader. Until that refactor,
+// they opt out of the React Compiler.
 'use no memo';
-
-import type { ColumnDef, Row, Table } from '@tanstack/react-table';
 
 import { Checkbox } from '@components/ui';
 
 import { useAppTranslation } from '@hooks/shared';
+import { type KitColumnDef, type KitRow, type KitCoreTable } from '@utils';
+import type { RowData } from '@tanstack/react-table';
 
-function SelectPageCheckbox<TData>({ table }: { table: Table<TData> }) {
+/** Header cells get the core table (v9), not the one useTable returns. */
+function SelectPageCheckbox<TData extends RowData>({ table }: { table: KitCoreTable<TData> }) {
   const { t } = useAppTranslation('common');
   const checked = table.getIsAllPageRowsSelected() ? true : table.getIsSomePageRowsSelected() ? 'indeterminate' : false;
 
@@ -21,7 +23,7 @@ function SelectPageCheckbox<TData>({ table }: { table: Table<TData> }) {
   );
 }
 
-function SelectRowCheckbox<TData>({ row, label }: { row: Row<TData>; label?: string }) {
+function SelectRowCheckbox<TData extends RowData>({ row, label }: { row: KitRow<TData>; label?: string }) {
   const { t } = useAppTranslation('common');
 
   return (
@@ -35,7 +37,9 @@ function SelectRowCheckbox<TData>({ row, label }: { row: Row<TData>; label?: str
 }
 
 /** A pinned-start checkbox column. Rows are keyed by the table's `getRowId`, so selection survives paging and sorting. */
-export function createSelectionColumn<TData>({ getRowLabel }: { getRowLabel?: (row: TData) => string } = {}): ColumnDef<TData> {
+export function createSelectionColumn<TData extends RowData>({
+  getRowLabel,
+}: { getRowLabel?: (row: TData) => string } = {}): KitColumnDef<TData> {
   return {
     id: 'select',
     size: 44,
