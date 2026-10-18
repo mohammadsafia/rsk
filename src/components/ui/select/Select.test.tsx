@@ -40,8 +40,10 @@ describe('Select', () => {
     expect(screen.getByRole('listbox').className).toContain('origin-(--radix-select-content-transform-origin)');
   });
 
-  it('its options cascade in as the list unfolds', () => {
+  it('its options cascade in from above, so the rise never counts as overflow (no stray scroll-down arrow)', () => {
     renderSelect(true);
-    expect(document.querySelector('[data-slot="select-viewport"]')?.className).toContain('cascade');
+    const className = document.querySelector('[data-slot="select-viewport"]')?.className ?? '';
+    expect(className).toContain('cascade');
+    expect(className).toContain('[--cascade-rise:-4px]');
   });
 });

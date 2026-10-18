@@ -11,6 +11,8 @@ describe('motion CSS contract', () => {
     expect(css).toMatch(/@utility cascade\s*\{/);
     expect(css).toContain('nth-child(12)');
     expect(css).toMatch(/calc\(var\(--motion-stagger\) \* 11\)/);
+    // The rise distance is a variable, so a list that measures its own overflow (Select) can come in from above.
+    expect(css).toContain('--tw-enter-translate-y: var(--cascade-rise, 4px);');
   });
 
   it('the app shell recedes by --motion-depth while a modal surface is open, and never under reduced motion', () => {

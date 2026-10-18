@@ -114,8 +114,9 @@ const SelectContent: FC<SelectContentProps> = ({ className, children, position =
 
       <SelectPrimitive.Viewport
         data-slot="select-viewport"
-        // Options cascade in as the list unfolds.
-        className={cn('cascade', position === 'popper' && 'h-(--radix-select-trigger-height) w-full')}
+        // Options cascade in as the list unfolds, from above: Radix shows its scroll-down arrow whenever content overflows,
+        // and a rise from below would count as overflow while it plays.
+        className={cn('cascade [--cascade-rise:-4px]', position === 'popper' && 'h-(--radix-select-trigger-height) w-full')}
       >
         {children}
       </SelectPrimitive.Viewport>
