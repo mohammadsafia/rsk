@@ -13,9 +13,11 @@ describe('motion CSS contract', () => {
     expect(css).toMatch(/calc\(var\(--motion-stagger\) \* 11\)/);
   });
 
-  it('the app shell recedes by --motion-depth under a modal surface, and never under reduced motion', () => {
+  it('the app shell recedes by --motion-depth while a modal surface is open, and never under reduced motion', () => {
     const css = read('src/styles/motion.css');
-    expect(css).toMatch(/\[data-overlay-depth\] \[data-slot='app-shell'\]\s*\{[^}]*scale: calc\(1 - var\(--motion-depth\)\)/);
-    expect(css).toMatch(/prefers-reduced-motion: reduce\)\s*\{[^@]*\[data-overlay-depth\] \[data-slot='app-shell'\][^}]*scale: none/);
+    expect(css).toMatch(
+      /:root:has\(\[data-slot='dialog-content'\]\[data-state='open'\], \[data-slot='sheet-content'\]\[data-state='open'\]\) \[data-slot='app-shell'\]\s*\{[^}]*scale: calc\(1 - var\(--motion-depth\)\)/,
+    );
+    expect(css).toMatch(/prefers-reduced-motion: reduce\)\s*\{[^@]*\[data-slot='app-shell'\][^}]*scale: none/);
   });
 });
