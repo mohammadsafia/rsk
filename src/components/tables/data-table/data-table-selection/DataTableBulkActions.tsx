@@ -70,7 +70,11 @@ function DataTableBulkActions<TData>({ children, className }: DataTableBulkActio
           data-slot="data-table-bulk-actions"
           role="toolbar"
           aria-label={t('table.bulkActions')}
-          className={cn('bg-surface border-border flex w-full flex-wrap items-center gap-2 rounded-lg border px-3 py-2', className)}
+          className={cn(
+            // Rises in on the spring; no exit — the toolbar takes the row back at once, so an exit would stack both bars.
+            'bg-surface border-border animate-in fade-in slide-in-from-bottom-1 duration-base ease-spring flex w-full flex-wrap items-center gap-2 rounded-lg border px-3 py-2 motion-reduce:animate-none',
+            className,
+          )}
         >
           <span className="text-fg text-sm font-medium tabular-nums">{t('table.selected', { count })}</span>
 

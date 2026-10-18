@@ -80,6 +80,21 @@ describe('DataTable selection', () => {
     expect(document.querySelector('[aria-live="polite"]')?.textContent).toBe('1 selected');
   });
 
+  it('rises in on the spring when selection starts, leaves at once so the returning toolbar never stacks under it', () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select INV-1' }));
+    const bar = screen.getByRole('toolbar', { name: 'Actions for selected rows' });
+    expect(bar.className).toContain('animate-in');
+    expect(bar.className).toContain('slide-in-from-bottom-1');
+    expect(bar.className).toContain('duration-base');
+    expect(bar.className).toContain('ease-spring');
+    expect(bar.className).toContain('motion-reduce:animate-none');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Clear selection' }));
+    expect(screen.queryByRole('toolbar')).toBeNull();
+    expect(document.querySelector('[data-slot="data-table-toolbar"]')?.hasAttribute('hidden')).toBe(false);
+  });
+
   it('header checkbox selects the page (indeterminate when partial), then offers all filtered results', () => {
     render(<Harness />);
     const header = screen.getByRole('checkbox', { name: 'Select all rows on this page' });
