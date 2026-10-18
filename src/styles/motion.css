@@ -9,3 +9,14 @@
   --motion-reveal-stagger: 0ms;
   --motion-depth: 0;
 }
+
+/* The toast timer: its heavy top rule drains over the auto-close time (Toast.tsx). */
+@keyframes rsk-drain {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}

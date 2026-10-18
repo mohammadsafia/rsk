@@ -1,3 +1,5 @@
+import { type CSSProperties } from 'react';
+
 import { Toast } from '@components/ui';
 
 import { useAppTranslation, useToast } from '@hooks/shared';
@@ -8,8 +10,17 @@ function Toaster() {
 
   return (
     <Toast.Provider duration={5000} label={t('toast.label')} swipeDirection={direction === 'rtl' ? 'left' : 'right'}>
-      {toasts.map(({ id, title, description, action, ...props }) => (
-        <Toast key={id} {...props}>
+      {toasts.map(({ id, title, description, action, autoClose = true, duration, ...props }) => (
+        <Toast
+          key={id}
+          duration={duration}
+          data-auto-close={String(autoClose)}
+          // The heavy top rule drains over this time (Toast's timer), paused on hover and focus.
+          style={
+            autoClose && duration && Number.isFinite(duration) ? ({ '--toast-duration': `${duration}ms` } as CSSProperties) : undefined
+          }
+          {...props}
+        >
           <Toast.Icon />
 
           <div className="grid min-w-0 flex-1 gap-0.5">

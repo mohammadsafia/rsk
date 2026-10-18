@@ -16,9 +16,9 @@ export type ToastTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
 const viewportVariants = cva('fixed z-100 flex w-full flex-col gap-2 p-3 md:max-w-max', {
   variants: {
     position: {
-      'top-start': 'top-16 inset-s-0',
-      'top-center': 'top-16 inset-x-0 mx-auto',
-      'top-end': 'top-16 inset-e-0',
+      'top-start': 'top-0 inset-s-0',
+      'top-center': 'top-0 inset-x-0 mx-auto',
+      'top-end': 'top-0 inset-e-0',
       'bottom-start': 'bottom-0 inset-s-0',
       'bottom-center': 'bottom-0 inset-x-0 mx-auto',
       'bottom-end': 'bottom-0 inset-e-0',
@@ -32,10 +32,11 @@ const viewportVariants = cva('fixed z-100 flex w-full flex-col gap-2 p-3 md:max-
 const toastVariants = cva(
   [
     floatingSurfaceClassName,
-    'group pointer-events-auto relative rule-top flex w-full items-start gap-3 overflow-hidden p-3 pe-10 md:w-96',
+    'group pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden p-3 pe-10 md:w-96',
     'data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-(--radix-toast-swipe-end-x) data-[swipe=move]:translate-x-(--radix-toast-swipe-move-x)',
     'data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out',
-    'duration-base data-[state=closed]:fade-out-0 motion-reduce:data-[state=open]:slide-in-from-top-0 motion-reduce:data-[state=open]:slide-in-from-bottom-0',
+    // Springs into place, leaves quicker (spec §4 toast).
+    'data-[state=open]:duration-spring data-[state=open]:ease-spring data-[state=closed]:duration-exit data-[state=closed]:ease-in data-[state=closed]:fade-out-0 motion-reduce:data-[state=open]:slide-in-from-top-0 motion-reduce:data-[state=open]:slide-in-from-bottom-0',
   ],
   {
     variants: {
@@ -113,7 +114,7 @@ const ToastClose: FC<ToastCloseProps> = ({ className, ...props }) => {
       data-slot="toast-close"
       className={cn(
         'focus-ring text-fg-muted hover:text-fg absolute end-2 top-2 cursor-pointer rounded-sm p-1',
-        'transition-opacity pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 pointer-fine:focus-visible:opacity-100',
+        'transition-opacity',
         className,
       )}
       toast-close=""
@@ -138,6 +139,16 @@ const ToastAction: FC<ToastActionProps> = ({ className, ...props }) => (
 const Toast: ToastComponent = ({ className, tone = 'neutral', position, children, ...props }) => (
   <ToastContext.Provider value={{ tone }}>
     <ToastPrimitives.Root data-slot="toast" data-tone={tone} className={cn(toastVariants({ position }), className)} {...props}>
+      {/* The heavy top rule doubles as the auto-close timer: it drains over --toast-duration and pauses with Radix's own timer. */}
+      <span
+        data-slot="toast-timer"
+        aria-hidden="true"
+        className={cn(
+          'bg-rule-strong pointer-events-none absolute inset-x-0 top-0 h-(--rule-width) origin-left rtl:origin-right',
+          '[animation:rsk-drain_var(--toast-duration,0ms)_linear_forwards] group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]',
+          'group-data-[auto-close=false]:animate-none motion-reduce:animate-none',
+        )}
+      />
       {children}
     </ToastPrimitives.Root>
   </ToastContext.Provider>

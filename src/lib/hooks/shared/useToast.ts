@@ -9,6 +9,8 @@ type ToasterToast = ToastProps & {
   title?: ReactNode;
   description?: ReactNode;
   action?: ReactElement<typeof Toast.Action>;
+  /** Closes by itself after a reading-time duration (default true); false keeps it until dismissed. */
+  autoClose?: boolean;
 };
 
 type ActionType = typeof ACTION_TYPES;
@@ -117,8 +119,14 @@ function dispatch(action: Action) {
   listeners.forEach((listener) => listener(memoryState));
 }
 
-export const toast = (props: Toast) => {
+const textOf = (node: ReactNode) => (typeof node === 'string' || typeof node === 'number' ? String(node) : '');
+
+/** Auto-close time from the message length (spec §4 toast): 4s + 60ms a word, at most 10s. */
+export const toastDuration = (text: string) => Math.min(10000, 4000 + 60 * text.trim().split(/\s+/).filter(Boolean).length);
+
+export const toast = ({ autoClose = true, ...props }: Toast) => {
   const id = genId();
+  const duration = autoClose ? (props.duration ?? toastDuration(`${textOf(props.title)} ${textOf(props.description)}`)) : Infinity;
 
   const update = (props: ToasterToast) => dispatch({ type: 'UPDATE_TOAST', toast: { ...props, id } });
 
@@ -128,6 +136,8 @@ export const toast = (props: Toast) => {
     type: 'ADD_TOAST',
     toast: {
       ...props,
+      autoClose,
+      duration,
       id,
       open: true,
       onOpenChange: (open) => {
