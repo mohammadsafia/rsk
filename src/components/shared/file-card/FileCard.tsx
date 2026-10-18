@@ -401,7 +401,7 @@ const Assignee = <TOption,>({
   );
 };
 
-const Date: FC<DateProps> = ({ className, ...props }) => {
+const FileDate: FC<DateProps> = ({ className, ...props }) => {
   const { entry, accessors } = useFileCardContext();
   const { formatNullableDate, constants } = useDate();
 
@@ -449,7 +449,7 @@ FileCard.Reject = Reject;
 FileCard.Status = Status;
 FileCard.Footer = Footer;
 FileCard.Assignee = Assignee;
-FileCard.Date = Date;
+FileCard.Date = FileDate;
 
 Header.displayName = 'FileCardHeader';
 Title.displayName = 'FileCardTitle';
@@ -460,6 +460,6 @@ ApprovalPrompt.displayName = 'FileCardApprovalPrompt';
 FileCard.Approve.displayName = 'FileCardApprove';
 FileCard.Reject.displayName = 'FileCardReject';
 Footer.displayName = 'FileCardFooter';
-Date.displayName = 'FileCardDate';
+FileDate.displayName = 'FileCardDate';
 
 export default FileCard;

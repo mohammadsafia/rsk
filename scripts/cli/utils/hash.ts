@@ -17,5 +17,7 @@ export function computeContentHash(content: string): string {
     .replace(/\s+/g, ' ')
     .trim();
 
-  return crypto.createHash('md5').update(normalized).digest('hex');
+  // A content fingerprint for change detection, not security; manifests already store MD5s, so changing it would mark
+  // every generated file as hand-edited.
+  return crypto.createHash('md5').update(normalized).digest('hex'); // NOSONAR
 }

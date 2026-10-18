@@ -30,6 +30,8 @@ export const DROP = [
   'src/locales/ar/components.json',
   // This repository's own tooling, plans and editor state
   'scripts/starter/',
+  // Renders RSK's own logo favicons; an app replaces public/ favicons with its own.
+  'scripts/design-system/favicons/',
   'tests/starter/',
   '.github/workflows/starter-sync.yml',
   'docs/',

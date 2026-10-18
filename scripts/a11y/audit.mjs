@@ -45,10 +45,20 @@ const responds = async (url) => {
 async function ensureServer() {
   if (await responds(BASE)) return () => {};
   const port = new URL(BASE).port || '5173';
-  const server = spawn('corepack', ['pnpm@10.34.7', 'exec', 'vp', 'dev', '--port', port, '--strictPort'], { cwd: ROOT, stdio: 'ignore' });
+  // Node runs vp's own entry by absolute path: no PATH lookup, and kill() reaches the server itself, not a wrapper.
+  const vp = path.join(path.dirname(require.resolve('vite-plus/package.json')), 'bin/vp');
+  // Its own process group: vp starts the dev server as a child, so stopping means stopping the whole group.
+  const server = spawn(process.execPath, [vp, 'dev', '--port', port, '--strictPort'], { cwd: ROOT, stdio: 'ignore', detached: true });
   for (let attempt = 0; attempt < 120 && !(await responds(BASE)); attempt += 1) await new Promise((resolve) => setTimeout(resolve, 500));
   if (!(await responds(BASE))) throw new Error(`The dev server did not answer on ${BASE}`);
-  return () => server.kill();
+  return () => {
+    try {
+      // pid is undefined only if the spawn itself failed; then there is no group to stop.
+      if (server.pid !== undefined) process.kill(-server.pid, 'SIGTERM');
+    } catch {
+      server.kill();
+    }
+  };
 }
 
 /** Every same-site page reachable from "/" by links (breadth first, up to MAX_PAGES). */

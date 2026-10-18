@@ -30,6 +30,17 @@ describe('buildStarter', () => {
     expect(existsSync(path.join(out, '.github/workflows/starter-sync.yml'))).toBe(false);
   });
 
+  it('ships SonarCloud settings that skip the Tailwind v4 stylesheet its CSS parser cannot read', () => {
+    const settings = readFileSync(path.join(out, '.sonarcloud.properties'), 'utf8');
+    expect(settings).toMatch(/^sonar\.exclusions=src\/styles\/utilities\.css$/m);
+  });
+
+  it('ships none of the RSK brand tooling (the favicon renderer)', () => {
+    expect(existsSync(path.join(out, 'scripts/design-system/favicons'))).toBe(false);
+    // The class/prop codemods stay: the starter's own tests and scripts use them.
+    expect(existsSync(path.join(out, 'scripts/design-system/codemods'))).toBe(true);
+  });
+
   it('names no client API anywhere in the tree', () => {
     const offenders = walk(out).filter((file) => /qlinica/i.test(readFileSync(file, 'utf8')));
     expect(offenders.map((file) => path.relative(out, file))).toEqual([]);

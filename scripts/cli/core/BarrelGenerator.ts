@@ -30,7 +30,8 @@ export class BarrelGenerator {
    * Generate a barrel for a list of filenames (without reading IR).
    */
   generateFromFilenames(filenames: string[], enumStrategy: EnumStrategy, enumNames: Set<string> = new Set()): string {
-    const sorted = [...filenames].sort();
+    // Code-unit order: deterministic output, independent of the machine's locale.
+    const sorted = [...filenames].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 
     const exports = sorted.map((name) => {
       const isEnum = enumNames.has(name) && enumStrategy === 'enum';

@@ -108,7 +108,7 @@ export function listSourceFiles(repoRoot: string): string[] {
   return walk(join(repoRoot, 'src'))
     .filter((file) => /\.(tsx?|mdx)$/.test(file) && !/\.(test|d)\.tsx?$/.test(file))
     .map((file) => toPosix(relative(repoRoot, file)))
-    .sort();
+    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 }
 
 export function scanRepo(repoRoot: string): Baseline {
@@ -125,7 +125,7 @@ export function scanRepo(repoRoot: string): Baseline {
 export function compareToBaseline(current: Baseline, baseline: Baseline): { regressions: string[]; improvements: string[] } {
   const regressions: string[] = [];
   const improvements: string[] = [];
-  const files = [...new Set([...Object.keys(current), ...Object.keys(baseline)])].sort();
+  const files = [...new Set([...Object.keys(current), ...Object.keys(baseline)])].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 
   for (const file of files) {
     for (const { id } of FORBIDDEN_PATTERNS) {
