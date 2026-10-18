@@ -37,7 +37,7 @@ describe('Sheet', () => {
     const sheet = screen.getByRole('dialog', { name: 'New appointment' });
     expect(sheet.querySelector('[data-slot="sheet-footer"]')?.textContent).toContain('Save');
     expect(sheet.className).toContain('rule-top-section');
-    expect(sheet.className).toContain('data-[state=open]:duration-slow');
+    expect(sheet.className).toContain('data-[state=open]:duration-spring-long');
     expect(sheet.className).toContain('data-[state=closed]:duration-exit');
     expect(sheet.className).toContain('data-[state=closed]:ease-in');
     expect(sheet.querySelector('[data-slot="section-marker"]')).toBeNull();
@@ -61,6 +61,16 @@ describe('Sheet', () => {
     // Unscoped bottom slides leak into the md side panel and add vertical travel (a diagonal slide from below).
     expect(classes.filter((name) => /slide-(in-from|out-to)-bottom/.test(name)).every((name) => name.startsWith('max-md:'))).toBe(true);
     expect(classes).toContain('md:data-[state=open]:slide-in-from-end');
+  });
+
+  it('springs in from its edge and leaves quickly; its body fields cascade in', () => {
+    render(<Example side="end" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Book' }));
+    const classes = screen.getByRole('dialog').className.split(/\s+/);
+    expect(classes).toEqual(expect.arrayContaining(['data-[state=open]:duration-spring-long', 'data-[state=open]:ease-spring']));
+    expect(classes).toEqual(expect.arrayContaining(['data-[state=closed]:duration-exit', 'data-[state=closed]:ease-in']));
+    expect(classes).not.toContain('data-[state=open]:duration-slow');
+    expect(document.querySelector('[data-slot="sheet-body"]')?.className).toContain('cascade');
   });
 
   it('ignores Escape when not dismissible', () => {
