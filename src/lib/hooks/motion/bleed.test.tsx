@@ -76,4 +76,36 @@ describe('useInkBleed', () => {
     fireEvent.pointerDown(screen.getByRole('button', { name: 'Save' }), { clientX: 130 });
     expect(animate).not.toHaveBeenCalled();
   });
+
+  it('only bleeds for a primary press: no ink on a right-click', () => {
+    render(<Pressable />);
+    const button = screen.getByRole('button', { name: 'Save' });
+    fireEvent.pointerDown(button, { clientX: 130, button: 2 });
+    expect(button.querySelector('[data-slot="ink-bleed"]')).toBeNull();
+  });
+
+  it('waits for a touch to end as a tap: a touch that turns into a scroll (pointercancel) leaves no ink', () => {
+    render(<Pressable />);
+    const button = screen.getByRole('button', { name: 'Save' });
+    fireEvent.pointerDown(button, { clientX: 130, pointerType: 'touch' });
+    expect(button.querySelector('[data-slot="ink-bleed"]')).toBeNull();
+    fireEvent.pointerCancel(button, { pointerType: 'touch' });
+    fireEvent.pointerUp(button, { pointerType: 'touch' });
+    expect(button.querySelector('[data-slot="ink-bleed"]')).toBeNull();
+
+    fireEvent.pointerDown(button, { clientX: 130, pointerType: 'touch' });
+    fireEvent.pointerUp(button, { pointerType: 'touch' });
+    expect(button.querySelector('[data-slot="ink-bleed"]')).not.toBeNull();
+  });
+
+  it("stays inside the element's rounded corners: the line sits in a clip that inherits the border radius", () => {
+    render(<Pressable />);
+    const button = screen.getByRole('button', { name: 'Save' });
+    fireEvent.pointerDown(button, { clientX: 130 });
+    const clip = button.querySelector<HTMLElement>('[data-slot="ink-bleed"]')!.parentElement!;
+    expect(clip).not.toBe(button);
+    expect(clip.style.borderRadius).toBe('inherit');
+    expect(clip.style.overflow).toBe('hidden');
+    expect(['0', '0px']).toContain(clip.style.inset);
+  });
 });
