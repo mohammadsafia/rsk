@@ -50,7 +50,9 @@ describe('motion CSS contract', () => {
   it('the theme switch reveals the new snapshot as a circle (a fade in calm), never per-element transitions; reveal rises sections in counting order', () => {
     const css = read('src/styles/motion.css');
     // While the theme swaps, elements' own colour transitions are frozen: the reveal is the only motion.
-    expect(css).toMatch(/\.theme-switching \*,\s*\.theme-switching \*::before,\s*\.theme-switching \*::after\s*\{\s*transition: none !important;/);
+    expect(css).toMatch(
+      /\.theme-switching \*,\s*\.theme-switching \*::before,\s*\.theme-switching \*::after\s*\{\s*transition: none !important;/,
+    );
     expect(css).toMatch(/::view-transition-new\(root\)\s*\{\s*animation: rsk-theme-reveal/);
     expect(css).toMatch(/@keyframes rsk-theme-reveal[\s\S]*?clip-path: circle\(var\(--theme-reveal-r/);
     expect(css).toMatch(/\[data-motion='calm'\]::view-transition-new\(root\)\s*\{\s*animation: rsk-theme-fade/);
