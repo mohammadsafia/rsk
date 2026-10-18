@@ -3,6 +3,7 @@
 //
 //   node scripts/bundle/first-load.mjs --dist dist                 # discover routes from "/" and report
 //   node scripts/bundle/first-load.mjs --dist dist --budget 150    # fail a route over 150 KB gz
+//   node scripts/bundle/first-load.mjs --dist dist --budget starter --routes /,/dashboard   # the starter's own budget
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import path from 'node:path';
@@ -12,6 +13,21 @@ import { chromium } from 'playwright';
 
 import { discoverRoutes } from '../a11y/audit.mjs';
 import { isEntry } from '../lib/is-entry.mjs';
+
+/**
+ * The starter's first-load budget per route, in KB of gzipped JS: 200.8 KB measured when the budget was set
+ * (2026-10-18), plus ~5%. Raising it is a decision: say why in the commit.
+ */
+export const BUNDLE_BUDGET_KB = 210;
+
+/** --budget: 'starter' is BUNDLE_BUDGET_KB, a number is itself, absent means report only. */
+export function resolveBudget(value) {
+  if (value === undefined) return undefined;
+  if (value === 'starter') return BUNDLE_BUDGET_KB;
+  const budget = Number(value);
+  if (!Number.isFinite(budget) || budget <= 0) throw new Error(`--budget must be a number of KB or "starter", not "${value}"`);
+  return budget;
+}
 
 const TYPES = { '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json' };
 
@@ -96,7 +112,7 @@ const arg = (name, fallback) => {
 async function main() {
   const dist = path.resolve(arg('dist', 'dist'));
   const routes = arg('routes')?.split(',');
-  const budget = arg('budget') ? Number(arg('budget')) : undefined;
+  const budget = resolveBudget(arg('budget'));
   const results = await measureFirstLoad({ dist, routes, localesDir: path.resolve('src/locales/en') });
   for (const result of results) {
     const flags = [

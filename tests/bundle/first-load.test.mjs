@@ -5,7 +5,7 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { localeKeys, rawKeysIn } from '../../scripts/bundle/first-load.mjs';
+import { BUNDLE_BUDGET_KB, localeKeys, rawKeysIn, resolveBudget } from '../../scripts/bundle/first-load.mjs';
 
 const locales = () => {
   const dir = mkdtempSync(path.join(tmpdir(), 'locales-'));
@@ -29,5 +29,13 @@ describe('first-load page check', () => {
     // innerText puts block elements on their own lines, as the spike's broken page would read.
     expect(rawKeysIn('title\ndescription\nempty.title\nempty.description', keys)).toEqual(['empty.title', 'empty.description']);
     expect(rawKeysIn('Nothing here — write to layla@empty.title.com or open empty.title.json', keys)).toEqual([]);
+  });
+
+  it("resolves --budget: 'starter' is the starter's budget, a number is itself, nothing means report only", () => {
+    expect(BUNDLE_BUDGET_KB).toBe(210);
+    expect(resolveBudget('starter')).toBe(210);
+    expect(resolveBudget('150')).toBe(150);
+    expect(resolveBudget(undefined)).toBeUndefined();
+    expect(() => resolveBudget('lots')).toThrow(/--budget/);
   });
 });
