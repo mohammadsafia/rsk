@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { Toast } from '@components/ui';
@@ -24,7 +24,7 @@ describe('Toast', () => {
   it('keeps every tone on the raised surface and names its close button', () => {
     render(
       <Toast.Provider>
-        <Toast open tone="success">
+        <Toast open tone="success" duration={4000}>
           <Toast.Title>Saved</Toast.Title>
           <Toast.Close />
         </Toast>
@@ -38,8 +38,7 @@ describe('Toast', () => {
     expect(toast?.className).not.toContain('rule-top');
     const timer = toast?.querySelector<HTMLElement>('[data-slot="toast-timer"]');
     expect(timer?.getAttribute('aria-hidden')).toBe('true');
-    expect(timer?.className).toContain('group-hover:[animation-play-state:paused]');
-    expect(timer?.className).toContain('group-focus-within:[animation-play-state:paused]');
+    expect(timer?.className).toContain('group-data-paused:[animation-play-state:paused]');
     expect(timer?.className).toContain('motion-reduce:animate-none');
     // The close button is always visible, not only on hover.
     expect(toast?.querySelector('[data-slot="toast-close"]')?.className).not.toContain('opacity-0');
@@ -85,5 +84,47 @@ describe('Toast', () => {
     const viewport = document.querySelector('[data-slot="toast-viewport"]')!;
     expect(viewport.closest('[data-slot="app-shell"]')).toBeNull();
     expect(viewport.parentElement?.parentElement).toBe(document.body);
+  });
+
+  it('drains its timer over its own duration, outside the Toaster too; with no duration the rule stays whole', () => {
+    render(
+      <Toast.Provider>
+        <Toast open duration={3000}>
+          <Toast.Title>Timed</Toast.Title>
+        </Toast>
+        <Toast open>
+          <Toast.Title>Untimed</Toast.Title>
+        </Toast>
+        <Toast.Viewport />
+      </Toast.Provider>,
+    );
+    const timed = screen.getByText('Timed').closest<HTMLElement>('[data-slot="toast"]')!;
+    expect(timed.style.getPropertyValue('--toast-duration')).toBe('3000ms');
+    expect(timed.querySelector('[data-slot="toast-timer"]')?.className).toContain('rsk-drain');
+    const untimed = screen.getByText('Untimed').closest<HTMLElement>('[data-slot="toast"]')!;
+    expect(untimed.style.getPropertyValue('--toast-duration')).toBe('');
+    // A 0ms drain would empty the rule at once; an untimed toast keeps it full.
+    expect(untimed.querySelector('[data-slot="toast-timer"]')?.className).not.toContain('rsk-drain');
+  });
+
+  it('pauses its timer whenever Radix pauses the close timer (window blur, F8 into the region), not only on hover', () => {
+    render(
+      <Toast.Provider>
+        <Toast open duration={3000}>
+          <Toast.Title>Saved</Toast.Title>
+        </Toast>
+        <Toast.Viewport />
+      </Toast.Provider>,
+    );
+    const toast = screen.getByText('Saved').closest<HTMLElement>('[data-slot="toast"]')!;
+    expect(toast.dataset.paused).toBeUndefined();
+    act(() => {
+      window.dispatchEvent(new Event('blur'));
+    });
+    expect(toast.dataset.paused).toBe('');
+    act(() => {
+      window.dispatchEvent(new Event('focus'));
+    });
+    expect(toast.dataset.paused).toBeUndefined();
   });
 });

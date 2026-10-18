@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef, createContext, type FC, useContext } from 'react';
+import { type ComponentPropsWithoutRef, createContext, type CSSProperties, type FC, useContext, useState } from 'react';
 import { createPortal } from 'react-dom';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 
@@ -144,23 +144,47 @@ const ToastAction: FC<ToastActionProps> = ({ className, ...props }) => (
   <ToastPrimitives.Action data-slot="toast-action" className={cn('ms-auto shrink-0', className)} {...props} />
 );
 
-const Toast: ToastComponent = ({ className, tone = 'neutral', position, children, ...props }) => (
-  <ToastContext.Provider value={{ tone }}>
-    <ToastPrimitives.Root data-slot="toast" data-tone={tone} className={cn(toastVariants({ position }), className)} {...props}>
-      {/* The heavy top rule doubles as the auto-close timer: it drains over --toast-duration and pauses with Radix's own timer. */}
-      <span
-        data-slot="toast-timer"
-        aria-hidden="true"
-        className={cn(
-          'bg-rule-strong pointer-events-none absolute inset-x-0 top-0 h-(--rule-width) origin-left rtl:origin-right',
-          '[animation:rsk-drain_var(--toast-duration,0ms)_linear_forwards] group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]',
-          'group-data-[auto-close=false]:animate-none motion-reduce:animate-none',
-        )}
-      />
-      {children}
-    </ToastPrimitives.Root>
-  </ToastContext.Provider>
-);
+const Toast: ToastComponent = ({ className, tone = 'neutral', position, duration, style, onPause, onResume, children, ...props }) => {
+  // Radix pauses its close timer on hover, on focus, on window blur and when F8 moves focus into the region; the
+  // drain mirrors that through onPause/onResume instead of guessing from CSS states.
+  const [paused, setPaused] = useState(false);
+  // The drain needs a length to run over: a toast with no finite duration of its own keeps its rule whole.
+  const timed = duration !== undefined && Number.isFinite(duration);
+
+  return (
+    <ToastContext.Provider value={{ tone }}>
+      <ToastPrimitives.Root
+        data-slot="toast"
+        data-tone={tone}
+        data-paused={paused ? '' : undefined}
+        duration={duration}
+        style={timed ? ({ '--toast-duration': `${duration}ms`, ...style } as CSSProperties) : style}
+        onPause={() => {
+          setPaused(true);
+          onPause?.();
+        }}
+        onResume={() => {
+          setPaused(false);
+          onResume?.();
+        }}
+        className={cn(toastVariants({ position }), className)}
+        {...props}
+      >
+        {/* The heavy top rule doubles as the auto-close timer: it drains over --toast-duration and pauses with Radix's own timer. */}
+        <span
+          data-slot="toast-timer"
+          aria-hidden="true"
+          className={cn(
+            'bg-rule-strong pointer-events-none absolute inset-x-0 top-0 h-(--rule-width) origin-left rtl:origin-right',
+            timed && '[animation:rsk-drain_var(--toast-duration)_linear_forwards] group-data-paused:[animation-play-state:paused]',
+            'group-data-[auto-close=false]:animate-none motion-reduce:animate-none',
+          )}
+        />
+        {children}
+      </ToastPrimitives.Root>
+    </ToastContext.Provider>
+  );
+};
 
 Toast.Provider = ToastPrimitives.Provider;
 Toast.Viewport = ToastViewport;

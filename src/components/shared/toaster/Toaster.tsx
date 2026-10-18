@@ -1,5 +1,3 @@
-import { type CSSProperties } from 'react';
-
 import { Toast } from '@components/ui';
 
 import { useAppTranslation, useToast } from '@hooks/shared';
@@ -15,10 +13,6 @@ function Toaster() {
           key={id}
           duration={duration}
           data-auto-close={String(autoClose)}
-          // The heavy top rule drains over this time (Toast's timer), paused on hover and focus.
-          style={
-            autoClose && duration && Number.isFinite(duration) ? ({ '--toast-duration': `${duration}ms` } as CSSProperties) : undefined
-          }
           {...props}
         >
           <Toast.Icon />
