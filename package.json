@@ -55,6 +55,12 @@
     "tailwind-merge": "^3.7.0",
     "zod": "^4.6.7"
   },
+  "sideEffects": [
+    "*.css",
+    "./src/i18n.ts",
+    "./src/bootstrap.tsx",
+    "./src/main.tsx"
+  ],
   "scripts": {
     "dev": "vp dev",
     "build": "tsc -b && vp build",
