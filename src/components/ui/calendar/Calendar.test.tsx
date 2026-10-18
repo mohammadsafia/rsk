@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { act, cleanup, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { DirectionProvider } from '@radix-ui/react-direction';
 
@@ -19,6 +19,16 @@ const dayButton = (day: number) =>
   screen.getAllByRole('button').find((button) => button.textContent === String(day) && button.dataset.outside !== 'true')!;
 
 describe('Calendar', () => {
+  it('mirrors inside a dir="rtl" element even with no DirectionProvider above it', async () => {
+    const { container } = render(
+      <div dir="rtl">
+        <Calendar mode="single" defaultMonth={OCTOBER_2026} />
+      </div>,
+    );
+    const root = container.querySelector('.rdp-root') as HTMLElement;
+    await vi.waitFor(() => expect(root.getAttribute('dir')).toBe('rtl'));
+  });
+
   it('follows the surrounding direction, not only the language: an RTL section mirrors grid and arrows together', () => {
     const { container } = render(
       <DirectionProvider dir="rtl">
