@@ -15,7 +15,7 @@ describe('motion CSS contract', () => {
     expect(css).toContain('--tw-enter-translate-y: var(--cascade-rise, 4px);');
   });
 
-  it("cascade leaves a shimmering placeholder child its own shimmer instead of replacing it with the arrival", () => {
+  it('cascade leaves a shimmering placeholder child its own shimmer instead of replacing it with the arrival', () => {
     const css = read('src/styles/utilities.css');
     const cascade = css.slice(css.indexOf('@utility cascade'));
     expect(cascade).toMatch(/& > :not\(:where\(\.shimmer\)\)\s*\{[^}]*animation: enter/);

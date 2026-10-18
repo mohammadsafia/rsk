@@ -42,7 +42,10 @@ const mdxPlugin: VitePlugin = {
 } as VitePlugin;
 
 /** This project's root as Vite writes module ids (posix slashes), escaped for a RegExp. */
-const ROOT_ID = __dirname.split(path.sep).join('/').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const ROOT_ID = __dirname
+  .split(path.sep)
+  .join('/')
+  .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 /**
  * The compiler builds the kit, not its tests: a component declared inside a test closes over test-local state. The
  * folders are anchored at this project's root: a bare /tests/ would also match a clone that lives under some tests/

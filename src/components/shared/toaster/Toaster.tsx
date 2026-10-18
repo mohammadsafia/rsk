@@ -9,12 +9,7 @@ function Toaster() {
   return (
     <Toast.Provider duration={5000} label={t('toast.label')} swipeDirection={direction === 'rtl' ? 'left' : 'right'}>
       {toasts.map(({ id, title, description, action, autoClose = true, duration, ...props }) => (
-        <Toast
-          key={id}
-          duration={duration}
-          data-auto-close={String(autoClose)}
-          {...props}
-        >
+        <Toast key={id} duration={duration} data-auto-close={String(autoClose)} {...props}>
           <Toast.Icon />
 
           <div className="grid min-w-0 flex-1 gap-0.5">

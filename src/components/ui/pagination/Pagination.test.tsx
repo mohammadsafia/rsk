@@ -75,7 +75,7 @@ describe('Pagination', () => {
     expect(list.hasAttribute('data-ink-scope')).toBe(true);
   });
 
-  it("lays the list out by its own className: no wrapper box between it and the nav", () => {
+  it('lays the list out by its own className: no wrapper box between it and the nav', () => {
     render(
       <Pagination>
         <Pagination.List className="flex-1 justify-between">

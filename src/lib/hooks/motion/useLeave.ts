@@ -11,7 +11,8 @@ export const LEAVE_TIMING: KeyframeAnimationOptions = {
   fill: 'forwards',
 };
 
-const FOCUSABLE = 'button:not(:disabled), [href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE =
+  'button:not(:disabled), [href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
 
 /** The first focusable thing in the siblings after the element, else before it (skipping siblings that are leaving too). */
 function neighbourOf(element: HTMLElement): HTMLElement | null {
