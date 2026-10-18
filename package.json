@@ -9,7 +9,7 @@
   },
   "packageManager": "pnpm@10.34.7",
   "dependencies": {
-    "@hookform/resolvers": "^3.10.0",
+    "@hookform/resolvers": "^5.9.2",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-avatar": "^1.1.2",
     "@radix-ui/react-checkbox": "^1.1.3",
@@ -53,7 +53,7 @@
     "react-router": "^8.4.0",
     "recharts": "3.10.1",
     "tailwind-merge": "^2.6.0",
-    "zod": "^3.23.8"
+    "zod": "^4.6.7"
   },
   "scripts": {
     "dev": "vp dev",

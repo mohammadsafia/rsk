@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 
 import { ClinicError, type Invoice, invoiceBalance, invoiceTotal, type PaymentMethod } from '@api/clinic';
 import { Alert, Badge, Button, EmptyState, Money, Sheet, Skeleton } from '@components/ui';
@@ -9,7 +8,7 @@ import { FormContainer, FormDatePicker, FormNumber, FormSelect } from '@componen
 
 import { toast, useAppTranslation, useDate } from '@hooks/shared';
 
-import { useMoneyFormat } from '@utils';
+import { formResolver, useMoneyFormat } from '@utils';
 
 import { useInvoice, usePatients, useRecordPayment, useSendInvoice, useVoidInvoice } from '../queries';
 import { INVOICE_TONE } from '../shared/status';
@@ -41,7 +40,7 @@ function RecordPayment({ invoice }: { invoice: Invoice }) {
   );
 
   const form = useForm<PaymentForm>({
-    resolver: zodResolver(schema),
+    resolver: formResolver<PaymentForm>(schema),
     defaultValues: { amount: null, method: 'card', date: todayKey },
   });
 

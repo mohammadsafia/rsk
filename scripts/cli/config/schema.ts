@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 export const SwaggerEndpointSchema = z.object({
   name: z.string().min(1),
-  url: z.string().url(),
+  url: z.url(),
   outputDir: z.string().min(1),
 });
 
@@ -26,8 +26,9 @@ export const FormattingConfigSchema = z.preprocess(
 export const DtoGenConfigSchema = z.object({
   endpoints: z.array(SwaggerEndpointSchema).min(1),
   enumStrategy: z.enum(['type-literal', 'enum']).default('type-literal'),
-  formatting: FormattingConfigSchema.default({}),
-  selectedSchemas: z.record(z.union([z.array(z.string()), z.literal('all')])).optional(),
+  // prefault, not default: Zod 4's .default() returns {} as-is, skipping the inner defaults (format / lint: true).
+  formatting: FormattingConfigSchema.prefault({}),
+  selectedSchemas: z.record(z.string(), z.union([z.array(z.string()), z.literal('all')])).optional(),
   dryRun: z.boolean().default(false),
 });
 

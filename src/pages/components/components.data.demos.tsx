@@ -26,6 +26,8 @@ import { useToast } from '@hooks/shared';
 import { LookupHandler as LookupService } from '@api/handlers';
 
 import { z } from 'zod';
+
+import { formResolver } from '@utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CheckCircleFilled, CheckSquareFilled } from '@assets/icons';
 
@@ -294,7 +296,7 @@ export function FormNumberTextareaDemo() {
 export function FormWithValidationDemo() {
   const [disabled, setDisabled] = useState(false);
   const schema = z.object({
-    email: z.string().email('Enter a complete email address'),
+    email: z.email('Enter a complete email address'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     age: z.coerce.number().min(18, 'Must be at least 18 years old'),
     notes: z.string().optional(),
@@ -303,7 +305,7 @@ export function FormWithValidationDemo() {
   type FormData = z.infer<typeof schema>;
 
   const form = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: formResolver<FormData>(schema),
     defaultValues: { email: '', password: '', age: 18, notes: 'Test notes' },
   });
 
