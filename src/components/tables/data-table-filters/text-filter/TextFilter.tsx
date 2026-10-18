@@ -1,3 +1,7 @@
+// TanStack Table v8 hands out one mutable table object, so compiled memoization would render stale rows;
+// opted out of the React Compiler until Table 9 (compiler-compatible).
+'use no memo';
+
 import { useEffect, useRef, useState } from 'react';
 
 import type { Column } from '@tanstack/react-table';
@@ -26,11 +30,14 @@ function TextFilter<TData>({ column, filterMeta }: TextFilterProps<TData>) {
     timer.current = setTimeout(() => column.setFilterValue(text.trim() || undefined), COMMIT_DELAY);
   };
 
-  // A clear from outside (✕, Clear filters) cancels any pending commit and empties the box.
+  // A clear from outside (✕, Clear filters) empties the box (picked up while rendering) and cancels any pending commit.
+  const [lastValue, setLastValue] = useState(value);
+  if (value !== lastValue) {
+    setLastValue(value);
+    if (!value) setDraft('');
+  }
   useEffect(() => {
-    if (value) return;
-    clearTimeout(timer.current);
-    setDraft('');
+    if (!value) clearTimeout(timer.current);
   }, [value]);
 
   useEffect(() => () => clearTimeout(timer.current), []);

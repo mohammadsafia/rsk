@@ -29,6 +29,9 @@ const IMPLICIT_DEPENDENCIES = new Set([
   'tw-animate-css',
   '@tailwindcss/vite',
   'tsx',
+  // Babel peers of @rolldown/plugin-babel + the React Compiler preset (loaded by name, never imported).
+  '@babel/core',
+  'babel-plugin-react-compiler',
   // Kept for the WCAG sweep; scripts/a11y/audit.mjs imports it from Task 11 of the React 19 plan.
   'axe-core',
 ]);

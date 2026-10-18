@@ -1,7 +1,8 @@
 import { configDefaults, defineConfig, lazyPlugins } from 'vite-plus';
 import type { Plugin as VitePlugin } from 'vite-plus';
 import path from 'path';
-import react from '@vitejs/plugin-react-swc';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
+import babel from '@rolldown/plugin-babel';
 import tailwindcss from '@tailwindcss/vite';
 
 import mdx from '@mdx-js/rollup';
@@ -39,6 +40,9 @@ const mdxPlugin: VitePlugin = {
     return (mdxBase.transform as (...a: [string, string]) => unknown).apply(this, args);
   },
 } as VitePlugin;
+
+/** The compiler builds the kit, not its tests: a component declared inside a test closes over test-local state. */
+const COMPILER_EXCLUDE = [/[\\/]node_modules[\\/]/, /\.test\.[jt]sx?(?:$|\?)/, /[\\/]tests[\\/]/, /[\\/]test-utils[\\/]/];
 
 export default defineConfig({
   lint: {
@@ -138,6 +142,13 @@ export default defineConfig({
           'typescript/triple-slash-reference': 'error',
           'react/rules-of-hooks': 'error',
           'react/exhaustive-deps': 'warn',
+          // React Compiler rules: code that breaks them can't be compiled, so they fail the build of new code.
+          'react/purity': 'error',
+          'react/refs': 'error',
+          'react/set-state-in-effect': 'error',
+          'react/static-components': 'error',
+          // TanStack Table's hook is the known incompatible library; the compiler skips the components that use it.
+          'react/incompatible-library': 'warn',
           'react/only-export-components': 'off',
         },
         plugins: ['react'],
@@ -186,7 +197,8 @@ export default defineConfig({
     // .claude/skills: vendored Taste skills; reformatting breaks their skills-lock.json hashes.
     ignorePatterns: ['**/*.hbs', '**/*.mdx', '.claude/skills/**'],
   },
-  plugins: lazyPlugins(() => [mdxPlugin, react(), tailwindcss()]),
+  // The React Compiler memoizes components and hooks at build time (Babel preset; the Rust port is still experimental).
+  plugins: lazyPlugins(() => [mdxPlugin, react(), babel({ presets: [reactCompilerPreset()], exclude: COMPILER_EXCLUDE }), tailwindcss()]),
   // The docs site is dev-only; the landing page's component counts are baked in at build time instead.
   define: {
     __RSK_DOC_COUNTS__: JSON.stringify(scanDocCounts(path.resolve(__dirname, 'src/component-docs'))),

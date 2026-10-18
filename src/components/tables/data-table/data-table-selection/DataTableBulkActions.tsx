@@ -1,3 +1,7 @@
+// TanStack Table v8 hands out one mutable table object, so compiled memoization would render stale rows;
+// opted out of the React Compiler until Table 9 (compiler-compatible).
+'use no memo';
+
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import type { Row } from '@tanstack/react-table';
@@ -42,9 +46,8 @@ function DataTableBulkActions<TData>({ children, className }: DataTableBulkActio
   const canSelectAll =
     !table.options.manualPagination && table.getIsAllPageRowsSelected() && !table.getIsAllRowsSelected() && total > count;
 
-  useEffect(() => {
-    if (count > 0) setCleared(false);
-  }, [count]);
+  // A new selection retires the "selection cleared" announcement.
+  if (count > 0 && cleared) setCleared(false);
 
   const clear = () => {
     const root = barRef.current?.closest('[data-slot="data-table"]');

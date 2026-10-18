@@ -1,3 +1,7 @@
+// TanStack Table v8 hands out one mutable table object, so compiled memoization would render stale rows;
+// opted out of the React Compiler until Table 9 (compiler-compatible).
+'use no memo';
+
 import { useState } from 'react';
 
 import type { Column } from '@tanstack/react-table';

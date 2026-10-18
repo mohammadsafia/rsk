@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, useId } from 'react';
+import { useCallback, useId, useMemo, useState } from 'react';
 import { type FieldValues, useController } from 'react-hook-form';
 
 import { Calendar, type CalendarProps, fieldVariants, Popover, IconButton } from '@components/ui';
@@ -65,8 +65,9 @@ function FormDatePicker<TFieldValues extends FieldValues>({
     return undefined;
   }, [value]);
 
-  const isUserInputRef = useRef(false);
-  const lastSyncedValueRef = useRef<number | null>(null);
+  // The form value the text box last took in, and whether the latest change came from typing (keep the person's text).
+  const [syncedKey, setSyncedKey] = useState<number | null>(null);
+  const [typed, setTyped] = useState(false);
 
   const formatDateValue = useCallback(
     (dateValue: Date | undefined) => {
@@ -86,7 +87,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
 
   const handleDateChange = useCallback(
     (newDate: Date | undefined) => {
-      isUserInputRef.current = true;
+      setTyped(true);
       onChange(formatDateValue(newDate));
       if (newDate) {
         setCalendarMonth(newDate);
@@ -110,30 +111,24 @@ function FormDatePicker<TFieldValues extends FieldValues>({
     onChange: handleDateChange,
   });
 
-  useEffect(() => {
-    if (isUserInputRef.current) {
-      isUserInputRef.current = false;
-      return;
+  // A value from outside (load, reset, setValue) refills the box; a value the person just typed leaves their text alone.
+  const valueKey = date ? date.getTime() : null;
+  if (valueKey !== syncedKey) {
+    setSyncedKey(valueKey);
+    if (typed) setTyped(false);
+    else {
+      setFromDate(date);
+      if (date) setCalendarMonth(date);
     }
+  }
 
-    const valueKey = date ? date.getTime() : null;
-
-    if (lastSyncedValueRef.current === valueKey) {
-      return;
-    }
-
-    lastSyncedValueRef.current = valueKey;
-    setFromDate(date);
-    if (date) {
-      setCalendarMonth(date);
-    }
-  }, [date, setFromDate]);
-
-  useEffect(() => {
-    if (parsedDate) {
-      setCalendarMonth(parsedDate);
-    }
-  }, [parsedDate]);
+  // The calendar follows whatever date the box holds.
+  const parsedKey = parsedDate ? parsedDate.getTime() : null;
+  const [monthFor, setMonthFor] = useState<number | null>(null);
+  if (parsedKey !== monthFor) {
+    setMonthFor(parsedKey);
+    if (parsedDate) setCalendarMonth(parsedDate);
+  }
 
   const handleCalendarSelect = (selectedDate: Date | undefined) => {
     onChange(formatDateValue(selectedDate));

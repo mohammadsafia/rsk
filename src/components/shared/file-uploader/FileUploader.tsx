@@ -310,8 +310,6 @@ const FileUploaderImagePreview: FC<FileUploaderImagePreviewProps> = ({ className
 
   const { files, onRemove, multiple, disabled, isUploading } = useFileUploaderContext();
 
-  const [urls, setUrls] = useState<string[]>([]);
-
   const imageEntries = useMemo(
     () =>
       files.reduce<Array<{ file: File; index: number }>>((acc, file, index) => (isImageFile(file) ? [...acc, { file, index }] : acc), []),
@@ -320,13 +318,9 @@ const FileUploaderImagePreview: FC<FileUploaderImagePreviewProps> = ({ className
 
   const isCompact = imageEntries.length <= 2;
 
-  useEffect(() => {
-    const created = imageEntries.map(({ file }) => URL.createObjectURL(file));
-
-    setUrls(created);
-
-    return () => created.forEach(URL.revokeObjectURL);
-  }, [imageEntries]);
+  // One object URL per previewed image, made with the list and revoked when it changes or unmounts.
+  const urls = useMemo(() => imageEntries.map(({ file }) => URL.createObjectURL(file)), [imageEntries]);
+  useEffect(() => () => urls.forEach((url) => URL.revokeObjectURL(url)), [urls]);
 
   if (imageEntries.length === 0) return null;
 

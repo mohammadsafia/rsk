@@ -1,3 +1,7 @@
+// TanStack Table v8 hands out one mutable table object, so compiled memoization would render stale rows;
+// opted out of the React Compiler until Table 9 (compiler-compatible).
+'use no memo';
+
 import { useEffect, useState } from 'react';
 
 import type { Column } from '@tanstack/react-table';
@@ -21,11 +25,20 @@ function NumberRangeFilter<TData>({ column, filterMeta }: NumberRangeFilterProps
   const [min, setMin] = useState<number | null>(value.min ?? null);
   const [max, setMax] = useState<number | null>(value.max ?? null);
 
-  useEffect(() => {
-    if (!open) return;
+  // The inputs start from the applied range each time the popover opens, and follow it if it changes while open.
+  const reseed = () => {
     setMin(value.min ?? null);
     setMax(value.max ?? null);
-  }, [open, value.min, value.max]);
+  };
+  const onOpenChange = (next: boolean) => {
+    if (next) reseed();
+    setOpen(next);
+  };
+  const [seededFrom, setSeededFrom] = useState({ min: value.min, max: value.max });
+  if (value.min !== seededFrom.min || value.max !== seededFrom.max) {
+    setSeededFrom({ min: value.min, max: value.max });
+    if (open) reseed();
+  }
 
   const format = (n: number) => formatNumber(n, { style: filterMeta.format ?? 'decimal' });
   const hasMin = value.min !== undefined;
@@ -47,7 +60,7 @@ function NumberRangeFilter<TData>({ column, filterMeta }: NumberRangeFilterProps
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={onOpenChange}>
       <FilterPill
         label={filterMeta.label}
         values={summary ? [summary] : []}

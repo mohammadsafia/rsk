@@ -1,14 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { type DateFormat, useDate } from '@hooks/shared';
-
-// Helper to keep stable references to useDate functions
-const useDateFunctionsRef = (): React.MutableRefObject<ReturnType<typeof useDate>> => {
-  const dateUtils = useDate();
-  const ref = useRef(dateUtils);
-  ref.current = dateUtils;
-  return ref;
-};
 
 export const DATE_INPUT_FORMATS = {
   US_SLASH: 'MM/dd/yyyy',
@@ -98,13 +90,17 @@ const getDatePartSelectionRange = (part: DatePart): [number, number] => {
 export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn => {
   const { dateFormat = DATE_INPUT_FORMATS.US_SLASH, onChange } = options;
 
-  const dateUtilsRef = useDateFunctionsRef();
+  // Stable per language (useDate builds its toolkit once per locale), so it can sit in dependency lists.
+  const dateUtils = useDate();
 
   const [inputValue, setInputValueInternal] = useState<string>('');
   const inputRef = useRef<HTMLInputElement | null>(null);
   const pendingSelectionRef = useRef<[number, number] | null>(null);
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
+  // Handlers call the latest onChange without re-creating themselves when it changes.
+  useLayoutEffect(() => {
+    onChangeRef.current = onChange;
+  });
 
   const separator = useMemo(() => getSeparator(dateFormat), [dateFormat]);
   const placeholder = useMemo(() => getPlaceholder(dateFormat), [dateFormat]);
@@ -112,17 +108,17 @@ export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn
 
   const formatDateToString = useCallback(
     (date: Date | undefined): string => {
-      return dateUtilsRef.current.formatNullableDate(date, dateFormat as DateFormat, '');
+      return dateUtils.formatNullableDate(date, dateFormat as DateFormat, '');
     },
-    [dateFormat, dateUtilsRef],
+    [dateFormat, dateUtils],
   );
 
   const parseDateString = useCallback(
     (value: string): Date | undefined => {
       if (!value) return undefined;
-      return dateUtilsRef.current.parseDate(value, dateFormat as DateFormat);
+      return dateUtils.parseDate(value, dateFormat as DateFormat);
     },
-    [dateFormat, dateUtilsRef],
+    [dateFormat, dateUtils],
   );
 
   const parsedDate = useMemo(() => {
@@ -152,10 +148,10 @@ export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn
 
   const setFromDate = useCallback(
     (date: Date | undefined) => {
-      const formatted = dateUtilsRef.current.formatNullableDate(date, dateFormat as DateFormat, '');
+      const formatted = dateUtils.formatNullableDate(date, dateFormat as DateFormat, '');
       setInputValueInternal(formatted);
     },
-    [dateFormat, dateUtilsRef],
+    [dateFormat, dateUtils],
   );
 
   const handleChange = useCallback(
@@ -166,10 +162,10 @@ export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn
       inputRef.current = e.target;
       setInputValueInternal(maskedValue);
 
-      const parsed = dateUtilsRef.current.parseDate(maskedValue, dateFormat as DateFormat);
+      const parsed = dateUtils.parseDate(maskedValue, dateFormat as DateFormat);
       onChangeRef.current?.(parsed);
     },
-    [dateFormat, dateUtilsRef],
+    [dateFormat, dateUtils],
   );
 
   const handleKeyDown = useCallback(
@@ -193,7 +189,7 @@ export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn
           pendingSelectionRef.current = [cursorPos - 2, cursorPos - 2];
           setInputValueInternal(maskedValue);
 
-          const parsed = dateUtilsRef.current.parseDate(maskedValue, dateFormat as DateFormat);
+          const parsed = dateUtils.parseDate(maskedValue, dateFormat as DateFormat);
           onChangeRef.current?.(parsed);
         }
         return;
@@ -210,7 +206,7 @@ export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn
         const part = getDatePartFromCursor(cursorPos);
         const direction = e.key === 'ArrowUp' ? 'up' : 'down';
 
-        const { addDuration, subtractDuration, constants } = dateUtilsRef.current;
+        const { addDuration, subtractDuration, constants } = dateUtils;
         const durationFn = direction === 'up' ? addDuration : subtractDuration;
 
         let newDate: Date;
@@ -232,7 +228,7 @@ export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn
         }
 
         if (newDate.getFullYear() >= 1900 && newDate.getFullYear() <= 2100) {
-          const newValue = dateUtilsRef.current.formatNullableDate(newDate, dateFormat as DateFormat, '');
+          const newValue = dateUtils.formatNullableDate(newDate, dateFormat as DateFormat, '');
           const [selStart, selEnd] = getDatePartSelectionRange(part);
 
           pendingSelectionRef.current = [selStart, selEnd];
@@ -241,7 +237,7 @@ export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn
         }
       }
     },
-    [inputValue, separator, dateFormat, parsedDate, formatOrder, dateUtilsRef],
+    [inputValue, separator, dateFormat, parsedDate, formatOrder, dateUtils],
   );
 
   const handlePaste = useCallback(
@@ -252,10 +248,10 @@ export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn
 
       setInputValueInternal(maskedValue);
 
-      const parsed = dateUtilsRef.current.parseDate(maskedValue, dateFormat as DateFormat);
+      const parsed = dateUtils.parseDate(maskedValue, dateFormat as DateFormat);
       onChangeRef.current?.(parsed);
     },
-    [dateFormat, dateUtilsRef],
+    [dateFormat, dateUtils],
   );
 
   const handleBlur = useCallback(() => {
@@ -282,13 +278,17 @@ export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn
 export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
   const { dateFormat = DATE_INPUT_FORMATS.US_SLASH, onChange } = options;
 
-  const dateUtilsRef = useDateFunctionsRef();
+  // Stable per language (useDate builds its toolkit once per locale), so it can sit in dependency lists.
+  const dateUtils = useDate();
 
   const [inputValue, setInputValueInternal] = useState<string>('');
   const inputRef = useRef<HTMLInputElement | null>(null);
   const pendingSelectionRef = useRef<[number, number] | null>(null);
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
+  // Handlers call the latest onChange without re-creating themselves when it changes.
+  useLayoutEffect(() => {
+    onChangeRef.current = onChange;
+  });
 
   const separator = useMemo(() => getSeparator(dateFormat), [dateFormat]);
   const placeholder = useMemo(() => {
@@ -308,10 +308,10 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
     const toStr = parts[1]?.trim() || '';
 
     return {
-      from: dateUtilsRef.current.parseDate(fromStr, dateFormat as DateFormat),
-      to: dateUtilsRef.current.parseDate(toStr, dateFormat as DateFormat),
+      from: dateUtils.parseDate(fromStr, dateFormat as DateFormat),
+      to: dateUtils.parseDate(toStr, dateFormat as DateFormat),
     };
-  }, [inputValue, dateFormat, dateUtilsRef]);
+  }, [inputValue, dateFormat, dateUtils]);
 
   const isValidInput = useMemo(() => {
     if (!inputValue) return true;
@@ -345,8 +345,8 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
         return;
       }
 
-      const fromStr = dateUtilsRef.current.formatNullableDate(range.from, dateFormat as DateFormat, '');
-      const toStr = dateUtilsRef.current.formatNullableDate(range.to, dateFormat as DateFormat, '');
+      const fromStr = dateUtils.formatNullableDate(range.from, dateFormat as DateFormat, '');
+      const toStr = dateUtils.formatNullableDate(range.to, dateFormat as DateFormat, '');
 
       if (fromStr && toStr) {
         setInputValueInternal(`${fromStr}${RANGE_SEPARATOR}${toStr}`);
@@ -358,7 +358,7 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
         setInputValueInternal('');
       }
     },
-    [dateFormat, dateUtilsRef],
+    [dateFormat, dateUtils],
   );
 
   const handleChange = useCallback(
@@ -402,12 +402,12 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
 
       setInputValueInternal(result);
 
-      const fromDate = dateUtilsRef.current.parseDate(maskedFrom, dateFormat as DateFormat);
-      const toDate = dateUtilsRef.current.parseDate(maskedTo, dateFormat as DateFormat);
+      const fromDate = dateUtils.parseDate(maskedFrom, dateFormat as DateFormat);
+      const toDate = dateUtils.parseDate(maskedTo, dateFormat as DateFormat);
 
       onChangeRef.current?.({ from: fromDate, to: toDate });
     },
-    [dateFormat, dateUtilsRef],
+    [dateFormat, dateUtils],
   );
 
   const handleKeyDown = useCallback(
@@ -451,7 +451,7 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
         const part = getDatePartFromCursor(localCursorPos);
         const direction = e.key === 'ArrowUp' ? 'up' : 'down';
 
-        const { addDuration, subtractDuration, constants } = dateUtilsRef.current;
+        const { addDuration, subtractDuration, constants } = dateUtils;
         const durationFn = direction === 'up' ? addDuration : subtractDuration;
 
         const calculateNewDate = (currentDate: Date): Date => {
@@ -482,7 +482,7 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
 
           if (newDate.getFullYear() >= 1900 && newDate.getFullYear() <= 2100) {
             const fromStr = inputValue.slice(0, rangeSeparatorIndex);
-            const newToStr = dateUtilsRef.current.formatNullableDate(newDate, dateFormat as DateFormat, '');
+            const newToStr = dateUtils.formatNullableDate(newDate, dateFormat as DateFormat, '');
             const newValue = `${fromStr}${RANGE_SEPARATOR}${newToStr}`;
 
             const [selStart, selEnd] = getDatePartSelectionRange(part);
@@ -499,7 +499,7 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
           const newDate = calculateNewDate(parsedRange.from);
 
           if (newDate.getFullYear() >= 1900 && newDate.getFullYear() <= 2100) {
-            const newFromStr = dateUtilsRef.current.formatNullableDate(newDate, dateFormat as DateFormat, '');
+            const newFromStr = dateUtils.formatNullableDate(newDate, dateFormat as DateFormat, '');
             let newValue = newFromStr;
 
             if (rangeSeparatorIndex !== -1) {
@@ -515,7 +515,7 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
         }
       }
     },
-    [inputValue, separator, dateFormat, parsedRange, formatOrder, dateUtilsRef],
+    [inputValue, separator, dateFormat, parsedRange, formatOrder, dateUtils],
   );
 
   const handlePaste = useCallback(
@@ -542,8 +542,8 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
     const fromStr = parts[0]?.trim() || '';
     const toStr = parts[1]?.trim() || '';
 
-    const fromValid = !fromStr || dateUtilsRef.current.parseDate(fromStr, dateFormat as DateFormat) !== undefined;
-    const toValid = !toStr || dateUtilsRef.current.parseDate(toStr, dateFormat as DateFormat) !== undefined;
+    const fromValid = !fromStr || dateUtils.parseDate(fromStr, dateFormat as DateFormat) !== undefined;
+    const toValid = !toStr || dateUtils.parseDate(toStr, dateFormat as DateFormat) !== undefined;
 
     if (fromStr && !fromValid) {
       if (toStr && toValid) {
@@ -554,7 +554,7 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
     } else if (toStr && !toValid) {
       setInputValueInternal(fromStr);
     }
-  }, [inputValue, dateFormat, dateUtilsRef]);
+  }, [inputValue, dateFormat, dateUtils]);
 
   return {
     inputValue,

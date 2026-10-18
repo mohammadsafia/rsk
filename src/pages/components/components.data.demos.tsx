@@ -198,9 +198,10 @@ export function FormCheckboxDemo() {
 
 export function FormDatePickerDemo() {
   const [disabled, setDisabled] = useState(false);
+  const [today] = useState(() => new Date());
   const form = useForm<{ date?: Date; dateRequired?: Date; dateWithDefault?: Date; dateDisabled?: Date }>({
     defaultValues: {
-      dateWithDefault: new Date(),
+      dateWithDefault: today,
     },
   });
   return (
@@ -721,7 +722,7 @@ export function ConfirmDialogDemo() {
 }
 
 export function DateNavigationDemo() {
-  const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [currentDate, setCurrentDate] = useState(() => new Date().toISOString().split('T')[0]);
   const handlePrevious = () => {
     const date = new Date(currentDate);
     date.setDate(date.getDate() - 1);
@@ -837,7 +838,7 @@ export function TimePickerDemo() {
 }
 
 export function CalendarDemo() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(() => new Date());
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   return (
     <div className="space-y-6">

@@ -315,20 +315,26 @@ const TimePicker: TimePickerComponent = ({
 
   const available = useMemo(() => availableTimes(min, max, step), [min, max, step]);
 
-  useEffect(() => {
-    if (!isOpen) {
-      setTempValue('');
-      return;
-    }
-
-    // Seed on the step grid in the picker's own format, so confirming untouched never emits a 12h string in 24h mode.
-    const seed = nearestTime(available, parseTime(value) ?? parseTime(startAt) ?? parseTime(use24hFormat ? '08:00' : '08:00 AM'));
-    setTempValue(seed === null ? '' : formatTime(seed, use24hFormat));
-  }, [isOpen, value, startAt, available, use24hFormat]);
+  // Seed on the step grid in the picker's own format, so confirming untouched never emits a 12h string in 24h mode.
+  const seed = () => {
+    const time = nearestTime(available, parseTime(value) ?? parseTime(startAt) ?? parseTime(use24hFormat ? '08:00' : '08:00 AM'));
+    return time === null ? '' : formatTime(time, use24hFormat);
+  };
+  // Seeded when it opens (and re-seeded if its inputs change while open); the scratch value is cleared on every close.
+  const onOpenChange = (next: boolean) => {
+    setTempValue(next ? seed() : '');
+    setIsOpen(next);
+  };
+  const seedInputs = [value, startAt, min, max, step, use24hFormat].join('|');
+  const [seededFor, setSeededFor] = useState(seedInputs);
+  if (seedInputs !== seededFor) {
+    setSeededFor(seedInputs);
+    if (isOpen) setTempValue(seed());
+  }
 
   const handleConfirm = () => {
     onChange?.(tempValue || undefined);
-    setIsOpen(false);
+    onOpenChange(false);
   };
 
   const handleClear = () => onChange?.(undefined);
@@ -337,7 +343,7 @@ const TimePicker: TimePickerComponent = ({
 
   return (
     <div data-slot="time-picker" className="relative w-full">
-      <Popover open={isOpen} onOpenChange={setIsOpen} modal>
+      <Popover open={isOpen} onOpenChange={onOpenChange} modal>
         <Popover.Trigger id={id ?? name} asChild>
           <TimePickerTrigger
             size={size}

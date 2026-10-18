@@ -1,3 +1,7 @@
+// TanStack Table v8 hands out one mutable table object, so compiled memoization would render stale rows;
+// opted out of the React Compiler until Table 9 (compiler-compatible).
+'use no memo';
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { Column } from '@tanstack/react-table';
@@ -25,10 +29,16 @@ function TimeFilter<TData>({ column, filterMeta }: TimeFilterProps<TData>) {
 
   const startAt = use24hFormat ? '08:00' : '08:00 AM';
 
-  // Seed the scroll selectors when opening; clear scratch state on close.
-  useEffect(() => {
-    setTempValue(open ? value || startAt : '');
-  }, [open, value, startAt]);
+  // Seed the scroll selectors when opening (and if the applied time changes while open); clear scratch state on close.
+  const onOpenChange = (next: boolean) => {
+    setTempValue(next ? value || startAt : '');
+    setOpen(next);
+  };
+  const [seededFrom, setSeededFrom] = useState(value);
+  if (value !== seededFrom) {
+    setSeededFrom(value);
+    if (open) setTempValue(value || startAt);
+  }
 
   const chips = useMemo<FilterChip[]>(() => (value ? [{ value, label: value }] : []), [value]);
 
@@ -38,7 +48,7 @@ function TimeFilter<TData>({ column, filterMeta }: TimeFilterProps<TData>) {
   }, [column, tempValue]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen} modal>
+    <Popover open={open} onOpenChange={onOpenChange} modal>
       <FilterPill label={filterMeta.label} values={chips.map((chip) => chip.label)} onClear={() => column.setFilterValue(undefined)} />
 
       <TimePicker.Content
