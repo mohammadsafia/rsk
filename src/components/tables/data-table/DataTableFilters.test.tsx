@@ -9,7 +9,7 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { DataTable } from '@components/tables';
 import { Tooltip } from '@components/ui';
@@ -108,7 +108,7 @@ describe('DataTable filter bar', () => {
     expect(pill('Role').textContent).toContain('Admin +2');
   });
 
-  it('removes one filter with a separate, named button', () => {
+  it('removes one filter with a separate, named button', async () => {
     renderBar([
       { id: 'role', value: ['admin'] },
       { id: 'status', value: ['active'] },
@@ -116,7 +116,7 @@ describe('DataTable filter bar', () => {
     const remove = screen.getByRole('button', { name: 'Remove Role filter' });
     expect(remove.closest('[role="combobox"]')).toBeNull();
     fireEvent.click(remove);
-    expect(pill('Role').hasAttribute('data-active')).toBe(false);
+    await vi.waitFor(() => expect(pill('Role').hasAttribute('data-active')).toBe(false));
     expect(pill('Status').hasAttribute('data-active')).toBe(true);
   });
 

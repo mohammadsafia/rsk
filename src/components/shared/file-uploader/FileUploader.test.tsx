@@ -9,7 +9,7 @@ import '../../../i18n';
 afterEach(cleanup);
 
 describe('FileUploader.FileList chips', () => {
-  it('uses the Tag remove control, named after the file', () => {
+  it('uses the Tag remove control, named after the file', async () => {
     const handleChange = vi.fn();
     const file = new File(['x'], 'report.pdf', { type: 'application/pdf' });
     render(
@@ -20,7 +20,7 @@ describe('FileUploader.FileList chips', () => {
     const remove = screen.getByRole('button', { name: 'Remove report.pdf' });
     expect(remove.getAttribute('data-slot')).toBe('tag-remove');
     fireEvent.click(remove);
-    expect(handleChange).toHaveBeenCalledWith(null);
+    await vi.waitFor(() => expect(handleChange).toHaveBeenCalledWith(null));
   });
 });
 describe('FileUploader keyboard access', () => {

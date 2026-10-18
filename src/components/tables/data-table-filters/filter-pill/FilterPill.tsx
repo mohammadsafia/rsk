@@ -1,8 +1,9 @@
-import { type FC, type ReactNode } from 'react';
+import { type FC, type ReactNode, useRef } from 'react';
 
 import { Combobox } from '@components/shared';
 import { Conditional } from '@components/utils';
 
+import { LEAVE_TIMING, useLeave } from '@hooks/motion';
 import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
@@ -19,6 +20,12 @@ export type FilterPillProps = {
   renderValues?: (text: string) => ReactNode;
 };
 
+/** The pill stays (it turns back into "+ Label"), so only what is being cleared fades: the values and this button. */
+const fadeValues = (pill: HTMLElement) =>
+  [...pill.querySelectorAll<HTMLElement>('[data-slot="filter-pill-values"], [data-slot="filter-pill-remove"]')].map((part) =>
+    part.animate([{ opacity: 1 }, { opacity: 0 }], LEAVE_TIMING),
+  );
+
 const summarise = (values: string[]) => (values.length > 2 ? `${values[0]} +${values.length - 1}` : values.join(', '));
 
 /**
@@ -28,9 +35,11 @@ const summarise = (values: string[]) => (values.length > 2 ? `${values[0]} +${va
 const FilterPill: FC<FilterPillProps> = ({ label, values, onClear, renderValues }) => {
   const { t } = useAppTranslation('common');
   const active = values.length > 0;
+  const pillRef = useRef<HTMLDivElement>(null);
+  const leave = useLeave(pillRef, fadeValues);
 
   return (
-    <div data-slot="filter-pill" data-filter={label} data-active={active || undefined} className="inline-flex items-stretch">
+    <div ref={pillRef} data-slot="filter-pill" data-filter={label} data-active={active || undefined} className="inline-flex items-stretch">
       <Combobox.Trigger
         size="sm"
         className={cn(
@@ -67,7 +76,7 @@ const FilterPill: FC<FilterPillProps> = ({ label, values, onClear, renderValues 
           type="button"
           data-slot="filter-pill-remove"
           aria-label={t('filterBar.remove', { label })}
-          onClick={onClear}
+          onClick={() => leave(onClear)}
           className="bg-accent-subtle border-accent/40 text-fg-muted hover:text-fg focus-visible:ring-ring h-control-sm -ms-px inline-flex items-center rounded-e-md border px-1.5 transition-colors focus-visible:ring-2 focus-visible:outline-none"
         >
           <X aria-hidden="true" className="size-3.5" />

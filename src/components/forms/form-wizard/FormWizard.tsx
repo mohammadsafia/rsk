@@ -5,6 +5,7 @@ import { Alert, Badge, Button, Divider } from '@components/ui';
 import { ConfirmDialog, DescriptionList, Stepper } from '@components/shared';
 import { Conditional } from '@components/utils';
 
+import { useTravel } from '@hooks/motion';
 import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
@@ -257,6 +258,8 @@ function FormWizard<TValues extends FieldValues>({
   };
   const isLast = wizard.index === steps.length - 1;
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const stepRef = useRef<HTMLElement>(null);
+  useTravel(stepRef, wizard.index);
   const shownIndex = useRef(wizard.index);
   const [announcement, setAnnouncement] = useState('');
 
@@ -420,7 +423,7 @@ function FormWizard<TValues extends FieldValues>({
           {announcement}
         </span>
 
-        <section data-slot="form-wizard-step" className="flex flex-col gap-4">
+        <section ref={stepRef} data-slot="form-wizard-step" className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <h2 ref={headingRef} tabIndex={-1} className="text-fg text-lg font-semibold focus:outline-none">

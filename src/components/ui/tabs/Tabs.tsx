@@ -4,9 +4,11 @@ import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
+import InkBar from '../ink-bar/InkBar';
+
 // Scrolls sideways when tabs overflow, but never vertically and without scrollbar chrome: a scrollbar used to
 // appear because overflow-x forces overflow-y to auto and the underline hung 1px below the list.
-const tabsListVariants = cva('group/tabs-list scrollbar-none flex min-w-0 items-center overflow-x-auto overflow-y-hidden', {
+const tabsListVariants = cva('group/tabs-list scrollbar-none relative flex min-w-0 items-center overflow-x-auto overflow-y-hidden', {
   variants: {
     variant: {
       underline: 'rule-bottom gap-4',
@@ -29,7 +31,7 @@ const triggerClassName = [
   'disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-fg [&_svg]:size-4',
   'group-data-[full-width=true]/tabs-list:flex-1',
   // Ledger: the active tab carries the ink bar (drawn in), never a fill.
-  'group-data-[variant=underline]/tabs-list:h-9 group-data-[variant=underline]/tabs-list:px-1 data-[state=active]:ink-block',
+  'group-data-[variant=underline]/tabs-list:h-9 group-data-[variant=underline]/tabs-list:px-1',
   'group-data-[variant=contained]/tabs-list:h-7 group-data-[variant=contained]/tabs-list:rounded-sm group-data-[variant=contained]/tabs-list:px-3',
 ].join(' ');
 
@@ -44,14 +46,18 @@ type TabsComponent = FC<TabsProps> & {
   Content: FC<TabsContentProps>;
 };
 
-const List: FC<TabsListProps> = ({ className, variant, fullWidth, ...props }) => (
+const List: FC<TabsListProps> = ({ className, variant, fullWidth, children, ...props }) => (
   <TabsPrimitive.List
     data-slot="tabs-list"
     data-variant={variant ?? 'underline'}
     data-full-width={String(fullWidth ?? false)}
     className={cn(tabsListVariants({ variant, fullWidth }), className)}
     {...props}
-  />
+  >
+    {children}
+    {/* Ledger: one ink bar travels to the active tab (spec §4 elastic ink), instead of a mark per trigger. */}
+    <InkBar selector='[role="tab"][data-state="active"]' />
+  </TabsPrimitive.List>
 );
 
 const Trigger: FC<TabsTriggerProps> = ({ className, ...props }) => (

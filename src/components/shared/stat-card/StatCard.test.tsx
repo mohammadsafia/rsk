@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { StatCard } from '@components/shared';
 
@@ -49,5 +49,20 @@ describe('StatCard', () => {
       </MemoryRouter>,
     );
     expect(screen.getByRole('link', { name: /Visits/ }).getAttribute('href')).toBe('/visits');
+  });
+
+  it('rolls a string or number value, keeping its accessible text', () => {
+    render(<StatCard label="Visits" value="248" />);
+    expect(document.querySelector('[data-slot="rolling-text"]')).not.toBeNull();
+    expect(screen.getByText('248').className).toContain('sr-only');
+  });
+
+  it('pops the trend when it changes, never on first paint', () => {
+    const animate = vi.fn();
+    Element.prototype.animate = animate as unknown as typeof Element.prototype.animate;
+    const { rerender } = render(<StatCard label="Visits" value="248" trend={{ value: 12.4 }} />);
+    expect(animate).not.toHaveBeenCalled();
+    rerender(<StatCard label="Visits" value="251" trend={{ value: 13.1 }} />);
+    expect(animate).toHaveBeenCalledTimes(1);
   });
 });

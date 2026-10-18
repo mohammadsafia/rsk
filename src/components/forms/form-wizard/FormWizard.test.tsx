@@ -41,6 +41,19 @@ function Intake({ onSubmit = vi.fn() }: { onSubmit?: (values: Values) => void })
 const next = () => fireEvent.click(screen.getByRole('button', { name: 'Next' }));
 
 describe('FormWizard navigation', () => {
+  it('slides the next step in from the end and the previous one from the start, but not the first step', async () => {
+    render(<Intake />);
+    const step = () => document.querySelector<HTMLElement>('[data-slot="form-wizard-step"]')!;
+    expect(step().hasAttribute('data-direction')).toBe(false);
+    fireEvent.change(screen.getByLabelText('Full name'), { target: { value: 'Sara' } });
+    next();
+    await screen.findByRole('heading', { name: 'Contact' });
+    expect(step().dataset.direction).toBe('forward');
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    await screen.findByRole('heading', { name: 'Patient' });
+    expect(step().dataset.direction).toBe('back');
+  });
+
   it('shows one step at a time with a stepper, a caption and the step heading', () => {
     render(<Intake />);
     expect(screen.getByRole('heading', { name: 'Patient' })).toBeTruthy();

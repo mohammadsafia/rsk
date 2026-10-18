@@ -2,7 +2,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { type ColumnDef, type ColumnFiltersState, getCoreRowModel, getFilteredRowModel, useReactTable } from '@tanstack/react-table';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { DataTable } from '@components/tables';
 import { Tooltip } from '@components/ui';
@@ -87,7 +87,8 @@ describe('text filter clearing', () => {
   it('clears at once when its ✕ is clicked and does not come back after the debounce', async () => {
     renderBar([{ id: 'patient', value: 'sa' }]);
     fireEvent.click(screen.getByRole('button', { name: 'Remove Patient filter' }));
-    expect(pill('Patient').hasAttribute('data-active')).toBe(false);
+    // The values fade out first (a fast exit), then the filter clears, well before the debounce would fire.
+    await vi.waitFor(() => expect(pill('Patient').hasAttribute('data-active')).toBe(false));
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 450));
     });
