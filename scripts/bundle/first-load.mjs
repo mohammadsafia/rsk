@@ -3,7 +3,7 @@
 //
 //   node scripts/bundle/first-load.mjs --dist dist                 # discover routes from "/" and report
 //   node scripts/bundle/first-load.mjs --dist dist --budget 150    # fail a route over 150 KB gz
-//   node scripts/bundle/first-load.mjs --dist dist --budget starter --routes /,/dashboard   # the starter's own budget
+//   node scripts/bundle/first-load.mjs --dist dist --budget starter --routes /,/dashboard --redirects /=/dashboard
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import path from 'node:path';
@@ -131,25 +131,41 @@ const arg = (name, fallback) => {
   return index > -1 ? process.argv[index + 1] : fallback;
 };
 
+/** --redirects "/=/dashboard,/old=/new": routes expected to land somewhere else. */
+export function parseRedirects(value) {
+  return Object.fromEntries((value ?? '').split(',').filter(Boolean).map((pair) => pair.split('=')));
+}
+
+/**
+ * Why a measured route fails: over budget, page errors, raw keys, or (when `redirects` is given, i.e. an explicit
+ * route list) landing on another page than the one asked for, so the page meant to be checked never was.
+ */
+export function failuresOf(result, { budget, redirects }) {
+  const expected = redirects?.[result.route] ?? result.route;
+  return [
+    budget !== undefined && result.gzipKb > budget ? `over ${budget} KB` : '',
+    result.errors.length ? `${result.errors.length} errors: ${result.errors[0].slice(0, 120)}` : '',
+    result.rawKeys.length ? `raw keys: ${result.rawKeys.slice(0, 5).join(', ')}` : '',
+    redirects && result.landed !== expected ? `redirected to ${result.landed}` : '',
+  ].filter(Boolean);
+}
+
 async function main() {
   const dist = path.resolve(arg('dist', 'dist'));
   const routes = arg('routes')?.split(',');
   const budget = resolveBudget(arg('budget'));
+  // Only an explicit route list is held to where each route lands; discovered routes are wherever links lead.
+  const redirects = routes ? parseRedirects(arg('redirects')) : undefined;
   const results = await measureFirstLoad({ dist, routes, localesDir: path.resolve('src/locales/en') });
+  const failed = [];
   for (const result of results) {
-    const flags = [
-      budget !== undefined && result.gzipKb > budget ? `over ${budget} KB` : '',
-      result.errors.length ? `${result.errors.length} errors: ${result.errors[0].slice(0, 120)}` : '',
-      result.rawKeys.length ? `raw keys: ${result.rawKeys.slice(0, 5).join(', ')}` : '',
-    ].filter(Boolean);
+    const flags = failuresOf(result, { budget, redirects });
+    if (flags.length) failed.push(result);
     console.log(
       `${result.route.padEnd(28)} ${String(result.gzipKb).padStart(7)} KB gz  → ${result.landed}${flags.length ? `  ✗ ${flags.join('; ')}` : ''}`,
     );
   }
   writeFileSync(arg('report', 'first-load-report.json'), `${JSON.stringify({ budget, results }, null, 1)}\n`);
-  const failed = results.filter(
-    (result) => (budget !== undefined && result.gzipKb > budget) || result.errors.length || result.rawKeys.length,
-  );
   if (!results.length) console.error('No route was measured.');
   if (!results.length || failed.length) process.exitCode = 1;
 }

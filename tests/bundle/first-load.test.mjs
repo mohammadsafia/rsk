@@ -5,7 +5,7 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { BUNDLE_BUDGET_KB, localeKeys, rawKeysIn, resolveBudget, resolveFile, serve } from '../../scripts/bundle/first-load.mjs';
+import { BUNDLE_BUDGET_KB, localeKeys, rawKeysIn, failuresOf, parseRedirects, resolveBudget, resolveFile, serve } from '../../scripts/bundle/first-load.mjs';
 
 const locales = () => {
   const dir = mkdtempSync(path.join(tmpdir(), 'locales-'));
@@ -56,5 +56,12 @@ describe('first-load page check', () => {
     const server = await serve(dist);
     expect(server.address().address).toBe('127.0.0.1');
     server.close();
+  });
+
+  it('fails a route that landed somewhere else, unless that redirect was declared', () => {
+    const result = { route: '/auth/login', landed: '/dashboard', gzipKb: 100, errors: [], rawKeys: [] };
+    expect(failuresOf(result, { budget: 210, redirects: {} })).toEqual(['redirected to /dashboard']);
+    expect(failuresOf({ ...result, route: '/' }, { budget: 210, redirects: parseRedirects('/=/dashboard') })).toEqual([]);
+    expect(failuresOf({ ...result, landed: '/auth/login', gzipKb: 300 }, { budget: 210, redirects: {} })).toEqual(['over 210 KB']);
   });
 });

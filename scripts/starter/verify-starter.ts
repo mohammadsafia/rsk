@@ -42,6 +42,7 @@ try {
   run(out, 'corepack', [...pnpm, 'exec', 'vp', 'test', '--run']);
   run(out, 'corepack', [...pnpm, 'exec', 'vp', 'build']);
   // First-load budget: each route's gzipped JS, page errors and untranslated keys (a dropped side-effect module).
+  // /auth/login isn't measured: the starter's useAuth is always signed in, so it only ever redirects to /dashboard.
   run(out, 'node', [
     'scripts/bundle/first-load.mjs',
     '--dist',
@@ -49,7 +50,9 @@ try {
     '--budget',
     'starter',
     '--routes',
-    '/,/dashboard,/settings,/auth/login',
+    '/,/dashboard,/settings',
+    '--redirects',
+    '/=/dashboard',
   ]);
   console.log(`\nStarter verified: ${out}`);
 } finally {
