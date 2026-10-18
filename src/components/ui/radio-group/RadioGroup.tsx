@@ -1,4 +1,4 @@
-import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC } from 'react';
 
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 
@@ -21,10 +21,12 @@ type RadioGroupComponent = FC<RadioGroupProps> & {
   Dot: FC<RadioGroupDotProps>;
 };
 
-/** The 16px radio circle; `data-state="checked"` draws the accent ring and dot. */
+/** The 16px radio circle; `data-state="checked"` draws the ring and grows the dot. */
 const radioCircleClassName = [
   'border-border-strong bg-surface flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors',
   'after:size-2 after:rounded-full data-[state=checked]:border-fg data-[state=checked]:after:bg-fg',
+  // The dot grows in on the spring when chosen.
+  'after:scale-0 after:transition-[scale] after:duration-fast after:ease-spring data-[state=checked]:after:scale-100 motion-reduce:after:transition-none',
   'in-aria-invalid:border-danger',
 ].join(' ');
 
@@ -69,8 +71,7 @@ const RadioGroup: RadioGroupComponent = ({ className, invalid, ...props }) => (
   />
 );
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-RadioGroup.Item = forwardRef<HTMLButtonElement, RadioGroupItemProps>((props, ref) => Item({ ...props, ref }));
+RadioGroup.Item = Item;
 RadioGroup.Indicator = Indicator;
 RadioGroup.Dot = Dot;
 

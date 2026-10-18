@@ -1,4 +1,4 @@
-import { type ComponentProps, type FC, forwardRef } from 'react';
+import { type ComponentProps, type FC } from 'react';
 
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 
@@ -24,10 +24,10 @@ const Checkbox: FC<CheckboxProps> = ({ ref, className, checked, invalid, ...prop
     aria-invalid={invalid || undefined}
     data-slot="checkbox"
     checked={checked}
-    className={cn(checkboxBoxClassName, 'focus-ring cursor-pointer disabled:pointer-events-none disabled:opacity-50', className)}
+    className={cn(checkboxBoxClassName, 'tactile focus-ring cursor-pointer disabled:pointer-events-none disabled:opacity-50', className)}
     {...props}
   >
-    <CheckboxPrimitive.Indicator data-slot="checkbox-indicator" className="flex items-center justify-center">
+    <CheckboxPrimitive.Indicator data-slot="checkbox-indicator" className="draw-check flex items-center justify-center">
       <Conditional>
         <Conditional.If condition={checked === 'indeterminate'}>
           <Minus className="size-3" strokeWidth={3} />
@@ -43,5 +43,4 @@ const Checkbox: FC<CheckboxProps> = ({ ref, className, checked, invalid, ...prop
 
 Checkbox.displayName = 'Checkbox';
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-export default forwardRef<HTMLButtonElement, CheckboxProps>((props, ref) => Checkbox({ ...props, ref }));
+export default Checkbox;

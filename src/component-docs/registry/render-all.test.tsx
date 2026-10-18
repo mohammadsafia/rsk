@@ -3,7 +3,7 @@ import { cleanup, render } from '@testing-library/react';
 import { MDXProvider } from '@mdx-js/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Tooltip } from '@components/ui';

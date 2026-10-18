@@ -1,6 +1,6 @@
-import type { FilterFn, Table } from '@tanstack/react-table';
-
 import type { DataTableFilterMeta, DateRangeFilterValue, NumberRangeFilterValue } from '@app-types';
+import type { KitCoreTable, KitFilterFn, KitTable } from './tableFeatures';
+import type { RowData } from '@tanstack/react-table';
 
 export type FilterCodec = {
   /** `undefined` means "no filter": omit the URL param / storage entry. */
@@ -126,22 +126,22 @@ const fold = (value: unknown) =>
     .replace(/[̀-ًͯ-ٰٟ]/g, '')
     .toLowerCase();
 
-// Loosely typed (`FilterFn<any>`) so one fn is assignable to any column's FilterFn<TData>.
+// Loosely typed (`KitFilterFn<any>`) so one fn is assignable to any column's KitFilterFn<TData>.
 
 /** Pair with `select` / `multiSelect`. */
-export const inListFilterFn: FilterFn<any> = (row, columnId, filterValue) =>
+export const inListFilterFn: KitFilterFn<any> = (row, columnId, filterValue) =>
   !Array.isArray(filterValue) || filterValue.length === 0 || filterValue.includes(String(row.getValue(columnId)));
 
 /** Pair with `boolean`. */
-export const booleanFilterFn: FilterFn<any> = (row, columnId, filterValue) =>
+export const booleanFilterFn: KitFilterFn<any> = (row, columnId, filterValue) =>
   typeof filterValue !== 'boolean' || row.getValue(columnId) === filterValue;
 
 /** Pair with `text`. */
-export const containsFilterFn: FilterFn<any> = (row, columnId, filterValue) =>
+export const containsFilterFn: KitFilterFn<any> = (row, columnId, filterValue) =>
   typeof filterValue !== 'string' || !filterValue.trim() || fold(row.getValue(columnId)).includes(fold(filterValue.trim()));
 
 /** Pair with `numberRange`. */
-export const numberRangeFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
+export const numberRangeFilterFn: KitFilterFn<any> = (row, columnId, filterValue) => {
   const { min, max } = (filterValue ?? {}) as NumberRangeFilterValue;
   if (min === undefined && max === undefined) return true;
   const cell = row.getValue(columnId);
@@ -150,16 +150,17 @@ export const numberRangeFilterFn: FilterFn<any> = (row, columnId, filterValue) =
 };
 
 /** Serializes every active column filter (and the search as `q`) for a server request. */
-export const getFilterQueryParams = <TData>(table: Table<TData>): Record<string, string> => {
+/** Takes the core table or the one useTable returns (both carry the store). */
+export const getFilterQueryParams = <TData extends RowData>(table: KitCoreTable<TData>): Record<string, string> => {
   const params: Record<string, string> = {};
 
-  for (const { id, value } of table.getState().columnFilters) {
+  for (const { id, value } of table.store.state.columnFilters) {
     const meta = table.getColumn(id)?.columnDef.meta?.filterMeta;
     const raw = meta ? filterCodecFor(meta).serialize(value) : undefined;
     if (raw !== undefined) params[id] = raw;
   }
 
-  const search = table.getState().globalFilter;
+  const search = table.store.state.globalFilter;
   if (typeof search === 'string' && search.trim()) params.q = search.trim();
 
   return params;

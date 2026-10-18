@@ -73,4 +73,17 @@ describe('Toast', () => {
     expect(viewport?.className).toContain('top-0');
     expect(viewport?.className).not.toContain('top-16');
   });
+
+  it('portals its viewport to <body>, so toasts sit above an open dialog even when the page recedes behind it', () => {
+    render(
+      <Toast.Provider>
+        <div data-slot="app-shell">
+          <Toast.Viewport />
+        </div>
+      </Toast.Provider>,
+    );
+    const viewport = document.querySelector('[data-slot="toast-viewport"]')!;
+    expect(viewport.closest('[data-slot="app-shell"]')).toBeNull();
+    expect(viewport.parentElement?.parentElement).toBe(document.body);
+  });
 });

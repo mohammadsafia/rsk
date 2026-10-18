@@ -20,6 +20,8 @@ type AlertComponent = FC<AlertProps> & {
 const alertVariants = cva(
   [
     'grid w-full grid-cols-[auto_1fr] items-start gap-x-3 gap-y-0.5 rounded-lg border p-3 text-sm',
+    // Fades in when it appears.
+    'animate-in fade-in-0 duration-base ease-out motion-reduce:animate-none',
     '[&>svg]:mt-0.5 [&>svg]:size-4 *:data-[slot=alert-description]:col-start-2 *:data-[slot=alert-title]:col-start-2',
   ],
   {

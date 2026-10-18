@@ -1,5 +1,5 @@
 import { type ComponentType, lazy, type LazyExoticComponent, Suspense, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 
 import { MDXProvider } from '@mdx-js/react';
 
@@ -43,6 +43,7 @@ function ScrollToHash() {
 
 /** Header, MDX body, prev/next and the "On this page" outline of one docs entry. */
 export default function DocArticle({ entry }: { entry: ComponentDocEntry }) {
+  // Not created during render: docFor returns the module-level cached lazy component for this entry (stable identity).
   const Doc = docFor(entry);
 
   return (
@@ -61,6 +62,7 @@ export default function DocArticle({ entry }: { entry: ComponentDocEntry }) {
         >
           <MDXProvider components={mdxComponents}>
             <DocsProse>
+              {/* oxlint-disable-next-line react/static-components -- Doc comes from docFor's per-entry cache (see above). */}
               <Doc />
             </DocsProse>
           </MDXProvider>

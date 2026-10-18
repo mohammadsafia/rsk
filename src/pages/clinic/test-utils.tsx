@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
 import type { ReactElement, ReactNode } from 'react';
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 
 import { clinicStore } from '@api/clinic';
 import { Tooltip } from '@components/ui';
@@ -35,7 +35,7 @@ export const renderClinic = (
   render(
     // nuqs reads its own copy of the query string; give it the route's so ?range=… etc. reach the page.
     <NuqsTestingAdapter searchParams={new URL(route, 'http://clinic.test').search} hasMemory={urlMemory}>
-      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false, cacheTime: 0 } } })}>
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })}>
         <Tooltip.Provider>
           <MemoryRouter initialEntries={[route]}>
             <Routes>

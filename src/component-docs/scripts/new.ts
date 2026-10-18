@@ -190,10 +190,10 @@ async function main(): Promise<void> {
   const rawId = await text({
     message: 'Component id (kebab case)',
     placeholder: 'toggle-group',
-    validate(value: string) {
-      const next = toKebabCase(value);
+    validate(value) {
+      const next = toKebabCase(value ?? '');
       if (!next) return 'Id is required';
-      if (next !== value.trim()) return `Use: ${next}`;
+      if (next !== (value ?? '').trim()) return `Use: ${next}`;
       return undefined;
     },
   });
@@ -208,8 +208,8 @@ async function main(): Promise<void> {
   const rawDescription = await text({
     message: 'One sentence description',
     placeholder: 'One sentence describing what this component is for.',
-    validate(value: string) {
-      if (!value.trim()) return 'Description is required';
+    validate(value) {
+      if (!value?.trim()) return 'Description is required';
       return undefined;
     },
   });

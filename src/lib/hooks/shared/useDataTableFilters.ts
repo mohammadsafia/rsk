@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import type { ColumnDef, ColumnFiltersState, OnChangeFn } from '@tanstack/react-table';
+import { ColumnFiltersState, OnChangeFn } from '@tanstack/react-table';
 import { parseAsString, useQueryStates } from 'nuqs';
 
 import type { DataTableFilterMeta } from '@app-types';
 
-import { filterCodecFor } from '@utils';
+import { filterCodecFor, type KitColumnDef } from '@utils';
+import type { RowData } from '@tanstack/react-table';
 
-type Options<TData> = {
-  columns: ColumnDef<TData, any>[];
+type Options<TData extends RowData> = {
+  columns: KitColumnDef<TData, any>[];
   /** Mirror filters and search in the URL. `{ prefix }` namespaces params when a page has two tables. */
   urlSync?: boolean | { prefix: string };
   /** Keep filters and search in sessionStorage (`rsk:table:<storageKey>`) across navigation. */
@@ -18,14 +19,14 @@ type Options<TData> = {
 type Stored = { filters: Record<string, string>; q?: string };
 
 /** TanStack's own id rule: explicit id, else accessorKey with dots as underscores, else a string header. */
-const columnIdOf = (column: ColumnDef<any, any>): string | undefined => {
+const columnIdOf = <TData extends RowData>(column: KitColumnDef<TData, any>): string | undefined => {
   if (column.id) return column.id;
   if ('accessorKey' in column && column.accessorKey !== undefined) return String(column.accessorKey).replaceAll('.', '_');
   return typeof column.header === 'string' ? column.header : undefined;
 };
 
 /** Leaf columns, descending into header groups. */
-const leafColumnsOf = <TData>(columns: ColumnDef<TData, any>[]): ColumnDef<TData, any>[] =>
+const leafColumnsOf = <TData extends RowData>(columns: KitColumnDef<TData, any>[]): KitColumnDef<TData, any>[] =>
   columns.flatMap((column) => ('columns' in column && Array.isArray(column.columns) ? leafColumnsOf(column.columns) : [column]));
 
 const readSession = (key: string | undefined): Stored | undefined => {
@@ -48,13 +49,13 @@ const writeSession = (key: string | undefined, value: Stored | undefined) => {
   }
 };
 
-export const useDataTableFilters = <TData>({ columns, urlSync = false, storageKey }: Options<TData>) => {
+export const useDataTableFilters = <TData extends RowData>({ columns, urlSync = false, storageKey }: Options<TData>) => {
   const prefix = typeof urlSync === 'object' ? urlSync.prefix : '';
   const sessionKey = storageKey ? `rsk:table:${storageKey}` : undefined;
 
   const filterable = useMemo(
     () =>
-      leafColumnsOf(columns).flatMap((column) => {
+      leafColumnsOf<TData>(columns).flatMap((column) => {
         const id = columnIdOf(column);
         const meta = column.meta?.filterMeta as DataTableFilterMeta | undefined;
         return id && meta ? [{ id, codec: filterCodecFor(meta) }] : [];

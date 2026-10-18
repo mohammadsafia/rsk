@@ -1,3 +1,8 @@
+// These parts read table state through stable TanStack objects (table / column / row from context and props), which
+// compiled memoization would reuse stale; TanStack v9's fix is a Subscribe boundary per reader. Until that refactor,
+// they opt out of the React Compiler.
+'use no memo';
+
 import { type FC, type ReactNode, useRef } from 'react';
 
 import { Combobox } from '@components/shared';

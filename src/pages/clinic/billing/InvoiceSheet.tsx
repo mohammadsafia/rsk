@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 
 import { ClinicError, type Invoice, invoiceBalance, invoiceTotal, type PaymentMethod } from '@api/clinic';
 import { Alert, Badge, Button, EmptyState, Money, Sheet, Skeleton } from '@components/ui';
@@ -9,7 +8,7 @@ import { FormContainer, FormDatePicker, FormNumber, FormSelect } from '@componen
 
 import { toast, useAppTranslation, useDate } from '@hooks/shared';
 
-import { useMoneyFormat } from '@utils';
+import { formResolver, useMoneyFormat } from '@utils';
 
 import { useInvoice, usePatients, useRecordPayment, useSendInvoice, useVoidInvoice } from '../queries';
 import { INVOICE_TONE } from '../shared/status';
@@ -41,7 +40,7 @@ function RecordPayment({ invoice }: { invoice: Invoice }) {
   );
 
   const form = useForm<PaymentForm>({
-    resolver: zodResolver(schema),
+    resolver: formResolver<PaymentForm>(schema),
     defaultValues: { amount: null, method: 'card', date: todayKey },
   });
 
@@ -77,7 +76,7 @@ function RecordPayment({ invoice }: { invoice: Invoice }) {
         />
         <FormDatePicker<PaymentForm> name="date" control={form.control} label={t('billing.sheet.record.date')} required />
         <div className="sm:col-span-3">
-          <Button type="submit" loading={record.isLoading}>
+          <Button type="submit" loading={record.isPending}>
             {t('billing.sheet.record.submit')}
           </Button>
         </div>
@@ -195,7 +194,7 @@ function InvoiceSheet({ invoiceId, onClose }: { invoiceId: string | null; onClos
       <Sheet open={!!invoiceId} onOpenChange={(open) => !open && onClose()}>
         <Sheet.Content side="end" size="md" title={data?.number ?? t('billing.sheet.loadingTitle')} description={description}>
           <Sheet.Body>
-            {invoice.isLoading ? (
+            {invoice.isPending ? (
               <div className="flex flex-col gap-3">
                 <Skeleton />
                 <Skeleton shape="block" size="lg" />
@@ -220,7 +219,7 @@ function InvoiceSheet({ invoiceId, onClose }: { invoiceId: string | null; onClos
             {data?.status === 'draft' ? (
               <Button
                 variant="outline"
-                loading={send.isLoading}
+                loading={send.isPending}
                 onClick={() =>
                   send.mutate(data.id, {
                     onSuccess: () => toast({ title: t('billing.sheet.sent'), tone: 'success' }),

@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { z } from 'zod';
+
+import { optionalEmail } from '@utils';
 
 import { ClinicError, type NewPatientInput } from '@api/clinic';
 import {
@@ -97,7 +99,7 @@ function NewPatientPage() {
         lastNameAr: z.string(),
         sex: z.enum(['female', 'male']),
         dob: z
-          .string({ required_error: t('intake.errors.dobRequired'), invalid_type_error: t('intake.errors.dobRequired') })
+          .string({ error: t('intake.errors.dobRequired') })
           .min(1, t('intake.errors.dobRequired'))
           .refine((dob) => dob <= todayKey, t('intake.errors.dobFuture')),
         primaryDoctorId: z.string().min(1, t('intake.errors.doctorRequired')),
@@ -108,7 +110,7 @@ function NewPatientPage() {
           .trim()
           .min(1, t('intake.errors.phoneRequired'))
           .refine((phone) => phone.replace(/\D/g, '').length >= 7, t('intake.errors.phoneInvalid')),
-        email: z.union([z.literal(''), z.string().trim().email(t('intake.errors.emailInvalid'))]),
+        email: optionalEmail(t('intake.errors.emailInvalid')),
       }),
       insurance: z.object({
         insurerId: z.string().min(1, t('intake.errors.insurerRequired')),
@@ -137,7 +139,7 @@ function NewPatientPage() {
     try {
       const patient = await register.mutateAsync(input);
       toast({ title: t('intake.registered'), tone: 'success' });
-      navigate(patientPath(patient.id), { replace: true });
+      void navigate(patientPath(patient.id), { replace: true });
     } catch (error) {
       // Field errors (e.g. a phone already registered) go back to the step that owns the field.
       if (error instanceof ClinicError && error.fieldErrors) {

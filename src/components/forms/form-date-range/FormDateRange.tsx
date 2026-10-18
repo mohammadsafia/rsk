@@ -1,4 +1,4 @@
-import { type FC, type RefCallback, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { type FC, type RefCallback, useCallback, useId, useMemo, useState } from 'react';
 
 import { type DateRange } from 'react-day-picker';
 import { type FieldError, type FieldPath, type FieldValues, useController } from 'react-hook-form';
@@ -91,11 +91,12 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState<Date | undefined>(undefined);
 
-  const isUserInputRef = useRef(false);
-  const lastSyncedValueRef = useRef<string | null>(null);
+  // The form value the text box last took in, and whether the latest change came from typing (keep the person's text).
+  const [syncedKey, setSyncedKey] = useState<string | null>(null);
+  const [typed, setTyped] = useState(false);
 
   const handleRangeChange = useCallback((newRange: { from?: Date; to?: Date } | undefined) => {
-    isUserInputRef.current = true;
+    setTyped(true);
     if (!newRange) {
       onRangeChange(undefined);
       return;
@@ -123,36 +124,27 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
     onChange: handleRangeChange,
   });
 
-  useEffect(() => {
-    if (isUserInputRef.current) {
-      isUserInputRef.current = false;
-      return;
-    }
-
-    const valueKey = dateRange ? `${dateRange.from?.getTime()}-${dateRange.to?.getTime()}` : 'empty';
-    if (lastSyncedValueRef.current === valueKey) {
-      return;
-    }
-
-    lastSyncedValueRef.current = valueKey;
-
-    if (dateRange) {
+  // A range from outside (load, reset, setValue) refills the box; a range the person just typed leaves their text alone.
+  const valueKey = dateRange ? `${dateRange.from?.getTime()}-${dateRange.to?.getTime()}` : 'empty';
+  if (valueKey !== syncedKey) {
+    setSyncedKey(valueKey);
+    if (typed) setTyped(false);
+    else if (dateRange) {
       setFromDateRange({ from: dateRange.from, to: dateRange.to });
-      if (dateRange.from) {
-        setCalendarMonth(dateRange.from);
-      }
+      if (dateRange.from) setCalendarMonth(dateRange.from);
     } else {
       setFromDateRange(undefined);
     }
-  }, [dateRange]);
+  }
 
-  useEffect(() => {
-    if (parsedRange.from) {
-      setCalendarMonth(parsedRange.from);
-    } else if (parsedRange.to) {
-      setCalendarMonth(parsedRange.to);
-    }
-  }, [parsedRange.from, parsedRange.to]);
+  // The calendar follows the range the box holds: its start, or its end while only that is typed.
+  const parsedKey = `${parsedRange.from?.getTime()}-${parsedRange.to?.getTime()}`;
+  const [monthFor, setMonthFor] = useState(parsedKey);
+  if (parsedKey !== monthFor) {
+    setMonthFor(parsedKey);
+    if (parsedRange.from) setCalendarMonth(parsedRange.from);
+    else if (parsedRange.to) setCalendarMonth(parsedRange.to);
+  }
 
   const handleCalendarSelect = (selectedRange: DateRange | undefined) => {
     onRangeChange(selectedRange);

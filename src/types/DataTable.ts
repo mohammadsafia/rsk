@@ -1,6 +1,6 @@
 import '@tanstack/react-table';
 
-import type { RowData, ColumnSort } from '@tanstack/react-table';
+import type { CellData, ColumnSort, RowData, TableFeatures } from '@tanstack/react-table';
 
 import type { AsyncOptionsFn, DateFormat } from '@hooks/shared';
 
@@ -89,7 +89,7 @@ export type DateRangeFilterValue = { from?: string; to?: string };
 
 declare module '@tanstack/table-core' {
   // oxlint-disable-next-line @typescript-eslint/no-unused-vars
-  interface ColumnMeta<TData extends RowData, TValue> {
+  interface ColumnMeta<in out TFeatures extends TableFeatures, in out TData extends RowData, TValue extends CellData = CellData> {
     label?: string;
     /** Right-align (end-align) and use tabular figures for this column. */
     numeric?: boolean;

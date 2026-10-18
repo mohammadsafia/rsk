@@ -1,19 +1,19 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { type ColumnDef, type ColumnFiltersState, getCoreRowModel, getFilteredRowModel, useReactTable } from '@tanstack/react-table';
+import { type ColumnFiltersState, useTable } from '@tanstack/react-table';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { DataTable } from '@components/tables';
 import { Tooltip } from '@components/ui';
 
-import { booleanFilterFn, containsFilterFn, createFilterMeta, numberRangeFilterFn } from '@utils';
+import { booleanFilterFn, containsFilterFn, createFilterMeta, type KitColumnDef, kitFeatures, numberRangeFilterFn } from '@utils';
 
 import i18n from '../../../i18n';
 
 type Visit = { patient: string; insured: boolean; amount: number };
 
-const columns: ColumnDef<Visit>[] = [
+const columns: KitColumnDef<Visit>[] = [
   { accessorKey: 'patient', filterFn: containsFilterFn, meta: { filterMeta: createFilterMeta({ variant: 'text', label: 'Patient' }) } },
   {
     accessorKey: 'insured',
@@ -33,11 +33,10 @@ const rows: Visit[] = [
 ];
 
 function Harness({ filters = [] }: { filters?: ColumnFiltersState }) {
-  const table = useReactTable({
+  const table = useTable({
+    features: kitFeatures,
     data: rows,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     initialState: { columnFilters: filters },
   });
   return (

@@ -94,10 +94,9 @@ All page components are code-split with `React.lazy` + `Suspense`. Route constan
 | UI Primitives | Radix UI (15+ primitives), CVA, lucide-react                 |
 | Forms         | React Hook Form + Zod + 18 form components                   |
 | Data          | TanStack React Query + React Table, Axios                    |
-| State         | MobX (client state), React Query (server state)              |
-| Auth          | OIDC (Microsoft), AuthGuard HOC                              |
+| State         | React Query (server state), React context (client state)     |
+| Auth          | Local session (`useAuth`), route guard                       |
 | i18n          | i18next with browser detection                               |
-| Monitoring    | Sentry (error tracking), Firebase (push notifications)       |
 | Docs          | MDX + rehype-pretty-code + Shiki (component gallery)         |
 | Tooling       | Vite+ (`vp`: Vite, Rolldown, Vitest, Oxlint, Oxfmt), DTO CLI |
 
@@ -129,7 +128,7 @@ The codebase enforces a 12-category standards checklist. Here are the key princi
 
 ```tsx
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { Button } from '@components/ui';
 
@@ -284,7 +283,7 @@ Opens on http://localhost:3000.
 
 - **Path aliases** are configured in both `vite.config.ts` and `tsconfig.app.json`. Available aliases: `@api`, `@components`, `@hooks`, `@utils`, `@contexts`, `@constants`, `@layouts`, `@pages`, `@views`, `@routes`, `@app-types`, `@assets`, `@locales`, `@app-config`, `@hoc`, `@component-docs`.
 
-- **Environment variables** — A `.env` file is required. All app variables use the `VITE_APP_*` prefix. Key variables: `VITE_APP_BASE_URL` (API base URL), `VITE_APP_CLIENT_ID` (OIDC client ID), plus Firebase config variables for push notifications.
+- **Environment variables** — None are required: the kit's settings (API URL, currency) live in `src/app-config/appConfig.ts`. Add `VITE_*` keys to `.env` and declare them in `src/vite-env.d.ts` as your app needs them.
 
 - **DTO generator** — Requires a Swagger/OpenAPI endpoint configured in `.dto-gen.json`. Run `pnpm dto:init` to scaffold the config file before first use.
 
@@ -294,7 +293,7 @@ Opens on http://localhost:3000.
 
 - **Conditional rendering** — `Conditional.If` is mandatory for all conditional rendering in JSX. Do not use `&&` or ternary expressions inside JSX templates.
 
-- **Auth** — Authentication uses Microsoft OIDC via `oidc-client-ts`. `AuthGuard` wraps all protected routes as a HOC. Use the `useAuth()` hook to access the current user and auth state inside components.
+- **Auth** — Auth is a local session hook (`useAuth`): it holds the current user and guards routes. Swap in your provider (OIDC, your API) behind the same hook.
 
 ---
 

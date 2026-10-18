@@ -27,6 +27,15 @@ describe('Dialog', () => {
     expect(content).toBeTruthy();
   });
 
+  it('cascades its parts in, and only the opening rise steps aside for a flight (the exit always plays)', () => {
+    render(<Example />);
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    const className = screen.getByRole('dialog').className;
+    expect(className).toContain('cascade');
+    expect(className).toContain('data-[flight]:data-[state=open]:animate-none');
+    expect(className).toContain('data-[state=closed]:animate-out');
+  });
+
   it('is named by its title and described by its description', () => {
     render(<Example />);
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));

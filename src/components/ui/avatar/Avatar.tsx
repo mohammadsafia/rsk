@@ -33,7 +33,12 @@ type AvatarComponent = FC<AvatarProps> & {
 };
 
 const Image: FC<ImageProps> = ({ className, ...props }) => (
-  <AvatarPrimitive.Image data-slot="avatar-image" className={cn('aspect-square size-full object-cover', className)} {...props} />
+  // Radix mounts the image once it has loaded, so it fades in over the initials' place.
+  <AvatarPrimitive.Image
+    data-slot="avatar-image"
+    className={cn('animate-in fade-in-0 duration-base ease-out motion-reduce:animate-none aspect-square size-full object-cover', className)}
+    {...props}
+  />
 );
 
 const Fallback: FC<FallbackProps> = ({ className, ...props }) => (

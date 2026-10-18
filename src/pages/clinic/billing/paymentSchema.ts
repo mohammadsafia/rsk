@@ -16,12 +16,12 @@ export const paymentSchema = ({
 }) =>
   z.object({
     amount: z
-      .number({ invalid_type_error: t('billing.sheet.record.amountRequired'), required_error: t('billing.sheet.record.amountRequired') })
+      .number({ error: t('billing.sheet.record.amountRequired') })
       .gt(0, t('billing.sheet.record.amountRequired'))
       .max(balance, t('billing.sheet.record.amountTooHigh', { balance: balanceLabel })),
     method: z.enum(['card', 'cash', 'insurance']),
     date: z
-      .string({ required_error: t('billing.sheet.record.dateRequired'), invalid_type_error: t('billing.sheet.record.dateRequired') })
+      .string({ error: t('billing.sheet.record.dateRequired') })
       .min(1, t('billing.sheet.record.dateRequired'))
       .refine((date) => date <= todayKey, t('billing.sheet.record.dateFuture')),
   });

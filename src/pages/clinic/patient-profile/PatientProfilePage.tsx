@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 
@@ -267,7 +267,7 @@ function PatientProfilePage() {
       </PageHeader>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label={t('profile.stats.visitsThisYear')} value={visitsThisYear} loading={visits.isLoading} />
+        <StatCard label={t('profile.stats.visitsThisYear')} value={visitsThisYear} loading={visits.isPending} />
         <StatCard label={t('profile.stats.balanceDue')} value={<Money value={data.balance} tone="none" />} />
         <StatCard
           label={t('profile.stats.lastVisit')}

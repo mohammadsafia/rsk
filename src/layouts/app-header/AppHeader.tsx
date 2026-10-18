@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { Avatar, Button, DropdownMenu, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';

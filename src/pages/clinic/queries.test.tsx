@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test';
 
 import { clinicStore } from '@api/clinic';
 
-import { usePatients, useRegisterPatient } from './queries';
+import { usePatients, useRegisterPatient, useVisits } from './queries';
 import { resetClinic } from './test-utils';
 
 beforeEach(resetClinic);
@@ -36,5 +36,17 @@ describe('clinic queries', () => {
     clinicStore.failNext('listPatients');
     const { result } = renderHook(() => usePatients(), { wrapper });
     await waitFor(() => expect(result.current.error).toMatchObject({ code: 'forced' }));
+  });
+
+  it('keeps the previous range visible while the next one loads (Query 5 placeholderData)', async () => {
+    const { result, rerender } = renderHook(({ from, to }) => useVisits({ from, to }, { keepPreviousData: true }), {
+      wrapper,
+      initialProps: { from: '2026-10-12', to: '2026-10-18' },
+    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    const first = result.current.data;
+    rerender({ from: '2026-10-19', to: '2026-10-25' });
+    expect(result.current.data).toBe(first);
+    expect(result.current.isPlaceholderData).toBe(true);
   });
 });

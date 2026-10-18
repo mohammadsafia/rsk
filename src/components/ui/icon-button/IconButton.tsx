@@ -1,4 +1,4 @@
-import { type FC, forwardRef } from 'react';
+import { type FC } from 'react';
 
 import { Button, type ButtonProps, Tooltip } from '@components/ui';
 
@@ -34,5 +34,4 @@ const IconButton: FC<IconButtonProps> = ({ ref, variant = 'ghost', size, tooltip
   );
 };
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-export default forwardRef<HTMLButtonElement, IconButtonProps>((props, ref) => IconButton({ ...props, ref }));
+export default IconButton;

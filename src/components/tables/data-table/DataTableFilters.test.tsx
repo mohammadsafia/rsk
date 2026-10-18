@@ -1,20 +1,13 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import {
-  type ColumnDef,
-  type ColumnFiltersState,
-  type FilterFn,
-  getCoreRowModel,
-  getFilteredRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { type ColumnFiltersState, useTable } from '@tanstack/react-table';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { DataTable } from '@components/tables';
 import { Tooltip } from '@components/ui';
 
-import { createFilterMeta } from '@utils';
+import { createFilterMeta, type KitColumnDef, kitFeatures, type KitFilterFn } from '@utils';
 
 import i18n from '../../../i18n';
 
@@ -30,7 +23,7 @@ const STATUSES = [
   { id: 'invited', name: 'Invited' },
 ];
 
-const inValues: FilterFn<Member> = (row, id, value) => !Array.isArray(value) || value.length === 0 || value.includes(row.getValue(id));
+const inValues: KitFilterFn<Member> = (row, id, value) => !Array.isArray(value) || value.length === 0 || value.includes(row.getValue(id));
 
 const select = (label: string, options: typeof ROLES) =>
   createFilterMeta({
@@ -41,7 +34,7 @@ const select = (label: string, options: typeof ROLES) =>
     getOptionValue: (option: { id: string; name: string }) => option.id,
   });
 
-const columns: ColumnDef<Member>[] = [
+const columns: KitColumnDef<Member>[] = [
   { accessorKey: 'name', header: 'Name' },
   { accessorKey: 'role', header: 'Role', filterFn: inValues, meta: { filterMeta: select('Role', ROLES) } },
   { accessorKey: 'status', header: 'Status', filterFn: inValues, meta: { filterMeta: select('Status', STATUSES) } },
@@ -54,11 +47,10 @@ const rows: Member[] = [
 ];
 
 function Harness({ filters = [] }: { filters?: ColumnFiltersState }) {
-  const table = useReactTable({
+  const table = useTable({
+    features: kitFeatures,
     data: rows,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     initialState: { columnFilters: filters },
     enableGlobalFilter: true,
   });

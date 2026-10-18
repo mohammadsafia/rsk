@@ -136,7 +136,8 @@ describe('shape, motion and states', () => {
   }
 
   it('neutralizes every tw-animate transform variable under reduced motion', () => {
-    const reduced = utilitiesCss.slice(utilitiesCss.indexOf('@media (prefers-reduced-motion: reduce)'));
+    // The global block (utilities may nest their own reduced-motion rules above it).
+    const reduced = utilitiesCss.slice(utilitiesCss.indexOf('/* Reduced motion: keep opacity fades'));
     for (const phase of ['enter', 'exit']) {
       for (const part of ['scale: 1', 'rotate: 0', 'translate-x: 0', 'translate-y: 0']) {
         expect(reduced).toContain(`--tw-${phase}-${part} !important;`);
@@ -181,6 +182,10 @@ describe('utility behavior', () => {
 });
 
 describe('code blocks', () => {
+  it('render comments in --code-muted (the GitHub theme grey is too faint on the code surface)', () => {
+    expect(indexCss).toMatch(/\[style\*='--shiki-dark: #6A737D'\]\s*\{\s*color: var\(--code-muted\) !important;/);
+  });
+
   it('always use the dark syntax palette, because --code-surface is dark in both themes', () => {
     expect(indexCss).not.toContain('var(--shiki-light)');
     expect(indexCss).toMatch(/\[data-rehype-pretty-code-figure\] code \[style\*='--shiki-dark'\] \{\s*color: var\(--shiki-dark\)/);

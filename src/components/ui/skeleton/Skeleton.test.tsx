@@ -25,4 +25,11 @@ describe('Skeleton', () => {
     expect(circle.className).toContain('size-10');
     expect(block.className).toContain('h-16');
   });
+
+  it('shimmers with a faint ink sweep instead of pulsing', () => {
+    const { container } = render(<Skeleton />);
+    const className = (container.firstElementChild as HTMLElement).className;
+    expect(className).toContain('shimmer');
+    expect(className).not.toContain('animate-pulse');
+  });
 });

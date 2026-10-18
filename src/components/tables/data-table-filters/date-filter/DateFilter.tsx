@@ -1,6 +1,10 @@
+// These parts read table state through stable TanStack objects (table / column / row from context and props), which
+// compiled memoization would reuse stale; TanStack v9's fix is a Subscribe boundary per reader. Until that refactor,
+// they opt out of the React Compiler.
+'use no memo';
+
 import { useCallback, useMemo, useState } from 'react';
 
-import type { Column } from '@tanstack/react-table';
 import type { DateRange } from 'react-day-picker';
 
 import { Calendar, Popover } from '@components/ui';
@@ -11,15 +15,17 @@ import { FilterPill } from '@components/tables/data-table-filters/filter-pill';
 import { DateFormats, useDate } from '@hooks/shared';
 
 import type { DateFilterMeta, DateRangeFilterValue } from '@app-types';
+import { type KitColumn } from '@utils';
+import type { RowData } from '@tanstack/react-table';
 
 type FilterChip = { value: string; label: string };
 
-type DateFilterProps<TData> = {
-  column: Column<TData>;
+type DateFilterProps<TData extends RowData> = {
+  column: KitColumn<TData>;
   filterMeta: DateFilterMeta;
 };
 
-function DateFilter<TData>({ column, filterMeta }: DateFilterProps<TData>) {
+function DateFilter<TData extends RowData>({ column, filterMeta }: DateFilterProps<TData>) {
   const { toDate, toBoundaryDate, formatDate } = useDate();
 
   const isRange = filterMeta.variant === 'dateRange';

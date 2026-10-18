@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
+import { optionalEmail } from '@utils';
+
 import { ClinicError, type PatientSummary } from '@api/clinic';
 import { Button, Sheet } from '@components/ui';
 import { FormContainer, FormInput, FormSelect } from '@components/forms';
@@ -49,7 +51,7 @@ function EditPatientSheet({ patient, onClose }: { patient: PatientSummary | null
             .trim()
             .min(1, t('profile.editSheet.phoneRequired'))
             .refine((phone) => phone.replace(/\D/g, '').length >= 7, t('profile.editSheet.phoneInvalid')),
-          email: z.union([z.literal(''), z.string().trim().email(t('profile.editSheet.emailInvalid'))]),
+          email: optionalEmail(t('profile.editSheet.emailInvalid')),
           insurerId: z.string(),
           policyNumber: z.string().trim(),
         })
@@ -111,7 +113,7 @@ function EditPatientSheet({ patient, onClose }: { patient: PatientSummary | null
             <FormInput<ContactForm> name="policyNumber" label={t('profile.editSheet.policy')} dir="ltr" />
           </Sheet.Body>
           <Sheet.Footer>
-            <Button type="submit" loading={update.isLoading}>
+            <Button type="submit" loading={update.isPending}>
               {t('profile.editSheet.save')}
             </Button>
             <Sheet.Close asChild>

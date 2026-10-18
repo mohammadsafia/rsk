@@ -1,4 +1,4 @@
-import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type PropsWithChildren, useId } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC, type PropsWithChildren, useId } from 'react';
 
 import { Command, type CommandProps, fieldVariants, type FieldVariants, Popover } from '@components/ui';
 
@@ -176,8 +176,7 @@ const Combobox: ComboboxComponent = ({ open, onOpenChange, children }: ComboboxP
   </Popover>
 );
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-Combobox.Trigger = forwardRef<HTMLButtonElement, ComboboxTriggerProps>((props, ref) => ComboboxTrigger({ ...props, ref }));
+Combobox.Trigger = ComboboxTrigger;
 Combobox.Value = ComboboxValue;
 Combobox.Clear = ComboboxClear;
 Combobox.Icon = ComboboxIcon;

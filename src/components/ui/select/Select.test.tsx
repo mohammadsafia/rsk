@@ -39,4 +39,11 @@ describe('Select', () => {
     expect(chosen.className).toContain('data-[state=checked]:ink');
     expect(screen.getByRole('listbox').className).toContain('origin-(--radix-select-content-transform-origin)');
   });
+
+  it('its options cascade in from above, so the rise never counts as overflow (no stray scroll-down arrow)', () => {
+    renderSelect(true);
+    const className = document.querySelector('[data-slot="select-viewport"]')?.className ?? '';
+    expect(className).toContain('cascade');
+    expect(className).toContain('[--cascade-rise:-4px]');
+  });
 });

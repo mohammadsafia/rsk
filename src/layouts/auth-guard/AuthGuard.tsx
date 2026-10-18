@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router';
 
 import { useAuth } from '@hooks/shared';
 

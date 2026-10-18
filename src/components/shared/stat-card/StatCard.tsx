@@ -1,5 +1,5 @@
 import { type FC, type ReactNode, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { RollingText, Skeleton } from '@components/ui';
 import { Conditional } from '@components/utils';

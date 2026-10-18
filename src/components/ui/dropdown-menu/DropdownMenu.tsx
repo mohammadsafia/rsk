@@ -109,7 +109,8 @@ const Content: FC<DropdownMenuContentProps> = ({ className, sideOffset = 4, ...p
       className={cn(
         floatingSurfaceClassName,
         floatingMotionClassName,
-        'origin-(--radix-dropdown-menu-content-transform-origin) min-w-32 overflow-hidden p-1',
+        // Items cascade in as the menu unfolds.
+        'cascade origin-(--radix-dropdown-menu-content-transform-origin) min-w-32 overflow-hidden p-1',
         className,
       )}
       {...props}

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { type DateInput, useAppTranslation, useDate } from '@hooks/shared';
 
@@ -9,9 +9,12 @@ export function useGroupedByDay<T>(items: T[], getTime: (item: T) => DateInput):
   const { t } = useAppTranslation('common');
   const { toDate, subtractDuration, isValid, formatDate, constants } = useDate();
 
+  // "Today" is read once when the list mounts, not on every render, so labels stay steady while it is shown.
+  const [now] = useState(() => new Date());
+
   return useMemo(() => {
-    const today = toDate(new Date(), constants.DateFormats.ISO_DATE);
-    const yesterday = toDate(subtractDuration(new Date(), 1, constants.UnitOfTime.DAY), constants.DateFormats.ISO_DATE);
+    const today = toDate(now, constants.DateFormats.ISO_DATE);
+    const yesterday = toDate(subtractDuration(now, 1, constants.UnitOfTime.DAY), constants.DateFormats.ISO_DATE);
     const groups = new Map<string, T[]>();
 
     for (const item of items) {
@@ -34,5 +37,5 @@ export function useGroupedByDay<T>(items: T[], getTime: (item: T) => DateInput):
                 : '—',
         items: groupItems,
       }));
-  }, [items, getTime, t, toDate, subtractDuration, isValid, formatDate, constants]);
+  }, [items, getTime, t, now, toDate, subtractDuration, isValid, formatDate, constants]);
 }

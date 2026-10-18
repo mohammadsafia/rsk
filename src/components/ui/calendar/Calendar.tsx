@@ -200,7 +200,7 @@ function Calendar({
             : 'flex h-8 items-center gap-1 rounded-md ps-2 pe-1 text-sm [&>svg]:text-fg-muted [&>svg]:size-3.5',
           defaultClassNames.caption_label,
         ),
-        table: 'w-full border-collapse',
+        month_grid: cn('w-full border-collapse', defaultClassNames.month_grid),
         weekdays: cn('flex', defaultClassNames.weekdays),
         weekday: cn('text-fg-muted flex-1 text-xs font-normal select-none', defaultClassNames.weekday),
         week: cn('mt-1 flex w-full', defaultClassNames.week),

@@ -9,7 +9,7 @@ import {
   useId,
   useState,
 } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { IconButton, ScrollArea, Tooltip } from '@components/ui';
 import { Conditional } from '@components/utils';

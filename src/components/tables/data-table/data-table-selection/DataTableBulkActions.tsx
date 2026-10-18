@@ -1,27 +1,31 @@
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+// These parts read table state through stable TanStack objects (table / column / row from context and props), which
+// compiled memoization would reuse stale; TanStack v9's fix is a Subscribe boundary per reader. Until that refactor,
+// they opt out of the React Compiler.
+'use no memo';
 
-import type { Row } from '@tanstack/react-table';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import { Button } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
 
-import { cn } from '@utils';
+import { cn, type KitRow } from '@utils';
 
 import { useDataTableContext } from '../DataTableContext';
+import type { RowData } from '@tanstack/react-table';
 
-type DataTableBulkActionsProps<TData> = {
+type DataTableBulkActionsProps<TData extends RowData> = {
   /**
    * Receives the selected rows that are loaded, and every selected id. With server-side paging,
    * rows selected on other pages appear only in `ids`.
    */
-  children?: (rows: Row<TData>[], ids: string[]) => ReactNode;
+  children?: (rows: KitRow<TData>[], ids: string[]) => ReactNode;
   className?: string;
 };
 
 /** Replaces the toolbar while rows are selected: count, "select all results", your actions, Clear. */
-function DataTableBulkActions<TData>({ children, className }: DataTableBulkActionsProps<TData>) {
+function DataTableBulkActions<TData extends RowData>({ children, className }: DataTableBulkActionsProps<TData>) {
   const { t } = useAppTranslation('common');
   const { table, setBulkActionsMounted } = useDataTableContext<TData>();
 
@@ -34,7 +38,7 @@ function DataTableBulkActions<TData>({ children, className }: DataTableBulkActio
   const [cleared, setCleared] = useState(false);
 
   // Count from the selection state, not the row model: the row model only holds loaded rows.
-  const rowSelection = table.getState().rowSelection;
+  const rowSelection = table.state.rowSelection;
   const ids = Object.keys(rowSelection).filter((id) => rowSelection[id]);
   const count = ids.length;
   const selected = table.getSelectedRowModel().rows;
@@ -42,9 +46,8 @@ function DataTableBulkActions<TData>({ children, className }: DataTableBulkActio
   const canSelectAll =
     !table.options.manualPagination && table.getIsAllPageRowsSelected() && !table.getIsAllRowsSelected() && total > count;
 
-  useEffect(() => {
-    if (count > 0) setCleared(false);
-  }, [count]);
+  // A new selection retires the "selection cleared" announcement.
+  if (count > 0 && cleared) setCleared(false);
 
   const clear = () => {
     const root = barRef.current?.closest('[data-slot="data-table"]');

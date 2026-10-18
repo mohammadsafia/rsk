@@ -1,4 +1,6 @@
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState, useRef } from 'react';
+
+import { MOTION_DURATIONS } from '@constants';
 
 import { useStorage } from '@hooks/shared';
 
@@ -33,8 +35,16 @@ export function ThemeProvider({ children, defaultTheme = THEME_TYPES.DARK, stora
 
   const [theme, setTheme] = useState<Theme>(storageTheme);
 
+  const switchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
   const onSetTheme = useCallback(
     (newTheme: Theme) => {
+      // A one-off colour cross-fade while switching (motion.css), never on load; rapid toggles restart it.
+      const root = window.document.documentElement;
+      root.classList.add('theme-switching');
+      clearTimeout(switchTimer.current);
+      switchTimer.current = setTimeout(() => root.classList.remove('theme-switching'), MOTION_DURATIONS.base + 50);
+
       setStorageTheme(newTheme);
 
       setTheme(newTheme);

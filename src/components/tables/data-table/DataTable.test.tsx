@@ -1,15 +1,16 @@
 // @vitest-environment happy-dom
 import { act, cleanup, render, screen } from '@testing-library/react';
-import { type ColumnDef, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table';
+import { useTable } from '@tanstack/react-table';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { DataTable } from '@components/tables';
 
 import i18n from '../../../i18n';
+import { type KitColumnDef, kitFeatures } from '@utils';
 
 type Visit = { patient: string; amount: number };
 
-const columns: ColumnDef<Visit>[] = [
+const columns: KitColumnDef<Visit>[] = [
   { accessorKey: 'patient', header: 'Patient' },
   { accessorKey: 'amount', header: 'Amount', meta: { numeric: true } },
 ];
@@ -20,11 +21,10 @@ const rows: Visit[] = [
 ];
 
 function Harness({ total, label, pageSize }: { total?: number; label?: string; pageSize?: number }) {
-  const table = useReactTable({
+  const table = useTable({
+    features: kitFeatures,
     data: rows,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     enableGlobalFilter: true,
     initialState: pageSize ? { pagination: { pageIndex: 0, pageSize } } : undefined,
   });

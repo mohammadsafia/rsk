@@ -1,5 +1,5 @@
 import { type FC, useCallback, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs';
 
@@ -76,7 +76,7 @@ const VisitPopover: FC<{
             key={action.status}
             size="sm"
             variant="outline"
-            loading={setStatus.isLoading && setStatus.variables?.status === action.status}
+            loading={setStatus.isPending && setStatus.variables?.status === action.status}
             onClick={async () => {
               try {
                 await setStatus.mutateAsync({ id: visit.id, status: action.status });
@@ -183,7 +183,7 @@ function SchedulePage() {
         startHour={7}
         endHour={18}
         stepMinutes={15}
-        isLoading={(visits.isLoading || doctors.isLoading) && events.length === 0}
+        isLoading={(visits.isPending || doctors.isPending) && events.length === 0}
         onSlotSelect={setSlot}
         onEventChange={onEventChange}
         canEdit={canEdit}

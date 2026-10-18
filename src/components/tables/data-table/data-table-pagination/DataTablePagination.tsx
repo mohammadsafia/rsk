@@ -1,3 +1,8 @@
+// These parts read table state through stable TanStack objects (table / column / row from context and props), which
+// compiled memoization would reuse stale; TanStack v9's fix is a Subscribe boundary per reader. Until that refactor,
+// they opt out of the React Compiler.
+'use no memo';
+
 import { type FC, useCallback, useId, useMemo } from 'react';
 
 import { Pagination, Select } from '@components/ui';
@@ -39,12 +44,12 @@ const DataTablePagination: FC<PaginationProps> = ({ pageSizeOptions = [30, 50, 1
   const { table } = useDataTableContext();
   const rowsLabelId = useId();
 
-  const currentPage = table.getState().pagination.pageIndex + 1;
+  const currentPage = table.state.pagination.pageIndex + 1;
   const totalPages = table.getPageCount();
 
   const pageNumbers = useMemo(() => getPageNumbers(currentPage, totalPages), [currentPage, totalPages]);
 
-  const pageSize = table.getState().pagination.pageSize;
+  const pageSize = table.state.pagination.pageSize;
 
   // A page size set in initialState may not be one of the options; list it so the select can show it.
   const sizeOptions = useMemo(

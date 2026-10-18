@@ -44,6 +44,7 @@ export const DROP = [
 
 /** Dependencies only the docs site uses. */
 export const DOCS_ONLY_DEV_DEPENDENCIES = [
+  '@clack/prompts',
   '@mdx-js/react',
   '@mdx-js/rollup',
   '@types/mdx',

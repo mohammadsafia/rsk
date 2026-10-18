@@ -16,8 +16,10 @@ describe('Popover', () => {
     );
     const content = screen.getByText('Body').closest('[data-slot="popover-content"]');
     expect(content?.className).toContain('bg-surface-raised');
-    expect(content?.className).toContain('data-[state=open]:zoom-in-96');
-    expect(content?.className).toContain('data-[state=open]:duration-fast');
+    // Menus unfold from their trigger on the spring (spec §4), and still leave quickly.
+    expect(content?.className).toContain('data-[state=open]:zoom-in-90');
+    expect(content?.className).toContain('data-[state=open]:duration-spring');
+    expect(content?.className).toContain('data-[state=open]:ease-spring');
     expect(content?.className).toContain('data-[state=closed]:duration-instant');
     expect(content?.className).toContain('data-[state=closed]:ease-in');
     expect(content?.className).toContain('data-[side=top]:slide-in-from-bottom-1');

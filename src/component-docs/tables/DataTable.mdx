@@ -8,19 +8,11 @@ tags: [tables, data-table, tanstack, pagination, toolbar, filtering]
 ---
 
 import { useMemo } from 'react';
-import {
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { useTable } from '@tanstack/react-table';
 import { Badge, Button } from '@components/ui';
 import { createSelectionColumn, DataTable } from '@components/tables';
 import { useDataTableFilters } from '@hooks/shared';
-import { containsFilterFn, createFilterMeta, inListFilterFn, numberRangeFilterFn } from '@utils';
+import { containsFilterFn, createFilterMeta, inListFilterFn, kitFeatures, numberRangeFilterFn } from '@utils';
 import { demoSource } from '@component-docs/blocks';
 import pageSource from './DataTable.mdx?raw';
 
@@ -81,7 +73,8 @@ export const InvoicesDemo = () => {
   );
   const filters = useDataTableFilters({ columns });
 
-  const table = useReactTable({
+  const table = useTable({
+    features: kitFeatures,
     data: INVOICES,
     columns,
     getRowId: (row) => row.id,
@@ -90,13 +83,7 @@ export const InvoicesDemo = () => {
     onGlobalFilterChange: filters.onGlobalFilterChange,
     enableGlobalFilter: true,
     globalFilterFn: 'includesString',
-    initialState: { pagination: { pageSize: 6 } },
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
+    initialState: { pagination: { pageIndex: 0, pageSize: 6 } },
   });
 
   return (
@@ -131,7 +118,7 @@ Add `createSelectionColumn()` as the first column and `getRowId` on the table, t
 
 ```tsx
 const columns = [createSelectionColumn<Invoice>({ getRowLabel: (row) => row.id }), ...rest];
-const table = useReactTable({ data, columns, getRowId: (row) => row.id, ... });
+const table = useTable({ features: kitFeatures, data, columns, getRowId: (row) => row.id, ... });
 
 <DataTable table={table}>
   <DataTable.Toolbar totalCount={total} />
@@ -206,14 +193,13 @@ Every filterable column sets `meta.filterMeta` (via `createFilterMeta`) and a ma
 ```tsx
 const filters = useDataTableFilters({ columns, urlSync: true, storageKey: 'patients' });
 
-const table = useReactTable({
+const table = useTable({
+    features: kitFeatures,
   data,
   columns,
   state: filters.state,
   onColumnFiltersChange: filters.onColumnFiltersChange,
   onGlobalFilterChange: filters.onGlobalFilterChange,
-  getCoreRowModel: getCoreRowModel(),
-  getFilteredRowModel: getFilteredRowModel(),
 });
 
 <DataTable table={table} onResetFilters={filters.reset}>…</DataTable>
@@ -227,7 +213,8 @@ Malformed or unknown URL values are ignored, so a stale link still opens the tab
 const params = getFilterQueryParams(table); // { role: 'admin,editor', amount: '10..250', q: 'sara' }
 
 useQuery({ queryKey: ['patients', params, pagination], queryFn: () => api.patients.list({ ...params, page }) });
-// useReactTable({ manualFiltering: true, … })
+// useTable({
+    features: kitFeatures, manualFiltering: true, … })
 ```
 
 ## Column Sizing
@@ -247,7 +234,7 @@ DataTable uses `table-auto` with `max-w-0` on non-pinned body cells. The `size` 
 ### Example
 
 ```tsx
-const columns: ColumnDef<Doctor>[] = [
+const columns: KitColumnDef<Doctor>[] = [
   { id: 'flag', header: '', size: 40 }, // narrow (icon)
   { header: 'Name', accessorKey: 'fullName' }, // fits header text
   { header: 'Email', accessorKey: 'email', size: 300 }, // exact 300px
@@ -504,7 +491,7 @@ For all the above, prefer the action-icon pattern.
 
 <PropsTable
   rows={[
-    { prop: 'table', type: 'Table<TData>', required: true, description: 'A TanStack table instance (useReactTable or useDataTable).' },
+    { prop: 'table', type: 'KitTable<TData>', required: true, description: 'A TanStack table instance (useTactTable or useDataTable).' },
     { prop: 'isLoading', type: 'boolean', default: 'false', description: 'Skeleton rows in the body.' },
     { prop: 'onRowClick', type: '(row: Row<TData>) => void', description: 'Make rows clickable; see Row Click Navigation.' },
     { prop: 'getRowClassName', type: '(row: Row<TData>) => string', description: 'Per-row classes.' },
@@ -517,7 +504,7 @@ For all the above, prefer the action-icon pattern.
   ]}
 />
 
-> **Note on `onRowClick` and `getRowClassName`:** these live on the `<DataTable>` root, not on `<DataTable.Content>`. They take generic `Row<TData>` parameters, and TypeScript generics don't propagate through React Context — only the root has the `table` prop from which `TData` is inferred. See [Row Click Navigation](#row-click-navigation) for the API.
+> **Note on `onRowClick` and `getRowClassName`:** these live on the `<DataTable>` root, not on `<DataTable.Content>`. They take generic `KitRow<TData>` parameters, and TypeScript generics don't propagate through React Context — only the root has the `table` prop from which `TData` is inferred. See [Row Click Navigation](#row-click-navigation) for the API.
 
 ## Imports
 

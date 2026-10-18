@@ -1,5 +1,5 @@
 import { Suspense, useMemo } from 'react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation } from 'react-router';
 
 import { Spinner } from '@components/ui';
 import { AppShell, LanguageSwitcher, Logo, Sidebar, ThemeSwitcher, Toaster } from '@components/shared';

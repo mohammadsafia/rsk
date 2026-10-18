@@ -1,6 +1,9 @@
-import { useCallback, useMemo, useState } from 'react';
+// These parts read table state through stable TanStack objects (table / column / row from context and props), which
+// compiled memoization would reuse stale; TanStack v9's fix is a Subscribe boundary per reader. Until that refactor,
+// they opt out of the React Compiler.
+'use no memo';
 
-import type { Column } from '@tanstack/react-table';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Checkbox, RadioGroup } from '@components/ui';
 import { Combobox } from '@components/shared';
@@ -10,15 +13,17 @@ import { FilterPill } from '@components/tables/data-table-filters/filter-pill';
 import { type AsyncOptionsFn, useAppTranslation, useAsyncOptionsInfiniteQuery, useDebounce, useInfiniteScroll } from '@hooks/shared';
 
 import type { SelectFilterMeta } from '@app-types';
+import { type KitColumn } from '@utils';
+import type { RowData } from '@tanstack/react-table';
 
 type FilterChip = { value: string; label: string };
 
-type AsyncSelectFilterProps<TData> = {
-  column: Column<TData>;
+type AsyncSelectFilterProps<TData extends RowData> = {
+  column: KitColumn<TData>;
   filterMeta: SelectFilterMeta;
 };
 
-function AsyncSelectFilter<TData>({ column, filterMeta }: AsyncSelectFilterProps<TData>) {
+function AsyncSelectFilter<TData extends RowData>({ column, filterMeta }: AsyncSelectFilterProps<TData>) {
   const { t } = useAppTranslation('common');
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');

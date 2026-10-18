@@ -1,17 +1,7 @@
 import { useMemo } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 
-import {
-  type ColumnDef,
-  type FilterFn,
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { useTable } from '@tanstack/react-table';
 
 import type { Doctor, Insurer, PatientSummary } from '@api/clinic';
 import { Alert, Button, EmptyState, Money } from '@components/ui';
@@ -21,7 +11,16 @@ import { DataTable } from '@components/tables';
 import { useAppTranslation, useDataTableFilters, useDate } from '@hooks/shared';
 import { FULL_ROUTES_PATH, patientPath } from '@routes';
 
-import { containsFilterFn, createFilterMeta, dateRangeFilterFn, inListFilterFn } from '@utils';
+import {
+  containsFilterFn,
+  createFilterMeta,
+  dateRangeFilterFn,
+  inListFilterFn,
+  type KitColumnDef,
+  type KitFeatures,
+  kitFeatures,
+  type KitFilterFn,
+} from '@utils';
 
 import { Plus } from 'lucide-react';
 
@@ -38,7 +37,7 @@ const SEARCHABLE = new Set(['name', 'mrn', 'phone']);
 
 const digits = (value: string) => value.replace(/\D/g, '').replace(/^(962|0)/, '');
 
-const searchPatients: FilterFn<PatientSummary> = (row, columnId, filterValue) => {
+const searchPatients: KitFilterFn<PatientSummary> = (row, columnId, filterValue) => {
   const query = String(filterValue ?? '')
     .trim()
     .toLowerCase();
@@ -70,7 +69,7 @@ const optionFilter = (label: string, options: Option[]) =>
     getOptionValue: (option: Option) => option.id,
   });
 
-const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }: ColumnsInput): ColumnDef<PatientSummary>[] => {
+const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }: ColumnsInput): KitColumnDef<PatientSummary>[] => {
   const doctorName = (id: string) => localize(doctors.find((doctor) => doctor.id === id)?.name) || '—';
   const insurerName = (id: string | null) =>
     id ? localize(insurers.find((insurer) => insurer.id === id)?.name) || '—' : t('patients.selfPay');
@@ -87,7 +86,7 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }:
       header: t('patients.columns.name'),
       enableSorting: true,
       // Alphabetical in the active language (Arabic names sort as Arabic, not by code point).
-      sortingFn: (a, b) => String(a.getValue('name')).localeCompare(String(b.getValue('name')), language),
+      sortFn: (a, b) => String(a.getValue('name')).localeCompare(String(b.getValue('name')), language),
       filterFn: containsFilterFn,
       cell: ({ row }) => (
         <div className="flex flex-col">
@@ -123,7 +122,7 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }:
     {
       accessorKey: 'primaryDoctorId',
       header: t('patients.columns.doctor'),
-      sortingFn: (a, b) => doctorName(a.original.primaryDoctorId).localeCompare(doctorName(b.original.primaryDoctorId), language),
+      sortFn: (a, b) => doctorName(a.original.primaryDoctorId).localeCompare(doctorName(b.original.primaryDoctorId), language),
       filterFn: inListFilterFn,
       cell: ({ row }) => <span className="text-fg">{doctorName(row.original.primaryDoctorId)}</span>,
       meta: { label: t('patients.columns.doctor'), filterMeta: optionFilter(t('patients.columns.doctor'), doctorOptions) },
@@ -132,7 +131,7 @@ const buildColumns = ({ t, localize, formatVisit, doctors, insurers, language }:
       id: 'insurer',
       accessorFn: (patient) => patient.insurerId ?? SELF_PAY,
       header: t('patients.columns.insurer'),
-      sortingFn: (a, b) => insurerName(a.original.insurerId).localeCompare(insurerName(b.original.insurerId), language),
+      sortFn: (a, b) => insurerName(a.original.insurerId).localeCompare(insurerName(b.original.insurerId), language),
       filterFn: inListFilterFn,
       cell: ({ row }) => <span className="text-fg-muted">{insurerName(row.original.insurerId)}</span>,
       meta: { label: t('patients.columns.insurer'), filterMeta: optionFilter(t('patients.columns.insurer'), insurerOptions) },
@@ -197,7 +196,8 @@ function PatientsPage() {
   );
   const filters = useDataTableFilters({ columns, urlSync: true, storageKey: 'clinic-patients' });
 
-  const table = useReactTable<PatientSummary>({
+  const table = useTable<KitFeatures, PatientSummary>({
+    features: kitFeatures,
     data: patients.data ?? [],
     columns,
     state: { ...filters.state, columnVisibility: COLUMN_VISIBILITY },
@@ -207,13 +207,7 @@ function PatientsPage() {
     globalFilterFn: searchPatients,
     getColumnCanGlobalFilter: (column) => SEARCHABLE.has(column.id),
     enableSortingRemoval: true,
-    initialState: { pagination: { pageSize: 10 }, sorting: initialSorting },
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 }, sorting: initialSorting },
   });
 
   const newPatientLink = (
@@ -257,7 +251,7 @@ function PatientsPage() {
     return (
       <DataTable
         table={table}
-        isLoading={patients.isLoading || doctors.isLoading || insurers.isLoading}
+        isLoading={patients.isPending || doctors.isPending || insurers.isPending}
         onResetFilters={filters.reset}
         onRowClick={(row) => navigate(patientPath(row.original.id))}
         className="min-h-0 flex-1"

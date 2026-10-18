@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+
+import { formResolver } from '@utils';
 
 import { ClinicError, type VisitType } from '@api/clinic';
 import type { CalendarSlot } from '@components/calendar';
@@ -60,9 +61,7 @@ function NewVisitSheet({ slot, slots, preselectedPatientId, onClose, onBooked }:
   const schema = useMemo(
     () =>
       z.object({
-        patientId: z
-          .string({ required_error: t('schedule.newVisit.patientRequired'), invalid_type_error: t('schedule.newVisit.patientRequired') })
-          .min(1, t('schedule.newVisit.patientRequired')),
+        patientId: z.string({ error: t('schedule.newVisit.patientRequired') }).min(1, t('schedule.newVisit.patientRequired')),
         doctorId: z.string().min(1, t('schedule.newVisit.doctorRequired')),
         type: z.enum(['consultation', 'follow-up', 'procedure', 'check-up']),
         notes: z.string(),
@@ -70,7 +69,7 @@ function NewVisitSheet({ slot, slots, preselectedPatientId, onClose, onBooked }:
     [t],
   );
   const form = useForm<VisitForm>({
-    resolver: zodResolver(schema),
+    resolver: formResolver<VisitForm>(schema),
     defaultValues: { patientId: knownPatient, doctorId: '', type: 'consultation', notes: '' },
   });
 
@@ -157,7 +156,7 @@ function NewVisitSheet({ slot, slots, preselectedPatientId, onClose, onBooked }:
             <FormTextarea<VisitForm> name="notes" label={t('schedule.newVisit.notes')} />
           </Sheet.Body>
           <Sheet.Footer>
-            <Button type="submit" loading={create.isLoading}>
+            <Button type="submit" loading={create.isPending}>
               {t('schedule.newVisit.submit')}
             </Button>
             <Sheet.Close asChild>

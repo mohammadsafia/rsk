@@ -1,7 +1,7 @@
 import { Children, type FormEvent, Fragment, isValidElement, type ReactElement, type ReactNode, useEffect, useRef, useState } from 'react';
 import { type FieldErrors, type FieldValues, FormProvider, type Path, type UseFormReturn } from 'react-hook-form';
 
-import { Alert, Badge, Button, Divider } from '@components/ui';
+import { Alert, Badge, Button } from '@components/ui';
 import { ConfirmDialog, DescriptionList, Stepper } from '@components/shared';
 import { Conditional } from '@components/utils';
 
@@ -49,14 +49,14 @@ const readSteps = (children: ReactNode, reviewTitle: string): WizardStep[] =>
     return [];
   });
 
-type SchemaLike = { shape?: Record<string, unknown>; _def?: { schema?: SchemaLike } };
+type SchemaLike = { shape?: Record<string, unknown>; in?: SchemaLike; _zod?: { def?: { in?: SchemaLike; innerType?: SchemaLike } } };
 
-/** The object shape of a step schema, looking through wrappers such as `.refine()` (ZodEffects). */
-const schemaShape = (schema: unknown): Record<string, unknown> | undefined => {
+/** The object shape of a step schema, looking through wrappers: `.refine()` keeps the object, `.transform()`/`.pipe()` put it at `.in`. */
+export const schemaShape = (schema: unknown): Record<string, unknown> | undefined => {
   let current = schema as SchemaLike | undefined;
   for (let depth = 0; current && depth < 5; depth += 1) {
     if (current.shape) return current.shape;
-    current = current._def?.schema;
+    current = current.in ?? current._zod?.def?.in ?? current._zod?.def?.innerType;
   }
   return undefined;
 };
@@ -392,9 +392,7 @@ function FormWizard<TValues extends FieldValues>({
                     </button>
                   </Stepper.Step>
                   <Conditional.If condition={index < steps.length - 1}>
-                    <div aria-hidden="true" className="flex flex-1 items-center pt-3">
-                      <Divider />
-                    </div>
+                    <Stepper.Connector done={status === 'done'} />
                   </Conditional.If>
                 </li>
               );

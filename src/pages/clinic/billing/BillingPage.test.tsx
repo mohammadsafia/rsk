@@ -35,6 +35,19 @@ describe('BillingPage', () => {
     expect(screen.getByText('Outstanding')).toBeTruthy();
   });
 
+  it('pages forward and stays there (the tab reset must not fire on every page turn)', async () => {
+    renderPage();
+    const next = () => screen.getByRole('button', { name: /next page/i }) as HTMLButtonElement;
+    const current = () => document.querySelector('[data-slot="pagination"] [aria-current="page"]')?.textContent;
+    await waitFor(() => expect(next().disabled).toBe(false));
+    expect(current()).toBe('1');
+    fireEvent.click(next());
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(current()).toBe('2');
+  });
+
   it('filters by status tab and keeps it in the URL', async () => {
     renderPage();
     await screen.findAllByRole('row');

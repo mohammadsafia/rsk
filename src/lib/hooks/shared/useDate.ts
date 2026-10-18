@@ -32,7 +32,7 @@ import {
   startOfYear,
   sub,
 } from 'date-fns';
-import { ar, enUS } from 'date-fns/locale';
+import { ar, enUS, type Locale } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 
 import { LANGUAGES } from '@constants';
@@ -170,10 +170,8 @@ export const iterateDateRange = (start: DateInput, end: DateInput, callback: (da
   }
 };
 
-export const useDate = () => {
-  const { i18n } = useTranslation();
-  const locale = i18n.language === LANGUAGES.AR ? ar : enUS;
-
+/** The date toolkit for one locale: plain functions, built once per locale (see useDate). */
+const createDateUtils = (locale: Locale) => {
   // Locale-aware display formatting; toLatinDigits keeps Western (0-9) digits under Arabic.
   const format = (date: Date | number, pattern: string): string => toLatinDigits(dateFnsFormat(date, pattern, { locale }));
 
@@ -535,4 +533,23 @@ export const useDate = () => {
       UnitOfTime,
     },
   };
+};
+
+export type DateUtils = ReturnType<typeof createDateUtils>;
+
+const toolkits = new Map<Locale, DateUtils>();
+
+/**
+ * Locale-aware date helpers. The same object for every render in a language (built once per locale), so components
+ * and hooks can depend on it without re-running memos and effects; a new one when the language changes.
+ */
+export const useDate = (): DateUtils => {
+  const { i18n } = useTranslation();
+  const locale = i18n.language === LANGUAGES.AR ? ar : enUS;
+  let toolkit = toolkits.get(locale);
+  if (!toolkit) {
+    toolkit = createDateUtils(locale);
+    toolkits.set(locale, toolkit);
+  }
+  return toolkit;
 };

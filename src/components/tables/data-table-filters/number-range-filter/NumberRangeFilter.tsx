@@ -1,19 +1,23 @@
-import { useEffect, useState } from 'react';
+// These parts read table state through stable TanStack objects (table / column / row from context and props), which
+// compiled memoization would reuse stale; TanStack v9's fix is a Subscribe boundary per reader. Until that refactor,
+// they opt out of the React Compiler.
+'use no memo';
 
-import type { Column } from '@tanstack/react-table';
+import { useEffect, useState } from 'react';
 
 import { Button, FormattedNumber, Popover } from '@components/ui';
 import { FilterPill } from '@components/tables/data-table-filters/filter-pill';
 
 import { useAppTranslation } from '@hooks/shared';
 
-import { useNumberFormat } from '@utils';
+import { type KitColumn, useNumberFormat } from '@utils';
 
 import type { NumberRangeFilterMeta, NumberRangeFilterValue } from '@app-types';
+import type { RowData } from '@tanstack/react-table';
 
-type NumberRangeFilterProps<TData> = { column: Column<TData>; filterMeta: NumberRangeFilterMeta };
+type NumberRangeFilterProps<TData extends RowData> = { column: KitColumn<TData>; filterMeta: NumberRangeFilterMeta };
 
-function NumberRangeFilter<TData>({ column, filterMeta }: NumberRangeFilterProps<TData>) {
+function NumberRangeFilter<TData extends RowData>({ column, filterMeta }: NumberRangeFilterProps<TData>) {
   const { t } = useAppTranslation('common');
   const formatNumber = useNumberFormat();
   const value = (column.getFilterValue() as NumberRangeFilterValue | undefined) ?? {};
@@ -21,11 +25,20 @@ function NumberRangeFilter<TData>({ column, filterMeta }: NumberRangeFilterProps
   const [min, setMin] = useState<number | null>(value.min ?? null);
   const [max, setMax] = useState<number | null>(value.max ?? null);
 
-  useEffect(() => {
-    if (!open) return;
+  // The inputs start from the applied range each time the popover opens, and follow it if it changes while open.
+  const reseed = () => {
     setMin(value.min ?? null);
     setMax(value.max ?? null);
-  }, [open, value.min, value.max]);
+  };
+  const onOpenChange = (next: boolean) => {
+    if (next) reseed();
+    setOpen(next);
+  };
+  const [seededFrom, setSeededFrom] = useState({ min: value.min, max: value.max });
+  if (value.min !== seededFrom.min || value.max !== seededFrom.max) {
+    setSeededFrom({ min: value.min, max: value.max });
+    if (open) reseed();
+  }
 
   const format = (n: number) => formatNumber(n, { style: filterMeta.format ?? 'decimal' });
   const hasMin = value.min !== undefined;
@@ -47,7 +60,7 @@ function NumberRangeFilter<TData>({ column, filterMeta }: NumberRangeFilterProps
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={onOpenChange}>
       <FilterPill
         label={filterMeta.label}
         values={summary ? [summary] : []}

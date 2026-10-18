@@ -58,4 +58,10 @@ describe('EmptyState', () => {
     render(<EmptyState kind="first-use" icon={<svg data-testid="custom" />} />);
     expect(screen.getByTestId('custom')).toBeTruthy();
   });
+
+  it('fades in when it replaces content', () => {
+    const { container } = render(<EmptyState kind="no-results" />);
+    const className = container.querySelector('[data-slot="empty-state"]')!.className;
+    for (const name of ['animate-in', 'fade-in-0', 'duration-base', 'motion-reduce:animate-none']) expect(className).toContain(name);
+  });
 });

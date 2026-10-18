@@ -1,6 +1,6 @@
 import { type ComponentPropsWithoutRef, type FC, type ReactNode, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useFormContext, useFormState } from 'react-hook-form';
+import { useNavigate } from 'react-router';
 
 import { Button } from '@components/ui';
 import { ConfirmDialog } from '@components/shared';
@@ -38,9 +38,10 @@ const FormContainerActions: FC<FormContainerActionsProps> = ({
 }) => {
   const { t } = useAppTranslation('common');
   const navigate = useNavigate();
-  const {
-    formState: { isSubmitting, isDirty },
-  } = useFormContext();
+  // useFormState subscribes to these flags, so the actions re-render when they change (a compiled component reading
+  // formState through the context proxy would keep its first values).
+  const { control } = useFormContext();
+  const { isSubmitting, isDirty } = useFormState({ control });
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 

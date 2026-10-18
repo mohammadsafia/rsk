@@ -4,7 +4,6 @@ import {
   type ComponentPropsWithoutRef,
   createContext,
   type FC,
-  forwardRef,
   isValidElement,
   type ReactElement,
   type ReactNode,
@@ -91,8 +90,7 @@ const CountTooltip: CountTooltipComponent = ({ count, condition = true, children
   );
 };
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-CountTooltip.Trigger = forwardRef<HTMLSpanElement, CountTooltipTriggerProps>((props, ref) => Trigger({ ...props, ref }));
+CountTooltip.Trigger = Trigger;
 CountTooltip.Item = Item;
 
 CountTooltip.Trigger.displayName = 'CountTooltipTrigger';

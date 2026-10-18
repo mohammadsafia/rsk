@@ -57,7 +57,7 @@ export function buildStarter(outDir: string) {
   }
   // The MDX plugin and its ?raw wrapper: from `const mdxBase` to the wrapper's closing `} as VitePlugin;`.
   edit('vite.config.ts', /const mdxBase = mdx\([\s\S]*?\n\} as VitePlugin;\n\n/, '', out);
-  edit('vite.config.ts', 'lazyPlugins(() => [mdxPlugin, react(), tailwindcss()])', 'lazyPlugins(() => [react(), tailwindcss()])', out);
+  edit('vite.config.ts', 'lazyPlugins(() => [mdxPlugin, react(), ', 'lazyPlugins(() => [react(), ', out);
   edit('vite.config.ts', /\n {2}\/\/ The docs site is dev-only;[^\n]*\n {2}define: \{\n[^\n]*\n {2}\},/, '', out);
   edit('vite.config.ts', /\n {6}\{ find: '@component-docs'[^\n]*/, '', out);
   // Formatter ignores that only this repo needs (docs MDX, vendored agent skills).

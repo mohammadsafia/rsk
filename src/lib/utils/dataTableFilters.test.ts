@@ -1,4 +1,6 @@
-import { type ColumnDef, getCoreRowModel, getFilteredRowModel, createTable } from '@tanstack/react-table';
+// @vitest-environment happy-dom
+import { renderHook } from '@testing-library/react';
+import { useTable } from '@tanstack/react-table';
 import { describe, expect, it } from 'vite-plus/test';
 
 import type { DataTableFilterMeta } from '@app-types';
@@ -11,6 +13,7 @@ import {
   inListFilterFn,
   numberRangeFilterFn,
 } from './dataTableFilters';
+import { type KitColumnDef, type KitFeatures, kitFeatures } from '@utils';
 
 const meta = (variant: string, extra: Record<string, unknown> = {}) =>
   ({ variant, label: 'X', ...extra }) as unknown as DataTableFilterMeta;
@@ -95,26 +98,26 @@ describe('filter functions', () => {
 
 describe('getFilterQueryParams', () => {
   it('serializes active filters and the search with the codecs', () => {
-    const columns: ColumnDef<Row>[] = [
+    const columns: KitColumnDef<Row>[] = [
       { accessorKey: 'role', meta: { filterMeta: select } },
       { accessorKey: 'amount', meta: { filterMeta: meta('numberRange') } },
       { accessorKey: 'name' },
     ];
-    const table = createTable<Row>({
-      data: rows,
-      columns,
-      getCoreRowModel: getCoreRowModel(),
-      getFilteredRowModel: getFilteredRowModel(),
-      state: {
-        columnFilters: [
-          { id: 'role', value: ['admin', 'In progress'] },
-          { id: 'amount', value: { min: 10 } },
-        ],
-        globalFilter: 'sara',
-      },
-      onStateChange: () => {},
-      renderFallbackValue: null,
-    });
+    const { result } = renderHook(() =>
+      useTable<KitFeatures, Row>({
+        features: kitFeatures,
+        data: rows,
+        columns,
+        state: {
+          columnFilters: [
+            { id: 'role', value: ['admin', 'In progress'] },
+            { id: 'amount', value: { min: 10 } },
+          ],
+          globalFilter: 'sara',
+        },
+      }),
+    );
+    const table = result.current;
     expect(getFilterQueryParams(table)).toEqual({ role: 'admin,In progress', amount: '10..', q: 'sara' });
   });
 });

@@ -1,10 +1,10 @@
 import {
   type ChangeEvent,
   type ComponentProps,
+  type DragEvent,
   type ComponentPropsWithoutRef,
   createContext,
   type FC,
-  forwardRef,
   type PropsWithChildren,
   type ReactNode,
   useCallback,
@@ -85,6 +85,20 @@ const getUniqueFiles = (existing: File[], incoming: File[]): File[] =>
 
 const FileUploaderContext = createContext<FileUploaderContextValue | null>(null);
 
+/** Whether `file` matches an input `accept` list: MIME types, wildcards (`image/*`) or extensions (`.pdf`). */
+const acceptsFile = (file: File, accept: string) => {
+  const rules = accept
+    .split(',')
+    .map((rule) => rule.trim().toLowerCase())
+    .filter(Boolean);
+  if (!rules.length) return true;
+  const name = file.name.toLowerCase();
+  const type = file.type.toLowerCase();
+  return rules.some((rule) =>
+    rule.startsWith('.') ? name.endsWith(rule) : rule.endsWith('/*') ? type.startsWith(rule.slice(0, -1)) : type === rule,
+  );
+};
+
 const useFileUploaderContext = () => {
   const context = useContext(FileUploaderContext);
 
@@ -94,13 +108,32 @@ const useFileUploaderContext = () => {
 };
 
 const FileUploaderDropzoneGroup: FC<FileUploaderDropzoneGroupProps> = ({ className, children, ...props }) => {
-  const { disabled, isUploading } = useFileUploaderContext();
+  const { files, onChange, accept, multiple, disabled, isUploading } = useFileUploaderContext();
+  // Entering a child fires dragenter before the parent's dragleave, so count to know when the file has really left.
+  const [dragDepth, setDragDepth] = useState(0);
+
+  // Always cancel the drop's default: otherwise the browser opens the dropped file in the tab and the form is lost.
+  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setDragDepth(0);
+    if (disabled || isUploading) return;
+    const incoming = Array.from(event.dataTransfer?.files ?? []).filter((file) => acceptsFile(file, accept));
+    if (!incoming.length) return;
+    onChange(multiple ? [...files, ...getUniqueFiles(files, incoming)] : [incoming[0]]);
+  };
 
   return (
     <div
       data-slot="file-uploader-dropzone-group"
+      data-drag-over={(dragDepth > 0 && !disabled) || undefined}
+      onDragEnter={() => setDragDepth((depth) => depth + 1)}
+      onDragLeave={() => setDragDepth((depth) => Math.max(0, depth - 1))}
+      onDragOver={(event) => event.preventDefault()}
+      onDrop={handleDrop}
       className={cn(
-        'border-border bg-surface text-fg-muted relative flex items-center gap-2 rounded-lg border border-dashed p-3 text-sm transition-colors outline-none',
+        'border-border bg-surface text-fg-muted duration-fast relative flex items-center gap-2 rounded-lg border border-dashed p-3 text-sm transition-colors outline-none',
+        // A file held over the zone: the dashed border turns into a solid ink line.
+        'data-[drag-over]:border-ink data-[drag-over]:border-solid',
         'has-[input:focus-visible]:ring-ring has-[input:focus-visible]:ring-2',
         !disabled && 'hover:border-border-strong',
         disabled && 'bg-surface-sunken text-fg-subtle cursor-not-allowed',
@@ -243,7 +276,11 @@ const FileUploaderFileList: FC<FileUploaderFileListProps> = ({ variant = 'list',
     <ScrollArea>
       <ul data-slot="file-uploader-file-list" className={cn('grid max-h-16 grid-cols-[minmax(0,1fr)] gap-1', className)}>
         {files.map((file, index) => (
-          <li key={`${file.name}-${index}`} className="border-border flex items-center gap-2 rounded-lg border px-3 py-2 text-sm">
+          <li
+            key={`${file.name}-${index}`}
+            // A newly added file rises into the list.
+            className="border-border animate-in fade-in-0 slide-in-from-bottom-1 duration-spring ease-spring flex items-center gap-2 rounded-lg border px-3 py-2 text-sm"
+          >
             <PaperclipIcon size={14} aria-hidden="true" className="text-fg-muted shrink-0" />
 
             <span className="flex-1 truncate" title={file.name}>
@@ -273,8 +310,6 @@ const FileUploaderImagePreview: FC<FileUploaderImagePreviewProps> = ({ className
 
   const { files, onRemove, multiple, disabled, isUploading } = useFileUploaderContext();
 
-  const [urls, setUrls] = useState<string[]>([]);
-
   const imageEntries = useMemo(
     () =>
       files.reduce<Array<{ file: File; index: number }>>((acc, file, index) => (isImageFile(file) ? [...acc, { file, index }] : acc), []),
@@ -283,13 +318,9 @@ const FileUploaderImagePreview: FC<FileUploaderImagePreviewProps> = ({ className
 
   const isCompact = imageEntries.length <= 2;
 
-  useEffect(() => {
-    const created = imageEntries.map(({ file }) => URL.createObjectURL(file));
-
-    setUrls(created);
-
-    return () => created.forEach(URL.revokeObjectURL);
-  }, [imageEntries]);
+  // One object URL per previewed image, made with the list and revoked when it changes or unmounts.
+  const urls = useMemo(() => imageEntries.map(({ file }) => URL.createObjectURL(file)), [imageEntries]);
+  useEffect(() => () => urls.forEach((url) => URL.revokeObjectURL(url)), [urls]);
 
   if (imageEntries.length === 0) return null;
 
@@ -385,8 +416,7 @@ const FileUploader: FileUploaderComponent = ({
 };
 
 FileUploader.DropzoneGroup = FileUploaderDropzoneGroup;
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-FileUploader.Dropzone = forwardRef<HTMLInputElement, FileUploaderDropzoneProps>((props, ref) => FileUploaderDropzone({ ...props, ref }));
+FileUploader.Dropzone = FileUploaderDropzone;
 FileUploader.Actions = FileUploaderActions;
 FileUploader.FileList = FileUploaderFileList;
 FileUploader.ImagePreview = FileUploaderImagePreview;

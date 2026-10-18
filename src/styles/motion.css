@@ -10,6 +10,32 @@
   --motion-depth: 0;
 }
 
+/* Skeleton shimmer (utilities.css): one sweep of the ink band across the placeholder. */
+:root {
+  --motion-shimmer-period: 1.6s;
+}
+
+@keyframes rsk-shimmer {
+  from {
+    background-position: -100% 0;
+  }
+
+  to {
+    background-position: 200% 0;
+  }
+}
+
+/* A checkbox's check drawing itself (draw-check in utilities.css). */
+@keyframes rsk-stroke {
+  from {
+    stroke-dashoffset: 24;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 /* The toast timer: its heavy top rule drains over the auto-close time (Toast.tsx). */
 @keyframes rsk-drain {
   from {
@@ -18,5 +44,32 @@
 
   to {
     transform: scaleX(0);
+  }
+}
+
+/* Page depth: while a modal surface is open, the app shell recedes behind it; it returns as the last one starts closing. */
+[data-slot='app-shell'] {
+  transform-origin: 50% 0;
+  transition: scale var(--duration-exit) var(--ease-in);
+}
+
+:root:has([data-slot='dialog-content'][data-state='open'], [data-slot='sheet-content'][data-state='open']) [data-slot='app-shell'] {
+  scale: calc(1 - var(--motion-depth));
+  transition: scale var(--duration-spring) var(--ease-spring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='app-shell'] {
+    scale: none !important;
+  }
+}
+
+/* Theme switch: colours cross-fade for one beat while ThemeContext holds .theme-switching (never on load). */
+@media (prefers-reduced-motion: no-preference) {
+  .theme-switching,
+  .theme-switching * {
+    transition-property: color, background-color, border-color, fill, stroke, box-shadow !important;
+    transition-duration: var(--duration-base) !important;
+    transition-timing-function: var(--ease-out) !important;
   }
 }

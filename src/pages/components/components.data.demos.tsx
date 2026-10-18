@@ -26,6 +26,8 @@ import { useToast } from '@hooks/shared';
 import { LookupHandler as LookupService } from '@api/handlers';
 
 import { z } from 'zod';
+
+import { formResolver } from '@utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CheckCircleFilled, CheckSquareFilled } from '@assets/icons';
 
@@ -198,9 +200,10 @@ export function FormCheckboxDemo() {
 
 export function FormDatePickerDemo() {
   const [disabled, setDisabled] = useState(false);
+  const [today] = useState(() => new Date());
   const form = useForm<{ date?: Date; dateRequired?: Date; dateWithDefault?: Date; dateDisabled?: Date }>({
     defaultValues: {
-      dateWithDefault: new Date(),
+      dateWithDefault: today,
     },
   });
   return (
@@ -293,7 +296,7 @@ export function FormNumberTextareaDemo() {
 export function FormWithValidationDemo() {
   const [disabled, setDisabled] = useState(false);
   const schema = z.object({
-    email: z.string().email('Enter a complete email address'),
+    email: z.email('Enter a complete email address'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     age: z.coerce.number().min(18, 'Must be at least 18 years old'),
     notes: z.string().optional(),
@@ -302,7 +305,7 @@ export function FormWithValidationDemo() {
   type FormData = z.infer<typeof schema>;
 
   const form = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: formResolver<FormData>(schema),
     defaultValues: { email: '', password: '', age: 18, notes: 'Test notes' },
   });
 
@@ -721,7 +724,7 @@ export function ConfirmDialogDemo() {
 }
 
 export function DateNavigationDemo() {
-  const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [currentDate, setCurrentDate] = useState(() => new Date().toISOString().split('T')[0]);
   const handlePrevious = () => {
     const date = new Date(currentDate);
     date.setDate(date.getDate() - 1);
@@ -837,7 +840,7 @@ export function TimePickerDemo() {
 }
 
 export function CalendarDemo() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(() => new Date());
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   return (
     <div className="space-y-6">
@@ -851,7 +854,7 @@ export function CalendarDemo() {
             </Button>
           </Popover.Trigger>
           <Popover.Content className="w-auto p-0">
-            <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+            <Calendar mode="single" selected={date} onSelect={setDate} autoFocus />
           </Popover.Content>
         </Popover>
         <Button variant="outline" size="sm" className="ms-2" onClick={() => setDate(undefined)}>
@@ -884,7 +887,7 @@ export function CalendarDemo() {
               selected={dateRange}
               onSelect={setDateRange}
               numberOfMonths={2}
-              initialFocus
+              autoFocus
             />
           </Popover.Content>
         </Popover>

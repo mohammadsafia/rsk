@@ -1,4 +1,4 @@
-import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC } from 'react';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 
 import { checkboxBoxClassName } from '@components/ui';
@@ -50,8 +50,7 @@ const CheckboxGroup: CheckboxGroupComponent = ({ className, invalid, children, .
   </div>
 );
 
-// React 18 bridge — remove forwardRef wrapper when upgrading to React 19
-CheckboxGroup.Item = forwardRef<HTMLButtonElement, CheckboxGroupItemProps>((props, ref) => Item({ ...props, ref }));
+CheckboxGroup.Item = Item;
 CheckboxGroup.Indicator = Indicator;
 
 CheckboxGroup.Item.displayName = 'CheckboxGroupItem';

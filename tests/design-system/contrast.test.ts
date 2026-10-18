@@ -9,6 +9,9 @@ const UI = 3;
 /** [foreground role, background role, minimum ratio] — spec §7.8.1 */
 const PAIRS: ReadonlyArray<readonly [string, string, number]> = [
   ['fg', 'canvas', TEXT],
+  // Code comments render in --code-muted on the code surface (dark in both themes).
+  ['code-muted', 'code-surface', TEXT],
+  ['code-foreground', 'code-surface', TEXT],
   ['fg', 'surface', TEXT],
   ['fg', 'surface-raised', TEXT],
   ['fg', 'surface-sunken', TEXT],
@@ -48,6 +51,8 @@ const PAIRS: ReadonlyArray<readonly [string, string, number]> = [
 ];
 
 const tokensCss = readProjectFile('src/styles/tokens.css');
+/** Some roles (the code tokens) point at palette steps, so resolve through the palette too. */
+const paletteVars = extractBlock(readProjectFile('src/styles/palette.css'), ':root');
 
 const opaqueRgb = (vars: Record<string, string>, role: string) => {
   const color = parseOklch(resolveToken(vars, role));
@@ -62,7 +67,7 @@ describe('semantic token contrast (WCAG AA)', () => {
 
   for (const mode of ['.light', '.dark'] as const) {
     describe(mode, () => {
-      const vars = extractBlock(tokensCss, mode);
+      const vars = { ...paletteVars, ...extractBlock(tokensCss, mode) };
 
       for (const [foreground, background, minimum] of PAIRS) {
         it(`${foreground} on ${background} ≥ ${minimum}:1`, () => {
