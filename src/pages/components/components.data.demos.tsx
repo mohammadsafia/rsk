@@ -854,7 +854,7 @@ export function CalendarDemo() {
             </Button>
           </Popover.Trigger>
           <Popover.Content className="w-auto p-0">
-            <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+            <Calendar mode="single" selected={date} onSelect={setDate} autoFocus />
           </Popover.Content>
         </Popover>
         <Button variant="outline" size="sm" className="ms-2" onClick={() => setDate(undefined)}>
@@ -887,7 +887,7 @@ export function CalendarDemo() {
               selected={dateRange}
               onSelect={setDateRange}
               numberOfMonths={2}
-              initialFocus
+              autoFocus
             />
           </Popover.Content>
         </Popover>

@@ -1,5 +1,13 @@
 import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { extendTailwindMerge } from 'tailwind-merge';
+
+/** tailwind-merge with the kit's motion scale (duration-instant…roll, ease-spring), so a later token replaces an earlier one. */
+const twMerge = extendTailwindMerge({
+  extend: {
+    theme: { ease: ['spring'] },
+    classGroups: { duration: [{ duration: ['instant', 'fast', 'base', 'exit', 'slow', 'spring', 'spring-long', 'roll'] }] },
+  },
+});
 
 export const cn = (...classList: ClassValue[]): string => twMerge(clsx(classList));
 
