@@ -363,7 +363,8 @@ const Assignee = <TOption,>({
         <ChevronDown size={14} aria-hidden="true" className="text-fg-muted shrink-0" />
       </Combobox.Trigger>
 
-      <Combobox.Content className="w-(--radix-popover-content-available-width) min-w-64" shouldFilter={!isAsync}>
+      {/* A comfortable list width, capped by the room the screen has (a narrow phone). */}
+      <Combobox.Content className="w-72 max-w-(--radix-popover-content-available-width)" shouldFilter={!isAsync}>
         <Combobox.Input placeholder={t('searchPlaceholder')} {...(isAsync && { value: search, onValueChange: setSearch })}>
           <Combobox.Loader when={isLoading} />
         </Combobox.Input>
