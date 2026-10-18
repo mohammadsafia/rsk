@@ -20,3 +20,20 @@
     transform: scaleX(0);
   }
 }
+
+/* Page depth: while a modal surface is open (usePageDepth), the app shell recedes behind the overlay. */
+[data-slot='app-shell'] {
+  transform-origin: 50% 0;
+  transition: scale var(--duration-exit) var(--ease-in);
+}
+
+[data-overlay-depth] [data-slot='app-shell'] {
+  scale: calc(1 - var(--motion-depth));
+  transition: scale var(--duration-spring) var(--ease-spring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-overlay-depth] [data-slot='app-shell'] {
+    scale: none;
+  }
+}
