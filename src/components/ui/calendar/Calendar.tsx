@@ -9,6 +9,7 @@ import { useAppTranslation } from '@hooks/shared';
 import { cn } from '@utils';
 
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { useDirection } from '@radix-ui/react-direction';
 
 export type CalendarRange = DateRange;
 
@@ -144,7 +145,9 @@ function Calendar({
   labels,
   ...props
 }: CalendarProps) {
-  const { t, isRTL, direction } = useAppTranslation('common');
+  const { t, isRTL } = useAppTranslation('common');
+  // Layout follows the surrounding direction (an RTL section in an English app mirrors); month names follow the language.
+  const direction = useDirection();
   const defaultClassNames = getDefaultClassNames();
 
   const navButtonClassName = cn(buttonVariants({ variant: buttonVariant, size: 'sm' }), 'w-control-sm px-0 aria-disabled:opacity-50');
@@ -170,8 +173,8 @@ function Calendar({
       }}
       className={cn(
         'bg-surface group/calendar p-3 [--cell-size:--spacing(8)] in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent',
-        String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
-        String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
+        String.raw`[&[dir=rtl]_.rdp-button\_next>svg]:rotate-180`,
+        String.raw`[&[dir=rtl]_.rdp-button\_previous>svg]:rotate-180`,
         className,
       )}
       captionLayout={captionLayout}

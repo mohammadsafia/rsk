@@ -2,6 +2,8 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
+import { DirectionProvider } from '@radix-ui/react-direction';
+
 import { Calendar } from '@components/ui';
 
 import i18n from '../../../i18n';
@@ -17,6 +19,20 @@ const dayButton = (day: number) =>
   screen.getAllByRole('button').find((button) => button.textContent === String(day) && button.dataset.outside !== 'true')!;
 
 describe('Calendar', () => {
+  it('follows the surrounding direction, not only the language: an RTL section mirrors grid and arrows together', () => {
+    const { container } = render(
+      <DirectionProvider dir="rtl">
+        <Calendar mode="single" defaultMonth={OCTOBER_2026} />
+      </DirectionProvider>,
+    );
+    const root = container.querySelector('.rdp-root') as HTMLElement;
+    expect(root.getAttribute('dir')).toBe('rtl');
+    // Arrows flip from the calendar's own dir, never from an ancestor's, so icons and layout cannot disagree.
+    expect(root.className).toContain(String.raw`[&[dir=rtl]_.rdp-button\_previous>svg]:rotate-180`);
+    expect(root.className).not.toMatch(/(^|\s)rtl:/);
+    expect(screen.getByRole('button', { name: /previous month/i })).toBeTruthy();
+  });
+
   it('marks the range ends and middle', () => {
     render(<Calendar mode="range" defaultMonth={OCTOBER_2026} selected={{ from: new Date(2026, 9, 12), to: new Date(2026, 9, 16) }} />);
     expect(dayButton(12).dataset.rangeStart).toBe('true');
