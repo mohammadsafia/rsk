@@ -150,7 +150,7 @@ describe('DataTable motion', () => {
     // The server answers with fresh objects in the new order (amount high-first).
     const answer = [BASE[0], BASE[2], BASE[1]].map((row) => ({ ...row }));
     rerender(<ServerHarness data={answer} sorting={sorting} onSort={onSort} />);
-    expect(glidingRows().sort()).toEqual(['v2', 'v3']);
+    expect(glidingRows().toSorted((a, b) => String(a).localeCompare(String(b)))).toEqual(['v2', 'v3']);
     expect(tintedRows()).toEqual([]);
   });
 
