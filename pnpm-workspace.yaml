@@ -1,5 +1,4 @@
 onlyBuiltDependencies:
-  - '@sentry/cli'
   - '@swc/core'
   - esbuild
 overrides:
