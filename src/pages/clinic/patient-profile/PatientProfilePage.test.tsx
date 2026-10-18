@@ -112,4 +112,20 @@ describe('PatientProfilePage', () => {
     expect(await within(sheet).findByText('Enter a valid phone number')).toBeTruthy();
     expect(clinicStore.read().patients.find((p) => p.id === patient.id)!.phone).toBe(patient.phone);
   });
+
+  it('drops the policy-number error as soon as the insurer becomes self-pay', async () => {
+    const insured = clinicStore.read().patients.find((p) => p.policyNumber)!;
+    renderProfile(insured.id);
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Edit contact details' });
+    fireEvent.change(within(sheet).getByLabelText(/^Policy/), { target: { value: '' } });
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Save' }));
+    expect(await within(sheet).findByText('Enter the policy number')).toBeTruthy();
+
+    const insurer = within(sheet).getByRole('combobox', { name: /Insurer/ });
+    fireEvent.keyDown(insurer, { key: 'Enter' });
+    fireEvent.click(await screen.findByRole('option', { name: 'Self-pay' }));
+    await waitFor(() => expect(insurer.textContent).toContain('Self-pay'));
+    await waitFor(() => expect(within(sheet).queryByText('Enter the policy number')).toBeNull());
+  });
 });

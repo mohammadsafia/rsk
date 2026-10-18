@@ -105,6 +105,8 @@ function EditPatientSheet({ patient, onClose }: { patient: PatientSummary | null
             <FormSelect<ContactForm, InsurerOption>
               name="insurerId"
               control={form.control}
+              // The policy rule reads the insurer, so changing the insurer re-checks the policy number too.
+              rules={{ deps: ['policyNumber'] }}
               label={t('profile.editSheet.insurer')}
               options={options}
               getOptionLabel={(option) => option.name}
