@@ -94,4 +94,10 @@ describe('dependencies', () => {
     expect(corpus.includes(`from '${'react-router'}-dom'`)).toBe(false);
     expect(pkg.dependencies?.['react-router']).toMatch(/^\^8/);
   });
+
+  it('index.html loads no local script that does not exist (a 404 on every page load)', () => {
+    const html = readFileSync(`${ROOT}index.html`, 'utf8');
+    const local = [...html.matchAll(/<script[^>]+src="\/([^"]+)"/g)].map((match) => match[1]);
+    expect(local.filter((src) => !tracked.includes(src) && !tracked.includes(`public/${src}`))).toEqual([]);
+  });
 });
