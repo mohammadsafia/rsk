@@ -8,7 +8,7 @@ import { Conditional } from '@components/utils';
 import { FormField } from '@components/forms';
 
 import { DATE_INPUT_FORMATS, type DateInputFormat, useAppTranslation, useDateRangeMask } from '@hooks/shared';
-import { cn } from '@utils';
+import { cn, parseDateValue } from '@utils';
 
 import { CalendarIcon, XIcon } from 'lucide-react';
 
@@ -46,16 +46,6 @@ type FormDateRangeCoreProps = FormDateRangeBaseProps<FieldValues> & {
   onBlur: () => void;
   inputRef: RefCallback<HTMLInputElement> | undefined;
   error: FieldError | undefined;
-};
-
-const parseDateValue = (value: unknown): Date | undefined => {
-  if (!value) return undefined;
-  if (value instanceof Date) return isNaN(value.getTime()) ? undefined : value;
-  if (typeof value === 'string') {
-    const parsed = new Date(value);
-    return isNaN(parsed.getTime()) ? undefined : parsed;
-  }
-  return undefined;
 };
 
 const parseCompositeValue = (value: unknown): DateRange | undefined => {

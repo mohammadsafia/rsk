@@ -55,6 +55,18 @@ describe('date fields keep the box and the form value in step', () => {
     expect(box('Visit').value).toBe('03/1');
   });
 
+  it('a single date: a date set from outside replaces a half-typed one (typing that changed no value leaves no claim)', () => {
+    render(
+      <Harness defaultValues={{ visit: null }}>
+        <FormDatePicker name="visit" label="Visit" />
+      </Harness>,
+    );
+    fireEvent.change(box('Visit'), { target: { value: '03/1' } });
+    expect(box('Visit').value).toBe('03/1');
+    fireEvent.click(screen.getByRole('button', { name: 'set visit' }));
+    expect(box('Visit').value).toBe('01/02/2026');
+  });
+
   it('a range: shows the loaded range and refills on setValue', () => {
     render(
       <Harness defaultValues={{ stay: { from: new Date(2026, 9, 1), to: new Date(2026, 9, 5) } }}>
