@@ -21,4 +21,20 @@ describe('mergeRefs', () => {
     (dispose as () => void)();
     expect(cleanupA).toHaveBeenCalledTimes(1);
   });
+
+  it('detaches every ref when one of them returns a cleanup: object refs go null, plain callbacks get null', () => {
+    const object: { current: HTMLDivElement | null } = { current: null };
+    const plain = vi.fn();
+    const cleanup = vi.fn();
+    const withCleanup = vi.fn(() => cleanup);
+    const node = {} as HTMLDivElement;
+    const detach = mergeRefs<HTMLDivElement>(object, plain, withCleanup)(node);
+    expect(object.current).toBe(node);
+    expect(typeof detach).toBe('function');
+    (detach as () => void)();
+    expect(object.current).toBeNull();
+    expect(plain).toHaveBeenLastCalledWith(null);
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(withCleanup).toHaveBeenCalledTimes(1);
+  });
 });
