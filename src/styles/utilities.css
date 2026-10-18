@@ -190,6 +190,7 @@
   @media (prefers-reduced-motion: reduce) {
     & > * {
       animation-delay: 0s !important;
+      animation-duration: var(--duration-fast) !important;
     }
   }
 }
@@ -256,6 +257,7 @@
   @media (prefers-reduced-motion: reduce) {
     & > * {
       animation-delay: 0s !important;
+      animation-duration: var(--duration-fast) !important;
     }
   }
 }
@@ -278,6 +280,12 @@
 
   .state-press:active {
     transform: none !important;
+  }
+
+  /* Opening and closing surfaces keep their fade, but never slower than fast (spec §3: reduced fades ≤ 120ms). */
+  [data-state='open'],
+  [data-state='closed'] {
+    animation-duration: var(--duration-fast) !important;
   }
 }
 

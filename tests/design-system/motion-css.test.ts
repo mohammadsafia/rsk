@@ -46,4 +46,18 @@ describe('motion CSS contract', () => {
     const utilities = read('src/styles/utilities.css');
     expect(utilities).toMatch(/@utility reveal\s*\{[\s\S]*?--tw-enter-translate-y: 10px[\s\S]*?var\(--motion-reveal-stagger\) \* 5/);
   });
+
+  it('reduced motion caps every enter/exit fade at fast (spec §3), however the component times it', () => {
+    const css = read('src/styles/utilities.css');
+    const global = css.slice(css.indexOf('/* Reduced motion: keep opacity fades'));
+    expect(global).toMatch(
+      /\[data-state='open'\],\s*\[data-state='closed'\]\s*\{\s*animation-duration: var\(--duration-fast\) !important;/,
+    );
+    for (const name of ['cascade', 'reveal']) {
+      const block = css.slice(css.indexOf(`@utility ${name}`));
+      expect(block.slice(0, block.indexOf('\n}\n'))).toMatch(
+        /prefers-reduced-motion: reduce\)[\s\S]*animation-duration: var\(--duration-fast\) !important/,
+      );
+    }
+  });
 });

@@ -48,10 +48,27 @@ describe('Pagination', () => {
     const other = screen.getByRole('button', { name: '02' });
     expect(current.getAttribute('aria-current')).toBe('page');
     expect(current.dataset.variant).toBe('ghost');
-    expect(current.closest('ol')?.querySelector('[data-slot="ink-bar"]')).not.toBeNull();
+    expect(current.closest('[data-ink-scope]')?.querySelector('[data-slot="ink-bar"]')).not.toBeNull();
     expect(other.getAttribute('aria-current')).toBeNull();
     expect(other.dataset.variant).toBe('ghost');
     // Only the current page carries a mark (the ink bar); the ghost hairline underline would make every number look like a link.
     expect(other.className).toContain('no-underline');
+  });
+
+  it('its list holds only list items: the travelling ink sits beside the <ol>, not inside it (axe: list)', () => {
+    render(
+      <Pagination>
+        <Pagination.List>
+          <Pagination.Item>
+            <a href="#1" aria-current="page">
+              1
+            </a>
+          </Pagination.Item>
+        </Pagination.List>
+      </Pagination>,
+    );
+    const list = document.querySelector('[data-slot="pagination-content"]')!;
+    expect(Array.from(list.children).every((child) => child.tagName === 'LI' && !child.hasAttribute('role'))).toBe(true);
+    expect(list.parentElement?.querySelector(':scope > [data-slot="ink-bar"]')).not.toBeNull();
   });
 });
