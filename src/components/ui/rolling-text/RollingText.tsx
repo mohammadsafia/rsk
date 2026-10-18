@@ -15,8 +15,8 @@ const STAGGER_MS = 40;
  * nothing moves on mount. Screen readers get the plain text.
  */
 const RollingText: FC<RollingTextProps> = ({ text, className }) => {
-  // Figures are ASCII digits and punctuation, so splitting by code unit is safe here.
-  const chars = text.split('');
+  // By code point, not code unit: a symbol outside the BMP (a surrogate pair) stays one cell.
+  const chars = Array.from(text);
   let digitFromRight = 0;
   const cells = chars
     .map((char, index) => ({ char, fromRight: chars.length - 1 - index }))
