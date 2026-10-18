@@ -50,7 +50,7 @@ const Item: FC<DescriptionListItemProps> = ({ term, value, numeric = false, clas
       <dd className={cn('text-fg text-sm font-medium', layout === 'inline' && 'text-end')}>
         <Conditional>
           <Conditional.If condition={isEmpty(value)}>
-            <span className="text-fg-subtle">—</span>
+            <span className="text-fg-muted">—</span>
           </Conditional.If>
 
           <Conditional.If condition={numeric}>

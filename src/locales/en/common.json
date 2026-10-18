@@ -81,6 +81,7 @@
     "views": "Views",
     "listView": "List view",
     "calendarView": "Calendar view",
+    "layout": "Layout",
     "jumpToDate": "Jump to date",
     "today": "Today",
     "more": "+{{count}} more",

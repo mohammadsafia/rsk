@@ -36,4 +36,22 @@ describe('Combobox.Trigger', () => {
     fireEvent.click(screen.getByText('Doctor').closest('button') as HTMLElement);
     await waitFor(() => expect(document.activeElement).toBe(screen.getByPlaceholderText('Search doctors')));
   });
+
+  it('takes its visible text as its name when no label is given (role=combobox is not named by content)', () => {
+    render(
+      <Combobox>
+        <Combobox.Trigger>Status</Combobox.Trigger>
+      </Combobox>,
+    );
+    expect(screen.getByRole('combobox', { name: 'Status' })).toBeTruthy();
+  });
+
+  it('keeps an explicit label', () => {
+    render(
+      <Combobox>
+        <Combobox.Trigger aria-label="Invoice status">Paid</Combobox.Trigger>
+      </Combobox>,
+    );
+    expect(screen.getByRole('combobox', { name: 'Invoice status' })).toBeTruthy();
+  });
 });

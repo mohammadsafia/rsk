@@ -11,6 +11,7 @@ import {
   FONT_FAMILIES,
   RADIUS_SCALE,
   SEMANTIC_COLOR_ROLES,
+  SIGNATURE_MARKS,
   STATE_UTILITIES,
   TEXT_SCALE,
 } from '../../src/lib/constants/DesignTokens';
@@ -113,6 +114,15 @@ describe('shape, motion and states', () => {
     it(`defines ${step.token}`, () => expect(themeCss).toContain(`--${step.token}: ${step.value};`));
   }
 
+  it('defines the Ledger mark widths on :root', () => {
+    expect(extractBlock(tokensCss, ':root')).toMatchObject({
+      'ink-thickness': '2px',
+      'ink-offset': '4px',
+      'rule-width': '2px',
+      'rule-width-section': '3px',
+    });
+  });
+
   for (const size of CONTROL_SIZES) {
     it(`defines control size ${size.token}`, () => expect(themeCss).toContain(`--spacing-${size.token}: ${size.value};`));
   }
@@ -174,5 +184,102 @@ describe('code blocks', () => {
   it('always use the dark syntax palette, because --code-surface is dark in both themes', () => {
     expect(indexCss).not.toContain('var(--shiki-light)');
     expect(indexCss).toMatch(/\[data-rehype-pretty-code-figure\] code \[style\*='--shiki-dark'\] \{\s*color: var\(--shiki-dark\)/);
+  });
+});
+
+describe('Ledger signature marks', () => {
+  const utilitiesCss = readProjectFile('src/styles/utilities.css');
+  /** The body of one @utility block (up to the next @utility or the end). */
+  const utilityBlock = (name: string) => {
+    const start = utilitiesCss.indexOf(`@utility ${name} {`);
+    const next = utilitiesCss.indexOf('@utility ', start + 1);
+    return utilitiesCss.slice(start, next < 0 ? undefined : next);
+  };
+
+  for (const mark of SIGNATURE_MARKS) {
+    it(`declares @utility ${mark.token}`, () => expect(utilitiesCss).toContain(`@utility ${mark.token} {`));
+  }
+
+  it('draws in only when reduced motion is not requested', () => {
+    const blocks = utilitiesCss.split('@utility ').filter((block) => block.includes('animation: rsk-draw-in'));
+    expect(blocks.length).toBeGreaterThan(0);
+    for (const block of blocks) {
+      const gate = block.indexOf('@media (prefers-reduced-motion: no-preference)');
+      expect(gate).toBeGreaterThan(-1);
+      expect(gate).toBeLessThan(block.indexOf('animation: rsk-draw-in'));
+    }
+    expect(utilitiesCss).toContain('@keyframes rsk-draw-in');
+  });
+
+  it('mirrors the draw-in under dir=rtl', () => {
+    for (const name of ['ink-block', 'rule-top']) {
+      expect(utilityBlock(name)).toContain('transform-origin: left;');
+      expect(utilityBlock(name)).toMatch(/\[dir='rtl'\][^{]*\{\s*transform-origin: right;/);
+    }
+  });
+
+  it('keeps the ink and the rule visible in forced-colors mode', () => {
+    for (const name of ['ink-block', 'rule-top']) expect(utilityBlock(name)).toContain('@media (forced-colors: active)');
+  });
+
+  it('focuses text fields with an fg border and the ink underline', () => {
+    const block = utilityBlock('focus-ring-input');
+    expect(block).toContain('border-color: var(--fg);');
+    expect(block).toContain('box-shadow: 0 var(--ink-thickness) 0 0 var(--ink);');
+    expect(block).not.toContain('ring-subtle');
+  });
+
+  it('keeps state-invalid after focus-ring-input so invalid wins on focus', () => {
+    expect(utilitiesCss.indexOf('@utility state-invalid {')).toBeGreaterThan(utilitiesCss.indexOf('@utility focus-ring-input {'));
+  });
+
+  it('keeps the ink bar inside its host, so overflow-clipped strips (tabs) still show 2px', () => {
+    expect(utilityBlock('ink-block')).toContain('bottom: 0;');
+    expect(utilityBlock('ink-block')).not.toContain('bottom: -1px;');
+  });
+
+  it('wins the top edge over border, rounded-* and border-t on its host', () => {
+    const block = utilityBlock('rule-top');
+    for (const declaration of [
+      'border-top-width: 0 !important;',
+      'border-start-start-radius: 0 !important;',
+      'border-start-end-radius: 0 !important;',
+    ]) {
+      expect(block).toContain(declaration);
+    }
+  });
+
+  it('numbers sections with Western leading-zero counters', () => {
+    expect(utilityBlock('sections')).toContain('counter-reset: rsk-section;');
+    expect(utilityBlock('section-number')).toContain('counter-increment: rsk-section;');
+    expect(utilityBlock('section-number')).toContain('content: counter(rsk-section, decimal-leading-zero);');
+  });
+});
+
+describe('browser-painted UI follows the theme', () => {
+  const utilitiesCss = readProjectFile('src/styles/utilities.css');
+  /** The raw body of the first `selector {` block (declarations, not just custom properties). */
+  const rawBlock = (css: string, selector: string) => {
+    const open = css.indexOf('{', css.indexOf(`${selector} {`));
+    return css.slice(open + 1, css.indexOf('}', open));
+  };
+
+  it('declares color-scheme per theme, so autofill, scrollbars and pickers match', () => {
+    expect(rawBlock(tokensCss, '.light')).toContain('color-scheme: light;');
+    expect(rawBlock(tokensCss, '.dark')).toContain('color-scheme: dark;');
+  });
+
+  it('repaints autofilled fields with the theme surface and text', () => {
+    const rule = utilitiesCss.slice(utilitiesCss.indexOf(':is(input, textarea, select):is(:autofill, :-webkit-autofill) {'));
+    expect(rule.length).toBeGreaterThan(0);
+    expect(rule).toContain('-webkit-text-fill-color: var(--fg);');
+    expect(rule).toContain('box-shadow: 0 0 0 100vmax var(--surface) inset;');
+  });
+
+  it('keeps the focus underline and the invalid glow on autofilled fields', () => {
+    expect(utilitiesCss).toContain(
+      ':is(input, textarea, select):is(:autofill, :-webkit-autofill):focus-visible {\n  box-shadow:\n    0 0 0 100vmax var(--surface) inset,\n    0 var(--ink-thickness) 0 0 var(--ink);',
+    );
+    expect(utilitiesCss).toContain(":is(input, textarea, select):is(:autofill, :-webkit-autofill)[aria-invalid='true']");
   });
 });

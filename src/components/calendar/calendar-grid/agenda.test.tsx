@@ -79,10 +79,10 @@ describe('CalendarGrid agenda', () => {
 
   it('adds an Agenda tab only when asked, in both languages', async () => {
     renderAgenda();
-    expect(screen.getByRole('tab', { name: 'Agenda' })).toBeTruthy();
+    expect(screen.getByRole('radio', { name: 'Agenda' })).toBeTruthy();
     cleanup();
     await act(() => i18n.changeLanguage('ar'));
     renderAgenda();
-    expect(screen.getByRole('tab', { name: 'جدول الأعمال' })).toBeTruthy();
+    expect(screen.getByRole('radio', { name: 'جدول الأعمال' })).toBeTruthy();
   });
 });

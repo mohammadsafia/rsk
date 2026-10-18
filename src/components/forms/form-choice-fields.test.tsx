@@ -69,6 +69,28 @@ describe('choice fields', () => {
     expect(checkbox.hasAttribute('tooltip')).toBe(false);
     const info = screen.getByRole('button', { name: 'More information' });
     expect(info.closest('label')).toBeNull();
-    expect(document.querySelector('[data-slot="form-checkbox-card"] [aria-hidden="true"]')?.textContent).toBe('*');
+    expect(document.querySelector('[data-slot="form-checkbox-label"] [aria-hidden="true"]')?.textContent).toBe('*');
+  });
+
+  it('FormCheckbox is a plain inline choice: the box before its label, no field-like card', () => {
+    render(
+      <FormHarness defaultValues={{ agree: true }}>
+        <FormCheckbox name="agree" label="The patient has insurance" />
+      </FormHarness>,
+    );
+    const label = document.querySelector<HTMLElement>('[data-slot="form-checkbox-label"]')!;
+    expect(label.className).not.toMatch(/\bborder\b|\bp-3\b|\brounded-lg\b|\bbg-surface\b|accent/);
+    expect(label.className).toContain('min-h-control-sm');
+    expect(label.firstElementChild?.getAttribute('role')).toBe('checkbox');
+  });
+
+  it('FormCheckboxGroup never puts aria-required on its role=group (not allowed there)', () => {
+    render(
+      <FormHarness defaultValues={{ allergies: [] }}>
+        <FormCheckboxGroup name="allergies" label="Allergies" required {...optionProps} />
+      </FormHarness>,
+    );
+    const group = screen.getByRole('group', { name: /Allergies/ });
+    expect(group.hasAttribute('aria-required')).toBe(false);
   });
 });

@@ -91,7 +91,12 @@ const SubTrigger: FC<DropdownMenuSubTriggerProps> = ({ className, inset, childre
 const SubContent: FC<DropdownMenuSubContentProps> = ({ className, ...props }) => (
   <DropdownMenuPrimitive.SubContent
     data-slot="dropdown-subcontent"
-    className={cn(floatingSurfaceClassName, floatingMotionClassName, 'min-w-32 overflow-hidden p-1', className)}
+    className={cn(
+      floatingSurfaceClassName,
+      floatingMotionClassName,
+      'origin-(--radix-dropdown-menu-content-transform-origin) min-w-32 overflow-hidden p-1',
+      className,
+    )}
     {...props}
   />
 );
@@ -101,7 +106,12 @@ const Content: FC<DropdownMenuContentProps> = ({ className, sideOffset = 4, ...p
     <DropdownMenuPrimitive.Content
       data-slot="dropdown-content"
       sideOffset={sideOffset}
-      className={cn(floatingSurfaceClassName, floatingMotionClassName, 'min-w-32 overflow-hidden p-1', className)}
+      className={cn(
+        floatingSurfaceClassName,
+        floatingMotionClassName,
+        'origin-(--radix-dropdown-menu-content-transform-origin) min-w-32 overflow-hidden p-1',
+        className,
+      )}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>
@@ -119,7 +129,7 @@ const Item: FC<DropdownMenuItemProps> = ({ className, inset, tone, ...props }) =
 const CheckboxItem: FC<DropdownMenuCheckboxItemProps> = ({ className, children, checked, ...props }) => (
   <DropdownMenuPrimitive.CheckboxItem
     data-slot="dropdown-checkbox-item"
-    className={cn(menuItemBase, 'text-fg cursor-default ps-8 pe-2', className)}
+    className={cn(menuItemBase, 'text-fg cursor-default ps-8 pe-2 data-[state=checked]:ink', className)}
     checked={checked}
     {...props}
   >
@@ -136,7 +146,7 @@ const CheckboxItem: FC<DropdownMenuCheckboxItemProps> = ({ className, children, 
 const RadioItem: FC<DropdownMenuRadioItemProps> = ({ className, children, ...props }) => (
   <DropdownMenuPrimitive.RadioItem
     data-slot="dropdown-radio-item"
-    className={cn(menuItemBase, 'text-fg cursor-default ps-8 pe-2', className)}
+    className={cn(menuItemBase, 'text-fg cursor-default ps-8 pe-2 data-[state=checked]:ink', className)}
     {...props}
   >
     <span className="absolute inset-s-2 flex h-3.5 w-3.5 items-center justify-center">
@@ -166,7 +176,7 @@ const Separator: FC<DropdownMenuSeparatorProps> = ({ className, ...props }) => (
 );
 
 const Shortcut: FC<DropdownMenuShortcutProps> = ({ className, ...props }) => (
-  <span data-slot="dropdown-shortcut" className={cn('text-fg-subtle ms-auto font-mono text-xs', className)} {...props} />
+  <span data-slot="dropdown-shortcut" className={cn('text-fg-muted ms-auto font-mono text-xs', className)} {...props} />
 );
 
 const DropdownMenu: DropdownMenuComponent = (props) => <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;

@@ -42,4 +42,20 @@ describe('EmptyState', () => {
     );
     expect(screen.getByRole('heading', { name: 'No members yet' }).closest('[data-slot="empty-state"]')).not.toBeNull();
   });
+
+  it('shows the Ledger 0 figure for empty kinds, and keeps the icon for errors', () => {
+    const { unmount } = render(<EmptyState kind="no-results" />);
+    const glyph = document.querySelector<HTMLElement>('[data-slot="empty-state-icon"]')!;
+    expect(glyph.textContent).toBe('0');
+    expect(glyph.className).toContain('figure');
+    expect(glyph.className).toContain('rule-top');
+    unmount();
+    render(<EmptyState kind="error" />);
+    expect(document.querySelector('[data-slot="empty-state-icon"] svg')).not.toBeNull();
+  });
+
+  it('a custom icon still replaces the glyph', () => {
+    render(<EmptyState kind="first-use" icon={<svg data-testid="custom" />} />);
+    expect(screen.getByTestId('custom')).toBeTruthy();
+  });
 });

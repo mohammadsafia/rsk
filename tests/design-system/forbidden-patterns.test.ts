@@ -56,6 +56,53 @@ describe('countPatterns', () => {
   });
 });
 
+describe('countPatterns — Ledger', () => {
+  it('counts the marks Ledger retires: state fills, soft radii, typed section numbers', () => {
+    const source = [
+      '<a className="data-[state=active]:bg-surface aria-selected:bg-hover aria-[current=page]:bg-hover" />',
+      '<b className="group-data-[variant=contained]/tabs-list:data-[state=active]:bg-surface data-[active=true]:bg-fg" />',
+      '<i className="rounded-xl rounded-2xl" />',
+      '<h2>01</h2><h3>§</h3>',
+    ].join('\n');
+
+    expect(countPatterns(source)).toEqual({ 'state-fill': 5, 'large-control-radius': 2, 'typed-section-number': 2 });
+  });
+
+  it('does not count the Ledger marks or keyboard highlight', () => {
+    const source = [
+      '<a className="data-[state=active]:ink-block data-highlighted:bg-hover data-[selected=true]:bg-hover focus:bg-hover" />',
+      '<i className="rounded-sm rounded-md rounded-lg rounded-full" />',
+      '<h2>{SECTION_SIGN} 2026</h2>',
+    ].join('\n');
+
+    expect(countPatterns(source)).toEqual({});
+  });
+});
+
+describe('countPatterns — motion', () => {
+  it('counts off-scale durations and easings', () => {
+    const source = [
+      '<a className="duration-150 duration-200 duration-[350ms] ease-linear ease-in-out" />',
+      "const fade = 'transition-opacity duration-300';",
+    ].join('\n');
+
+    expect(countPatterns(source)).toEqual({ 'raw-motion': 6 });
+  });
+
+  it('counts any numeric duration or delay, and arbitrary easings and animations', () => {
+    const source = '<a className="duration-250 duration-0 delay-150 ease-[cubic-bezier(0,0,1,1)] animate-[spin_1s_linear]" />';
+
+    expect(countPatterns(source)).toEqual({ 'raw-motion': 5 });
+  });
+
+  it('allows the motion tokens', () => {
+    const source =
+      '<a className="duration-instant duration-fast duration-base duration-exit duration-slow duration-spring duration-spring-long duration-roll ease-out ease-in ease-spring" />';
+
+    expect(countPatterns(source)).toEqual({});
+  });
+});
+
 describe('compareToBaseline', () => {
   const baseline: Baseline = { 'src/a.tsx': { 'hex-color': 2 } };
 

@@ -1,8 +1,10 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { ChartFrame, type ChartFrameProps, toneColor } from '@components/charts';
+
+import { MotionProvider } from '@contexts';
 
 import '../../i18n';
 
@@ -100,5 +102,68 @@ describe('ChartFrame', () => {
     expect(toneColor('success', 0)).toBe('var(--success)');
     expect(toneColor('neutral', 0)).toBe('var(--fg-muted)');
     expect(toneColor(undefined, 7)).toBe('var(--chart-2)');
+  });
+
+  it('does not animate the first paint, then animates data updates', () => {
+    const seen: boolean[] = [];
+    const Spy = ({ rows }: { rows: Row[] }) => (
+      <ChartFrame<Row> aria-label="Visits" data={rows} series={series} xKey="month" formatValue={String} formatX={String}>
+        {({ animate }) => {
+          seen.push(animate);
+          return null;
+        }}
+      </ChartFrame>
+    );
+    const { rerender } = render(<Spy rows={data} />);
+    expect(seen[0]).toBe(false);
+    rerender(<Spy rows={data} />);
+    expect(seen.at(-1)).toBe(false);
+    rerender(<Spy rows={[...data, { month: 'Mar', visits: 90, revenue: 0.1 }]} />);
+    expect(seen.at(-1)).toBe(true);
+  });
+
+  it('never animates under reduced motion', () => {
+    vi.spyOn(window, 'matchMedia').mockImplementation(
+      (query: string) =>
+        ({ matches: query.includes('reduce'), media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList,
+    );
+    const seen: boolean[] = [];
+    const tree = (rows: Row[]) => (
+      <MotionProvider>
+        <ChartFrame<Row> aria-label="Visits" data={rows} series={series} xKey="month" formatValue={String} formatX={String}>
+          {({ animate }) => {
+            seen.push(animate);
+            return null;
+          }}
+        </ChartFrame>
+      </MotionProvider>
+    );
+    const { rerender } = render(tree(data));
+    rerender(tree([...data, { month: 'Mar', visits: 90, revenue: 0.1 }]));
+    expect(seen.length).toBeGreaterThan(1);
+    expect(seen.every((value) => value === false)).toBe(true);
+    vi.restoreAllMocks();
+  });
+
+  it('stays still when data first arrives after loading, then animates later updates', () => {
+    const seen: boolean[] = [];
+    const Spy = ({ rows, loading }: { rows: Row[]; loading?: boolean }) => (
+      <ChartFrame<Row> aria-label="Visits" data={rows} series={series} xKey="month" formatValue={String} formatX={String} loading={loading}>
+        {({ animate }) => {
+          seen.push(animate);
+          return null;
+        }}
+      </ChartFrame>
+    );
+    const { rerender } = render(<Spy rows={[]} loading />);
+    rerender(<Spy rows={data} />);
+    expect(seen.at(-1)).toBe(false);
+    rerender(<Spy rows={[...data, { month: 'Mar', visits: 90, revenue: 0.1 }]} />);
+    expect(seen.at(-1)).toBe(true);
+  });
+
+  it('gives the keyboard-focusable chart surface the kit focus ring, not the browser default', () => {
+    render(<Frame />);
+    expect(document.querySelector('[data-slot="chart-plot"]')?.className).toContain('[&_.recharts-surface]:focus-ring');
   });
 });

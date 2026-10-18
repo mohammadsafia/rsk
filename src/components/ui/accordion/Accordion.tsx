@@ -38,7 +38,7 @@ const Item: FC<ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>> = ({ cl
 const Content: FC<ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>> = ({ className, children, ...props }) => (
   <AccordionPrimitive.Content
     data-slot="accordion-content"
-    className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden text-sm transition-all motion-reduce:animate-none motion-reduce:transition-none"
+    className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down data-[state=open]:duration-base data-[state=closed]:duration-fast overflow-hidden text-sm transition-all motion-reduce:animate-none motion-reduce:transition-none"
     {...props}
   >
     <div className={cn('text-fg-muted pb-4 text-sm', className)}>{children}</div>

@@ -4,11 +4,9 @@ import { LANGUAGES } from '@constants';
 
 export type NumberFormatStyle = 'decimal' | 'currency' | 'percent';
 
-export type FormatNumberOptions = {
+export type FormatNumberOptions = Omit<Intl.NumberFormatOptions, 'style' | 'currency'> & {
   style?: NumberFormatStyle;
   currency?: string;
-  minimumFractionDigits?: number;
-  maximumFractionDigits?: number;
 };
 
 /**

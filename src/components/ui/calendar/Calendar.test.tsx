@@ -57,4 +57,10 @@ describe('Calendar', () => {
     expect(outside.className).toContain('data-[disabled=true]:text-fg-subtle');
     expect(outside.closest('td')?.className).toContain('text-fg-muted');
   });
+
+  it('names each day with its visible number as a word, so voice users can say what they see', () => {
+    render(<Calendar mode="single" defaultMonth={new Date(2026, 9, 1)} />);
+    const day = screen.getAllByRole('button').find((button) => button.textContent === '27')!;
+    expect(day.getAttribute('aria-label') ?? day.textContent).toMatch(/(^|\s)27(\s|,|$)/);
+  });
 });

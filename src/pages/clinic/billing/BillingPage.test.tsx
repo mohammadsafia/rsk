@@ -152,4 +152,11 @@ describe('BillingPage', () => {
     expect(i18n.t('clinic:billing.summary.overdueCaption', { count: 2 })).toBe('فاتورتان');
     expect(i18n.t('clinic:billing.summary.overdueCaption', { count: 11 })).toBe('11 فاتورة');
   });
+
+  it('gives every status tab a real panel (aria-controls points at an element)', async () => {
+    renderPage();
+    const tabs = await screen.findAllByRole('tab');
+    expect(tabs.length).toBeGreaterThan(1);
+    for (const tab of tabs) expect(document.getElementById(tab.getAttribute('aria-controls') ?? '')).not.toBeNull();
+  });
 });

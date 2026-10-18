@@ -11,7 +11,7 @@ export function PropsTable({ rows }: { rows: PropsTableRow[] }) {
   const { t } = useAppTranslation('docs');
 
   return (
-    <div data-slot="docs-props" className="not-prose border-border my-6 overflow-x-auto rounded-lg border">
+    <div data-slot="docs-props" tabIndex={0} className="focus-ring not-prose border-border my-6 overflow-x-auto rounded-lg border">
       <Table>
         <Table.Header>
           <Table.Row>

@@ -20,7 +20,7 @@ const Bar: FC<ScrollBarProps> = ({ className, orientation = 'vertical', ...props
     orientation={orientation}
     className={cn(
       'flex touch-none transition-colors select-none',
-      'data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:animate-in data-[state=visible]:fade-in duration-150',
+      'data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:animate-in data-[state=visible]:fade-in duration-fast',
       orientation === 'vertical' && 'h-full w-1.5 border-s border-s-transparent p-px',
       orientation === 'horizontal' && 'h-1.5 flex-col border-t border-t-transparent p-px',
       className,
@@ -37,7 +37,12 @@ const ScrollArea: ScrollAreaComponent = ({ orientation = 'vertical', className, 
     className={cn('relative overflow-hidden', orientation === 'vertical' && '[&>[data-slot=scroll-area-viewport]>div]:block!', className)}
     {...props}
   >
-    <ScrollAreaPrimitive.Viewport data-slot="scroll-area-viewport" className={cn('h-full w-full rounded-[inherit]', viewportClassName)}>
+    <ScrollAreaPrimitive.Viewport
+      data-slot="scroll-area-viewport"
+      // Focusable so keyboard users can reach and scroll it (WCAG 2.1.1).
+      tabIndex={0}
+      className={cn('focus-ring h-full w-full rounded-[inherit]', viewportClassName)}
+    >
       {children}
     </ScrollAreaPrimitive.Viewport>
 

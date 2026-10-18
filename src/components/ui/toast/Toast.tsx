@@ -32,7 +32,7 @@ const viewportVariants = cva('fixed z-100 flex w-full flex-col gap-2 p-3 md:max-
 const toastVariants = cva(
   [
     floatingSurfaceClassName,
-    'group pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden p-3 pe-10 md:w-96',
+    'group pointer-events-auto relative rule-top flex w-full items-start gap-3 overflow-hidden p-3 pe-10 md:w-96',
     'data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-(--radix-toast-swipe-end-x) data-[swipe=move]:translate-x-(--radix-toast-swipe-move-x)',
     'data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out',
     'duration-base data-[state=closed]:fade-out-0 motion-reduce:data-[state=open]:slide-in-from-top-0 motion-reduce:data-[state=open]:slide-in-from-bottom-0',

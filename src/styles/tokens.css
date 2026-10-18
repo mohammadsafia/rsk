@@ -5,6 +5,8 @@
  */
 :root,
 .light {
+  color-scheme: light;
+
   --canvas: oklch(0.991 0.001 286.4);
   --surface-sunken: oklch(0.974 0.003 286.4);
   --surface: oklch(1 0 0);
@@ -28,6 +30,8 @@
   --accent-hover: oklch(0.37 0.13 14.9);
   --accent-subtle: oklch(0.953 0.013 5.8);
   --ring: var(--accent);
+  --ink: var(--accent);
+  --rule-strong: var(--fg);
   --ring-subtle: oklch(0.43 0.141 14.9 / 20%);
 
   --success: oklch(0.5 0.13 157.2);
@@ -70,6 +74,8 @@
 }
 
 .dark {
+  color-scheme: dark;
+
   --canvas: oklch(0.173 0.004 264.5);
   --surface-sunken: oklch(0.159 0.005 264.4);
   --surface: oklch(0.196 0.006 271.1);
@@ -93,6 +99,8 @@
   --accent-hover: oklch(0.75 0.11 12);
   --accent-subtle: oklch(0.698 0.125 12 / 11%);
   --ring: var(--accent);
+  --ink: var(--accent);
+  --rule-strong: var(--fg);
   --ring-subtle: oklch(0.698 0.125 12 / 25%);
 
   --success: oklch(0.735 0.136 159.3);
@@ -134,10 +142,23 @@
 }
 
 :root {
+  --duration-instant: 100ms;
   --duration-fast: 120ms;
   --duration-base: 180ms;
+  --duration-exit: 200ms;
   --duration-slow: 260ms;
+  --duration-spring: 380ms;
+  --duration-spring-long: 420ms;
+  --duration-roll: 520ms;
+  --motion-stagger: 32ms;
+  --motion-reveal-stagger: 60ms;
+  --motion-depth: 0.025;
+  --motion-ease-spring: cubic-bezier(0.34, 1.32, 0.64, 1);
   --leading-rtl-boost: 0em;
+  --ink-thickness: 2px;
+  --ink-offset: 4px;
+  --rule-width: 2px;
+  --rule-width-section: 3px;
 }
 
 [dir='rtl'] {

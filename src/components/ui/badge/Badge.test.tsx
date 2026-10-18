@@ -23,11 +23,21 @@ describe('Badge', () => {
     const badge = screen.getByText('Overdue');
     expect(badge.dataset.tone).toBe('danger');
     expect(badge.querySelector('[data-slot="badge-dot"]')).toBeNull();
-    expect(badge.className).toContain('bg-danger-subtle');
+    expect(badge.className).toContain('text-danger');
+    expect(badge.className).toContain('underline-tone');
+    expect(badge.className).toContain('smallcaps');
+    expect(badge.className).not.toMatch(/\bbg-|\brounded-|\bborder\b/);
   });
 
   it('sizes map to the scale', () => {
     render(<Badge size="sm">Small</Badge>);
     expect(screen.getByText('Small').className).toContain('h-5');
+  });
+
+  it('keeps the dot variant box-less, with the tone on the dot', () => {
+    render(<Badge tone="success">Paid</Badge>);
+    const badge = screen.getByText('Paid');
+    expect(badge.querySelector('[data-slot="badge-dot"]')).not.toBeNull();
+    expect(badge.className).not.toMatch(/\bborder\b|\brounded-/);
   });
 });

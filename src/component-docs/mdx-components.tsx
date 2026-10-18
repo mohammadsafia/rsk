@@ -20,7 +20,7 @@ export const mdxComponents: MDXComponents = {
     <code dir="ltr" className={cn('font-mono text-sm', className)} {...props} />
   ),
   table: (props: ComponentPropsWithoutRef<'table'>) => (
-    <div className="not-prose border-border my-6 overflow-x-auto rounded-lg border">
+    <div tabIndex={0} className="focus-ring not-prose border-border my-6 overflow-x-auto rounded-lg border">
       <Table {...props} />
     </div>
   ),

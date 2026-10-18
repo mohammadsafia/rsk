@@ -97,6 +97,7 @@
     "views": "طرق العرض",
     "listView": "عرض القائمة",
     "calendarView": "عرض التقويم",
+    "layout": "طريقة العرض",
     "jumpToDate": "الانتقال إلى تاريخ",
     "today": "اليوم",
     "more": "+{{count}} أخرى",

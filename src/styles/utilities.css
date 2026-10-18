@@ -28,6 +28,31 @@
   transition-duration: var(--duration-slow);
 }
 
+@utility duration-instant {
+  --tw-duration: var(--duration-instant);
+  transition-duration: var(--duration-instant);
+}
+
+@utility duration-exit {
+  --tw-duration: var(--duration-exit);
+  transition-duration: var(--duration-exit);
+}
+
+@utility duration-spring {
+  --tw-duration: var(--duration-spring);
+  transition-duration: var(--duration-spring);
+}
+
+@utility duration-spring-long {
+  --tw-duration: var(--duration-spring-long);
+  transition-duration: var(--duration-spring-long);
+}
+
+@utility duration-roll {
+  --tw-duration: var(--duration-roll);
+  transition-duration: var(--duration-roll);
+}
+
 /* Focus: buttons, links, toggles — solid 2px ring with offset, keyboard focus only. */
 @utility focus-ring {
   outline: 2px solid transparent;
@@ -38,7 +63,7 @@
   }
 }
 
-/* Focus: text inputs and input-like triggers — ring border + soft glow. */
+/* Focus: text inputs and input-like triggers — the field is the active one, so it takes the Ledger ink underline. */
 @utility focus-ring-input {
   /* transparent (not none) so forced-colors mode can still paint a focus outline */
   outline: 2px solid transparent;
@@ -46,8 +71,8 @@
 
   &:focus-visible,
   &:focus-within {
-    border-color: var(--ring);
-    box-shadow: 0 0 0 3px var(--ring-subtle);
+    border-color: var(--fg);
+    box-shadow: 0 var(--ink-thickness) 0 0 var(--ink);
   }
 }
 
@@ -103,4 +128,180 @@
 /* A hairline under a strip, painted behind its children so an indicator at bottom-0 can sit on top of it. */
 @utility rule-bottom {
   box-shadow: inset 0 -1px 0 var(--color-border-subtle);
+}
+
+/*
+ * Ledger signature marks (spec docs/superpowers/specs/2026-10-17-ledger-signature-design.md).
+ * One mark, one job: ink = current / selected, rule = the top edge of a grouped surface, figure = values that matter,
+ * section numbers = real order. Only the ink and the rule move, and only when reduced motion is not requested.
+ */
+@keyframes rsk-draw-in {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Ink on text: the underline that marks the current / selected item (and a focused text field). */
+@utility ink {
+  text-decoration-line: underline;
+  text-decoration-color: var(--ink);
+  text-decoration-thickness: var(--ink-thickness);
+  text-underline-offset: var(--ink-offset);
+}
+
+/* Ink on a block (tab, page button, nav item): a bar under the whole element. */
+@utility ink-block {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    /* inside the host: strips that clip overflow (scrolling tab lists) would cut a bar hung below it */
+    bottom: 0;
+    height: var(--ink-thickness);
+    background: var(--ink);
+    transform-origin: left;
+    pointer-events: none;
+  }
+
+  &:where([dir='rtl'], [dir='rtl'] *)::after {
+    transform-origin: right;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    &::after {
+      animation: rsk-draw-in var(--duration-base) var(--ease-out) both;
+    }
+  }
+
+  @media (forced-colors: active) {
+    &::after {
+      forced-color-adjust: none;
+      background: Highlight;
+    }
+  }
+}
+
+/*
+ * The heavy rule on top of a grouped surface. Replaces the top border; the host must be positioned
+ * (relative / fixed / absolute) — this utility does not set position, so fixed overlays stay fixed.
+ */
+@utility rule-top {
+  /* !important: the mark replaces the top edge, so it must beat border / rounded-* / border-t utilities emitted after it */
+  border-top-width: 0 !important;
+  border-start-start-radius: 0 !important;
+  border-start-end-radius: 0 !important;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    z-index: 1;
+    height: var(--rule-height, var(--rule-width));
+    background: var(--rule-color, var(--rule-strong));
+    transform-origin: left;
+    pointer-events: none;
+  }
+
+  &:where([dir='rtl'], [dir='rtl'] *)::before {
+    transform-origin: right;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    &::before {
+      animation: rsk-draw-in var(--duration-base) var(--ease-out) both;
+    }
+  }
+
+  @media (forced-colors: active) {
+    &::before {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+  }
+}
+
+/* rule-top modifiers: section weight (dialogs, sheets) and ink colour (inverse surfaces). */
+@utility rule-top-section {
+  --rule-height: var(--rule-width-section);
+}
+
+@utility rule-top-ink {
+  --rule-color: var(--ink);
+}
+
+/* Values that matter: stat and progress figures. */
+@utility figure {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-figure);
+  line-height: var(--text-figure--line-height);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+@utility smallcaps {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Status without a box: an underline in the text's own tone. */
+@utility underline-tone {
+  text-decoration-line: underline;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+/* Structural numbering: <Sections> resets, each <SectionMarker> inside it counts (display:none children don't). */
+@utility sections {
+  counter-reset: rsk-section;
+}
+
+@utility section-number {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.65625rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--fg-subtle);
+  margin-inline-end: 0.375rem;
+
+  &::before {
+    counter-increment: rsk-section;
+    content: counter(rsk-section, decimal-leading-zero);
+  }
+}
+
+/*
+ * Browser autofill paints its own light background and dark text over fields, whatever the theme.
+ * Repaint it with the theme's surface and text. These rules are unlayered (they beat the utilities layer),
+ * so they also carry the focus underline and the invalid glow that focus-ring-input / state-invalid add.
+ * The long transition stops Chrome flashing its colour in before the repaint applies.
+ */
+:is(input, textarea, select):is(:autofill, :-webkit-autofill) {
+  -webkit-text-fill-color: var(--fg);
+  caret-color: var(--fg);
+  box-shadow: 0 0 0 100vmax var(--surface) inset;
+  transition:
+    background-color 600000s 0s,
+    color 600000s 0s;
+}
+
+:is(input, textarea, select):is(:autofill, :-webkit-autofill):focus-visible {
+  box-shadow:
+    0 0 0 100vmax var(--surface) inset,
+    0 var(--ink-thickness) 0 0 var(--ink);
+}
+
+:is(input, textarea, select):is(:autofill, :-webkit-autofill)[aria-invalid='true'] {
+  box-shadow:
+    0 0 0 100vmax var(--surface) inset,
+    0 0 0 3px var(--danger-subtle);
 }

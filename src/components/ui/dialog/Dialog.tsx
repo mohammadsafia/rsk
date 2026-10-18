@@ -1,7 +1,7 @@
 import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
-import { floatingMotionClassName, IconButton } from '@components/ui';
+import { IconButton, SectionsReset } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -13,8 +13,8 @@ import { XIcon } from 'lucide-react';
 
 const dialogContentVariants = cva(
   [
-    'bg-surface-raised text-fg shadow-overlay fixed inset-x-4 top-1/2 z-50 mx-auto flex max-h-[85dvh] -translate-y-1/2 flex-col gap-4',
-    'overflow-y-auto rounded-lg p-5 outline-none',
+    'bg-surface-raised text-fg shadow-overlay rule-top rule-top-section fixed inset-x-4 top-1/2 z-50 mx-auto flex max-h-[85dvh] -translate-y-1/2 flex-col gap-4',
+    'overflow-hidden rounded-lg p-5 outline-none',
   ],
   {
     variants: {
@@ -61,6 +61,15 @@ const DialogTrigger: FC<DialogTriggerProps> = ({ ref, ...props }) => (
 
 const DialogClose: FC<DialogCloseProps> = ({ ref, ...props }) => <DialogPrimitive.Close ref={ref} data-slot="dialog-close" {...props} />;
 
+/** Calm dialog motion (spec §4): rise 8px into place at base, leave at fast. The expressive flight lands in Motion Plan C. */
+const dialogMotionClassName = [
+  'data-[state=open]:animate-in data-[state=closed]:animate-out',
+  'data-[state=open]:duration-base data-[state=closed]:duration-fast data-[state=closed]:ease-in',
+  'data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
+  'data-[state=open]:zoom-in-98 data-[state=closed]:zoom-out-98 data-[state=open]:slide-in-from-bottom-2',
+  'motion-reduce:data-[state=open]:zoom-in-100 motion-reduce:data-[state=closed]:zoom-out-100',
+].join(' ');
+
 const DialogContent: FC<DialogContentProps> = ({
   ref,
   className,
@@ -90,48 +99,54 @@ const DialogContent: FC<DialogContentProps> = ({
   const describedBy = description ? {} : { 'aria-describedby': undefined };
 
   return (
-    <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay
-        data-slot="dialog-overlay"
-        className={cn(
-          'bg-overlay fixed inset-0 z-50 duration-slow',
-          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
-        )}
-      />
+    // Outside the portal: Portal wraps each direct child in Presence, which needs a DOM node to run exit animations.
+    <SectionsReset>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay
+          data-slot="dialog-overlay"
+          className={cn(
+            'bg-overlay fixed inset-0 z-50 data-[state=open]:duration-base data-[state=closed]:duration-fast',
+            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
+          )}
+        />
 
-      <DialogPrimitive.Content
-        ref={ref}
-        data-slot="dialog-content"
-        data-size={size ?? 'md'}
-        className={cn(dialogContentVariants({ size }), floatingMotionClassName, 'duration-slow', className)}
-        onEscapeKeyDown={handleEscapeKeyDown}
-        onInteractOutside={handleInteractOutside}
-        {...describedBy}
-        {...props}
-      >
-        <header data-slot="dialog-header" className={cn('flex flex-col gap-1 pe-8', hideTitle && !description && 'sr-only')}>
-          <DialogPrimitive.Title data-slot="dialog-title" className={cn('text-fg text-md font-semibold', hideTitle && 'sr-only')}>
-            {title}
-          </DialogPrimitive.Title>
+        <DialogPrimitive.Content
+          ref={ref}
+          data-slot="dialog-content"
+          data-size={size ?? 'md'}
+          className={cn(dialogContentVariants({ size }), dialogMotionClassName, className)}
+          onEscapeKeyDown={handleEscapeKeyDown}
+          onInteractOutside={handleInteractOutside}
+          {...describedBy}
+          {...props}
+        >
+          <header data-slot="dialog-header" className={cn('flex flex-col gap-1 pe-8', hideTitle && !description && 'sr-only')}>
+            <DialogPrimitive.Title data-slot="dialog-title" className={cn('text-fg text-md font-semibold', hideTitle && 'sr-only')}>
+              {title}
+            </DialogPrimitive.Title>
 
-          <Conditional.If condition={!!description}>
-            <DialogPrimitive.Description data-slot="dialog-description" className="text-fg-muted text-sm">
-              {description}
-            </DialogPrimitive.Description>
+            <Conditional.If condition={!!description}>
+              <DialogPrimitive.Description data-slot="dialog-description" className="text-fg-muted text-sm">
+                {description}
+              </DialogPrimitive.Description>
+            </Conditional.If>
+          </header>
+
+          {/* The body scrolls, not the panel, so the heavy rule and the title stay in place in long dialogs. */}
+          <div data-slot="dialog-body" className="-m-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1">
+            {children}
+          </div>
+
+          <Conditional.If condition={dismissible}>
+            <DialogPrimitive.Close asChild>
+              <IconButton size="sm" tooltip={false} aria-label={t('close')} className="absolute end-3 top-3">
+                <XIcon />
+              </IconButton>
+            </DialogPrimitive.Close>
           </Conditional.If>
-        </header>
-
-        {children}
-
-        <Conditional.If condition={dismissible}>
-          <DialogPrimitive.Close asChild>
-            <IconButton size="sm" tooltip={false} aria-label={t('close')} className="absolute end-3 top-3">
-              <XIcon />
-            </IconButton>
-          </DialogPrimitive.Close>
-        </Conditional.If>
-      </DialogPrimitive.Content>
-    </DialogPrimitive.Portal>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </SectionsReset>
   );
 };
 

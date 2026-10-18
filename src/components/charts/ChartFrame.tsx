@@ -3,6 +3,7 @@ import { type ReactNode, useState } from 'react';
 import { Button, EmptyState, Skeleton, Table } from '@components/ui';
 import { Conditional } from '@components/utils';
 
+import { useMotion } from '@contexts';
 import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
@@ -34,8 +35,6 @@ export type ChartFrameProps<T> = {
 export const formatCell = (raw: unknown, formatValue: (value: number) => string) =>
   raw === null || raw === undefined || raw === '' || !Number.isFinite(Number(raw)) ? '—' : formatValue(Number(raw));
 
-const prefersReducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-
 export function ChartFrame<T>({
   'aria-label': ariaLabel,
   data,
@@ -54,7 +53,12 @@ export function ChartFrame<T>({
   const { t, isRTL } = useAppTranslation('common');
   const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());
   const [asTable, setAsTable] = useState(false);
-  const [animate] = useState(() => !prefersReducedMotion());
+  const { mode } = useMotion();
+  // Charts paint still and morph on later data changes only (spec §4 Charts); never under reduced motion.
+  // The "still" snapshot is taken when the plot is first shown, so data arriving after a loading state doesn't animate.
+  const [stillData, setStillData] = useState<typeof data | null>(loading || data.length === 0 ? null : data);
+  if (stillData === null && !loading && data.length > 0) setStillData(data);
+  const animate = stillData !== null && data !== stillData && mode !== 'reduced';
 
   const colored: VisibleSeries[] = series.map((item, index) => ({ ...item, color: toneColor(item.tone, index) }));
   // Hidden keys are reconciled with the current series: stale keys are ignored, and the plot never goes blank.
@@ -149,7 +153,8 @@ export function ChartFrame<T>({
           </div>
         </Conditional.If>
         <Conditional.Else>
-          <div data-slot="chart-plot" className="w-full" style={{ height }}>
+          {/* recharts' accessibility layer makes the svg focusable: give it the kit ring, not the browser default. */}
+          <div data-slot="chart-plot" className="[&_.recharts-surface]:focus-ring w-full" style={{ height }}>
             {children({ visible, isRTL, animate })}
           </div>
         </Conditional.Else>

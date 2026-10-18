@@ -1,0 +1,11 @@
+/*
+ * Motion modes (spec docs/superpowers/specs/2026-10-17-motion-design.md §3). MotionProvider writes data-motion on <html>.
+ * expressive is the default (tokens.css values). reduced comes from the OS setting and is handled by the global
+ * prefers-reduced-motion rules in utilities.css; JS-driven motion reads the mode from useMotion().
+ */
+:root[data-motion='calm'] {
+  --motion-ease-spring: var(--ease-out);
+  --motion-stagger: 0ms;
+  --motion-reveal-stagger: 0ms;
+  --motion-depth: 0;
+}

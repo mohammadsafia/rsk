@@ -5,10 +5,10 @@ import { Conditional } from '@components/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
 
-export const badgeVariants = cva('inline-flex shrink-0 items-center gap-1.5 rounded-md font-medium whitespace-nowrap', {
+export const badgeVariants = cva('smallcaps underline-tone inline-flex shrink-0 items-center gap-1.5 font-semibold whitespace-nowrap', {
   variants: {
     variant: {
-      dot: 'border-border text-fg border',
+      dot: 'text-fg',
       soft: '',
     },
     tone: {
@@ -20,8 +20,8 @@ export const badgeVariants = cva('inline-flex shrink-0 items-center gap-1.5 roun
       info: '',
     },
     size: {
-      sm: 'h-5 px-1.5 text-2xs',
-      md: 'h-5.5 px-2 text-xs',
+      sm: 'h-5 text-2xs',
+      md: 'h-5.5 text-2xs tracking-widest',
     },
   },
   compoundVariants: [
@@ -31,12 +31,12 @@ export const badgeVariants = cva('inline-flex shrink-0 items-center gap-1.5 roun
     { variant: 'dot', tone: 'warning', className: '*:data-[slot=badge-dot]:bg-warning' },
     { variant: 'dot', tone: 'danger', className: '*:data-[slot=badge-dot]:bg-danger' },
     { variant: 'dot', tone: 'info', className: '*:data-[slot=badge-dot]:bg-info' },
-    { variant: 'soft', tone: 'neutral', className: 'bg-surface-sunken text-fg' },
-    { variant: 'soft', tone: 'accent', className: 'bg-accent-subtle text-accent' },
-    { variant: 'soft', tone: 'success', className: 'bg-success-subtle text-success' },
-    { variant: 'soft', tone: 'warning', className: 'bg-warning-subtle text-warning' },
-    { variant: 'soft', tone: 'danger', className: 'bg-danger-subtle text-danger' },
-    { variant: 'soft', tone: 'info', className: 'bg-info-subtle text-info' },
+    { variant: 'soft', tone: 'neutral', className: 'text-fg-muted' },
+    { variant: 'soft', tone: 'accent', className: 'text-accent' },
+    { variant: 'soft', tone: 'success', className: 'text-success' },
+    { variant: 'soft', tone: 'warning', className: 'text-warning' },
+    { variant: 'soft', tone: 'danger', className: 'text-danger' },
+    { variant: 'soft', tone: 'info', className: 'text-info' },
   ],
   defaultVariants: {
     variant: 'dot',

@@ -5,6 +5,7 @@ import { ChartFrame } from './ChartFrame';
 import { ChartTooltip } from './ChartTooltip';
 import type { ChartBaseProps } from './types';
 import { useChartFormat } from './useChartFormat';
+import { MOTION_DURATIONS } from '@constants';
 
 export type LineChartProps<T> = ChartBaseProps<T> & { curve?: 'monotone' | 'linear' };
 
@@ -54,6 +55,7 @@ export function LineChart<T>({
                 dot={false}
                 activeDot={{ r: 4 }}
                 isAnimationActive={animate}
+                animationDuration={MOTION_DURATIONS.slow}
               />
             ))}
           </RechartsLineChart>

@@ -6,6 +6,7 @@ import { ChartFrame, formatCell } from './ChartFrame';
 import { ChartTooltip } from './ChartTooltip';
 import type { ValueFormat } from './types';
 import { useChartFormat } from './useChartFormat';
+import { MOTION_DURATIONS } from '@constants';
 
 export type DonutChartProps<T> = {
   data: T[];
@@ -77,6 +78,7 @@ export function DonutChart<T>({
                   paddingAngle={2}
                   stroke="var(--surface)"
                   isAnimationActive={animate}
+                  animationDuration={MOTION_DURATIONS.slow}
                 >
                   {shown.map((datum) => {
                     const index = data.indexOf(datum);

@@ -6,7 +6,7 @@ import { NuqsAdapter } from 'nuqs/adapters/react';
 
 import { queryClient } from '@api/config';
 import { ROUTER } from '@routes';
-import { AppDirectionProvider, ThemeProvider } from '@contexts';
+import { AppDirectionProvider, MotionProvider, ThemeProvider } from '@contexts';
 import { Tooltip } from '@components/ui';
 
 import './i18n';
@@ -18,11 +18,13 @@ export function renderApp(container: HTMLElement) {
       <ThemeProvider>
         <QueryClientProvider client={queryClient}>
           <AppDirectionProvider>
-            <NuqsAdapter>
-              <Tooltip.Provider delayDuration={300}>
-                <RouterProvider router={ROUTER} future={{ v7_startTransition: true }} />
-              </Tooltip.Provider>
-            </NuqsAdapter>
+            <MotionProvider>
+              <NuqsAdapter>
+                <Tooltip.Provider delayDuration={300}>
+                  <RouterProvider router={ROUTER} future={{ v7_startTransition: true }} />
+                </Tooltip.Provider>
+              </NuqsAdapter>
+            </MotionProvider>
           </AppDirectionProvider>
         </QueryClientProvider>
       </ThemeProvider>

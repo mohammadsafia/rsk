@@ -1,4 +1,4 @@
-import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type PropsWithChildren } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type FC, forwardRef, type PropsWithChildren, useId } from 'react';
 
 import { Command, type CommandProps, fieldVariants, type FieldVariants, Popover } from '@components/ui';
 
@@ -57,21 +57,31 @@ type ComboboxComponent = FC<ComboboxProps> & {
   Indicator: FC<ComboboxIndicatorProps>;
 };
 
-const ComboboxTrigger: FC<ComboboxTriggerProps> = ({ className, size, invalid, children, ...props }) => (
-  <Popover.Trigger
-    data-slot="combobox-trigger"
-    role="combobox"
-    aria-invalid={invalid || undefined}
-    className={cn(
-      fieldVariants({ size }),
-      'group/combobox-trigger data-[state=open]:border-accent cursor-pointer gap-2 text-start',
-      className,
-    )}
-    {...props}
-  >
-    {children}
-  </Popover.Trigger>
-);
+const ComboboxTrigger: FC<ComboboxTriggerProps> = ({ className, size, invalid, children, ...props }) => {
+  // role="combobox" isn't named by its content (a self-reference would read its empty value), so without a label it
+  // would be announced as nameless: label it with its own visible text, wrapped in a layout-neutral span.
+  const textId = useId();
+  const labelledBy = props['aria-labelledby'] ?? (props['aria-label'] ? undefined : textId);
+
+  return (
+    <Popover.Trigger
+      data-slot="combobox-trigger"
+      role="combobox"
+      aria-invalid={invalid || undefined}
+      className={cn(
+        fieldVariants({ size }),
+        'group/combobox-trigger data-[state=open]:border-accent cursor-pointer gap-2 text-start',
+        className,
+      )}
+      {...props}
+      aria-labelledby={labelledBy}
+    >
+      <span id={textId} className="contents">
+        {children}
+      </span>
+    </Popover.Trigger>
+  );
+};
 
 const ComboboxValue: FC<ComboboxValueProps> = ({ placeholder, children, className, ...props }) => (
   <span data-slot="combobox-value" className={cn('flex-1 truncate text-start', !children && 'text-fg-muted', className)} {...props}>

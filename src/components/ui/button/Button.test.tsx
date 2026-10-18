@@ -75,4 +75,11 @@ describe('Button', () => {
     expect(link.dataset.slot).toBe('button');
     expect(link.dataset.variant).toBe('outline');
   });
+
+  it('gives the neutral ghost button a hairline underline', () => {
+    render(<Button variant="ghost">Cancel</Button>);
+    const button = screen.getByRole('button', { name: 'Cancel' });
+    expect(button.className).toContain('underline');
+    expect(button.className).toContain('decoration-border-strong');
+  });
 });

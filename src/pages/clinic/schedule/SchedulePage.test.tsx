@@ -67,7 +67,7 @@ describe('SchedulePage', () => {
 
   it('follows ?view=agenda', async () => {
     renderPage('/schedule?view=agenda');
-    expect(await screen.findByRole('tab', { name: 'Agenda', selected: true })).toBeTruthy();
+    expect(await screen.findByRole('radio', { name: 'Agenda', checked: true })).toBeTruthy();
   });
 
   it('books a visit from a free slot', async () => {

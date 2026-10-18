@@ -190,7 +190,7 @@ const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY
       <div data-slot="app-shell" className={cn('bg-canvas text-fg flex h-dvh overflow-hidden', className)}>
         <a
           href={`#${contentId}`}
-          className="bg-surface-raised text-fg shadow-overlay focus-visible:ring-ring sr-only z-[60] rounded-md px-3 py-2 text-sm focus:not-sr-only focus:fixed focus:start-2 focus:top-2 focus-visible:ring-2"
+          className="bg-surface-raised text-fg shadow-overlay focus-ring sr-only z-[60] rounded-md px-3 py-2 text-sm focus:not-sr-only focus:fixed focus:start-2 focus:top-2"
         >
           {t('skipToContent')}
         </a>
@@ -214,7 +214,7 @@ const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY
           data-open={mobileOpen}
           className={cn(
             'bg-sidebar border-sidebar-border fixed inset-y-0 start-0 z-50 flex w-72 flex-col border-e focus:outline-none',
-            'transition-[translate,visibility] duration-200 ease-out motion-reduce:transition-none',
+            'transition-[translate,visibility] duration-base ease-out motion-reduce:transition-none',
             'md:static md:transition-[width] md:motion-reduce:transition-none',
             collapsed ? 'md:w-16' : 'md:w-64',
             !mobileOpen && 'max-md:invisible max-md:-translate-x-full max-md:rtl:translate-x-full',

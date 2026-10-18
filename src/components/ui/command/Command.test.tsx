@@ -37,4 +37,17 @@ describe('Command', () => {
     expect(item.className).not.toMatch(/(^|\s)h-control-sm(\s|$)/);
     expect(item.className).toContain('py-1.5');
   });
+
+  it('marks the checked item with ink, not weight', () => {
+    render(
+      <Command>
+        <Command.List>
+          <Command.Item data-checked="true">Dr. Haddad</Command.Item>
+        </Command.List>
+      </Command>,
+    );
+    const item = screen.getByText('Dr. Haddad').closest('[cmdk-item]') as HTMLElement;
+    expect(item.className).toContain('data-[checked=true]:ink');
+    expect(item.className).not.toContain('data-[checked=true]:font-medium');
+  });
 });

@@ -121,7 +121,7 @@ function TimeColumn<TValue extends number | string>({ label, options, selected, 
           ref={option.value === selected ? scrollSelectedIntoView : undefined}
           className={cn(
             'focus-ring text-fg-muted hover:bg-hover hover:text-fg h-7 shrink-0 cursor-pointer rounded-md tabular-nums transition-colors',
-            'aria-selected:bg-accent aria-selected:text-accent-fg aria-selected:hover:bg-accent aria-selected:hover:text-accent-fg',
+            'aria-selected:text-fg aria-selected:ink',
           )}
           onClick={() => onSelect(option.value)}
           onKeyDown={(event) => handleKeyDown(event, index)}

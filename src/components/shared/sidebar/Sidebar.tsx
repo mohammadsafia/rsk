@@ -83,7 +83,7 @@ const Group: FC<GroupProps> = ({ label, className, children, ...props }) => {
       <p
         id={labelId}
         className={cn(
-          'text-fg-subtle text-2xs px-3 pb-1 font-medium tracking-wider uppercase rtl:tracking-normal',
+          'text-fg-muted text-2xs px-3 pb-1 font-medium tracking-wider uppercase rtl:tracking-normal',
           collapsed && 'md:sr-only',
         )}
       >
@@ -116,8 +116,9 @@ const Item: FC<ItemProps> = ({ href, icon: Icon, active = false, badge, classNam
         aria-current={active ? 'page' : undefined}
         className={cn(
           ROW,
-          'aria-[current=page]:bg-hover aria-[current=page]:text-fg aria-[current=page]:font-medium',
-          collapsed && 'md:justify-center md:px-0',
+          'group/sidebar-item aria-[current=page]:text-fg aria-[current=page]:font-medium',
+          // Collapsed, the label is hidden: the ink bar under the icon marks the current item (not colour alone).
+          collapsed && 'md:justify-center md:px-0 md:aria-[current=page]:ink-block',
           className,
         )}
         onClick={handleClick}
@@ -125,7 +126,10 @@ const Item: FC<ItemProps> = ({ href, icon: Icon, active = false, badge, classNam
       >
         <Icon aria-hidden="true" />
 
-        <span data-slot="sidebar-item-label" className={cn('flex-1 truncate', collapsed && 'md:sr-only')}>
+        <span
+          data-slot="sidebar-item-label"
+          className={cn('-mb-1 flex-1 truncate pb-1 group-aria-[current=page]/sidebar-item:ink', collapsed && 'md:sr-only')}
+        >
           {children}
         </span>
 

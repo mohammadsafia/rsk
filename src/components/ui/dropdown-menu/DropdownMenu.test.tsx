@@ -32,5 +32,21 @@ describe('DropdownMenu', () => {
     renderMenu();
     expect(screen.getByText('⌘E').className).toContain('font-mono');
     expect(screen.getByRole('menu').className).toContain('bg-surface-raised');
+    expect(screen.getByRole('menu').className).toContain('origin-(--radix-dropdown-menu-content-transform-origin)');
+    expect(screen.getByRole('menu').className).toContain('data-[state=closed]:duration-instant');
+  });
+
+  it('marks a checked item with ink and keeps aria-checked', () => {
+    render(
+      <DropdownMenu defaultOpen>
+        <DropdownMenu.Trigger>View</DropdownMenu.Trigger>
+        <DropdownMenu.Content>
+          <DropdownMenu.CheckboxItem checked>Show archived</DropdownMenu.CheckboxItem>
+        </DropdownMenu.Content>
+      </DropdownMenu>,
+    );
+    const item = screen.getByRole('menuitemcheckbox', { name: 'Show archived' });
+    expect(item.getAttribute('aria-checked')).toBe('true');
+    expect(item.className).toContain('data-[state=checked]:ink');
   });
 });

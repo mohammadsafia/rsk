@@ -1,6 +1,6 @@
 import { type ComponentPropsWithoutRef, type FC, useMemo } from 'react';
 
-import { IconButton, Select, Tabs, ToggleGroup } from '@components/ui';
+import { IconButton, Select, ToggleGroup } from '@components/ui';
 import {
   type CalendarLegendItem,
   CalendarPicker,
@@ -65,8 +65,13 @@ const ViewTabs: FC<{ views?: CalendarView[] }> = ({ views = DEFAULT_VIEWS }) => 
   const { t } = useAppTranslation('common');
   const { view, setView } = useCalendarGridContext();
 
+  // A view switch has no panels: it's a single choice (radio items), not tabs.
   return (
-    <Tabs
+    <ToggleGroup
+      type="single"
+      variant="ghost"
+      size="sm"
+      aria-label={t('calendar.views')}
       className="min-w-1/3"
       value={view}
       onValueChange={(value) => {
@@ -74,14 +79,12 @@ const ViewTabs: FC<{ views?: CalendarView[] }> = ({ views = DEFAULT_VIEWS }) => 
         if (next) setView(next);
       }}
     >
-      <Tabs.List variant="contained" fullWidth aria-label={t('calendar.views')}>
-        {views.map((candidate) => (
-          <Tabs.Trigger key={candidate} value={candidate}>
-            {t(`calendar.${candidate}`)}
-          </Tabs.Trigger>
-        ))}
-      </Tabs.List>
-    </Tabs>
+      {views.map((candidate) => (
+        <ToggleGroup.Item key={candidate} value={candidate} className="flex-1">
+          {t(`calendar.${candidate}`)}
+        </ToggleGroup.Item>
+      ))}
+    </ToggleGroup>
   );
 };
 
@@ -93,6 +96,7 @@ const ViewToggle: FC = () => {
     <ToggleGroup
       type="single"
       variant="ghost"
+      aria-label={t('calendar.layout')}
       value={viewMode}
       onValueChange={(value) => {
         if (value === 'calendar' || value === 'list') setViewMode(value);

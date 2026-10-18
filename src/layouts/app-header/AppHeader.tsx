@@ -24,14 +24,18 @@ function AppHeader() {
       <button
         type="button"
         onClick={toggle}
-        aria-label={t('openCommandPalette')}
+        // The visible text is the accessible name (WCAG 2.5.3); the shortcut is announced, not read as part of the name.
+        aria-keyshortcuts="Meta+K Control+K"
         className="text-fg-muted bg-surface border-border hover:bg-hover hover:text-fg focus-visible:ring-ring h-control-md flex w-full max-w-xs items-center gap-2 rounded-md border px-3 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
       >
         <Search aria-hidden="true" className="size-4 shrink-0" />
 
         <span className="flex-1 truncate text-start">{t('searchPlaceholder')}</span>
 
-        <kbd className="bg-surface-sunken text-fg-muted border-border text-2xs pointer-events-none hidden rounded-sm border px-1.5 font-mono sm:inline-block">
+        <kbd
+          aria-hidden="true"
+          className="bg-surface-sunken text-fg-muted border-border text-2xs pointer-events-none hidden rounded-sm border px-1.5 font-mono sm:inline-block"
+        >
           ⌘K
         </kbd>
       </button>

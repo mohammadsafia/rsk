@@ -3,7 +3,7 @@ id: form-checkbox-group
 title: FormCheckboxGroup
 section: Components
 category: Forms
-description: 'Several checkbox cards bound to one array value in react-hook-form.'
+description: 'Several inline checkboxes bound to one array value in react-hook-form.'
 tags: [forms, checkbox, group]
 ---
 
@@ -29,12 +29,12 @@ The value is an array of the selected option values. Options can be strings or o
   ]}
 />
 
-Plus the [shared field props](/docs/components/form-field#shared-by-every-form-field). The cards are [CheckboxGroup](/docs/components/checkbox-group) items.
+Plus the [shared field props](/docs/components/form-field#shared-by-every-form-field). The options are [CheckboxGroup](/docs/components/checkbox-group) items.
 
 ## Accessibility
 
-- The cards sit in a `role="group"` labelled by the field label; each card is a checkbox named by its text.
+- The options sit in a `role="group"` labelled by the field label; each option is a checkbox named by its text.
 
 ## RTL notes
 
-- The cards wrap in reading order, and each card's indicator sits at its end.
+- The options wrap in reading order, and each box sits at the inline start of its label.

@@ -158,6 +158,14 @@ function Calendar({
       labels={{
         labelPrevious: () => t('calendar.previousMonth'),
         labelNext: () => t('calendar.nextMonth'),
+        // "Tuesday, October 27, 2026": the visible day number appears as a word (WCAG 2.5.3), in Western digits.
+        labelDayButton: (date) =>
+          new Intl.DateTimeFormat(`${isRTL ? 'ar' : 'en'}-u-nu-latn`, {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          }).format(date),
         ...labels,
       }}
       className={cn(

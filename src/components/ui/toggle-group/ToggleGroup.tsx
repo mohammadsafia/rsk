@@ -9,7 +9,7 @@ const toggleVariants = cva(
   [
     'text-fg-muted inline-flex cursor-pointer items-center justify-center gap-2 rounded-md font-medium transition-colors [&_svg]:size-4',
     'focus-ring hover:bg-hover hover:text-fg disabled:pointer-events-none disabled:opacity-50',
-    'data-[state=on]:bg-accent-subtle data-[state=on]:text-accent',
+    'data-[state=on]:text-fg data-[state=on]:ink-block',
   ],
   {
     variants: {

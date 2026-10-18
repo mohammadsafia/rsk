@@ -2,7 +2,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
-import { Button, Dialog } from '@components/ui';
+import { Button, Dialog, Sections } from '@components/ui';
 
 import '../../../i18n';
 
@@ -59,5 +59,63 @@ describe('Dialog', () => {
     fireEvent.pointerDown(document.body);
     expect(screen.getByRole('dialog')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+  });
+
+  it('tops the dialog with the section rule, with no marker before the title', () => {
+    render(
+      <Dialog>
+        <Dialog.Trigger>Open</Dialog.Trigger>
+        <Dialog.Content title="Edit patient" description="Changes save immediately." />
+      </Dialog>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit patient' });
+    expect(dialog.className).toContain('rule-top');
+    expect(dialog.className).toContain('rule-top-section');
+    expect(dialog.className).toContain('data-[state=open]:duration-base');
+    expect(dialog.className).toContain('data-[state=closed]:duration-fast');
+    expect(dialog.className).toContain('data-[state=open]:slide-in-from-bottom-2');
+    expect(dialog.className).not.toContain('duration-slow');
+    expect(dialog.querySelector('[data-slot="section-marker"]')).toBeNull();
+    expect(dialog.querySelector('[data-slot="dialog-title"]')?.textContent).toBe('Edit patient');
+  });
+
+  it('keeps the accessible name without the marker', () => {
+    render(
+      <Dialog>
+        <Dialog.Trigger>Open</Dialog.Trigger>
+        <Dialog.Content title="Edit patient" />
+      </Dialog>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    expect(screen.getByRole('dialog', { name: 'Edit patient' })).toBeTruthy();
+  });
+
+  it('a dialog opened inside a numbered Sections page shows no stray number', () => {
+    render(
+      <Sections>
+        <Dialog defaultOpen>
+          <Dialog.Content title="Edit patient" />
+        </Dialog>
+      </Sections>,
+    );
+    expect(screen.getByRole('dialog', { name: 'Edit patient' }).querySelector('[data-slot="section-marker"]')).toBeNull();
+  });
+
+  it('scrolls an inner body, so the heavy rule and the title stay put in long dialogs', () => {
+    render(
+      <Dialog defaultOpen>
+        <Dialog.Content title="Edit patient">
+          <p>Body</p>
+        </Dialog.Content>
+      </Dialog>,
+    );
+    const dialog = screen.getByRole('dialog', { name: 'Edit patient' });
+    expect(dialog.className).not.toContain('overflow-y-auto');
+    expect(dialog.className).toContain('overflow-hidden');
+    const body = dialog.querySelector<HTMLElement>('[data-slot="dialog-body"]')!;
+    expect(body.className).toContain('overflow-y-auto');
+    expect(body.textContent).toBe('Body');
+    expect(body.contains(dialog.querySelector('[data-slot="dialog-header"]'))).toBe(false);
   });
 });

@@ -17,6 +17,7 @@ import { type InvoiceStatus } from '@api/clinic';
 import { Alert, Badge, Button, EmptyState, Money, Tabs } from '@components/ui';
 import { ConfirmDialog, PageHeader, StatCard } from '@components/shared';
 import { createSelectionColumn, DataTable } from '@components/tables';
+import { Conditional } from '@components/utils';
 
 import { toast, useAppTranslation, useDate } from '@hooks/shared';
 import { patientPath } from '@routes';
@@ -246,6 +247,7 @@ function BillingPage() {
         ) : (
           <div className="flex min-h-0 flex-1 flex-col gap-3">
             <Tabs
+              className="flex min-h-0 flex-1 flex-col gap-3"
               value={status}
               onValueChange={(value) => {
                 // A selection made on one tab must not ride along, hidden, into bulk actions on another.
@@ -263,43 +265,57 @@ function BillingPage() {
                   </Tabs.Trigger>
                 ))}
               </Tabs.List>
+
+              {/* Each status tab controls a real panel (aria-controls must point at an element); the table renders in the active one. */}
+              {[ALL, ...STATUSES].map((value) => (
+                <Tabs.Content
+                  key={value}
+                  value={value}
+                  forceMount
+                  className="mt-0 flex min-h-0 flex-1 flex-col data-[state=inactive]:hidden"
+                >
+                  <Conditional.If condition={status === value}>
+                    <DataTable
+                      table={table}
+                      isLoading={loading}
+                      onRowClick={(row) => void setInvoiceId(row.original.id)}
+                      className="min-h-0 flex-1"
+                    >
+                      <DataTable.Toolbar
+                        totalCount={table.getFilteredRowModel().rows.length}
+                        totalLabel={t('billing.totalLabel')}
+                        placeholder={t('billing.searchPlaceholder')}
+                      />
+
+                      <DataTable.BulkActions<InvoiceRow>>
+                        {(selected, ids) => (
+                          <>
+                            <Button size="sm" variant="outline" loading={reminding} onClick={() => void runBulk(ids, 'send-reminder')}>
+                              <Send aria-hidden="true" />
+                              {t('billing.bulk.remind')}
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => setConfirmIds(ids)}>
+                              <CheckCheck aria-hidden="true" />
+                              {t('billing.bulk.markPaid')}
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => exportRows(selected)}>
+                              <Download aria-hidden="true" />
+                              {t('billing.bulk.export')}
+                            </Button>
+                          </>
+                        )}
+                      </DataTable.BulkActions>
+
+                      <DataTable.Content
+                        emptyState={{ title: t('billing.noResults.title'), description: t('billing.noResults.description') }}
+                      />
+
+                      <DataTable.Pagination />
+                    </DataTable>
+                  </Conditional.If>
+                </Tabs.Content>
+              ))}
             </Tabs>
-
-            <DataTable
-              table={table}
-              isLoading={loading}
-              onRowClick={(row) => void setInvoiceId(row.original.id)}
-              className="min-h-0 flex-1"
-            >
-              <DataTable.Toolbar
-                totalCount={table.getFilteredRowModel().rows.length}
-                totalLabel={t('billing.totalLabel')}
-                placeholder={t('billing.searchPlaceholder')}
-              />
-
-              <DataTable.BulkActions<InvoiceRow>>
-                {(selected, ids) => (
-                  <>
-                    <Button size="sm" variant="outline" loading={reminding} onClick={() => void runBulk(ids, 'send-reminder')}>
-                      <Send aria-hidden="true" />
-                      {t('billing.bulk.remind')}
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => setConfirmIds(ids)}>
-                      <CheckCheck aria-hidden="true" />
-                      {t('billing.bulk.markPaid')}
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => exportRows(selected)}>
-                      <Download aria-hidden="true" />
-                      {t('billing.bulk.export')}
-                    </Button>
-                  </>
-                )}
-              </DataTable.BulkActions>
-
-              <DataTable.Content emptyState={{ title: t('billing.noResults.title'), description: t('billing.noResults.description') }} />
-
-              <DataTable.Pagination />
-            </DataTable>
           </div>
         )}
       </>

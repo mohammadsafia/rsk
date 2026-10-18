@@ -15,7 +15,11 @@ export type PatternId =
   | 'hex-color'
   | 'raw-color-function'
   | 'arbitrary-length'
-  | 'palette-color';
+  | 'palette-color'
+  | 'state-fill'
+  | 'large-control-radius'
+  | 'typed-section-number'
+  | 'raw-motion';
 
 export type PatternCounts = Partial<Record<PatternId, number>>;
 
@@ -57,6 +61,22 @@ export const FORBIDDEN_PATTERNS: ReadonlyArray<{ id: PatternId; regex: RegExp; w
     why: 'The theme clears the Tailwind palette (--color-*: initial); palette classes render nothing',
   },
   { id: 'arbitrary-length', regex: /\b[a-z][\w-]*-\[-?\d*\.?\d+(?:px|rem)\]/g, why: 'Use the Tailwind scale (README code standards)' },
+  {
+    id: 'state-fill',
+    regex: /(?:data-\[state=(?:active|on)\]|aria-selected|aria-\[selected=true\]|aria-\[current=page\]|data-\[active=true\]):bg-/g,
+    why: 'Ledger: current / selected is marked by the ink underline (ink, ink-block), never a fill',
+  },
+  { id: 'large-control-radius', regex: /\brounded-(?:xl|2xl|3xl)\b/g, why: 'Ledger keeps edges square: radius-sm/md/lg only' },
+  {
+    id: 'typed-section-number',
+    regex: />\s*(?:0[1-9]|§)\s*</g,
+    why: 'Section numbers come from <Sections>/<SectionMarker> (CSS counters), never typed',
+  },
+  {
+    id: 'raw-motion',
+    regex: /\bduration-\d+\b|\bduration-\[[^\]]+\]|\bease-(?:linear|in-out)\b|\bease-\[[^\]]+\]|\bdelay-\d+\b|\banimate-\[[^\]]+\]/g,
+    why: 'Motion timing comes from the motion tokens (duration-instant…roll, ease-out/in/spring)',
+  },
 ];
 
 export function countPatterns(source: string): PatternCounts {

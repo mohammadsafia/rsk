@@ -23,4 +23,12 @@ describe('Progress', () => {
     expect(bar.dataset.tone).toBe('danger');
     expect(bar.querySelector<HTMLElement>('[data-slot="progress-indicator"]')!.style.transform).toBe('scaleX(1)');
   });
+
+  it('is a square 3px fg rule by default', () => {
+    render(<Progress value={40} aria-label="Claims processed" />);
+    const bar = screen.getByRole('progressbar', { name: 'Claims processed' });
+    expect(bar.dataset.tone).toBe('neutral');
+    expect(bar.className).not.toContain('rounded-full');
+    expect(bar.querySelector<HTMLElement>('[data-slot="progress-indicator"]')!.className).toContain('bg-fg');
+  });
 });

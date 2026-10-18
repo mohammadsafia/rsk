@@ -31,7 +31,7 @@ function GetGoing() {
           <li key={step.key}>
             <Card>
               <Card.Content className="flex flex-col gap-2">
-                <span className="text-fg-subtle font-mono text-xs">
+                <span className="text-fg-muted font-mono text-xs">
                   <span dir="ltr">{String(index + 1).padStart(2, '0')}</span> · {t(`gettingStarted.${step.key}`)}
                 </span>
 
