@@ -100,6 +100,14 @@ describe('DataTable motion', () => {
     expect(tintedRows()).toEqual(['v2']);
   });
 
+  it("fades the tint into the row's own background (a selected row's tint), never through transparent", () => {
+    const { rerender } = render(<Harness data={BASE} />);
+    rerender(<Harness data={[BASE[0], { ...BASE[1], amount: 95 }, BASE[2]]} />);
+    const tint = animate.mock.calls.find((args) => 'backgroundColor' in (args[0] as Keyframe[])[0])!;
+    // One keyframe: WAAPI animates from it to the element's underlying value.
+    expect(tint[0] as Keyframe[]).toHaveLength(1);
+  });
+
   it('tints an added row, but not when the whole page of rows changes', () => {
     const { rerender } = render(<Harness data={BASE} />);
     rerender(<Harness data={[...BASE, { id: 'v4', patient: 'Sami Odeh', amount: 40 }]} />);
