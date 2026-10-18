@@ -1,41 +1,23 @@
 import { type RefObject, useEffect, useLayoutEffect, useRef } from 'react';
-import { animate, type MotionValue, useMotionValue, useTransform } from 'framer-motion';
 
 import { MOTION_EASINGS } from '@constants';
 import { useMotion } from '../../contexts/MotionContext';
 
-import { type InkEdge, type InkGeometry, planInkMove } from './inkPlan';
+import { type InkGeometry, planInkMove, sampleInkMove } from './inkPlan';
 
-const CURVES = {
-  out: MOTION_EASINGS.out,
-  spring: MOTION_EASINGS.spring,
-} as const;
-
-/** "cubic-bezier(a, b, c, d)" → [a, b, c, d] for framer-motion. */
-const bezier = (curve: string) => curve.match(/[\d.]+/g)!.map(Number) as [number, number, number, number];
-
-const run = (value: MotionValue<number>, edge: InkEdge) => {
-  if (edge.duration === 0 || edge.ease === 'none') {
-    value.jump(edge.to);
-    return;
-  }
-  animate(value, edge.to, { duration: edge.duration / 1000, delay: edge.delay / 1000, ease: bezier(CURVES[edge.ease]) });
-};
+const CURVES = { out: MOTION_EASINGS.out, spring: MOTION_EASINGS.spring } as const;
 
 /**
  * Tracks the element matching `selector` inside the bar's strip (the closest `[data-ink-scope]`, else the parent) and
- * moves the ink to it (spec §4: elastic ink). The strip must be positioned. Re-measures when selection attributes change or the strip resizes.
+ * moves the ink to it (spec §4: elastic ink), writing the bar's left, width and opacity. The strip must be positioned. Re-measures when selection attributes change or the strip resizes.
  */
 const SELECTION_ATTRIBUTES = ['data-state', 'aria-current', 'aria-selected', 'aria-checked'];
 
 export function useInkBar(barRef: RefObject<HTMLElement | null>, selector: string) {
   const { mode } = useMotion();
-  const left = useMotionValue(0);
-  const right = useMotionValue(0);
-  const opacity = useMotionValue(0);
-  const width = useTransform(() => Math.max(0, right.get() - left.get()));
   const modeRef = useRef(mode);
   const last = useRef<InkGeometry | null>(null);
+  const running = useRef<Animation | null>(null);
 
   useEffect(() => {
     modeRef.current = mode;
@@ -44,14 +26,14 @@ export function useInkBar(barRef: RefObject<HTMLElement | null>, selector: strin
   useLayoutEffect(() => {
     const bar = barRef.current;
     const container = bar?.closest<HTMLElement>('[data-ink-scope]') ?? bar?.parentElement;
-    if (!container) return;
+    if (!bar || !container) return;
 
     /** `instant`: a layout shift (fonts, a label in another language, direction, an item appearing) moves the ink at
      * once; only a change of selection travels. */
     const measure = (instant = false) => {
       const active = container.querySelector<HTMLElement>(selector);
       if (!active) {
-        opacity.jump(0);
+        bar.style.opacity = '0';
         last.current = null;
         return;
       }
@@ -59,9 +41,18 @@ export function useInkBar(barRef: RefObject<HTMLElement | null>, selector: strin
       const previous = last.current;
       if (previous && previous.left === geometry.left && previous.width === geometry.width) return;
       const move = planInkMove(instant ? null : previous, geometry, modeRef.current);
-      run(left, move.left);
-      run(right, move.right);
-      opacity.jump(1);
+      // Where the bar is now: mid-flight, the running animation's position, so an interrupted move doesn't jump back.
+      const style = getComputedStyle(bar);
+      const startLeft = parseFloat(style.left) || 0;
+      const start = { left: startLeft, right: startLeft + (parseFloat(style.width) || 0) };
+      running.current?.cancel();
+      running.current = null;
+      // The resting place is written first; the animation plays over it and ends where the style already is.
+      bar.style.left = `${move.left.to}px`;
+      bar.style.width = `${Math.max(0, move.right.to - move.left.to)}px`;
+      bar.style.opacity = '1';
+      const { duration, frames } = sampleInkMove(start, move, CURVES);
+      if (duration > 0 && typeof bar.animate === 'function') running.current = bar.animate(frames, { duration, easing: 'linear' });
       last.current = geometry;
     };
     const relayout = () => measure(true);
@@ -97,11 +88,10 @@ export function useInkBar(barRef: RefObject<HTMLElement | null>, selector: strin
 
     return () => {
       alive = false;
+      running.current?.cancel();
       mutations.disconnect();
       page.disconnect();
       resize?.disconnect();
     };
-  }, [barRef, selector, left, right, opacity]);
-
-  return { left, width, opacity };
+  }, [barRef, selector]);
 }

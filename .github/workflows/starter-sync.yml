@@ -37,7 +37,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Verify the starter (type check, lint, tests, build)
+      # The first-load budget (and the accessibility audit) drive headless Chromium.
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Verify the starter (type check, lint, tests, build, first-load budget)
         run: pnpm starter:verify
 
       - name: Build the starter

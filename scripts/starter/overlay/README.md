@@ -29,7 +29,11 @@ vp check          # format, lint, type check
 vp test           # unit tests (Vitest)
 vp build          # production build
 pnpm ds:baseline  # design-system guard: only semantic tokens
+pnpm a11y:audit   # axe (WCAG A/AA) over every page, light/dark × en/ar
+pnpm bundle:report -- --budget starter   # first-load JS per route; fails over budget, on a page error or an untranslated key
 ```
+
+The last two drive headless Chromium: run `pnpm exec playwright install chromium` once.
 
 ## Where to add things
 

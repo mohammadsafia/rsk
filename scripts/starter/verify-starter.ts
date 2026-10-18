@@ -1,6 +1,7 @@
 /**
  * Proves the starter stands on its own: builds it into a temporary folder, installs (offline from the pnpm store locally, online in CI),
- * then runs its type check, lint/format check, tests and production build, and looks for showcase leftovers.
+ * then runs its type check, lint/format check, tests and production build, checks each route's first-load budget, and
+ * looks for showcase leftovers.
  *
  *   pnpm starter:verify
  */
@@ -40,6 +41,19 @@ try {
   run(out, 'corepack', [...pnpm, 'exec', 'vp', 'check']);
   run(out, 'corepack', [...pnpm, 'exec', 'vp', 'test', '--run']);
   run(out, 'corepack', [...pnpm, 'exec', 'vp', 'build']);
+  // First-load budget: each route's gzipped JS, page errors and untranslated keys (a dropped side-effect module).
+  // /auth/login isn't measured: the starter's useAuth is always signed in, so it only ever redirects to /dashboard.
+  run(out, 'node', [
+    'scripts/bundle/first-load.mjs',
+    '--dist',
+    'dist',
+    '--budget',
+    'starter',
+    '--routes',
+    '/,/dashboard,/settings',
+    '--redirects',
+    '/=/dashboard',
+  ]);
   console.log(`\nStarter verified: ${out}`);
 } finally {
   if (!process.env.KEEP_STARTER) rmSync(out, { recursive: true, force: true });

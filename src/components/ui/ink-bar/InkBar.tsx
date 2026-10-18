@@ -1,5 +1,4 @@
 import { type FC, useRef } from 'react';
-import { motion } from 'framer-motion';
 
 import { useInkBar } from '@hooks/motion';
 
@@ -14,15 +13,14 @@ export type InkBarProps = {
 /** The Ledger ink as one bar that travels between items: it stretches across, then springs into place. Decorative. */
 const InkBar: FC<InkBarProps> = ({ selector, className }) => {
   const ref = useRef<HTMLSpanElement>(null);
-  const { left, width, opacity } = useInkBar(ref, selector);
+  useInkBar(ref, selector);
 
   return (
-    <motion.span
+    <span
       ref={ref}
       aria-hidden="true"
       data-slot="ink-bar"
-      className={cn('bg-ink pointer-events-none absolute bottom-0 h-(--ink-thickness)', className)}
-      style={{ left, width, opacity }}
+      className={cn('bg-ink pointer-events-none absolute bottom-0 h-(--ink-thickness) opacity-0', className)}
     />
   );
 };

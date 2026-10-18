@@ -3,7 +3,7 @@ import { Outlet } from 'react-router';
 
 import { Avatar, Spinner } from '@components/ui';
 import { Conditional } from '@components/utils';
-import { AppShell, CommandPalette, Logo, Sidebar, Toaster, useAppShell } from '@components/shared';
+import { AppShell, LazyCommandPalette, Logo, Sidebar, Toaster, useAppShell } from '@components/shared';
 
 import { CommandPaletteProvider } from '@contexts';
 import { AppHeader } from '../app-header';
@@ -114,7 +114,7 @@ function AppLayout() {
 
       <Toaster />
 
-      <CommandPalette />
+      <LazyCommandPalette />
     </CommandPaletteProvider>
   );
 }
