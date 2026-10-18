@@ -41,8 +41,19 @@ const mdxPlugin: VitePlugin = {
   },
 } as VitePlugin;
 
-/** The compiler builds the kit, not its tests: a component declared inside a test closes over test-local state. */
-const COMPILER_EXCLUDE = [/[\\/]node_modules[\\/]/, /\.test\.[jt]sx?(?:$|\?)/, /[\\/]tests[\\/]/, /[\\/]test-utils[\\/]/];
+/** This project's root as Vite writes module ids (posix slashes), escaped for a RegExp. */
+const ROOT_ID = __dirname.split(path.sep).join('/').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+/**
+ * The compiler builds the kit, not its tests: a component declared inside a test closes over test-local state. The
+ * folders are anchored at this project's root: a bare /tests/ would also match a clone that lives under some tests/
+ * directory and switch the compiler off for everything.
+ */
+const COMPILER_EXCLUDE = [
+  /[\\/]node_modules[\\/]/,
+  /\.test\.[jt]sx?(?:$|\?)/,
+  new RegExp(`^${ROOT_ID}/tests/`),
+  new RegExp(`^${ROOT_ID}/(?:.+/)?test-utils/`),
+];
 
 export default defineConfig({
   lint: {
