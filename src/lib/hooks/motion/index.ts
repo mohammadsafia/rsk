@@ -5,3 +5,4 @@ export * from './useRowTint';
 export * from './useLeave';
 export * from './useTravel';
 export * from './useFlight';
+export * from './useInkBleed';
