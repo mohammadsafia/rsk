@@ -480,3 +480,12 @@
     0 0 0 100vmax var(--surface) inset,
     0 0 0 3px var(--danger-subtle);
 }
+
+/* 1 in left-to-right text, -1 in right-to-left: scales a physical offset (a box-shadow's x) so it mirrors with the text. */
+[dir='ltr'] {
+  --inline-sign: 1;
+}
+
+[dir='rtl'] {
+  --inline-sign: -1;
+}
