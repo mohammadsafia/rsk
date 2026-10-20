@@ -24,6 +24,17 @@ afterAll(() => {
 });
 
 describe('buildStarter', () => {
+  it('ships none of the screenshot tests (they shoot the docs site), their config or their runner', () => {
+    expect(existsSync(path.join(out, 'tests/visual'))).toBe(false);
+    expect(existsSync(path.join(out, 'playwright.config.ts'))).toBe(false);
+    const pkg = JSON.parse(readFileSync(path.join(out, 'package.json'), 'utf8')) as {
+      scripts: Record<string, string>;
+      devDependencies: Record<string, string>;
+    };
+    expect(pkg.devDependencies['@playwright/test']).toBeUndefined();
+    expect(pkg.scripts['visual:test']).toBeUndefined();
+  });
+
   it('ships none of the starter tooling, its tests or its sync workflow', () => {
     expect(existsSync(path.join(out, 'scripts/starter'))).toBe(false);
     expect(existsSync(path.join(out, 'tests/starter'))).toBe(false);
