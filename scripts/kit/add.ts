@@ -226,14 +226,27 @@ export function rankBlocks(blocks: BlockMeta[], search: string): BlockMeta[] {
     .map(({ block }) => block);
 }
 
+/** Whether every word of `search` is somewhere in the block's id, title, description, level, family or tags. */
+const matches = (search: string, block: BlockMeta) => {
+  const text = [block.id, block.title, block.description, block.level, block.family, ...block.tags].join(' ').toLowerCase();
+  return search
+    .toLowerCase()
+    .split(/\s+/)
+    .every((word) => text.includes(word));
+};
+
 async function pick(catalogue: Catalogue, added: string[]): Promise<string[] | null> {
   const byId = new Map(catalogue.blocks.map((block) => [block.id, block]));
   const picked = await autocompleteMultiselect<string>({
     message: 'Which blocks do you want to add?',
     placeholder: 'Search blocks',
-    // Re-ranked on every keystroke (clack calls this with the prompt), so the best match is first.
+    // Re-ranked when the search changes (clack calls this with the prompt), and the focus moves to the best match:
+    // clack would otherwise keep it on the option focused before typing.
     options() {
-      return rankBlocks(catalogue.blocks, this.userInput).map((block) => ({
+      const ranked = rankBlocks(catalogue.blocks, this.userInput);
+      const best = ranked.find((block) => !added.includes(block.id) && matches(this.userInput, block));
+      if (this.userInput && best) this.focusedValue = best.id;
+      return ranked.map((block) => ({
         value: block.id,
         label: added.includes(block.id) ? `${block.title} (added)` : block.title,
         hint: `${block.level} · ${block.family}`,
@@ -242,11 +255,7 @@ async function pick(catalogue: Catalogue, added: string[]): Promise<string[] | n
     },
     filter: (search, option) => {
       const block = byId.get(option.value);
-      const text = block ? [block.id, block.title, block.description, block.level, block.family, ...block.tags].join(' ') : option.value;
-      return search
-        .toLowerCase()
-        .split(/\s+/)
-        .every((word) => text.toLowerCase().includes(word));
+      return block ? matches(search, block) : option.value.includes(search);
     },
   });
   return isCancel(picked) ? null : picked;
