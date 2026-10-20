@@ -12,3 +12,4 @@ export * from './formResolver';
 export * from './schemas';
 export * from './tableFeatures';
 export * from './auth';
+export * from './menu';
