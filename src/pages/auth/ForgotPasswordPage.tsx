@@ -1,8 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
 import { authApi } from '@api/handlers/auth';
 import { Alert, Button } from '@components/ui';
@@ -11,6 +9,8 @@ import { FormContainer, FormInput } from '@components/forms';
 import { useAppTranslation } from '@hooks/shared';
 
 import { FULL_ROUTES_PATH } from '@routes';
+
+import { emailRules } from './fields';
 
 type ForgotForm = { email: string };
 
@@ -23,17 +23,7 @@ function ForgotPasswordPage() {
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
 
-  const schema = useMemo(
-    () =>
-      z.object({
-        email: z
-          .string()
-          .trim()
-          .pipe(z.email(t('login.emailInvalid'))),
-      }),
-    [t],
-  );
-  const form = useForm<ForgotForm>({ resolver: zodResolver(schema), defaultValues: { email: '' } });
+  const form = useForm<ForgotForm>({ defaultValues: { email: '' } });
 
   return (
     <section aria-labelledby="forgot-title" className="flex w-full max-w-sm flex-col gap-6">
@@ -68,7 +58,15 @@ function ForgotPasswordPage() {
               <Alert.Description>{t('forgot.failed')}</Alert.Description>
             </Alert>
           )}
-          <FormInput<ForgotForm> name="email" label={t('forgot.email')} type="email" autoComplete="email" dir="ltr" required />
+          <FormInput<ForgotForm>
+            name="email"
+            label={t('forgot.email')}
+            type="email"
+            autoComplete="email"
+            dir="ltr"
+            required
+            rules={emailRules(t('login.emailInvalid'))}
+          />
           <Button type="submit" loading={form.formState.isSubmitting}>
             {t('forgot.submit')}
           </Button>

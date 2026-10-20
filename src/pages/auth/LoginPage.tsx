@@ -1,8 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
 import { authApi } from '@api/handlers/auth';
 import { DEMO_CREDENTIALS } from '@api/mock/auth';
@@ -14,6 +12,8 @@ import { useAppTranslation, useAuth } from '@hooks/shared';
 
 import { FULL_ROUTES_PATH } from '@routes';
 
+import { emailRules, requiredRules } from './fields';
+
 type LoginForm = { email: string; password: string };
 
 /** Sign in. On success the session starts and AuthLayout sends the person on to ?next= (or the dashboard). */
@@ -22,18 +22,7 @@ function LoginPage() {
   const { signIn } = useAuth();
   const [failure, setFailure] = useState<string | null>(null);
 
-  const schema = useMemo(
-    () =>
-      z.object({
-        email: z
-          .string()
-          .trim()
-          .pipe(z.email(t('login.emailInvalid'))),
-        password: z.string().min(1, t('login.passwordRequired')),
-      }),
-    [t],
-  );
-  const form = useForm<LoginForm>({ resolver: zodResolver(schema), defaultValues: { email: '', password: '' } });
+  const form = useForm<LoginForm>({ defaultValues: { email: '', password: '' } });
 
   return (
     <section aria-labelledby="login-title" className="flex w-full max-w-sm flex-col gap-6">
@@ -73,7 +62,15 @@ function LoginPage() {
           }
         }}
       >
-        <FormInput<LoginForm> name="email" label={t('login.email')} type="email" autoComplete="email" dir="ltr" required />
+        <FormInput<LoginForm>
+          name="email"
+          label={t('login.email')}
+          type="email"
+          autoComplete="email"
+          dir="ltr"
+          required
+          rules={emailRules(t('login.emailInvalid'))}
+        />
         <FormInput<LoginForm>
           name="password"
           label={t('login.password')}
@@ -81,6 +78,7 @@ function LoginPage() {
           autoComplete="current-password"
           dir="ltr"
           required
+          rules={requiredRules(t('login.passwordRequired'))}
         />
 
         <Link
