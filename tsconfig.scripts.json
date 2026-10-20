@@ -1,16 +1,7 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2023"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "skipLibCheck": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-    "strict": true,
-    "types": ["node"]
-  },
+  // The repo's scripts and tests: the app's settings (JSX, DOM, path aliases, Vite and Node types), since the tests
+  // render the app's components and the scripts run on Node. Part of `tsc -b`, so they are type-checked like src/.
+  "extends": "./tsconfig.app.json",
   "include": ["scripts", "tests"],
   "exclude": ["scripts/starter/overlay"]
 }

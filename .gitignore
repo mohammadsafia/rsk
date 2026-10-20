@@ -10,8 +10,7 @@
 
 # production
 /build
-tsconfig.app.tsbuildinfo
-tsconfig.node.tsbuildinfo
+*.tsbuildinfo
 
 # misc
 .DS_Store
