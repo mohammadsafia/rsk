@@ -1,0 +1,93 @@
+---
+id: system-pages
+title: SystemPages
+section: Blocks
+category: Templates
+description: '404, 500, maintenance and no-access pages, routed for you. Add them with pnpm kit:add system-pages.'
+tags: [block, template, error, 404, 500, 403, maintenance, permission]
+importFrom: '@blocks/system-pages'
+---
+
+import { MaintenancePage, NoAccessPage, NotFoundPage, ServerErrorScreen } from '@blocks/system-pages';
+
+Four pages for when the app can't show what was asked for. Each has the logo (or sits in the app shell), a status code, a plain explanation and a way back home, in English and Arabic. The examples below use `layout="preview"` to sit inside this page; as routes they fill the screen.
+
+## Not found (404)
+
+The catch-all route: any address that matches no page.
+
+<Example title="404" code={`<NotFoundPage />`}>
+  <NotFoundPage layout="preview" />
+</Example>
+
+## Server error (500)
+
+`ServerErrorPage` is the error element of the whole router: a page that throws while rendering, or a loader that fails. **Try again** re-runs the route's loaders; a loader that throws a 404 response shows the not-found page instead. It needs a data router (`createBrowserRouter`), so this preview shows `ServerErrorScreen`, the same page without the router, which you can use anywhere else.
+
+<Example title="500" code={`<ServerErrorScreen onRetry={() => window.location.reload()} />`}>
+  <ServerErrorScreen layout="preview" onRetry={() => {}} />
+</Example>
+
+## Maintenance
+
+Send visitors here (`/maintenance`) when your API answers 503, or behind a feature flag.
+
+<Example title="Maintenance" code={`<MaintenancePage />`}>
+  <MaintenancePage layout="preview" />
+</Example>
+
+## No access (403)
+
+Inside the app shell (`/no-access`): for a signed-in person who may not open a page. Redirect there from a guard or a loader.
+
+<Example title="403" code={`<NoAccessPage />`}>
+  <NoAccessPage />
+</Example>
+
+## Add it
+
+```bash
+pnpm kit:add system-pages
+```
+
+The pages land in `src/blocks/system-pages/` and join the router through `src/blocks/index.ts` — no router edits:
+
+<PropsTable
+  rows={[
+    { prop: '*', type: 'NotFoundPage', description: 'Placed before the app’s own catch-all, so it replaces it.' },
+    { prop: '/maintenance', type: 'MaintenancePage', description: 'A page of its own, without the app shell.' },
+    { prop: '/no-access', type: 'NoAccessPage', description: 'Inside the app shell, behind sign-in.' },
+    { prop: 'errorElement', type: 'ServerErrorPage', description: 'The error page of the app’s routes.' },
+  ]}
+/>
+
+`pnpm kit:remove system-pages` puts the app's own 404 and error page back.
+
+## API
+
+<PropsTable
+  rows={[
+    {
+      prop: 'layout',
+      type: "'bare' | 'app' | 'preview'",
+      default: "'bare' ('app' for NoAccessPage)",
+      description: 'bare: a page of its own; app: inside the shell; preview: inside another page, as here.',
+    },
+  ]}
+/>
+
+`SystemPage` (also exported) is the shared layout — `code` or `icon`, `title`, `description`, `kind` and extra actions as children — for a system page of your own.
+
+## Files
+
+- `src/blocks/system-pages/SystemPage.tsx`, `NotFoundPage.tsx`, `ServerErrorPage.tsx`, `ServerErrorScreen.tsx`, `MaintenancePage.tsx`, `NoAccessPage.tsx`, `index.ts`, `system-pages.test.tsx`, `block.json`
+- `src/locales/en/block-system-pages.json`, `src/locales/ar/block-system-pages.json`
+
+## Accessibility
+
+- Each page's title is its `h1` and the page is the `main` landmark (the shell provides it for the no-access page). The server error is announced as an alert.
+- The status code is drawn large but read once, before the title.
+
+## RTL notes
+
+- Everything is centred; the home and retry icons don't point anywhere, so nothing mirrors.

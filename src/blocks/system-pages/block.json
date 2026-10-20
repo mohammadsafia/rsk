@@ -1,0 +1,17 @@
+{
+  "id": "system-pages",
+  "title": "System pages",
+  "level": "template",
+  "family": "system",
+  "description": "404, 500, maintenance and no-access pages.",
+  "tags": ["error", "404", "500", "403", "maintenance", "permission", "not found"],
+  "dependsOn": [],
+  "packages": {},
+  "routes": [
+    { "path": "*", "component": "NotFoundPage", "layout": "bare" },
+    { "path": "/maintenance", "component": "MaintenancePage", "layout": "bare" },
+    { "path": "/no-access", "component": "NoAccessPage", "layout": "app" }
+  ],
+  "nav": [],
+  "errorElement": "ServerErrorPage"
+}

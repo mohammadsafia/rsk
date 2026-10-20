@@ -41,6 +41,8 @@ describe('buildStarter', () => {
     const index = JSON.parse(readFileSync(path.join(out, 'registry/index.json'), 'utf8')) as { id: string }[];
     const registered = existsSync(path.join(out, 'registry/blocks')) ? readdirSync(path.join(out, 'registry/blocks')).sort() : [];
     expect(index.map((block) => block.id).sort()).toEqual(registered);
+    expect(registered).toEqual(expect.arrayContaining(['invite-members-dialog', 'search-field', 'system-pages']));
+    expect(existsSync(path.join(out, 'registry/blocks/system-pages/files/src/locales/ar/block-system-pages.json'))).toBe(true);
     for (const id of registered) expect(existsSync(path.join(out, `registry/blocks/${id}/files/src/blocks/${id}/block.json`))).toBe(true);
     // No block in the app's own source: an app has only the blocks it adds.
     expect(readdirSync(path.join(out, 'src/blocks'))).toEqual(['index.ts']);
