@@ -29,6 +29,19 @@ describe('useBlockTranslation', () => {
     expect(screen.getByText('مرحبا')).toBeTruthy();
   });
 
+  it('adds the full copy even when the menu already registered the block’s nav labels', () => {
+    i18n.addResourceBundle('en', 'block-menu', { nav: { home: 'Home' } }, true);
+    function Page() {
+      const { t } = useBlockTranslation('block-menu', {
+        en: { nav: { home: 'Home' }, title: 'Welcome' },
+        ar: { nav: { home: 'الرئيسية' }, title: 'أهلًا' },
+      });
+      return <p>{t('title')}</p>;
+    }
+    render(<Page />);
+    expect(screen.getByText('Welcome')).toBeTruthy();
+  });
+
   it('keeps blocks’ copy out of the app’s eagerly loaded locales: it travels with the block', () => {
     // The namespaces of the block locale files on disk (i18next shares LOCALES, so a registered bundle shows up there).
     const blockFiles = Object.keys(import.meta.glob('../../../locales/en/block-*.json')).map((file) =>

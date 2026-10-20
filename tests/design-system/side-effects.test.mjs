@@ -26,6 +26,7 @@ const sources = all.filter(
  * effect runs, so they need no sideEffects entry.
  */
 const TIED_TO_EXPORTS = {
+  './src/blocks/index.ts': "registers added blocks' menu labels; the menu always uses its blockNav, so it is always kept",
   './src/lib/hooks/motion/useFlight.ts': 'records the last press from load, for useFlight; only its users read it',
   './src/types/DataTable.ts': "import '@tanstack/react-table' only makes the file's declare-module augmentation apply (types)",
 };

@@ -50,6 +50,13 @@ describe('blocks', () => {
     ]);
   });
 
+  it('requires a label in both languages for each menu entry', () => {
+    const root = kit([meta('a', { nav: [{ id: 'home', path: '/a', icon: 'House' }] })]);
+    expect(validateBlocks(root).join('\n')).toMatch(/a: menu entry "home" has no nav\.home in src\/locales\/en\/block-a\.json/);
+    for (const lang of ['en', 'ar']) put(root, `src/locales/${lang}/block-a.json`, JSON.stringify({ nav: { home: 'Home' } }));
+    expect(validateBlocks(root)).toEqual([]);
+  });
+
   it('accepts a valid catalogue', () => {
     expect(validateBlocks(kit([meta('a'), meta('b', { dependsOn: ['a'] })]))).toEqual([]);
   });
@@ -110,5 +117,30 @@ describe('generated block index', () => {
     expect(source).not.toMatch(/^export \{.*\} from/m);
     expect(source).toMatch(/import \{ Activity \} from 'lucide-react';/);
     expect(source).toContain("{ id: 'status', path: '/status', icon: Activity, labelKey: 'block-system-pages:nav.status' }");
+    // The menu shows on every page, before the block loads: its labels come with the index (only the nav keys).
+    expect(source).toContain("import { nav as blockSystemPagesNavEn } from '@locales/en/block-system-pages.json';");
+    expect(source).toContain("i18n.addResourceBundle('ar', 'block-system-pages', { nav: blockSystemPagesNavAr }, true);");
+  });
+
+  it('writes a single short entry on one line and longer lists one entry per line, as the formatter does', () => {
+    const one = generateBlockIndex([meta('m', { nav: [{ id: 'find', path: '/find', icon: 'Search' }] })]);
+    expect(one).toContain(
+      "export const blockNav: AppMenu[] = [{ id: 'find', path: '/find', icon: Search, labelKey: 'block-m:nav.find' }];",
+    );
+    const two = generateBlockIndex([
+      meta('m', {
+        nav: [
+          { id: 'a', path: '/a', icon: 'Search' },
+          { id: 'b', path: '/b', icon: 'Search' },
+        ],
+      }),
+    ]);
+    expect(two).toContain("export const blockNav: AppMenu[] = [\n  { id: 'a',");
+  });
+
+  it('registers no labels when no block has menu entries', () => {
+    const source = generateBlockIndex([meta('quiet')]);
+    expect(source).not.toContain('i18next');
+    expect(source).not.toContain('addResourceBundle');
   });
 });
