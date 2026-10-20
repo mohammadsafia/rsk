@@ -2,6 +2,8 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { Dialog } from '@components/ui';
+
 import { SearchField } from './index';
 
 import '../../i18n';
@@ -88,6 +90,30 @@ describe('SearchField', () => {
     fireEvent.keyDown(input, { key: 'Escape' });
     expect(input.getAttribute('aria-expanded')).toBe('false');
     expect(screen.queryByRole('listbox')).toBeNull();
+  });
+
+  it('keeps the Escape that closes its suggestions from closing a dialog around it, and lets the next one through', async () => {
+    const onOpenChange = vi.fn();
+    render(
+      <Dialog open onOpenChange={onOpenChange}>
+        <Dialog.Content title="Find someone">
+          <SearchField<Person>
+            label="Search people"
+            onSearch={() => PEOPLE}
+            getLabel={(person) => person.name}
+            getKey={(person) => person.id}
+            onSelect={vi.fn()}
+          />
+        </Dialog.Content>
+      </Dialog>,
+    );
+    const input = screen.getByRole('combobox', { name: 'Search people' });
+    await type(input, 'na');
+    fireEvent.keyDown(input, { key: 'Escape' });
+    expect(input.getAttribute('aria-expanded')).toBe('false');
+    expect(onOpenChange).not.toHaveBeenCalled();
+    fireEvent.keyDown(input, { key: 'Escape' });
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
   it('says so when nothing matches', async () => {

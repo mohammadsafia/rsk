@@ -76,7 +76,7 @@ export function validateBlocks(root: string): string[] {
       new RegExp(`export\\s+(?:const|function|default\\s+function)\\s+${name}\\b|export\\s*\\{[^}]*\\b${name}\\b`).test(exported);
     for (const route of block.routes ?? [])
       if (route.layout !== 'app' && route.layout !== 'bare')
-        errors.push(`${folder}: route ${route.path} has layout "${route.layout}"; use "app" or "bare"`);
+        errors.push(`${folder}: route ${route.path} has layout "${String(route.layout as unknown)}"; use "app" or "bare"`);
     for (const route of block.routes ?? [])
       if (!exports(route.component))
         errors.push(`${folder}: route ${route.path} names "${route.component}", which src/blocks/${folder}/index.ts doesn't export`);

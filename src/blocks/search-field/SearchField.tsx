@@ -145,6 +145,19 @@ function SearchField<T>({
     };
   }, [debouncedQuery, searchable]);
 
+  // The Escape that closes the suggestions stays here: a dialog around the field (Radix listens on the document, in the
+  // capture phase) must not close with it. Only while the suggestions show; the next Escape goes through.
+  useEffect(() => {
+    if (!expanded) return;
+    const handleEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== 'Escape' || (event.target as HTMLElement | null)?.id !== `${id}-input`) return;
+      event.stopPropagation();
+      setOpen(false);
+      setActiveIndex(-1);
+    };
+    window.addEventListener('keydown', handleEscape, true);
+    return () => window.removeEventListener('keydown', handleEscape, true);
+  }, [expanded, id]);
   return (
     <div data-slot="search-field" className={cn('flex flex-col gap-1.5', className)}>
       <label htmlFor={`${id}-input`} className="text-fg text-sm font-medium">
