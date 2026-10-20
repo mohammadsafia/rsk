@@ -58,6 +58,10 @@ describe('buildStarter', () => {
     expect(pkg.devDependencies['@clack/prompts']).toBeDefined();
   });
 
+  it('has a pre-commit staged block of its own, so vp create doesn’t add one the formatter rejects', () => {
+    expect(readFileSync(path.join(out, 'vite.config.ts'), 'utf8')).toContain("staged: {\n    '*': 'vp check --fix',\n  },");
+  });
+
   it('ships none of the starter tooling, its tests or its sync workflow', () => {
     expect(existsSync(path.join(out, 'scripts/starter'))).toBe(false);
     expect(existsSync(path.join(out, 'tests/starter'))).toBe(false);

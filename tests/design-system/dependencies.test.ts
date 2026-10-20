@@ -40,10 +40,17 @@ const IMPLICIT_DEPENDENCIES = new Set([
 
 const SKIP_DIRS = new Set(['node_modules', 'dist', '.git', '.starter', 'docs', '.superpowers', 'coverage']);
 
-/** Repo files: tracked ones in a git checkout, else a walk of the tree (the generated starter is not a git repo). */
+/**
+ * Repo files: in a git checkout, the tracked ones plus new ones not ignored (an app just made with vp create has
+ * committed nothing yet); else a walk of the tree (the generated starter is not a git repo).
+ */
 const listFiles = (): string[] => {
   try {
-    return execSync('git ls-files', { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })
+    return execSync('git ls-files --cached --others --exclude-standard', {
+      cwd: ROOT,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
       .split('\n')
       .filter(Boolean);
   } catch {
