@@ -6,11 +6,11 @@
  *   pnpm starter:build [outDir]      (default: .starter)
  */
 import { execFileSync } from 'node:child_process';
-
-import { readTree, writeLock } from '../kit/core';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { blockFiles, generateBlockIndex, readBlocks, validateBlocks } from '../kit/blocks';
+import { readTree, writeLock } from '../kit/core';
 import { lockfileArgs } from './install';
 import { DOCS_ONLY_DEV_DEPENDENCIES, DOCS_ONLY_SCRIPTS, DROP, SHOWCASE_NAV_KEYS } from './manifest';
 
@@ -110,6 +110,27 @@ export function buildStarter(outDir: string) {
     writeFileSync(navFile, `${JSON.stringify(nav, null, 2)}\n`);
   }
 
+  // 3b. The block catalogue: each block moves out of src/ into registry/blocks/<id>/files/ (at its app paths), so an
+  // app has only the blocks it adds with kit:add. registry/index.json is what the picker searches.
+  const blockErrors = validateBlocks(out);
+  if (blockErrors.length) throw new Error(`starter: invalid blocks:\n${blockErrors.join('\n')}`);
+  const blocks = readBlocks(out);
+  for (const block of blocks) {
+    const registry = path.join(out, 'registry/blocks', block.id);
+    mkdirSync(registry, { recursive: true });
+    cpSync(path.join(out, 'src/blocks', block.id, 'block.json'), path.join(registry, 'block.json'));
+    for (const file of blockFiles(out, block.id)) {
+      mkdirSync(path.dirname(path.join(registry, 'files', file)), { recursive: true });
+      cpSync(path.join(out, file), path.join(registry, 'files', file));
+      rmSync(path.join(out, file));
+    }
+    rmSync(path.join(out, 'src/blocks', block.id), { recursive: true, force: true });
+  }
+  mkdirSync(path.join(out, 'registry'), { recursive: true });
+  writeFileSync(path.join(out, 'registry/index.json'), `${JSON.stringify(blocks, null, 2)}\n`);
+  mkdirSync(path.join(out, 'src/blocks'), { recursive: true });
+  writeFileSync(path.join(out, 'src/blocks/index.ts'), generateBlockIndex([]));
+
   // 4. package.json for a new app.
   const pkgFile = path.join(out, 'package.json');
   const pkg = JSON.parse(readFileSync(pkgFile, 'utf8')) as Record<string, unknown> & {
@@ -128,6 +149,9 @@ export function buildStarter(outDir: string) {
   // The kit updater: compare the app's kit files with the latest starter, and take the kit's changes.
   pkg.scripts['kit:status'] = 'tsx scripts/kit/kit.ts status';
   pkg.scripts['kit:update'] = 'tsx scripts/kit/kit.ts update';
+  // Blocks: search the catalogue and add molecules, organisms and page templates; or take them out again.
+  pkg.scripts['kit:add'] = 'tsx scripts/kit/add.ts add';
+  pkg.scripts['kit:remove'] = 'tsx scripts/kit/add.ts remove';
   writeFileSync(pkgFile, `${JSON.stringify(pkg, null, 2)}\n`);
 
   // 4b. The kit version this app starts from, and a fingerprint of each kit file (what kit:update compares against).

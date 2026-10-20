@@ -31,6 +31,19 @@ pnpm theme:accent "<your brand colour>"   # a hex value or an OKLCH colour; --dr
 It sets the accent for light and dark at the lightness that passes WCAG AA, in `src/styles/tokens.css`; `vp test`
 rechecks every contrast pair.
 
+## Blocks
+
+Ready-made molecules, organisms and page templates, built from the kit's components:
+
+```bash
+pnpm kit:add                 # search the catalogue and pick
+pnpm kit:add system-pages    # or add by name (its dependencies come too)
+pnpm kit:remove system-pages
+```
+
+A block lands in `src/blocks/<id>/` with its English and Arabic copy, its pages join the router through
+`src/blocks/index.ts`, and `pnpm kit:update` keeps it current like the rest of the kit.
+
 ## Everyday commands
 
 ```bash

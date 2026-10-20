@@ -37,6 +37,25 @@ describe('buildStarter', () => {
     expect(pkg.scripts['kit:update']).toBe('tsx scripts/kit/kit.ts update');
   });
 
+  it('ships the block catalogue in registry/ (not in src), an empty block index, kit:add/kit:remove and the picker’s library', () => {
+    const index = JSON.parse(readFileSync(path.join(out, 'registry/index.json'), 'utf8')) as { id: string }[];
+    const registered = existsSync(path.join(out, 'registry/blocks')) ? readdirSync(path.join(out, 'registry/blocks')).sort() : [];
+    expect(index.map((block) => block.id).sort()).toEqual(registered);
+    for (const id of registered) expect(existsSync(path.join(out, `registry/blocks/${id}/files/src/blocks/${id}/block.json`))).toBe(true);
+    // No block in the app's own source: an app has only the blocks it adds.
+    expect(readdirSync(path.join(out, 'src/blocks'))).toEqual(['index.ts']);
+    for (const lang of ['en', 'ar'])
+      expect(readdirSync(path.join(out, `src/locales/${lang}`)).filter((file) => file.startsWith('block-'))).toEqual([]);
+    expect(readFileSync(path.join(out, 'src/blocks/index.ts'), 'utf8')).toContain('export const appBlockRoutes: RouteObject[] = [];');
+    const pkg = JSON.parse(readFileSync(path.join(out, 'package.json'), 'utf8')) as {
+      scripts: Record<string, string>;
+      devDependencies: Record<string, string>;
+    };
+    expect(pkg.scripts['kit:add']).toBe('tsx scripts/kit/add.ts add');
+    expect(pkg.scripts['kit:remove']).toBe('tsx scripts/kit/add.ts remove');
+    expect(pkg.devDependencies['@clack/prompts']).toBeDefined();
+  });
+
   it('ships none of the starter tooling, its tests or its sync workflow', () => {
     expect(existsSync(path.join(out, 'scripts/starter'))).toBe(false);
     expect(existsSync(path.join(out, 'tests/starter'))).toBe(false);
