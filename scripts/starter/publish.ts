@@ -5,7 +5,7 @@
  *
  *   pnpm starter:publish <starterDir> <cloneDir>
  */
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
@@ -32,7 +32,15 @@ export function publish(from: string, into: string, source: SyncSource): 'unchan
   // execFileSync passes arguments without a shell, so the subject reaches git verbatim.
   const git = (...args: string[]) => execFileSync('git', args, { cwd: into, encoding: 'utf8' });
   git('add', '--all');
-  if (!git('status', '--porcelain').trim()) return 'unchanged';
+  const changes = git('status', '--porcelain').trim().split('\n').filter(Boolean);
+  // kit.lock.json names the kit commit; when nothing else changed, the starter didn't either: keep the lock that
+  // matches the existing kit/ tag rather than commit a new version of the same files.
+  const hasHead = spawnSync('git', ['rev-parse', '--verify', '--quiet', 'HEAD'], { cwd: into }).status === 0;
+  if (hasHead && changes.length === 1 && changes[0].endsWith(' kit.lock.json')) {
+    git('checkout', 'HEAD', '--', 'kit.lock.json');
+    return 'unchanged';
+  }
+  if (!changes.length) return 'unchanged';
   git(
     '-c',
     'user.name=rsk-starter-bot',
@@ -46,6 +54,21 @@ export function publish(from: string, into: string, source: SyncSource): 'unchan
     '--no-verify',
     '--message',
     commitMessage(source),
+  );
+  // Annotated, so `git push --follow-tags` sends it: an app's kit:update fetches this as the version it took.
+  git(
+    '-c',
+    'user.name=rsk-starter-bot',
+    '-c',
+    'user.email=noreply@github.com',
+    '-c',
+    'tag.gpgsign=false',
+    'tag',
+    '-a',
+    '-f',
+    `kit/${source.sha.slice(0, 7)}`,
+    '-m',
+    `rsk@${source.sha}`,
   );
   return 'committed';
 }

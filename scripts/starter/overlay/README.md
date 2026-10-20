@@ -35,6 +35,21 @@ pnpm bundle:report -- --budget starter   # first-load JS per route; fails over b
 
 The last two drive headless Chromium: run `pnpm exec playwright install chromium` once.
 
+## Staying up to date with the kit
+
+The components, hooks, styles and checks came from the RSK kit, and `kit.lock.json` records which version. When the kit
+improves:
+
+```bash
+pnpm kit:status    # what changed in the kit, and what you changed yourself
+pnpm kit:update    # take the kit's changes (add paths to take only some, --dry-run to preview)
+```
+
+Files you never touched are updated. Files only you changed are kept. Files changed on both sides are merged; if your
+change and the kit's touch the same lines, the file gets `<<<<<<<` markers to resolve. Your pages, routes, layouts,
+API code and translations are never touched. If the kit's dependencies changed, the command prints the `pnpm add`
+line to run.
+
 ## Where to add things
 
 - Pages: `src/pages/<area>/<Page>.tsx`

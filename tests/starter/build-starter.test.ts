@@ -5,6 +5,7 @@ import path from 'node:path';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test';
 
+import { hashFile } from '../../scripts/kit/core';
 import { buildStarter } from '../../scripts/starter/build-starter';
 
 const walk = (dir: string): string[] =>
@@ -24,6 +25,18 @@ afterAll(() => {
 });
 
 describe('buildStarter', () => {
+  it('ships a kit.lock.json naming the kit commit and fingerprinting every kit file, and the kit:status/kit:update scripts', () => {
+    const lock = JSON.parse(readFileSync(path.join(out, 'kit.lock.json'), 'utf8')) as { kit: string; files: Record<string, string> };
+    expect(lock.kit).toBe(execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim());
+    const button = 'src/components/ui/button/Button.tsx';
+    expect(lock.files[button]).toBe(hashFile(path.join(out, button)));
+    expect(lock.files['src/pages/dashboard/DashboardPage.tsx']).toBeUndefined(); // app-owned
+    expect(Object.keys(lock.files).every((file) => existsSync(path.join(out, file)))).toBe(true);
+    const pkg = JSON.parse(readFileSync(path.join(out, 'package.json'), 'utf8')) as { scripts: Record<string, string> };
+    expect(pkg.scripts['kit:status']).toBe('tsx scripts/kit/kit.ts status');
+    expect(pkg.scripts['kit:update']).toBe('tsx scripts/kit/kit.ts update');
+  });
+
   it('ships none of the starter tooling, its tests or its sync workflow', () => {
     expect(existsSync(path.join(out, 'scripts/starter'))).toBe(false);
     expect(existsSync(path.join(out, 'tests/starter'))).toBe(false);
