@@ -37,7 +37,17 @@ function LoginPage() {
         <Alert tone="info">
           <Alert.Title>{t('login.demoTitle')}</Alert.Title>
           <Alert.Description>
-            <span dir="ltr">{t('login.demoBody', { email: DEMO_CREDENTIALS.email, password: DEMO_CREDENTIALS.password })}</span>
+            {/* The values are LTR inside the sentence's own direction, so Arabic reads in order. */}
+            <dl className="grid grid-cols-[auto_1fr] gap-x-2">
+              <dt>{t('login.email')}</dt>
+              <dd dir="ltr" className="text-fg justify-self-start font-mono">
+                {DEMO_CREDENTIALS.email}
+              </dd>
+              <dt>{t('login.password')}</dt>
+              <dd dir="ltr" className="text-fg justify-self-start font-mono">
+                {DEMO_CREDENTIALS.password}
+              </dd>
+            </dl>
           </Alert.Description>
         </Alert>
       )}
