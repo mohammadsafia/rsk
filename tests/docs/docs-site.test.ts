@@ -29,8 +29,11 @@ beforeAll(() => {
 afterAll(() => rmSync(out, { recursive: true, force: true }));
 
 describe('docs site build', () => {
-  it("leaves the docs out of an app's production build", () => {
-    expect(scripts(path.join(out, 'app'))).not.toContain(DOCS_MARK);
+  it("leaves the docs out of an app's production build: no docs code, registry, MDX or docs-only data", () => {
+    const app = path.join(out, 'app');
+    const code = scripts(app);
+    for (const mark of [DOCS_MARK, 'rehype-pretty-code', '__RSK_DOC_COUNTS__']) expect(code).not.toContain(mark);
+    expect(readdirSync(path.join(app, 'assets')).filter((file) => /mdx|DocsLayout|docs-nav|Docs.*Page/i.test(file))).toEqual([]);
   });
 
   it('ships the docs in the docs build, under the /rsk/ path GitHub Pages serves it from', () => {
