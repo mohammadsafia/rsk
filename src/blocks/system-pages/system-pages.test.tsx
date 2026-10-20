@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { MaintenancePage, NoAccessPage, NotFoundPage, ServerErrorPage } from './index';
+import { MaintenancePage, NoAccessPage, NotFoundPage, ServerErrorPage, ServerErrorScreen } from './index';
 
 import i18n from '../../i18n';
 import { type BlockMeta, generateBlockIndex } from '../../../scripts/kit/blocks';
@@ -78,6 +78,17 @@ describe('system pages', () => {
     ]);
     render(<RouterProvider router={router} />);
     expect(await screen.findByRole('heading', { level: 1, name: 'Page not found' })).toBeTruthy();
+  });
+
+  it.each([
+    ['NotFoundPage', <NotFoundPage key="404" layout="preview" />],
+    ['ServerErrorScreen', <ServerErrorScreen key="500" layout="preview" onRetry={() => {}} />],
+    ['MaintenancePage', <MaintenancePage key="maint" layout="preview" />],
+    ['NoAccessPage', <NoAccessPage key="403" layout="preview" />],
+  ])('%s as a preview has no main landmark and an h2, to sit inside another page', async (_name, page) => {
+    renderAt(page);
+    expect(await screen.findByRole('heading', { level: 2 })).toBeTruthy();
+    expect(document.querySelector('main')).toBeNull();
   });
 
   it('reads in Arabic, right to left', async () => {

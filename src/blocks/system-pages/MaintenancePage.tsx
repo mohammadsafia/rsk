@@ -13,6 +13,7 @@ function MaintenancePage({ layout }: Pick<SystemPageProps, 'layout'>): ReactElem
 
   return (
     <SystemPage
+      layout={layout}
       icon={<Wrench aria-hidden="true" strokeWidth={1.5} />}
       title={t('maintenance.title')}
       description={t('maintenance.description')}
