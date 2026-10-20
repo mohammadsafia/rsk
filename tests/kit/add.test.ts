@@ -142,8 +142,9 @@ describe('kit:add and the app’s kit version', () => {
     const { app } = setup();
     expect(wiringGaps(app).join('\n')).toMatch(/src\/routes\/router\.tsx/);
     expect(wiringGaps(app).join('\n')).toMatch(/@locales\/\*/);
-    expect(
-      wiringGaps(path.resolve(import.meta.dirname, '../../scripts/starter/overlay'), path.resolve(import.meta.dirname, '../..')),
-    ).toEqual([]);
+    // The starter's wiring: its overlay in the kit, its own src/routes in an app made from it.
+    const root = path.resolve(import.meta.dirname, '../..');
+    const overlay = path.join(root, 'scripts/starter/overlay');
+    expect(wiringGaps(existsSync(overlay) ? overlay : root, root)).toEqual([]);
   });
 });
