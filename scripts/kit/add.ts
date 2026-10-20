@@ -201,17 +201,45 @@ const listing = (catalogue: Catalogue, added: string[]) =>
     .join('\n\n');
 
 /** The interactive picker: search by title, id, tags, description, level and family. Null when cancelled. */
+/**
+ * The catalogue in the order the picker shows it for `search`: a match in a block's name ranks before one in its tags,
+ * then its level or family, then only its description; ties keep the catalogue's order.
+ */
+export function rankBlocks(blocks: BlockMeta[], search: string): BlockMeta[] {
+  const words = search.toLowerCase().split(/\s+/).filter(Boolean);
+  const tier = (block: BlockMeta) => {
+    const fields = [`${block.id} ${block.title}`, block.tags.join(' '), `${block.level} ${block.family}`, block.description].map((text) =>
+      text.toLowerCase(),
+    );
+    // A block ranks by its weakest word: every word must match somewhere.
+    return Math.max(
+      0,
+      ...words.map((word) => {
+        const found = fields.findIndex((text) => text.includes(word));
+        return found < 0 ? fields.length : found;
+      }),
+    );
+  };
+  return blocks
+    .map((block, index) => ({ block, index, tier: tier(block) }))
+    .sort((a, b) => a.tier - b.tier || a.index - b.index)
+    .map(({ block }) => block);
+}
+
 async function pick(catalogue: Catalogue, added: string[]): Promise<string[] | null> {
   const byId = new Map(catalogue.blocks.map((block) => [block.id, block]));
   const picked = await autocompleteMultiselect<string>({
     message: 'Which blocks do you want to add?',
     placeholder: 'Search blocks',
-    options: catalogue.blocks.map((block) => ({
-      value: block.id,
-      label: added.includes(block.id) ? `${block.title} (added)` : block.title,
-      hint: `${block.level} · ${block.family}`,
-      disabled: added.includes(block.id),
-    })),
+    // Re-ranked on every keystroke (clack calls this with the prompt), so the best match is first.
+    options() {
+      return rankBlocks(catalogue.blocks, this.userInput).map((block) => ({
+        value: block.id,
+        label: added.includes(block.id) ? `${block.title} (added)` : block.title,
+        hint: `${block.level} · ${block.family}`,
+        disabled: added.includes(block.id),
+      }));
+    },
     filter: (search, option) => {
       const block = byId.get(option.value);
       const text = block ? [block.id, block.title, block.description, block.level, block.family, ...block.tags].join(' ') : option.value;
