@@ -1,18 +1,27 @@
-import axios, { type AxiosInstance } from 'axios';
+import axios, { type AxiosInstance, isAxiosError } from 'axios';
 
-import { getPersistentData } from '@utils';
+import { notifyUnauthorized, readSession } from '@contexts';
 import { APP_CONFIGURATIONS } from '@app-config';
 
 const instance: AxiosInstance = axios.create({
   baseURL: APP_CONFIGURATIONS.VITE_APP_API_URL,
 });
 
+// Requests that ask for it (httpClient's default) carry the session token.
 instance.interceptors.request.use((req) => {
-  const storageTokenKey = getPersistentData<string>(APP_CONFIGURATIONS.TOKEN_KEY);
+  const token = req.withToken ? readSession()?.token : undefined;
 
-  if (req.withToken && storageTokenKey) req.headers.set('Authorization', storageTokenKey);
+  if (token) req.headers.set('Authorization', `Bearer ${token}`);
 
   return req;
+});
+
+// A 401 on a request that carried the token means the session is over: sign out (the guard then asks to sign in again).
+// A 401 without a token (a wrong password at sign-in) is the caller's to show.
+instance.interceptors.response.use(undefined, (error: unknown) => {
+  if (isAxiosError(error) && error.response?.status === 401 && error.config?.withToken) notifyUnauthorized();
+
+  return Promise.reject(error);
 });
 
 export default instance;
