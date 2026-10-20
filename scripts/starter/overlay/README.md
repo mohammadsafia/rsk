@@ -42,7 +42,9 @@ pnpm kit:remove system-pages
 ```
 
 A block lands in `src/blocks/<id>/` with its English and Arabic copy, its pages join the router through
-`src/blocks/index.ts`, and `pnpm kit:update` keeps it current like the rest of the kit.
+`src/blocks/index.ts`, and `pnpm kit:update` keeps it current like the rest of the kit. Blocks come from the kit
+version your app has, so run `pnpm kit:update` first when `kit:add` asks you to. In an app made before blocks existed,
+`kit:add` lists the few lines its router, menu and `tsconfig.app.json` still need.
 
 ## Everyday commands
 

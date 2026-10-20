@@ -14,12 +14,12 @@ import { fileURLToPath } from 'node:url';
 
 import { autocompleteMultiselect, isCancel } from '@clack/prompts';
 
-import { type BlockLevel, type BlockMeta, generateBlockIndex, resolveDependencies } from './blocks';
-import { dependencyChanges, hashFile, readLock, writeLock } from './core';
+import { type BlockLevel, type BlockMeta, generateBlockIndex, readBlocks, resolveDependencies } from './blocks';
+import { dependencyChanges, hashFile, LOCK_FILE, readLock, writeLock } from './core';
 import { download, REPO } from './download';
 
 /** The blocks a starter offers: `dir` is the starter checkout, with registry/. */
-export type Catalogue = { dir: string; blocks: BlockMeta[] };
+export type Catalogue = { dir: string; blocks: BlockMeta[]; /** The starter's kit version (its kit.lock.json). */ kit?: string };
 export type AddResult = { added: string[]; files: string[]; install: string | null };
 export type RemoveResult = { removed: string[]; files: string[] };
 
@@ -36,17 +36,42 @@ const walk = (root: string, dir = ''): string[] => {
 export function readCatalogue(starterDir: string): Catalogue {
   const index = path.join(starterDir, 'registry/index.json');
   if (!existsSync(index)) throw new Error('This starter has no block catalogue (registry/index.json): update it, or use a newer one.');
-  return { dir: starterDir, blocks: JSON.parse(readFileSync(index, 'utf8')) as BlockMeta[] };
+  const lockFile = path.join(starterDir, LOCK_FILE);
+  const kit = existsSync(lockFile) ? (JSON.parse(readFileSync(lockFile, 'utf8')) as { kit: string }).kit : undefined;
+  return { dir: starterDir, blocks: JSON.parse(readFileSync(index, 'utf8')) as BlockMeta[], kit };
 }
 
 /** A block's registry files, as app-relative paths. */
 const filesOf = (catalogue: Catalogue, id: string) => walk(path.join(catalogue.dir, 'registry/blocks', id, 'files'));
 const source = (catalogue: Catalogue, id: string, file: string) => path.join(catalogue.dir, 'registry/blocks', id, 'files', file);
 
-const writeIndex = (appDir: string, catalogue: Catalogue, ids: string[]) => {
+/** Regenerates src/blocks/index.ts from the app's own blocks (their block.json), whatever the catalogue has now. */
+export const writeIndex = (appDir: string) => {
   mkdirSync(path.join(appDir, 'src/blocks'), { recursive: true });
-  writeFileSync(path.join(appDir, 'src/blocks/index.ts'), generateBlockIndex(catalogue.blocks.filter((block) => ids.includes(block.id))));
+  writeFileSync(path.join(appDir, 'src/blocks/index.ts'), generateBlockIndex(readBlocks(appDir)));
 };
+
+/**
+ * What an app made before blocks still lacks for added blocks to work: the wiring lives in files the app owns, so
+ * kit:update can't add it. [] when the app has it. `configDir` holds tsconfig.app.json and src/locales (the app).
+ */
+export function wiringGaps(appDir: string, configDir = appDir): string[] {
+  const text = (dir: string, file: string) => (existsSync(path.join(dir, file)) ? readFileSync(path.join(dir, file), 'utf8') : '');
+  const router = text(appDir, 'src/routes/router.tsx');
+  const routes = text(appDir, 'src/routes/routes.ts');
+  const tsconfig = text(configDir, 'tsconfig.app.json');
+  const locales = text(configDir, 'src/locales/index.ts');
+  return [
+    !/appBlockRoutes/.test(router) &&
+      'src/routes/router.tsx: spread appBlockRoutes inside the app shell, bareBlockRoutes before the "*" route, and use BlockErrorElement (from "../blocks") as the error element',
+    !/blockNav/.test(routes) &&
+      'src/routes/routes.ts: append blockNav (from "../blocks") to APP_MENU, and give AppMenu a `labelKey?: string`',
+    !tsconfig.includes('"@blocks/*"') && 'tsconfig.app.json: add the path "@blocks/*": ["./src/blocks/*"]',
+    !tsconfig.includes('"@locales/*"') && 'tsconfig.app.json: add the path "@locales/*": ["./src/locales/*"]',
+    !locales.includes('block-*.json') &&
+      "src/locales/index.ts: leave './{en,ar}/block-*.json' out of the eager glob (blocks bring their own copy)",
+  ].filter((gap): gap is string => !!gap);
+}
 
 /**
  * Adds `ids` and the blocks they depend on: copies their files and locale files, records them in kit.lock.json and
@@ -65,6 +90,12 @@ export function addBlocks({
   dryRun?: boolean;
 }): AddResult {
   const lock = readLock(appDir);
+  // Blocks are built on the kit: one from a newer kit than the app's may use what the app doesn't have yet, and its
+  // later updates would merge against the wrong base.
+  if (catalogue.kit && catalogue.kit !== lock.kit)
+    throw new Error(
+      `This app has rsk@${lock.kit.slice(0, 7)} and the starter has rsk@${catalogue.kit.slice(0, 7)}: run pnpm kit:update first, then add blocks.`,
+    );
   const have = new Set(lock.blocks ?? []);
   const wanted = resolveDependencies(ids, catalogue.blocks).filter((id) => !have.has(id));
   const files = wanted.flatMap((id) => filesOf(catalogue, id).map((file) => ({ id, file })));
@@ -101,26 +132,16 @@ export function addBlocks({
   for (const { file } of files) lockFiles.set(file, hashFile(path.join(appDir, file)));
   const blocks = [...have, ...wanted];
   writeLock(appDir, lock.kit, lockFiles, blocks);
-  writeIndex(appDir, catalogue, blocks);
+  writeIndex(appDir);
   return result;
 }
 
 /**
  * Takes `ids` back out: deletes their files and locale files, drops them from kit.lock.json and regenerates
- * src/blocks/index.ts. Refuses when the app changed one of their files or another added block depends on one, unless
- * `force`.
+ * src/blocks/index.ts. Refuses when the app changed one of their files, put its own file in their folder, or another of
+ * its blocks depends on one, unless `force`. Needs only the app (no catalogue).
  */
-export function removeBlocks({
-  appDir,
-  ids,
-  force = false,
-  catalogue,
-}: {
-  appDir: string;
-  ids: string[];
-  force?: boolean;
-  catalogue: Catalogue;
-}): RemoveResult {
+export function removeBlocks({ appDir, ids, force = false }: { appDir: string; ids: string[]; force?: boolean }): RemoveResult {
   const lock = readLock(appDir);
   const have = lock.blocks ?? [];
   for (const id of ids) if (!have.includes(id)) throw new Error(`"${id}" isn't added to this app.`);
@@ -128,8 +149,16 @@ export function removeBlocks({
   const owns = (file: string) =>
     ids.some((id) => file.startsWith(`src/blocks/${id}/`) || /^src\/locales\/(en|ar)\/block-(.+)\.json$/.exec(file)?.[2] === id);
   const files = Object.keys(lock.files).filter(owns);
+  // Files in the blocks' folders that kit:add didn't put there are the app's own.
+  const own = ids.flatMap((id) =>
+    walk(appDir, `src/blocks/${id}`)
+      .filter((file) => !(file in lock.files))
+      .map((file) => ({ id, file })),
+  );
   if (!force) {
-    for (const block of catalogue.blocks.filter((meta) => remaining.includes(meta.id)))
+    for (const { id, file } of own)
+      throw new Error(`Can't remove "${id}": ${file} isn't one of "${id}"'s files (yours?). Move it away, or --force to delete it too.`);
+    for (const block of readBlocks(appDir).filter((meta) => remaining.includes(meta.id)))
       for (const id of ids)
         if (block.dependsOn.includes(id)) throw new Error(`Can't remove "${id}": "${block.id}" depends on it (--force to remove anyway).`);
     for (const file of files)
@@ -137,9 +166,10 @@ export function removeBlocks({
         throw new Error(`Can't remove: you changed ${file} (--force to remove it anyway).`);
   }
   for (const file of files) rmSync(path.join(appDir, file), { force: true });
+  // With --force the app's own files go too; otherwise there are none left, and the folders are empty.
   for (const id of ids) rmSync(path.join(appDir, 'src/blocks', id), { recursive: true, force: true });
   writeLock(appDir, lock.kit, new Map(Object.entries(lock.files).filter(([file]) => !files.includes(file))), remaining);
-  writeIndex(appDir, catalogue, remaining);
+  writeIndex(appDir);
   return { removed: ids, files };
 }
 
@@ -204,17 +234,19 @@ async function main() {
   const { command, ids, from, dryRun, force } = parseArgs(process.argv.slice(2));
   const appDir = process.cwd();
   const added = readLock(appDir).blocks ?? [];
+  // Removing needs only the app's own blocks.
+  if (command === 'remove') {
+    if (!ids.length) throw new Error('usage: pnpm kit:remove <block ids…> [--force]');
+    const result = removeBlocks({ appDir, ids, force });
+    console.log(`Removed ${result.removed.join(', ')} (${result.files.length} files).`);
+    return;
+  }
+
   const starterDir = from ? path.resolve(from) : await download('refs/heads/main');
   if (!starterDir) throw new Error(`${REPO} has no main branch.`);
 
   try {
     const catalogue = readCatalogue(starterDir);
-    if (command === 'remove') {
-      if (!ids.length) throw new Error('usage: pnpm kit:remove <block ids…> [--force]');
-      const result = removeBlocks({ appDir, catalogue, ids, force });
-      console.log(`Removed ${result.removed.join(', ')} (${result.files.length} files).`);
-      return;
-    }
 
     let wanted = ids;
     if (!wanted.length) {
@@ -235,7 +267,10 @@ async function main() {
     }
     console.log(`${dryRun ? 'Would add' : 'Added'} ${result.added.join(', ')}:\n${result.files.map((file) => `  ${file}`).join('\n')}`);
     if (result.install) console.log(`\nThese blocks need packages this app doesn't have:\n  ${result.install}`);
-    if (!dryRun) console.log('\nRun vp dev: template pages are routed from src/blocks/index.ts.');
+    const gaps = wiringGaps(appDir);
+    if (gaps.length)
+      console.log(`\nThis app was made before blocks; for them to show up, it still needs:\n${gaps.map((gap) => `  - ${gap}`).join('\n')}`);
+    else if (!dryRun) console.log('\nRun vp dev: template pages are routed from src/blocks/index.ts.');
   } finally {
     if (!from) rmSync(starterDir, { recursive: true, force: true });
   }

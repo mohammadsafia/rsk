@@ -4,7 +4,7 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { addBlocks, readCatalogue, removeBlocks } from '../../scripts/kit/add';
+import { addBlocks, readCatalogue, removeBlocks, wiringGaps } from '../../scripts/kit/add';
 import { readTree, writeLock } from '../../scripts/kit/core';
 
 const dir = () => mkdtempSync(path.join(tmpdir(), 'kit-add-'));
@@ -32,15 +32,18 @@ const setup = () => {
   const blocks = [
     block('a'),
     block('b', { dependsOn: ['a'], packages: { 'date-fns': '^4.1.0' }, routes: [{ path: '/b', component: 'BPage', layout: 'app' }] }),
+    block('c', { routes: [{ path: '/c', component: 'CPage', layout: 'app' }] }),
   ];
+  writeLock(starter, 'aaaaaaa', new Map(), []);
   put(starter, 'registry/index.json', JSON.stringify(blocks));
   for (const meta of blocks) {
     put(starter, `registry/blocks/${meta.id}/block.json`, JSON.stringify(meta));
     put(
       starter,
       `registry/blocks/${meta.id}/files/src/blocks/${meta.id}/index.ts`,
-      meta.id === 'b' ? 'export const BPage = () => null;\n' : 'export {};\n',
+      meta.routes.length ? `export const ${meta.id.toUpperCase()}Page = () => null;\n` : 'export {};\n',
     );
+    put(starter, `registry/blocks/${meta.id}/files/src/blocks/${meta.id}/block.json`, JSON.stringify(meta));
     for (const lang of ['en', 'ar']) put(starter, `registry/blocks/${meta.id}/files/src/locales/${lang}/block-${meta.id}.json`, '{}\n');
   }
   const app = dir();
@@ -82,7 +85,7 @@ describe('kit:remove', () => {
   it('removes a block, its locales and lock entries, and regenerates the index', () => {
     const { app, catalogue } = setup();
     addBlocks({ appDir: app, catalogue, ids: ['b'] });
-    removeBlocks({ appDir: app, catalogue, ids: ['b'] });
+    removeBlocks({ appDir: app, ids: ['b'] });
     expect(existsSync(path.join(app, 'src/blocks/b'))).toBe(false);
     expect(existsSync(path.join(app, 'src/locales/en/block-b.json'))).toBe(false);
     const lock = JSON.parse(read(app, 'kit.lock.json'));
@@ -94,10 +97,53 @@ describe('kit:remove', () => {
   it('refuses to remove a block another added block depends on, or one the app changed, unless forced', () => {
     const { app, catalogue } = setup();
     addBlocks({ appDir: app, catalogue, ids: ['b'] });
-    expect(() => removeBlocks({ appDir: app, catalogue, ids: ['a'] })).toThrow(/"b" depends on it/);
+    expect(() => removeBlocks({ appDir: app, ids: ['a'] })).toThrow(/"b" depends on it/);
     put(app, 'src/blocks/b/index.ts', 'export const BPage = () => "mine";\n');
-    expect(() => removeBlocks({ appDir: app, catalogue, ids: ['b'] })).toThrow(/you changed src\/blocks\/b\/index\.ts/);
-    removeBlocks({ appDir: app, catalogue, ids: ['b'], force: true });
+    expect(() => removeBlocks({ appDir: app, ids: ['b'] })).toThrow(/you changed src\/blocks\/b\/index\.ts/);
+    removeBlocks({ appDir: app, ids: ['b'], force: true });
     expect(existsSync(path.join(app, 'src/blocks/b'))).toBe(false);
+  });
+});
+
+describe('kit:remove keeps the app’s own work', () => {
+  it('refuses to delete a file the app put in a block’s folder, unless forced, and otherwise removes only the block’s files', () => {
+    const { app, catalogue } = setup();
+    addBlocks({ appDir: app, catalogue, ids: ['c'] });
+    put(app, 'src/blocks/c/mine.ts', 'export const mine = 1;\n');
+    expect(() => removeBlocks({ appDir: app, ids: ['c'] })).toThrow(/src\/blocks\/c\/mine\.ts isn't one of "c"'s files/);
+    expect(existsSync(path.join(app, 'src/blocks/c/mine.ts'))).toBe(true);
+    removeBlocks({ appDir: app, ids: ['c'], force: true });
+    expect(existsSync(path.join(app, 'src/blocks/c'))).toBe(false);
+  });
+});
+
+describe('the block index follows the app’s own blocks', () => {
+  it('keeps a block the latest catalogue no longer has, and reads dependents from the app', () => {
+    const { app, catalogue } = setup();
+    addBlocks({ appDir: app, catalogue, ids: ['b'] });
+    // The registry dropped b since: adding c must not unroute it, and a (which b needs) still can't be removed.
+    const withoutB = { ...catalogue, blocks: catalogue.blocks.filter((meta) => meta.id !== 'b') };
+    addBlocks({ appDir: app, catalogue: withoutB, ids: ['c'] });
+    expect(read(app, 'src/blocks/index.ts')).toContain("import('./b')).BPage");
+    expect(read(app, 'src/blocks/index.ts')).toContain("import('./c')).CPage");
+    expect(() => removeBlocks({ appDir: app, ids: ['a'] })).toThrow(/"b" depends on it/);
+  });
+});
+
+describe('kit:add and the app’s kit version', () => {
+  it('refuses blocks from a newer kit than the app has, and says to update first', () => {
+    const { app, starter } = setup();
+    writeLock(starter, 'bbbbbbb', new Map(), []);
+    expect(() => addBlocks({ appDir: app, catalogue: readCatalogue(starter), ids: ['a'] })).toThrow(/pnpm kit:update first/);
+    expect(existsSync(path.join(app, 'src/blocks/a'))).toBe(false);
+  });
+
+  it('names what an app from before blocks still needs, and nothing for an app that has it', () => {
+    const { app } = setup();
+    expect(wiringGaps(app).join('\n')).toMatch(/src\/routes\/router\.tsx/);
+    expect(wiringGaps(app).join('\n')).toMatch(/@locales\/\*/);
+    expect(
+      wiringGaps(path.resolve(import.meta.dirname, '../../scripts/starter/overlay'), path.resolve(import.meta.dirname, '../..')),
+    ).toEqual([]);
   });
 });
