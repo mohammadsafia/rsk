@@ -24,12 +24,6 @@ afterAll(() => {
 });
 
 describe('buildStarter', () => {
-  it('ships no script that runs a file the starter drops (docs:build runs scripts/docs/)', () => {
-    const pkg = JSON.parse(readFileSync(path.join(out, 'package.json'), 'utf8')) as { scripts: Record<string, string> };
-    expect(pkg.scripts['docs:build']).toBeUndefined();
-    expect(Object.values(pkg.scripts).filter((command) => command.includes('scripts/docs/'))).toEqual([]);
-  });
-
   it('ships none of the starter tooling, its tests or its sync workflow', () => {
     expect(existsSync(path.join(out, 'scripts/starter'))).toBe(false);
     expect(existsSync(path.join(out, 'tests/starter'))).toBe(false);
@@ -46,6 +40,12 @@ describe('buildStarter', () => {
     expect(existsSync(path.join(out, 'scripts/design-system/favicons'))).toBe(false);
     // The class/prop codemods stay: the starter's own tests and scripts use them.
     expect(existsSync(path.join(out, 'scripts/design-system/codemods'))).toBe(true);
+  });
+
+  it('ships no script that runs a file the starter drops (docs:build runs scripts/docs/)', () => {
+    const pkg = JSON.parse(readFileSync(path.join(out, 'package.json'), 'utf8')) as { scripts: Record<string, string> };
+    expect(pkg.scripts['docs:build']).toBeUndefined();
+    expect(Object.values(pkg.scripts).filter((command) => command.includes('scripts/docs/'))).toEqual([]);
   });
 
   it('names no client API anywhere in the tree', () => {
