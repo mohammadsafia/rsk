@@ -1,0 +1,7 @@
+{
+  "searching": "Searching…",
+  "empty": "No results for “{{query}}”",
+  "failed": "The search didn’t work. Try again.",
+  "results_one": "{{count}} result",
+  "results_other": "{{count}} results"
+}

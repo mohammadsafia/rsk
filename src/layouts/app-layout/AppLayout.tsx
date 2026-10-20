@@ -54,12 +54,12 @@ function AppSidebar() {
                 <Conditional.If condition={!!route.submenu?.length}>
                   <Sidebar.SubMenu
                     icon={route.icon}
-                    label={t(route.id)}
+                    label={t(route.labelKey ?? route.id)}
                     active={isAnyRouteActive(route.submenu?.map((sub) => sub.path) ?? [])}
                   >
                     {route.submenu?.map((sub) => (
                       <Sidebar.Item key={sub.id} href={sub.path} icon={sub.icon} active={isActiveLink(sub.path)}>
-                        {t(sub.id)}
+                        {t(sub.labelKey ?? sub.id)}
                       </Sidebar.Item>
                     ))}
                   </Sidebar.SubMenu>
@@ -67,7 +67,7 @@ function AppSidebar() {
 
                 <Conditional.Else>
                   <Sidebar.Item href={route.path} icon={route.icon} active={isActiveLink(route.path)}>
-                    {t(route.id)}
+                    {t(route.labelKey ?? route.id)}
                   </Sidebar.Item>
                 </Conditional.Else>
               </Conditional>

@@ -30,6 +30,7 @@ export * from './money';
 export * from './numeral';
 export * from './rolling-text';
 export * from './input';
+export * from './chip-input';
 export * from './textarea';
 export * from './select';
 export * from './skeleton';

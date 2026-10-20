@@ -1,0 +1,93 @@
+---
+id: chip-input
+title: ChipInput
+section: Components
+category: UI
+description: 'Several values in one field, as removable chips: tags, keywords, email addresses.'
+tags: [ui, input, chips, tags, multiple]
+---
+
+import { useState } from 'react';
+import { ChipInput } from '@components/ui';
+
+export const TagsDemo = () => {
+  const [tags, setTags] = useState(['react', 'vite']);
+
+  return <ChipInput aria-label="Tags" listLabel="Tags" placeholder="Add a tag" value={tags} onChange={setTags} className="w-96" />;
+};
+
+export const CheckedDemo = () => {
+  const [domains, setDomains] = useState(['example.com', 'not a domain', 'taken.org']);
+
+  return (
+    <ChipInput
+      aria-label="Allowed domains"
+      listLabel="Allowed domains"
+      value={domains}
+      onChange={setDomains}
+      validate={(item) => /^[\w-]+(\.[\w-]+)+$/.test(item)}
+      flagged={{ 'taken.org': 'Already used by another workspace' }}
+      invalidLabel="(not a domain)"
+      className="w-96"
+    />
+  );
+};
+
+## Tags
+
+Type and press Enter, or a comma or space; paste a list to add it all at once. An item already there (in any case) is skipped, Backspace in the empty field removes the last chip, and leaving the field keeps what was typed. The field grows with its chips.
+
+<Example
+  title="Tags"
+  code={`const [tags, setTags] = useState(['react', 'vite']);
+
+<ChipInput aria-label="Tags" listLabel="Tags" placeholder="Add a tag" value={tags} onChange={setTags} />`}
+>
+  <TagsDemo />
+</Example>
+
+## Checked items
+
+`validate` marks an item that isn't valid; `flagged` marks items from outside, such as ones your server refused, with the reason. Both are marked in words for screen readers as well as in colour.
+
+<Example
+  title="Allowed domains"
+  code={`<ChipInput
+  aria-label="Allowed domains"
+  listLabel="Allowed domains"
+  value={domains}
+  onChange={setDomains}
+  validate={isDomain}
+  flagged={{ 'taken.org': 'Already used by another workspace' }}
+  invalidLabel="(not a domain)"
+/>`}
+>
+  <CheckedDemo />
+</Example>
+
+In a form, use [FormChipInput](/docs/components/form-chip-input): it adds the label, help text and error.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'value · onChange', type: 'string[] · (value: string[]) => void', description: 'The chips; controlled.' },
+    { prop: 'validate', type: '(item) => boolean', description: 'False marks the item’s chip as not valid.' },
+    { prop: 'flagged', type: 'Record<string, string>', description: 'Items marked from outside, each with the reason read with its chip.' },
+    { prop: 'invalidLabel', type: 'string', default: "t('chipInput.invalid')", description: 'Read after an item that fails validate.' },
+    { prop: 'listLabel', type: 'string', description: 'Names the list of chips (usually the field’s label).' },
+    { prop: 'separators', type: 'RegExp', default: 'commas, semicolons, spaces, new lines', description: 'What ends an item while typing or pasting.' },
+    { prop: 'invalid', type: 'boolean', description: 'Marks the whole field (aria-invalid on its input).' },
+  ]}
+/>
+
+Other props (placeholder, inputMode, onBlur, ref…) go to the input.
+
+## Accessibility
+
+- The input keeps the focus; chips are a list, each with a remove button named after its item.
+- An item that isn't valid or was refused says so in text (its reason), not only in red.
+
+## RTL notes
+
+- Chips flow from the start of the field and wrap; each item is isolated (`<bdi>`), so a Latin address reads correctly inside Arabic text.

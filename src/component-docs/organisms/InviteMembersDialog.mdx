@@ -1,0 +1,98 @@
+---
+id: invite-members-dialog
+title: InviteMembersDialog
+section: Blocks
+category: Organisms
+description: 'A dialog to invite people by email with a role, validation and per-address errors. Add it with pnpm kit:add invite-members-dialog.'
+tags: [block, organism, invite, members, team, email, roles]
+importFrom: '@blocks/invite-members-dialog'
+---
+
+import { useState } from 'react';
+import { Button } from '@components/ui';
+import { InviteMembersDialog } from '@blocks/invite-members-dialog';
+
+export const ROLES = [
+  { value: 'member', label: 'Member' },
+  { value: 'admin', label: 'Admin' },
+  { value: 'viewer', label: 'Viewer' },
+];
+
+export const fakeInvite = async (invites) => {
+  // A pretend server: anyone at taken.com is already a member.
+  await new Promise((resolve) => setTimeout(resolve, 800));
+  const taken = invites.filter((invite) => invite.email.endsWith('@taken.com'));
+  return { failed: Object.fromEntries(taken.map((invite) => [invite.email, 'Already a member'])) };
+};
+
+export const InviteDemo = () => {
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+
+  return (
+    <>
+      <Button onClick={handleOpen}>Invite people</Button>
+      <InviteMembersDialog open={open} onOpenChange={setOpen} roles={ROLES} onInvite={fakeInvite} />
+    </>
+  );
+};
+
+## Invite by email
+
+Type or paste addresses — a comma, a space or Enter ends each one — pick a role and send. Try `sam@taken.com`: the pretend server refuses it, so it stays in the dialog with its reason while the others are sent.
+
+<Example
+  title="Invite people"
+  code={`const [open, setOpen] = useState(false);
+
+const handleInvite = async (invites: Invite[]) => {
+  const { failed } = await api.team.invite(invites); // { 'sam@taken.com': 'Already a member' }
+  return { failed };
+};
+
+<Button onClick={() => setOpen(true)}>Invite people</Button>
+<InviteMembersDialog open={open} onOpenChange={setOpen} roles={ROLES} onInvite={handleInvite} />`}
+>
+  <InviteDemo />
+</Example>
+
+## Add it
+
+```bash
+pnpm kit:add invite-members-dialog
+```
+
+It lands in `src/blocks/invite-members-dialog/` with its English and Arabic copy; `pnpm kit:update` keeps it current and `pnpm kit:remove invite-members-dialog` takes it out again.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'open · onOpenChange', type: 'boolean · (open) => void', description: 'Controlled open state. Closing resets the form.' },
+    { prop: 'roles', type: '{ value: string; label: string }[]', description: 'The roles to pick from; one applies to every invitee.' },
+    { prop: 'defaultRole', type: 'string', default: 'the first role', description: 'The role picked when the dialog opens.' },
+    {
+      prop: 'onInvite',
+      type: '(invites: { email; role }[]) => Promise<{ failed?: Record<string, string> } | void>',
+      description: 'Sends the invitations. Return the refused addresses with a reason; reject when nothing went out.',
+    },
+  ]}
+/>
+
+The block never calls an API itself: `onInvite` is where your app sends the invitations.
+
+## Files
+
+- `src/blocks/invite-members-dialog/InviteMembersDialog.tsx`, `InviteMembersDialog.schemas.ts`, `index.ts`, `locale.ts`, `InviteMembersDialog.test.tsx`, `block.json`
+- Built on the kit's [FormChipInput](/docs/components/form-chip-input) and FormSelect.
+- `src/locales/en/block-invite-members-dialog.json`, `src/locales/ar/block-invite-members-dialog.json`
+
+## Accessibility
+
+- The addresses field is labelled and described by its hint or error; each chip's remove button is named after its address, and an address that isn't valid says so to screen readers too, not only in red.
+- Errors from the server appear in an alert, which is announced; while sending, the form is disabled and the send button shows it is busy.
+
+## RTL notes
+
+- Addresses are isolated (`<bdi>`), so a Latin address reads correctly inside Arabic text; chips wrap from the start of the field.

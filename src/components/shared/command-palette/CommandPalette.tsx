@@ -5,6 +5,7 @@ import { Command } from '@components/ui';
 import { THEME_TYPES, useCommandPalette, useTheme } from '@contexts';
 import { useAppTranslation, useAuth } from '@hooks/shared';
 
+import { menuLabelKey } from '@utils';
 import { APP_MENU } from '@routes';
 
 import { LogOut, Moon, Sun } from 'lucide-react';
@@ -32,9 +33,9 @@ function CommandPalette() {
 
         <Command.Group heading={t('navigation')}>
           {APP_MENU.map((route) => (
-            <Command.Item key={route.id} value={t(route.id)} onSelect={() => runCommand(() => navigate(route.path))}>
+            <Command.Item key={route.id} value={t(menuLabelKey(route))} onSelect={() => runCommand(() => navigate(route.path))}>
               <route.icon className="h-4 w-4" />
-              {t(route.id)}
+              {t(menuLabelKey(route))}
             </Command.Item>
           ))}
         </Command.Group>

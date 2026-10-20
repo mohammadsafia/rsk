@@ -29,6 +29,14 @@ const TIED_TO_EXPORTS = {
   './src/lib/hooks/motion/useFlight.ts': 'records the last press from load, for useFlight; only its users read it',
   './src/types/DataTable.ts': "import '@tanstack/react-table' only makes the file's declare-module augmentation apply (types)",
 };
+
+/**
+ * Generated files whose effect depends on what was generated: src/blocks/index.ts registers the added blocks' menu
+ * labels only when a block has menu entries. Tied to exports too (the menu always uses its blockNav).
+ */
+const GENERATED = {
+  './src/blocks/index.ts': "registers added blocks' menu labels; the menu always uses its blockNav, so it is always kept",
+};
 const rel = (file) => `./${path.relative(ROOT, file).split(path.sep).join('/')}`;
 
 /** Whether a package.json sideEffects entry covers a file ("*.css" matches by extension; "./src/x.ts" exactly). */
@@ -90,7 +98,11 @@ describe('package.json sideEffects', () => {
     const unlisted = sources
       .map((file) => [rel(file), effectsIn(file)])
       .filter(
-        ([file, effects]) => effects.length && !(file in TIED_TO_EXPORTS) && !listed.some((entry) => covers(entry, path.join(ROOT, file))),
+        ([file, effects]) =>
+          effects.length &&
+          !(file in TIED_TO_EXPORTS) &&
+          !(file in GENERATED) &&
+          !listed.some((entry) => covers(entry, path.join(ROOT, file))),
       );
     expect(unlisted).toEqual([]);
   });

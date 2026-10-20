@@ -1,0 +1,11 @@
+{
+  "searching": "جارٍ البحث…",
+  "empty": "لا نتائج عن «{{query}}»",
+  "failed": "تعذّر البحث. حاول مرة أخرى.",
+  "results_zero": "لا نتائج",
+  "results_one": "نتيجة واحدة",
+  "results_two": "نتيجتان",
+  "results_few": "{{count}} نتائج",
+  "results_many": "{{count}} نتيجة",
+  "results_other": "{{count}} نتيجة"
+}

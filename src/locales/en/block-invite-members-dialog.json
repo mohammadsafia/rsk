@@ -1,0 +1,18 @@
+{
+  "title": "Invite people",
+  "description": "Each person gets an email with a link to join.",
+  "emails": "Email addresses",
+  "emailsHint": "Separate addresses with a comma, or press Enter after each.",
+  "emailsPlaceholder": "name@example.com",
+  "notValid": "(not a valid email address)",
+  "role": "Role",
+  "roleRequired": "Choose a role.",
+  "submit": "Send invitations",
+  "cancel": "Cancel",
+  "invalidEmail": "Fix or remove the addresses marked as not valid.",
+  "required": "Add at least one email address.",
+  "notSent": "These invitations weren’t sent:",
+  "failed": "The invitations didn’t go out. Try again.",
+  "sent_one": "Invitation sent",
+  "sent_other": "{{count}} invitations sent"
+}

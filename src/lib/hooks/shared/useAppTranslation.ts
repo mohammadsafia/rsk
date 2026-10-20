@@ -3,6 +3,9 @@ import { useTranslation as useI18nTranslation } from 'react-i18next';
 import { LANGUAGE_OPTIONS, LANGUAGES, type LanguageOption } from '@constants';
 import { LOCALES } from '@locales';
 
+/** A block's namespace: its copy is added when the block loads (useBlockTranslation), not with the app's locales. */
+export type BlockNamespace = `block-${string}`;
+
 export type Namespace = string & keyof typeof LOCALES.EN;
 
 export const useAppTranslation = <T extends Namespace = 'common'>(namespace?: T) => {

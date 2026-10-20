@@ -14,6 +14,7 @@ import {
   inScope,
   parseArgs,
   readTree,
+  stageUpstream,
   writeLock,
 } from '../../scripts/kit/core';
 
@@ -227,5 +228,95 @@ describe('kit CLI arguments', () => {
     expect(() => parseArgs(['update', '--from'])).toThrow(/--from needs a value/);
     expect(() => parseArgs(['update', '--force'])).toThrow(/Unknown option --force/);
     expect(() => parseArgs(['upgrade'])).toThrow(/usage/);
+  });
+});
+
+describe('kit:update with added blocks', () => {
+  const BLOCK = 'src/blocks/search-field/SearchField.tsx';
+  const LOCALE = 'src/locales/en/block-search-field.json';
+  /** A starter whose registry has search-field, and an app that added it. */
+  const setup = () => {
+    const starter = dir();
+    put(starter, 'registry/blocks/search-field/block.json', '{"id":"search-field"}');
+    put(starter, `registry/blocks/search-field/files/${BLOCK}`, 'v2\n');
+    put(starter, `registry/blocks/search-field/files/${LOCALE}`, '{"v":2}\n');
+    put(starter, BUTTON, 'one\ntwo\nthree\n');
+    const app = dir();
+    put(app, BUTTON, 'one\ntwo\nthree\n');
+    put(app, BLOCK, 'v1\n');
+    put(app, LOCALE, '{"v":1}\n');
+    put(app, 'src/blocks/index.ts', '// generated\n');
+    writeLock(app, 'aaaaaaa', readTree(app), ['search-field']);
+    return { starter, app };
+  };
+
+  it('counts block files and their locale files as kit files, but not the generated index', () => {
+    expect(inScope(BLOCK)).toBe(true);
+    expect(inScope(LOCALE)).toBe(true);
+    expect(inScope('src/locales/en/common.json')).toBe(false);
+    expect(inScope('src/blocks/index.ts')).toBe(false);
+  });
+
+  it('updates an added block from the registry instead of deleting it as "removed"', () => {
+    const { starter, app } = setup();
+    const view = stageUpstream(starter, ['search-field']);
+    const result = applyUpdate({ appDir: app, upstreamDir: view, kit: 'bbbbbbb' });
+    expect(result.removed).toEqual([]);
+    expect(read(app, BLOCK)).toBe('v2\n');
+    expect(read(app, LOCALE)).toBe('{"v":2}\n');
+    expect(JSON.parse(read(app, 'kit.lock.json')).blocks).toEqual(['search-field']);
+  });
+
+  it('never adds a block the app didn’t add', () => {
+    const { starter, app } = setup();
+    put(starter, 'registry/blocks/other/files/src/blocks/other/Other.tsx', 'x\n');
+    applyUpdate({ appDir: app, upstreamDir: stageUpstream(starter, ['search-field']), kit: 'bbbbbbb' });
+    expect(existsSync(path.join(app, 'src/blocks/other'))).toBe(false);
+  });
+});
+
+describe('kit:update and the block index', () => {
+  const META = (routes: { path: string; component: string; layout: 'app' | 'bare' }[]) =>
+    JSON.stringify({
+      id: 'pages',
+      title: 'Pages',
+      level: 'template',
+      family: 'x',
+      description: 'x',
+      tags: [],
+      dependsOn: [],
+      packages: {},
+      routes,
+      nav: [],
+    });
+
+  it('keeps a block the kit no longer offers, as the app’s own, instead of deleting it', () => {
+    const app = dir();
+    const starter = dir();
+    put(starter, 'registry/index.json', '[]');
+    put(app, 'src/blocks/pages/block.json', META([]));
+    put(app, 'src/blocks/pages/index.ts', 'export {};\n');
+    put(app, 'src/locales/en/block-pages.json', '{}\n');
+    writeLock(app, 'aaaaaaa', readTree(app), ['pages']);
+    const result = applyUpdate({ appDir: app, upstreamDir: stageUpstream(starter, ['pages']), kit: 'bbbbbbb' });
+    expect(result.removed).toEqual([]);
+    expect(result.released).toEqual(['pages']);
+    expect(existsSync(path.join(app, 'src/blocks/pages/index.ts'))).toBe(true);
+    const lock = JSON.parse(read(app, 'kit.lock.json'));
+    expect(lock.blocks).toEqual([]);
+    expect(Object.keys(lock.files).some((file) => file.includes('pages'))).toBe(false);
+  });
+
+  it('regenerates src/blocks/index.ts when an update changes a block’s routes', () => {
+    const app = dir();
+    const starter = dir();
+    put(app, 'src/blocks/pages/block.json', META([]));
+    put(app, 'src/blocks/pages/index.ts', 'export {};\n');
+    put(app, 'src/blocks/index.ts', '// stale\n');
+    writeLock(app, 'aaaaaaa', readTree(app), ['pages']);
+    put(starter, 'registry/blocks/pages/files/src/blocks/pages/block.json', META([{ path: '/new', component: 'NewPage', layout: 'app' }]));
+    put(starter, 'registry/blocks/pages/files/src/blocks/pages/index.ts', 'export const NewPage = () => null;\n');
+    applyUpdate({ appDir: app, upstreamDir: stageUpstream(starter, ['pages']), kit: 'bbbbbbb' });
+    expect(read(app, 'src/blocks/index.ts')).toContain("import('./pages')).NewPage");
   });
 });

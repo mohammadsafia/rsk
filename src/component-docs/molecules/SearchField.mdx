@@ -1,0 +1,102 @@
+---
+id: search-field
+title: SearchField
+section: Blocks
+category: Molecules
+description: 'A search input with debounced, keyboard-navigable suggestions. Add it with pnpm kit:add search-field.'
+tags: [block, molecule, search, autocomplete, combobox]
+importFrom: '@blocks/search-field'
+---
+
+import { useState } from 'react';
+import { SearchField } from '@blocks/search-field';
+
+export const PEOPLE = [
+  'Lina Khoury',
+  'Omar Nasser',
+  'Sara Haddad',
+  'Yousef Saleh',
+  'Layla Mansour',
+  'Karim Aziz',
+  'Nour Farah',
+  'Rami Daher',
+];
+
+export const PeopleSearch = () => {
+  const [chosen, setChosen] = useState('');
+
+  const handleSearch = (query) => PEOPLE.filter((name) => name.toLowerCase().includes(query.toLowerCase()));
+
+  return (
+    <div className="flex w-80 max-w-full flex-col gap-3">
+      <SearchField
+        label="Find a colleague"
+        placeholder="Type a name"
+        onSearch={handleSearch}
+        getLabel={(name) => name}
+        getKey={(name) => name}
+        onSelect={setChosen}
+      />
+
+      <p className="text-fg-muted text-sm">Picked: {chosen || 'nobody yet'}</p>
+    </div>
+  );
+};
+
+## Search as you type
+
+Type two letters: the field waits for a pause (250 ms), calls `onSearch` and lists what it returns. ↑ and ↓ move through the suggestions, Enter picks one and Escape closes them (a second Escape clears the field).
+
+<Example
+  title="Find a colleague"
+  code={`const handleSearch = (query: string) => api.people.search(query); // or a filter over local data
+
+<SearchField
+  label="Find a colleague"
+  placeholder="Type a name"
+  onSearch={handleSearch}
+  getLabel={(person) => person.name}
+  getKey={(person) => person.id}
+  onSelect={(person) => navigate(\`/people/\${person.id}\`)}
+/>`}
+>
+  <PeopleSearch />
+</Example>
+
+## Add it
+
+```bash
+pnpm kit:add search-field
+```
+
+It lands in `src/blocks/search-field/` with its English and Arabic copy (`src/locales/{en,ar}/block-search-field.json`); `pnpm kit:update` keeps it current, and `pnpm kit:remove search-field` takes it out again.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'label', type: 'string', description: 'The visible label, also the input’s accessible name.' },
+    { prop: 'placeholder', type: 'string', description: 'Hint inside the empty input.' },
+    { prop: 'onSearch', type: '(query) => T[] | Promise<T[]>', description: 'Finds the suggestions. A rejected promise shows “The search didn’t work”.' },
+    { prop: 'getLabel · getKey', type: '(item) => string', description: 'The text shown for an item, and its stable key.' },
+    { prop: 'onSelect', type: '(item) => void', description: 'Called with the picked suggestion; the input then shows its label.' },
+    { prop: 'minLength', type: 'number', default: '2', description: 'Characters needed before searching.' },
+    { prop: 'debounceMs', type: 'number', default: '250', description: 'The pause after typing before searching.' },
+  ]}
+/>
+
+The block never fetches on its own: `onSearch` is where your app calls its API.
+
+## Files
+
+- `src/blocks/search-field/SearchField.tsx`, `index.ts`, `SearchField.test.tsx`, `block.json`
+- `src/locales/en/block-search-field.json`, `src/locales/ar/block-search-field.json`
+
+## Accessibility
+
+- The input is a `combobox` controlling a `listbox`; the highlighted suggestion is its `aria-activedescendant`, so focus never leaves the input.
+- One live region announces “Searching…”, the number of results, “No results” or a failed search.
+
+## RTL notes
+
+- The search icon sits at the start of the field and the text aligns to the start, in both directions.

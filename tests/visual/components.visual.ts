@@ -7,7 +7,7 @@ import path from 'node:path';
 import { expect, type Page, test } from '@playwright/test';
 
 const DOCS = path.resolve('src/component-docs');
-const CATEGORIES = ['ui', 'forms', 'shared', 'tables', 'calendar', 'charts'];
+const CATEGORIES = ['ui', 'forms', 'shared', 'tables', 'calendar', 'charts', 'molecules', 'organisms', 'templates'];
 
 /** Every component page's id, from its frontmatter. */
 const pages = CATEGORIES.flatMap((category) =>
@@ -20,6 +20,7 @@ const pages = CATEGORIES.flatMap((category) =>
 /** Pages whose first example is a trigger: the shot is of what it opens (portaled outside the preview). */
 const OVERLAYS: Record<string, 'click' | 'hover'> = {
   dialog: 'click',
+  'invite-members-dialog': 'click',
   sheet: 'click',
   popover: 'click',
   'dropdown-menu': 'click',

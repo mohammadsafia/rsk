@@ -11,6 +11,8 @@ export type AppMenu = {
   permissions?: string[];
   roles?: string[];
   icon: ElementType;
+  /** The label's translation key, when it isn't `nav:<id>` (a block's entries use `block-<id>:nav.<id>`). */
+  labelKey?: string;
   submenu?: AppMenu[];
 };
 

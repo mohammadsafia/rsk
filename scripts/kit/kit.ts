@@ -8,14 +8,23 @@
  * Options: --from <dir> (a local starter instead of GitHub), --base <dir> (the version you took, for three-way merges),
  * --dry-run. RSK_STARTER_REPO picks another GitHub repository (default mohammadsafia/rsk-starter).
  */
-import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import os from 'node:os';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
-import { applyUpdate, checkUpstream, classify, dependencyChanges, LOCK_FILE, parseArgs, readLock, readTree, type Status } from './core';
-
-const REPO = process.env.RSK_STARTER_REPO ?? 'mohammadsafia/rsk-starter';
+import {
+  applyUpdate,
+  checkUpstream,
+  classify,
+  dependencyChanges,
+  LOCK_FILE,
+  parseArgs,
+  readLock,
+  readTree,
+  releaseDroppedBlocks,
+  stageUpstream,
+  type Status,
+} from './core';
+import { download, REPO } from './download';
 
 const LABELS: Record<Exclude<Status, 'same'>, string> = {
   updated: 'updated in the kit',
@@ -25,25 +34,6 @@ const LABELS: Record<Exclude<Status, 'same'>, string> = {
   conflict: 'changed on both sides',
 };
 
-/** Downloads a ref of the starter repository and unpacks it; null when the ref doesn't exist. */
-async function download(ref: string): Promise<string | null> {
-  const response = await fetch(`https://codeload.github.com/${REPO}/tar.gz/${ref}`);
-  if (response.status === 404) return null;
-  if (!response.ok) throw new Error(`Downloading ${REPO}@${ref} failed: HTTP ${response.status}`);
-  const dir = mkdtempSync(path.join(os.tmpdir(), 'rsk-kit-'));
-  try {
-    writeFileSync(path.join(dir, 'starter.tar.gz'), Buffer.from(await response.arrayBuffer()));
-    // A relative archive path: some Windows tars read "C:\…" as a remote host.
-    const unpack = spawnSync('tar', ['-xzf', 'starter.tar.gz', '--strip-components=1'], { cwd: dir, encoding: 'utf8' });
-    if (unpack.status !== 0) throw new Error(`Unpacking ${REPO}@${ref} failed: ${unpack.stderr || unpack.error?.message}`);
-    rmSync(path.join(dir, 'starter.tar.gz'));
-    return dir;
-  } catch (error) {
-    rmSync(dir, { recursive: true, force: true });
-    throw error;
-  }
-}
-
 async function main() {
   const { command, paths, from: fromArg, base: baseArg, dryRun } = parseArgs(process.argv.slice(2));
   const appDir = process.cwd();
@@ -51,17 +41,24 @@ async function main() {
   const temporary: string[] = [];
 
   try {
-    const upstreamDir = fromArg ? path.resolve(fromArg) : await download('refs/heads/main');
-    if (!upstreamDir) throw new Error(`${REPO} has no main branch.`);
-    if (!fromArg) temporary.push(upstreamDir);
+    const starterDir = fromArg ? path.resolve(fromArg) : await download('refs/heads/main');
+    if (!starterDir) throw new Error(`${REPO} has no main branch.`);
+    if (!fromArg) temporary.push(starterDir);
+    // The starter plus the registry files of the blocks this app added, at their app paths.
+    const blocks = lock.blocks ?? [];
+    const upstreamDir = stageUpstream(starterDir, blocks);
+    temporary.push(upstreamDir);
     const upstreamLock = existsSync(path.join(upstreamDir, LOCK_FILE)) ? readLock(upstreamDir) : null;
     checkUpstream(upstreamLock);
     const { kit } = upstreamLock;
 
     const listed = (file: string) =>
       !paths.length || paths.some((prefix) => file.startsWith(prefix.replaceAll('\\', '/').replace(/^\.\//, '')));
-    const rows = classify(lock, readTree(appDir), readTree(upstreamDir)).filter((row) => row.status !== 'same' && listed(row.path));
+    const { lock: kept, released } = releaseDroppedBlocks(lock, upstreamDir);
+    const rows = classify(kept, readTree(appDir), readTree(upstreamDir)).filter((row) => row.status !== 'same' && listed(row.path));
     console.log(`Kit: you have rsk@${lock.kit.slice(0, 7)}, the starter has rsk@${kit.slice(0, 7)}.`);
+    if (released.length)
+      console.log(`\nNo longer in the kit, so ${command === 'status' ? 'kit:update keeps' : 'kept'} as your own: ${released.join(', ')}.`);
     if (!rows.length) console.log('Every kit file is up to date.');
     for (const status of Object.keys(LABELS) as (keyof typeof LABELS)[]) {
       const files = rows.filter((row) => row.status === status).map((row) => row.path);
@@ -76,8 +73,10 @@ async function main() {
     if (command === 'status') return;
 
     const needsBase = rows.some((row) => row.status === 'conflict');
-    const baseDir = baseArg ? path.resolve(baseArg) : needsBase ? await download(`refs/tags/kit/${lock.kit.slice(0, 7)}`) : null;
-    if (baseDir && !baseArg) temporary.push(baseDir);
+    const baseStarter = baseArg ? path.resolve(baseArg) : needsBase ? await download(`refs/tags/kit/${lock.kit.slice(0, 7)}`) : null;
+    if (baseStarter && !baseArg) temporary.push(baseStarter);
+    const baseDir = baseStarter ? stageUpstream(baseStarter, blocks) : null;
+    if (baseDir) temporary.push(baseDir);
     if (needsBase && !baseDir)
       console.log(`\nNo kit/${lock.kit.slice(0, 7)} tag to merge against: files changed on both sides get a .upstream copy beside them.`);
 

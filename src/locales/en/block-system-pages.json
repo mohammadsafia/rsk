@@ -1,0 +1,20 @@
+{
+  "home": "Back to home",
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you’re looking for doesn’t exist, or it has moved."
+  },
+  "serverError": {
+    "title": "Something went wrong on our side",
+    "description": "It isn’t something you did. Try again in a moment.",
+    "retry": "Try again"
+  },
+  "maintenance": {
+    "title": "We’ll be back soon",
+    "description": "We’re making some improvements. Check again in a few minutes."
+  },
+  "noAccess": {
+    "title": "You don’t have access to this page",
+    "description": "Ask an admin of your workspace to give you access."
+  }
+}

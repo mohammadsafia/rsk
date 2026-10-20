@@ -11,6 +11,8 @@ export const DROP = [
   '.github/workflows/docs.yml',
   'src/types/doc-counts.d.ts',
   'src/types/mdx.d.ts',
+  // How blocks are authored in the kit (each documented, at least one); an app only adds them
+  'tests/design-system/blocks.test.ts',
   // Showcase pages and their data
   'src/pages/components/',
   'src/pages/clinic/',
@@ -51,7 +53,6 @@ export const DROP = [
 
 /** Dependencies only the docs site uses. */
 export const DOCS_ONLY_DEV_DEPENDENCIES = [
-  '@clack/prompts',
   '@mdx-js/react',
   '@mdx-js/rollup',
   '@types/mdx',

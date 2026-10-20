@@ -2,6 +2,8 @@ import type { ElementType } from 'react';
 
 import { LayoutDashboard, Settings } from 'lucide-react';
 
+import { blockNav } from '../blocks';
+
 export type AppMenu = {
   id: string;
   path: string;
@@ -11,6 +13,8 @@ export type AppMenu = {
   permissions?: string[];
   roles?: string[];
   icon: ElementType;
+  /** The label's translation key, when it isn't `nav:<id>` (a block's entries use `block-<id>:nav.<id>`). */
+  labelKey?: string;
   submenu?: AppMenu[];
 };
 
@@ -36,7 +40,7 @@ export const FULL_ROUTES_PATH = {
 export const PLAIN_ROUTES = FULL_ROUTES_PATH;
 
 /** Sidebar and command-palette entries. The label comes from `nav.json` by `id`. */
-export const APP_MENU: AppMenu[] = [
+const BASE_MENU: AppMenu[] = [
   {
     id: 'dashboard',
     path: FULL_ROUTES_PATH.HOME.DASHBOARD,
@@ -52,3 +56,6 @@ export const APP_MENU: AppMenu[] = [
     icon: Settings,
   },
 ];
+
+/** The app's own entries, then those of the blocks added with kit:add. */
+export const APP_MENU: AppMenu[] = [...BASE_MENU, ...blockNav];

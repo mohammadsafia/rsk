@@ -6,11 +6,11 @@
  *   pnpm starter:build [outDir]      (default: .starter)
  */
 import { execFileSync } from 'node:child_process';
-
-import { readTree, writeLock } from '../kit/core';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { blockFiles, generateBlockIndex, readBlocks, validateBlocks } from '../kit/blocks';
+import { readTree, writeLock } from '../kit/core';
 import { lockfileArgs } from './install';
 import { DOCS_ONLY_DEV_DEPENDENCIES, DOCS_ONLY_SCRIPTS, DROP, SHOWCASE_NAV_KEYS } from './manifest';
 
@@ -65,24 +65,24 @@ export function buildStarter(outDir: string) {
   // Formatter ignores that only this repo needs (docs MDX, vendored agent skills).
   edit('vite.config.ts', /\n {4}\/\/ \*\.mdx:[^\n]*/, '', out);
   edit('vite.config.ts', /\n {4}\/\/ \.claude\/skills:[^\n]*/, '', out);
-  edit('vite.config.ts', "ignorePatterns: ['**/*.hbs', '**/*.mdx', '.claude/skills/**']", "ignorePatterns: ['**/*.hbs']", out);
+  edit(
+    'vite.config.ts',
+    "ignorePatterns: ['**/*.hbs', '**/*.mdx', '.claude/skills/**']",
+    "ignorePatterns: ['**/*.hbs', 'registry/**', 'kit.lock.json', 'first-load-*.json']",
+    out,
+  );
   edit('tsconfig.app.json', /,?\n\s*"@component-docs": \[[^\]]*\]/, '', out);
   edit('tsconfig.app.json', /,?\n\s*"@component-docs\/\*": \[[^\]]*\]/, '', out);
 
-  // This repo excludes its own generated starter from tests and lint; the starter has no such folder.
+  // This repo excludes its own generated starter from tests and lint; the starter excludes its block catalogue instead
+  // (registry/ holds the blocks' sources for kit:add: data, not this app's code, tests or formatting).
   edit(
     'vite.config.ts',
     /\n {4}\/\/ `pnpm starter:build`[^\n]*\n {4}exclude: \[\.\.\.configDefaults\.exclude, '\.starter\/\*\*', 'scripts\/starter\/overlay\/\*\*'\],/,
-    '',
+    "\n    // registry/ holds the block catalogue's sources for kit:add, not this app's tests.\n    exclude: [...configDefaults.exclude, 'registry/**'],",
     out,
   );
-  edit(
-    'vite.config.ts',
-    "import { configDefaults, defineConfig, lazyPlugins } from 'vite-plus';",
-    "import { defineConfig, lazyPlugins } from 'vite-plus';",
-    out,
-  );
-  edit('vite.config.ts', "ignorePatterns: ['dist', '.starter', 'scripts/starter/overlay', ", "ignorePatterns: ['dist', ", out);
+  edit('vite.config.ts', "ignorePatterns: ['dist', '.starter', 'scripts/starter/overlay', ", "ignorePatterns: ['dist', 'registry', ", out);
 
   // Removing blocks leaves runs of blank lines; keep the file formatter-clean.
   const viteConfig = path.join(out, 'vite.config.ts');
@@ -110,6 +110,27 @@ export function buildStarter(outDir: string) {
     writeFileSync(navFile, `${JSON.stringify(nav, null, 2)}\n`);
   }
 
+  // 3b. The block catalogue: each block moves out of src/ into registry/blocks/<id>/files/ (at its app paths), so an
+  // app has only the blocks it adds with kit:add. registry/index.json is what the picker searches.
+  const blockErrors = validateBlocks(out);
+  if (blockErrors.length) throw new Error(`starter: invalid blocks:\n${blockErrors.join('\n')}`);
+  const blocks = readBlocks(out);
+  for (const block of blocks) {
+    const registry = path.join(out, 'registry/blocks', block.id);
+    mkdirSync(registry, { recursive: true });
+    cpSync(path.join(out, 'src/blocks', block.id, 'block.json'), path.join(registry, 'block.json'));
+    for (const file of blockFiles(out, block.id)) {
+      mkdirSync(path.dirname(path.join(registry, 'files', file)), { recursive: true });
+      cpSync(path.join(out, file), path.join(registry, 'files', file));
+      rmSync(path.join(out, file));
+    }
+    rmSync(path.join(out, 'src/blocks', block.id), { recursive: true, force: true });
+  }
+  mkdirSync(path.join(out, 'registry'), { recursive: true });
+  writeFileSync(path.join(out, 'registry/index.json'), `${JSON.stringify(blocks, null, 2)}\n`);
+  mkdirSync(path.join(out, 'src/blocks'), { recursive: true });
+  writeFileSync(path.join(out, 'src/blocks/index.ts'), generateBlockIndex([]));
+
   // 4. package.json for a new app.
   const pkgFile = path.join(out, 'package.json');
   const pkg = JSON.parse(readFileSync(pkgFile, 'utf8')) as Record<string, unknown> & {
@@ -128,6 +149,9 @@ export function buildStarter(outDir: string) {
   // The kit updater: compare the app's kit files with the latest starter, and take the kit's changes.
   pkg.scripts['kit:status'] = 'tsx scripts/kit/kit.ts status';
   pkg.scripts['kit:update'] = 'tsx scripts/kit/kit.ts update';
+  // Blocks: search the catalogue and add molecules, organisms and page templates; or take them out again.
+  pkg.scripts['kit:add'] = 'tsx scripts/kit/add.ts add';
+  pkg.scripts['kit:remove'] = 'tsx scripts/kit/add.ts remove';
   writeFileSync(pkgFile, `${JSON.stringify(pkg, null, 2)}\n`);
 
   // 4b. The kit version this app starts from, and a fingerprint of each kit file (what kit:update compares against).
