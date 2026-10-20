@@ -28,6 +28,7 @@ describe('buildStarter', () => {
     expect(existsSync(path.join(out, 'scripts/starter'))).toBe(false);
     expect(existsSync(path.join(out, 'tests/starter'))).toBe(false);
     expect(existsSync(path.join(out, '.github/workflows/starter-sync.yml'))).toBe(false);
+    expect(existsSync(path.join(out, '.github/workflows/docs.yml'))).toBe(false);
   });
 
   it('ships SonarCloud settings that skip the Tailwind v4 stylesheet its CSS parser cannot read', () => {

@@ -34,6 +34,7 @@ export const DROP = [
   'scripts/design-system/favicons/',
   'tests/starter/',
   '.github/workflows/starter-sync.yml',
+  '.github/workflows/docs.yml',
   'docs/',
   '.superpowers/',
   '.claude/',
@@ -61,7 +62,7 @@ export const DOCS_ONLY_DEV_DEPENDENCIES = [
 /** `nav.json` labels that only the showcase menu uses. */
 export const SHOWCASE_NAV_KEYS = ['schedule', 'patients', 'billing', 'components', 'members'] as const;
 
-export const DOCS_ONLY_SCRIPTS = ['docs:new', 'docs:lint', 'starter:build', 'starter:verify', 'starter:publish'] as const;
+export const DOCS_ONLY_SCRIPTS = ['docs:build', 'docs:new', 'docs:lint', 'starter:build', 'starter:verify', 'starter:publish'] as const;
 
 /** Words that must not survive in the starter's src/ (showcase leftovers). */
 export const LEFTOVER_PATTERNS = [

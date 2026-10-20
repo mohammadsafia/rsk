@@ -53,3 +53,4 @@ i18n-*.png
 # pnpm a11y:audit output
 a11y-report.json
 first-load-report.json
+dist-docs/

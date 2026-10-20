@@ -10,7 +10,7 @@ function HomePage() {
         <Specimen />
         <Features />
         {/* The docs site is dev-only, so its showcase is too. */}
-        {import.meta.env.DEV && <Documented />}
+        {(import.meta.env.DEV || import.meta.env.MODE === 'docs') && <Documented />}
         <Tooling />
         <Structure />
         <GetGoing />
