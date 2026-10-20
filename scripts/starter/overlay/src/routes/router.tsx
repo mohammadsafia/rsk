@@ -10,7 +10,7 @@ import { NotFound, SettingsPlaceholder } from './RoutePlaceholders';
 const LoginPage = lazy(() => import('@pages/auth/LoginPage'));
 const ForgotPasswordPage = lazy(() => import('@pages/auth/ForgotPasswordPage'));
 
-// A block's error page (kit:add system-pages) replaces the kit's when one is added.
+// A block's error page (kit:add system-pages) replaces the kit's when one is added; it loads only when a route fails.
 const RouteError = BlockErrorElement ?? ErrorBoundary;
 
 export const router = createBrowserRouter([
@@ -24,7 +24,11 @@ export const router = createBrowserRouter([
   {
     path: FULL_ROUTES_PATH.AUTH.INDEX,
     element: <AuthLayout />,
-    errorElement: <RouteError />,
+    errorElement: (
+      <Suspense>
+        <RouteError />
+      </Suspense>
+    ),
     children: [
       {
         path: FULL_ROUTES_PATH.AUTH.LOGIN,
@@ -49,7 +53,11 @@ export const router = createBrowserRouter([
   // page load with the route (in parallel), so a signed-out visitor on the sign-in page never downloads them.
   {
     element: <AuthGuard />,
-    errorElement: <RouteError />,
+    errorElement: (
+      <Suspense>
+        <RouteError />
+      </Suspense>
+    ),
     children: [
       {
         lazy: async () => ({ Component: (await import('../layouts/app-layout/AppLayout')).default }),

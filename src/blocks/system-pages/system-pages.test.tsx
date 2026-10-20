@@ -93,6 +93,14 @@ describe('system pages', () => {
     const source = generateBlockIndex([meta]);
     expect(source).toContain("{ path: '/no-access', lazy: async () => ({ Component: (await import('./system-pages')).NoAccessPage }) }");
     expect(source.indexOf("path: '/maintenance'")).toBeLessThan(source.indexOf("path: '*'"));
-    expect(source).toContain("export { ServerErrorPage as BlockErrorElement } from './system-pages';");
+    // Lazy: the error page loads when a route fails, never with the first load.
+    expect(source).toContain(
+      [
+        'export const BlockErrorElement: LazyExoticComponent<ComponentType> | null = lazy(async () => ({',
+        "  default: (await import('./system-pages')).ServerErrorPage,",
+        '}));',
+      ].join('\n'),
+    );
+    expect(source).not.toMatch(/^export \{.*\} from/m);
   });
 });

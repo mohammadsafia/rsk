@@ -1,14 +1,15 @@
 import { type ReactElement } from 'react';
 
-import { useAppTranslation } from '@hooks/shared';
+import { useBlockTranslation } from '@hooks/shared';
 
 import { Wrench } from 'lucide-react';
 
+import { LOCALE } from './locale';
 import SystemPage, { type SystemPageProps } from './SystemPage';
 
 /** Shown while the app is down for maintenance: route visitors here from your API's 503, or a feature flag. */
 function MaintenancePage({ layout }: Pick<SystemPageProps, 'layout'>): ReactElement {
-  const { t } = useAppTranslation('block-system-pages');
+  const { t } = useBlockTranslation('block-system-pages', LOCALE);
 
   return (
     <SystemPage

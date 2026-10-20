@@ -80,7 +80,7 @@ describe('generated block index', () => {
     const source = generateBlockIndex([]);
     expect(source).toContain('export const appBlockRoutes: RouteObject[] = [];');
     expect(source).toContain('export const bareBlockRoutes: RouteObject[] = [];');
-    expect(source).toContain('export const BlockErrorElement: ComponentType | null = null;');
+    expect(source).toContain('export const BlockErrorElement: LazyExoticComponent<ComponentType> | null = null;');
     expect(source).toContain('export const blockNav: AppMenu[] = [];');
   });
 
@@ -99,7 +99,15 @@ describe('generated block index', () => {
     ]);
     expect(source).toContain(`{ path: '/no-access', lazy: async () => ({ Component: (await import('./system-pages')).NoAccessPage }) }`);
     expect(source.indexOf("path: '/maintenance'")).toBeLessThan(source.indexOf("path: '*'"));
-    expect(source).toContain("export { ServerErrorPage as BlockErrorElement } from './system-pages';");
+    // Lazy: the error page loads when a route fails, never with the first load.
+    expect(source).toContain(
+      [
+        'export const BlockErrorElement: LazyExoticComponent<ComponentType> | null = lazy(async () => ({',
+        "  default: (await import('./system-pages')).ServerErrorPage,",
+        '}));',
+      ].join('\n'),
+    );
+    expect(source).not.toMatch(/^export \{.*\} from/m);
     expect(source).toMatch(/import \{ Activity \} from 'lucide-react';/);
     expect(source).toContain("{ id: 'status', path: '/status', icon: Activity, labelKey: 'block-system-pages:nav.status' }");
   });

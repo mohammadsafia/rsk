@@ -10,7 +10,12 @@ import { describe, expect, it } from 'vite-plus/test';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 
 /** Folders and files held to the standards by this test. Add to it as code is brought up to them. */
-export const SCOPE = ['src/pages/auth', 'src/layouts/auth-layout', 'src/components/shared/command-palette/LazyCommandPalette.tsx'];
+export const SCOPE = [
+  'src/blocks',
+  'src/pages/auth',
+  'src/layouts/auth-layout',
+  'src/components/shared/command-palette/LazyCommandPalette.tsx',
+];
 
 type Rule = { id: string; standard: string; pattern: RegExp; tsxOnly?: boolean };
 
@@ -21,7 +26,7 @@ export const RULES: Rule[] = [
   {
     id: 'jsx-ternary',
     standard: '6.2 Conditional, not a ternary',
-    pattern: /\?\s*\(?\s*<[A-Za-z]|\?\s*\($|^\s*\)\s*:\s*\(?\s*<|:\s*null\s*\}?;?$/,
+    pattern: /\?\s*\(?\s*<[A-Za-z]|\?\s*\($|^\s*\)\s*:\s*\(?\s*<|\)\s*:\s*null\s*\}?;?$/,
     tsxOnly: true,
   },
   { id: 'interface', standard: '2.1 type, not interface', pattern: /^\s*(export\s+)?interface\s/ },

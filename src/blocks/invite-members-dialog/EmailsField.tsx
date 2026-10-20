@@ -7,12 +7,13 @@ import { fieldVariants, Tag } from '@components/ui';
 import { FormField } from '@components/forms';
 import { Conditional } from '@components/utils';
 
-import { useAppTranslation } from '@hooks/shared';
+import { useBlockTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
 
 import { AlertCircle } from 'lucide-react';
 
+import { LOCALE } from './locale';
 import { type InviteForm, isEmail } from './InviteMembersDialog.schemas';
 
 type EmailsFieldProps = {
@@ -28,7 +29,7 @@ const SEPARATORS = /[\s,;]+/;
  * chips (an address already in the list is skipped); Backspace in the empty input removes the last chip.
  */
 function EmailsField({ failures }: EmailsFieldProps): ReactElement {
-  const { t } = useAppTranslation('block-invite-members-dialog');
+  const { t } = useBlockTranslation('block-invite-members-dialog', LOCALE);
 
   const { field, fieldState } = useController<InviteForm, 'emails'>({ name: 'emails' });
 

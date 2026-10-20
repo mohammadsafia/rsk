@@ -2,10 +2,11 @@ import { type ReactElement } from 'react';
 
 import { Button } from '@components/ui';
 
-import { useAppTranslation } from '@hooks/shared';
+import { useBlockTranslation } from '@hooks/shared';
 
 import { RefreshCw } from 'lucide-react';
 
+import { LOCALE } from './locale';
 import SystemPage, { type SystemPageProps } from './SystemPage';
 
 export type ServerErrorScreenProps = Pick<SystemPageProps, 'layout'> & {
@@ -16,7 +17,7 @@ export type ServerErrorScreenProps = Pick<SystemPageProps, 'layout'> & {
 
 /** The 500 page itself, without the router: `ServerErrorPage` wires it to the route; use this one anywhere else. */
 function ServerErrorScreen({ layout, onRetry, retrying = false }: ServerErrorScreenProps): ReactElement {
-  const { t } = useAppTranslation('block-system-pages');
+  const { t } = useBlockTranslation('block-system-pages', LOCALE);
 
   return (
     <SystemPage layout={layout} code="500" kind="error" title={t('serverError.title')} description={t('serverError.description')}>

@@ -7,10 +7,11 @@ import { Alert, Button, Dialog } from '@components/ui';
 import { FormContainer, FormSelect } from '@components/forms';
 import { Conditional } from '@components/utils';
 
-import { toast, useAppTranslation } from '@hooks/shared';
+import { toast, useBlockTranslation } from '@hooks/shared';
 
 import { formResolver } from '@utils';
 
+import { LOCALE } from './locale';
 import EmailsField from './EmailsField';
 import { type InviteForm, inviteSchema } from './InviteMembersDialog.schemas';
 
@@ -34,7 +35,7 @@ export type InviteMembersDialogProps = {
  * reason; the ones sent leave it, and a toast confirms them.
  */
 function InviteMembersDialog({ open, onOpenChange, roles, defaultRole, onInvite }: InviteMembersDialogProps): ReactElement {
-  const { t } = useAppTranslation('block-invite-members-dialog');
+  const { t } = useBlockTranslation('block-invite-members-dialog', LOCALE);
 
   const form = useForm<InviteForm>({
     defaultValues: { emails: [], role: defaultRole ?? roles[0]?.value ?? '' },

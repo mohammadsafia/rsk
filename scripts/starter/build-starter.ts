@@ -65,24 +65,24 @@ export function buildStarter(outDir: string) {
   // Formatter ignores that only this repo needs (docs MDX, vendored agent skills).
   edit('vite.config.ts', /\n {4}\/\/ \*\.mdx:[^\n]*/, '', out);
   edit('vite.config.ts', /\n {4}\/\/ \.claude\/skills:[^\n]*/, '', out);
-  edit('vite.config.ts', "ignorePatterns: ['**/*.hbs', '**/*.mdx', '.claude/skills/**']", "ignorePatterns: ['**/*.hbs']", out);
+  edit(
+    'vite.config.ts',
+    "ignorePatterns: ['**/*.hbs', '**/*.mdx', '.claude/skills/**']",
+    "ignorePatterns: ['**/*.hbs', 'registry/**', 'kit.lock.json', 'first-load-*.json']",
+    out,
+  );
   edit('tsconfig.app.json', /,?\n\s*"@component-docs": \[[^\]]*\]/, '', out);
   edit('tsconfig.app.json', /,?\n\s*"@component-docs\/\*": \[[^\]]*\]/, '', out);
 
-  // This repo excludes its own generated starter from tests and lint; the starter has no such folder.
+  // This repo excludes its own generated starter from tests and lint; the starter excludes its block catalogue instead
+  // (registry/ holds the blocks' sources for kit:add: data, not this app's code, tests or formatting).
   edit(
     'vite.config.ts',
     /\n {4}\/\/ `pnpm starter:build`[^\n]*\n {4}exclude: \[\.\.\.configDefaults\.exclude, '\.starter\/\*\*', 'scripts\/starter\/overlay\/\*\*'\],/,
-    '',
+    "\n    // registry/ holds the block catalogue's sources for kit:add, not this app's tests.\n    exclude: [...configDefaults.exclude, 'registry/**'],",
     out,
   );
-  edit(
-    'vite.config.ts',
-    "import { configDefaults, defineConfig, lazyPlugins } from 'vite-plus';",
-    "import { defineConfig, lazyPlugins } from 'vite-plus';",
-    out,
-  );
-  edit('vite.config.ts', "ignorePatterns: ['dist', '.starter', 'scripts/starter/overlay', ", "ignorePatterns: ['dist', ", out);
+  edit('vite.config.ts', "ignorePatterns: ['dist', '.starter', 'scripts/starter/overlay', ", "ignorePatterns: ['dist', 'registry', ", out);
 
   // Removing blocks leaves runs of blank lines; keep the file formatter-clean.
   const viteConfig = path.join(out, 'vite.config.ts');

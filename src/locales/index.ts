@@ -16,11 +16,12 @@ function buildLocaleMap(modules: Record<string, unknown>, lang: string): Resourc
   return result;
 }
 
-// The `docs` namespace belongs to the docs site (development and the docs build), so app builds leave it out.
+// The `docs` namespace belongs to the docs site (development and the docs build), so app builds leave it out. A
+// block's copy (block-*.json) loads with the block itself (useBlockTranslation), never with every page.
 const allModules =
   import.meta.env.DEV || import.meta.env.MODE === 'docs'
-    ? import.meta.glob('./{en,ar}/*.json', { eager: true })
-    : import.meta.glob(['./{en,ar}/*.json', '!./{en,ar}/docs.json'], { eager: true });
+    ? import.meta.glob(['./{en,ar}/*.json', '!./{en,ar}/block-*.json'], { eager: true })
+    : import.meta.glob(['./{en,ar}/*.json', '!./{en,ar}/docs.json', '!./{en,ar}/block-*.json'], { eager: true });
 
 const EN = buildLocaleMap(allModules, 'en');
 const AR = buildLocaleMap(allModules, 'ar');

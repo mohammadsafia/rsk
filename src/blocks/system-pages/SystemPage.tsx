@@ -6,11 +6,13 @@ import { Button } from '@components/ui';
 import { EmptyState, Logo } from '@components/shared';
 import { Conditional } from '@components/utils';
 
-import { useAppTranslation } from '@hooks/shared';
+import { useBlockTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
 
 import { Home } from 'lucide-react';
+
+import { LOCALE } from './locale';
 
 /**
  * `bare`: a page of its own, with the logo and the main landmark. `app`: inside the app shell, which has both.
@@ -35,7 +37,7 @@ const HEIGHT: Record<SystemPageLayout, string> = { bare: 'min-h-dvh', app: 'min-
 
 /** The layout every system page shares: logo, code, title, description, and a way back home. */
 function SystemPage({ code, icon, title, description, kind = 'first-use', layout = 'bare', children }: SystemPageProps): ReactElement {
-  const { t } = useAppTranslation('block-system-pages');
+  const { t } = useBlockTranslation('block-system-pages', LOCALE);
 
   const Root = layout === 'bare' ? 'main' : 'div';
 
@@ -52,7 +54,15 @@ function SystemPage({ code, icon, title, description, kind = 'first-use', layout
         title={title}
         description={description}
         // The code takes the place of the icon, drawn like the kit's empty-state figure.
-        icon={code ? <span className="figure text-fg rule-top relative pt-2">{code}</span> : icon}
+        icon={
+          <Conditional>
+            <Conditional.If condition={!!code}>
+              <span className="figure text-fg rule-top relative pt-2">{code}</span>
+            </Conditional.If>
+
+            <Conditional.Else>{icon}</Conditional.Else>
+          </Conditional>
+        }
         className="max-w-lg [&_[data-slot=empty-state-icon]]:size-auto"
       >
         <EmptyState.Actions>

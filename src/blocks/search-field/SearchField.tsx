@@ -13,11 +13,13 @@ import { floatingSurfaceClassName, Input, Spinner } from '@components/ui';
 
 import { Conditional } from '@components/utils';
 
-import { useAppTranslation, useDebounce } from '@hooks/shared';
+import { useBlockTranslation, useDebounce } from '@hooks/shared';
 
 import { cn } from '@utils';
 
 import { SearchIcon } from 'lucide-react';
+
+import { LOCALE } from './locale';
 
 export type SearchFieldProps<T> = {
   /** The visible label, also the input's accessible name. */
@@ -55,7 +57,7 @@ function SearchField<T>({
 }: SearchFieldProps<T>): ReactElement {
   const id = useId();
 
-  const { t } = useAppTranslation('block-search-field');
+  const { t } = useBlockTranslation('block-search-field', LOCALE);
 
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);

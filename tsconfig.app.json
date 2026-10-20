@@ -38,6 +38,7 @@
       "@app-types": ["./src/types/index"],
       "@routes": ["./src/routes/index"],
       "@locales": ["./src/locales/index"],
+      "@locales/*": ["./src/locales/*"],
       "@component-docs": ["./src/component-docs/index.ts"],
       "@component-docs/*": ["./src/component-docs/*"]
     },
