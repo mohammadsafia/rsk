@@ -40,6 +40,7 @@ temp-api-types/
 .idea
 .superpowers/
 /dist
+dist-docs
 # Playwright MCP artifacts
 .playwright-mcp/
 .playwright-cli/
@@ -53,4 +54,3 @@ i18n-*.png
 # pnpm a11y:audit output
 a11y-report.json
 first-load-report.json
-dist-docs/

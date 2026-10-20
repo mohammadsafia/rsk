@@ -24,6 +24,12 @@ afterAll(() => {
 });
 
 describe('buildStarter', () => {
+  it('ships no script that runs a file the starter drops (docs:build runs scripts/docs/)', () => {
+    const pkg = JSON.parse(readFileSync(path.join(out, 'package.json'), 'utf8')) as { scripts: Record<string, string> };
+    expect(pkg.scripts['docs:build']).toBeUndefined();
+    expect(Object.values(pkg.scripts).filter((command) => command.includes('scripts/docs/'))).toEqual([]);
+  });
+
   it('ships none of the starter tooling, its tests or its sync workflow', () => {
     expect(existsSync(path.join(out, 'scripts/starter'))).toBe(false);
     expect(existsSync(path.join(out, 'tests/starter'))).toBe(false);
