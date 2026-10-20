@@ -14,7 +14,7 @@ import { Bell, LogOut, Search, Settings, User } from 'lucide-react';
 function AppHeader() {
   const navigate = useNavigate();
   const { t } = useAppTranslation('header');
-  const { currentUser, removeCurrentUser } = useAuth();
+  const { currentUser, signOut } = useAuth();
   const { toggle } = useCommandPalette();
 
   return (
@@ -97,7 +97,7 @@ function AppHeader() {
 
             <DropdownMenu.Separator />
 
-            <DropdownMenu.Item onClick={removeCurrentUser}>
+            <DropdownMenu.Item onClick={signOut}>
               <LogOut aria-hidden="true" />
               {t('logout')}
             </DropdownMenu.Item>

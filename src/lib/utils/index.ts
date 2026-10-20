@@ -11,3 +11,4 @@ export * from './parseDateValue';
 export * from './formResolver';
 export * from './schemas';
 export * from './tableFeatures';
+export * from './auth';

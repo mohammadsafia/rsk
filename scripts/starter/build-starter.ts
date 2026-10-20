@@ -88,10 +88,6 @@ export function buildStarter(outDir: string) {
   const viteConfig = path.join(out, 'vite.config.ts');
   writeFileSync(viteConfig, readFileSync(viteConfig, 'utf8').replace(/\n{3,}/g, '\n\n'));
 
-  // A neutral stub user: this repo's stub carries its author's name and email.
-  edit('src/lib/hooks/shared/useAuth.ts', /name: '[^']*'/, "name: 'Demo User'", out);
-  edit('src/lib/hooks/shared/useAuth.ts', /email: '[^']*'/, "email: 'demo@example.com'", out);
-
   // The DTO generator's sample sources point at a client's API; the starter names a placeholder.
   edit('scripts/cli/config/defaults.ts', /https:\/\/dev-api\.qlinica\.app\/med-legal/g, 'https://api.example.com', out);
   edit('scripts/cli/README.md', /https:\/\/dev-api\.qlinica\.app\/med-legal/g, 'https://api.example.com', out);

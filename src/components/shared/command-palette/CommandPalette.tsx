@@ -13,7 +13,7 @@ function CommandPalette() {
   const navigate = useNavigate();
   const { open, setOpen } = useCommandPalette();
   const { theme, setTheme } = useTheme();
-  const { removeCurrentUser } = useAuth();
+  const { signOut } = useAuth();
   const { t } = useAppTranslation('nav');
 
   const isDark = theme === THEME_TYPES.DARK;
@@ -50,7 +50,7 @@ function CommandPalette() {
             {t('toggleTheme')}
           </Command.Item>
 
-          <Command.Item value="log out sign out" onSelect={() => runCommand(removeCurrentUser)}>
+          <Command.Item value="log out sign out" onSelect={() => runCommand(signOut)}>
             <LogOut className="h-4 w-4" />
             {t('header:logout')}
           </Command.Item>

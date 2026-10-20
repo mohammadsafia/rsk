@@ -5,15 +5,17 @@ import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { Tooltip } from '@components/ui';
 
-import { ThemeProvider } from '@contexts';
-import { useAuth } from '@hooks/shared';
+import { AuthProvider, SESSION_KEY, ThemeProvider } from '@contexts';
 import { AppLayout } from '@layouts';
 
 import '../../i18n';
 
 afterEach(cleanup);
 
+const USER = { userId: '7', name: 'Lina Haddad', email: 'lina@example.com' };
+
 const renderAt = (path: string) => {
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ token: 't', user: USER }));
   const router = createMemoryRouter(
     [
       {
@@ -29,7 +31,9 @@ const renderAt = (path: string) => {
   return render(
     <ThemeProvider>
       <Tooltip.Provider>
-        <RouterProvider router={router} />
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
       </Tooltip.Provider>
     </ThemeProvider>,
   );
@@ -55,6 +59,6 @@ describe('AppLayout', () => {
     expect(header.querySelector('[aria-label="Open user menu"]')).not.toBeNull();
     expect(header.querySelector('[aria-label="Notifications"]')).not.toBeNull();
     expect(header.innerHTML).not.toMatch(/text-muted-foreground|bg-secondary|ring-primary|bg-background/);
-    expect(document.querySelector('[data-slot="sidebar-footer"]')?.textContent).toContain(useAuth().currentUser.email);
+    expect(document.querySelector('[data-slot="sidebar-footer"]')?.textContent).toContain(USER.email);
   });
 });
