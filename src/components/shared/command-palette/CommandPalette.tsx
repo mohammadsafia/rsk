@@ -32,9 +32,9 @@ function CommandPalette() {
 
         <Command.Group heading={t('navigation')}>
           {APP_MENU.map((route) => (
-            <Command.Item key={route.id} value={t(route.id)} onSelect={() => runCommand(() => navigate(route.path))}>
+            <Command.Item key={route.id} value={t(route.labelKey ?? route.id)} onSelect={() => runCommand(() => navigate(route.path))}>
               <route.icon className="h-4 w-4" />
-              {t(route.id)}
+              {t(route.labelKey ?? route.id)}
             </Command.Item>
           ))}
         </Command.Group>

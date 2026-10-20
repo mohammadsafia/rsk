@@ -4,7 +4,7 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { blockFiles, readBlocks, resolveDependencies, validateBlocks, type BlockMeta } from '../../scripts/kit/blocks';
+import { blockFiles, generateBlockIndex, readBlocks, resolveDependencies, validateBlocks, type BlockMeta } from '../../scripts/kit/blocks';
 
 const put = (root: string, file: string, text: string) => {
   mkdirSync(path.dirname(path.join(root, file)), { recursive: true });
@@ -72,5 +72,35 @@ describe('blocks', () => {
     expect(() => resolveDependencies(['x'], catalogue)).toThrow(/Unknown block "x"/);
     const cyclic = [meta('a', { dependsOn: ['b'] }), meta('b', { dependsOn: ['a'] })];
     expect(() => resolveDependencies(['a'], cyclic)).toThrow(/cycle: a → b → a/);
+  });
+});
+
+describe('generated block index', () => {
+  it('with no blocks, exports empty routes and nav and no error element', () => {
+    const source = generateBlockIndex([]);
+    expect(source).toContain('export const appBlockRoutes: RouteObject[] = [];');
+    expect(source).toContain('export const bareBlockRoutes: RouteObject[] = [];');
+    expect(source).toContain('export const BlockErrorElement: ComponentType | null = null;');
+    expect(source).toContain('export const blockNav: AppMenu[] = [];');
+  });
+
+  it('lazy-loads each route from its block, puts a catch-all last, and wires nav and the error element', () => {
+    const source = generateBlockIndex([
+      meta('system-pages', {
+        level: 'template',
+        routes: [
+          { path: '*', component: 'NotFoundPage', layout: 'bare' },
+          { path: '/maintenance', component: 'MaintenancePage', layout: 'bare' },
+          { path: '/no-access', component: 'NoAccessPage', layout: 'app' },
+        ],
+        errorElement: 'ServerErrorPage',
+        nav: [{ id: 'status', path: '/status', icon: 'Activity' }],
+      }),
+    ]);
+    expect(source).toContain(`{ path: '/no-access', lazy: async () => ({ Component: (await import('./system-pages')).NoAccessPage }) }`);
+    expect(source.indexOf("path: '/maintenance'")).toBeLessThan(source.indexOf("path: '*'"));
+    expect(source).toContain("export { ServerErrorPage as BlockErrorElement } from './system-pages';");
+    expect(source).toMatch(/import \{ Activity \} from 'lucide-react';/);
+    expect(source).toContain("{ id: 'status', path: '/status', icon: Activity, labelKey: 'block-system-pages:nav.status' }");
   });
 });
