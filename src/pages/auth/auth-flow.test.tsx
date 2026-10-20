@@ -126,4 +126,35 @@ describe('forgot password', () => {
     renderAt('/auth/login');
     expect((await screen.findByRole('link', { name: 'Forgot password?' })).getAttribute('href')).toBe('/auth/forgot-password');
   });
+
+  describe('after the review', () => {
+    it('moves focus to the reset confirmation, so a screen reader reads it', async () => {
+      renderAt('/auth/forgot-password');
+      fill(/^Email/, 'nobody@example.com');
+      fireEvent.click(screen.getByRole('button', { name: 'Send reset link' }));
+      const confirmation = await screen.findByText(/If an account exists/, {}, { timeout: 3000 });
+      await waitFor(() => expect(document.activeElement).not.toBe(document.body));
+      expect(document.activeElement?.contains(confirmation)).toBe(true);
+    });
+
+    it('keeps the logo and shows progress while a signed-in visitor is sent on (no blank screen)', async () => {
+      localStorage.setItem(SESSION_KEY, JSON.stringify(SESSION));
+      // The app's pages load with their routes; one that never arrives stands for a slow network.
+      const router = createMemoryRouter(
+        [
+          { path: '/auth', element: <AuthLayout />, children: [{ path: '/auth/login', element: <LoginPage /> }] },
+          { path: '/dashboard', lazy: () => new Promise<never>(() => {}) },
+        ],
+        { initialEntries: ['/auth/login'] },
+      );
+      render(
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>,
+      );
+      await waitFor(() => expect(router.state.navigation.state).toBe('loading'));
+      expect(document.querySelector('main [data-slot="logo"]')).not.toBeNull();
+      expect(screen.getByRole('status')).toBeTruthy();
+    });
+  });
 });

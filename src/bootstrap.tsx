@@ -12,6 +12,12 @@ import { Tooltip } from '@components/ui';
 import './i18n';
 import './index.css';
 
+/** When a session ends, nothing the last user loaded may show to the next one. */
+const clearUserData = () => {
+  void queryClient.cancelQueries();
+  queryClient.clear();
+};
+
 export function renderApp(container: HTMLElement) {
   createRoot(container).render(
     <StrictMode>
@@ -21,7 +27,7 @@ export function renderApp(container: HTMLElement) {
             <MotionProvider>
               <NuqsAdapter>
                 <Tooltip.Provider delayDuration={300}>
-                  <AuthProvider>
+                  <AuthProvider onSignOut={clearUserData}>
                     <RouterProvider router={ROUTER} />
                   </AuthProvider>
                 </Tooltip.Provider>

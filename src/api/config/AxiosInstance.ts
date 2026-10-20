@@ -19,7 +19,11 @@ instance.interceptors.request.use((req) => {
 // A 401 on a request that carried the token means the session is over: sign out (the guard then asks to sign in again).
 // A 401 without a token (a wrong password at sign-in) is the caller's to show.
 instance.interceptors.response.use(undefined, (error: unknown) => {
-  if (isAxiosError(error) && error.response?.status === 401 && error.config?.withToken) notifyUnauthorized();
+  if (isAxiosError(error) && error.response?.status === 401 && error.config?.withToken) {
+    // The token this request carried: a 401 for an older session must not end a newer one.
+    const sent = String(error.config.headers?.Authorization ?? '').replace(/^Bearer /, '');
+    notifyUnauthorized(sent || undefined);
+  }
 
   return Promise.reject(error);
 });

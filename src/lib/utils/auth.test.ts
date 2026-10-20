@@ -21,4 +21,12 @@ describe('errorMessage', () => {
     expect(errorMessage({ code: 500 }, 'Something went wrong')).toBe('Something went wrong');
     expect(errorMessage(null, 'Something went wrong')).toBe('Something went wrong');
   });
+
+  describe('safeNext with characters a URL parser drops', () => {
+    it('refuses a next that only becomes external once tabs or newlines are stripped', () => {
+      for (const value of ['/\t/evil.example', '/\n/evil.example', '/\r/evil.example', '\t//evil.example'])
+        expect(safeNext(value, '/dashboard')).toBe('/dashboard');
+      expect(safeNext('/patients#notes', '/dashboard')).toBe('/patients#notes');
+    });
+  });
 });

@@ -20,7 +20,11 @@ const BASE_CONFIG: HttpClientRequestConfig = {
 const responseBody = <T>(response: HttpClientResponse<T>) => response.data;
 
 const responseError = <T>(error: HttpClientError | T) => {
-  if (error instanceof AxiosError && error.response) throw error.response.data;
+  if (error instanceof AxiosError && error.response) {
+    const { data, status } = error.response;
+    // The API's body, with the HTTP status on it: a caller tells a wrong password (401) from an outage.
+    throw data !== null && typeof data === 'object' ? { ...data, status } : data;
+  }
 
   throw error;
 };

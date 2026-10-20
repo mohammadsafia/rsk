@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router';
 
@@ -22,6 +22,12 @@ function ForgotPasswordPage() {
   const { t } = useAppTranslation('auth');
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
+  const confirmation = useRef<HTMLDivElement>(null);
+
+  // The form (and its focused button) is replaced by the confirmation: focus moves to it, so it is read out.
+  useEffect(() => {
+    if (sentTo) confirmation.current?.focus();
+  }, [sentTo]);
 
   const form = useForm<ForgotForm>({ defaultValues: { email: '' } });
 
@@ -35,9 +41,11 @@ function ForgotPasswordPage() {
       </header>
 
       {sentTo ? (
-        <Alert tone="success">
-          <Alert.Description>{t('forgot.sent', { email: sentTo })}</Alert.Description>
-        </Alert>
+        <div ref={confirmation} tabIndex={-1} className="outline-none">
+          <Alert tone="success">
+            <Alert.Description>{t('forgot.sent', { email: sentTo })}</Alert.Description>
+          </Alert>
+        </div>
       ) : (
         <FormContainer
           formContext={form}

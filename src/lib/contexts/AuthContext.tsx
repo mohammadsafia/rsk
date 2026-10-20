@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 export type CurrentUser = { userId: string; name: string; email: string; picture?: string };
 export type Session = { token: string; user: CurrentUser };
@@ -29,15 +29,28 @@ export function readSession(): Session | null {
   }
 }
 
-const listeners = new Set<() => void>();
+const listeners = new Set<(token: string | undefined) => void>();
 
-/** For the API layer: the server rejected the token (401), so the session is over. */
-export const notifyUnauthorized = () => listeners.forEach((listener) => listener());
+/**
+ * For the API layer: the server rejected `token` (401), so that session is over. A 401 for an older token (a slow
+ * request from before signing in again) leaves the current session alone.
+ */
+export const notifyUnauthorized = (token?: string) => listeners.forEach((listener) => listener(token));
 
 const AuthContext = createContext<AuthState | null>(null);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+type AuthProviderProps = {
+  children: ReactNode;
+  /** Runs whenever a session ends (sign-out or a 401): drop what the last user loaded, e.g. the query cache. */
+  onSignOut?: () => void;
+};
+
+export function AuthProvider({ children, onSignOut }: AuthProviderProps) {
   const [session, setSession] = useState<Session | null>(readSession);
+  const onSignOutRef = useRef(onSignOut);
+  useEffect(() => {
+    onSignOutRef.current = onSignOut;
+  }, [onSignOut]);
 
   const signIn = useCallback((next: Session) => {
     try {
@@ -55,17 +68,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Storage blocked: nothing was kept.
     }
     setSession(null);
+    onSignOutRef.current?.();
   }, []);
 
   useEffect(() => {
-    listeners.add(signOut);
+    const onUnauthorized = (token: string | undefined) => {
+      if (token === undefined || token === readSession()?.token) signOut();
+    };
+    listeners.add(onUnauthorized);
     // Another tab signed in or out.
     const onStorage = (event: StorageEvent) => {
       if (event.key === SESSION_KEY || event.key === null) setSession(readSession());
     };
     window.addEventListener('storage', onStorage);
     return () => {
-      listeners.delete(signOut);
+      listeners.delete(onUnauthorized);
       window.removeEventListener('storage', onStorage);
     };
   }, [signOut]);

@@ -3,8 +3,12 @@
  * the app ("//host", "https://…", "/\host") is refused, so a crafted link can't send someone elsewhere.
  */
 export function safeNext(next: string | null | undefined, fallback = '/'): string {
-  if (!next || !next.startsWith('/') || next.startsWith('//') || next.startsWith('/\\')) return fallback;
-  return next;
+  // Control characters: a URL parser drops tabs and newlines, so "/\t/host" would become "//host".
+  // oxlint-disable-next-line no-control-regex -- matching control characters is the point
+  if (!next || !next.startsWith('/') || /[\u0000-\u001f\u007f\\]/.test(next)) return fallback;
+  const base = 'https://app.invalid';
+  const url = new URL(next, base);
+  return url.origin === base ? `${url.pathname}${url.search}${url.hash}` : fallback;
 }
 
 /** A message to show for a failed request: the API's `message`, an Error's, a plain string; else `fallback`. */

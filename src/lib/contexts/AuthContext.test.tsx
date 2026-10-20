@@ -54,7 +54,7 @@ describe('AuthProvider', () => {
   it('ends the session when the API says the token is no longer valid (401)', () => {
     localStorage.setItem(SESSION_KEY, JSON.stringify(SESSION));
     renderProbe();
-    act(() => notifyUnauthorized());
+    act(() => notifyUnauthorized(SESSION.token));
     expect(screen.getByText('signed out')).toBeTruthy();
     expect(localStorage.getItem(SESSION_KEY)).toBeNull();
   });
@@ -81,5 +81,26 @@ describe('AuthProvider', () => {
     localStorage.setItem(SESSION_KEY, JSON.stringify({ user: SESSION.user }));
     renderProbe();
     expect(screen.getByText('signed out')).toBeTruthy();
+  });
+
+  it('tells the app when a session ends (sign-out or a 401), so it can drop the last user’s cached data', () => {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(SESSION));
+    const ended: string[] = [];
+    render(
+      <AuthProvider onSignOut={() => ended.push('ended')}>
+        <Probe />
+      </AuthProvider>,
+    );
+    act(() => screen.getByRole('button', { name: 'sign out' }).click());
+    act(() => screen.getByRole('button', { name: 'sign in' }).click());
+    act(() => notifyUnauthorized(SESSION.token));
+    expect(ended).toEqual(['ended', 'ended']);
+  });
+
+  it('ignores a 401 for a token that is no longer the session’s (a slow request from before signing in again)', () => {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(SESSION));
+    renderProbe();
+    act(() => notifyUnauthorized('an-old-token'));
+    expect(screen.getByText('in as lina@example.com')).toBeTruthy();
   });
 });
