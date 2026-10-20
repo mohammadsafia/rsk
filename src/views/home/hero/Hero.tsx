@@ -46,7 +46,7 @@ function Hero() {
           <Link to={FULL_ROUTES_PATH.HOME.DASHBOARD}>{t('hero.ctaPrimary')}</Link>
         </Button>
 
-        {import.meta.env.DEV && (
+        {(import.meta.env.DEV || import.meta.env.MODE === 'docs') && (
           <Button size="lg" variant="outline" asChild>
             <Link to={FULL_ROUTES_PATH.DOCS.COMPONENTS}>{t('hero.ctaSecondary')}</Link>
           </Button>

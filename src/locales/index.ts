@@ -16,10 +16,11 @@ function buildLocaleMap(modules: Record<string, unknown>, lang: string): Resourc
   return result;
 }
 
-// The `docs` namespace belongs to the dev-only docs site, so production builds leave it out.
-const allModules = import.meta.env.DEV
-  ? import.meta.glob('./{en,ar}/*.json', { eager: true })
-  : import.meta.glob(['./{en,ar}/*.json', '!./{en,ar}/docs.json'], { eager: true });
+// The `docs` namespace belongs to the docs site (development and the docs build), so app builds leave it out.
+const allModules =
+  import.meta.env.DEV || import.meta.env.MODE === 'docs'
+    ? import.meta.glob('./{en,ar}/*.json', { eager: true })
+    : import.meta.glob(['./{en,ar}/*.json', '!./{en,ar}/docs.json'], { eager: true });
 
 const EN = buildLocaleMap(allModules, 'en');
 const AR = buildLocaleMap(allModules, 'ar');

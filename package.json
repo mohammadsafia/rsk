@@ -71,6 +71,7 @@
     "dto:diff": "tsx scripts/cli/bin-cli/dto-gen.ts list --diff",
     "dto:init": "tsx scripts/cli/bin-cli/dto-gen.ts init",
     "dto:clean": "tsx scripts/cli/bin-cli/dto-gen.ts clean",
+    "docs:build": "node scripts/docs/build-site.mjs",
     "docs:new": "tsx src/component-docs/scripts/new.ts",
     "docs:lint": "tsx src/component-docs/scripts/lint.ts",
     "theme:accent": "tsx scripts/design-system/theme-accent.ts",

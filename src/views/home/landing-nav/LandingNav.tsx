@@ -25,7 +25,7 @@ function LandingNav() {
         </Link>
 
         <nav aria-label={t('nav.primary')} className="hidden items-center gap-5 md:flex">
-          {import.meta.env.DEV && (
+          {(import.meta.env.DEV || import.meta.env.MODE === 'docs') && (
             <>
               <Link to={FULL_ROUTES_PATH.DOCS.COMPONENTS} className={LINK}>
                 {t('nav.components')}

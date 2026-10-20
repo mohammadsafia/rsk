@@ -91,8 +91,8 @@ export const APP_MENU: AppMenu[] = [
     group: 'main',
     icon: Receipt,
   },
-  // The docs site is dev-only (see docs-routes.tsx).
-  ...(import.meta.env.DEV
+  // The docs site: development and the docs build only (see docs-routes.tsx).
+  ...(import.meta.env.DEV || import.meta.env.MODE === 'docs'
     ? [
         {
           id: 'components',

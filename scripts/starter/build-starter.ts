@@ -121,6 +121,9 @@ export function buildStarter(outDir: string) {
   pkg.description = 'A React + TypeScript app on Vite+, started from the RSK UI kit.';
   delete pkg.Author;
   for (const script of DOCS_ONLY_SCRIPTS) delete pkg.scripts[script];
+  // A script that runs a file the starter doesn't ship (e.g. scripts/docs/) can't work there: drop it too.
+  for (const [script, command] of Object.entries(pkg.scripts))
+    if (DROP.some((prefix) => prefix.startsWith('scripts/') && command.includes(prefix))) delete pkg.scripts[script];
   for (const dependency of DOCS_ONLY_DEV_DEPENDENCIES) delete pkg.devDependencies[dependency];
   // The kit updater: compare the app's kit files with the latest starter, and take the kit's changes.
   pkg.scripts['kit:status'] = 'tsx scripts/kit/kit.ts status';

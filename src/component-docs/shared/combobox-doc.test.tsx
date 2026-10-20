@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { Tooltip } from '@components/ui';
@@ -17,11 +18,14 @@ const renderDoc = async () => {
     .find((doc) => doc.id === 'combobox')!
     .load();
   render(
-    <Tooltip.Provider>
-      <MDXProvider components={mdxComponents}>
-        <Doc />
-      </MDXProvider>
-    </Tooltip.Provider>,
+    // A docs page always renders inside the router (its links are router links).
+    <MemoryRouter>
+      <Tooltip.Provider>
+        <MDXProvider components={mdxComponents}>
+          <Doc />
+        </MDXProvider>
+      </Tooltip.Provider>
+    </MemoryRouter>,
   );
   return document.querySelector('[data-slot="combobox-value"]')!.closest('button') as HTMLElement;
 };

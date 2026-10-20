@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { createBrowserRouter } from 'react-router';
+import { createBrowserRouter, type RouteObject } from 'react-router';
 
 import { AppLayout, AuthGuard, AuthLayout, ErrorBoundary } from '@layouts';
 
@@ -18,7 +18,7 @@ const NewPatientPage = lazy(() => import('@pages/clinic/intake/NewPatientPage'))
 const LoginPage = lazy(() => import('@pages/auth/LoginPage'));
 const ForgotPasswordPage = lazy(() => import('@pages/auth/ForgotPasswordPage'));
 
-export const router = createBrowserRouter([
+const routes: RouteObject[] = [
   // Public documentation site (no auth) and redirects from the old /components gallery
   ...docsRoutes.map((route) => (route.path === '/docs' ? { ...route, errorElement: <ErrorBoundary /> } : route)),
 
@@ -113,4 +113,7 @@ export const router = createBrowserRouter([
     path: '*',
     element: <NotFound />,
   },
-]);
+];
+
+// Served under a path (the docs site on GitHub Pages: /rsk/), the app's routes start there.
+export const router = createBrowserRouter(routes, { basename: import.meta.env.BASE_URL });

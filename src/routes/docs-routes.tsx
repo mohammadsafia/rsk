@@ -3,8 +3,9 @@ import { Navigate, type RouteObject, useParams } from 'react-router';
 
 import { Spinner } from '@components/ui';
 
-// The docs site is a development tool. `vp build` replaces import.meta.env.DEV with false, so this
-// function is dead code in production and none of its lazy chunks (layout, pages, MDX) are emitted.
+// The docs site exists in development and in the docs build (`pnpm docs:build`, mode "docs"). `vp build` replaces
+// import.meta.env.DEV with false and MODE with "production", so in an app's build this function is dead code and
+// none of its lazy chunks (layout, pages, MDX) are emitted.
 const createDocsRoutes = (): RouteObject[] => {
   const DocsLayout = lazy(() => import('../layouts/docs-layout/DocsLayout'));
   const DocsDocPage = lazy(() => import('@pages/docs/DocsDocPage'));
@@ -33,4 +34,4 @@ const createDocsRoutes = (): RouteObject[] => {
   ];
 };
 
-export const docsRoutes: RouteObject[] = import.meta.env.DEV ? createDocsRoutes() : [];
+export const docsRoutes: RouteObject[] = import.meta.env.DEV || import.meta.env.MODE === 'docs' ? createDocsRoutes() : [];

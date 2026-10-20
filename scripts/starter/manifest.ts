@@ -8,6 +8,7 @@ export const DROP = [
   'src/routes/docs-gate.test.ts',
   'tests/docs/',
   'scripts/docs/',
+  '.github/workflows/docs.yml',
   'src/types/doc-counts.d.ts',
   'src/types/mdx.d.ts',
   // Showcase pages and their data
