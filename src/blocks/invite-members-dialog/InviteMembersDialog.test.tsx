@@ -34,7 +34,7 @@ const setup = (onInvite = vi.fn(async (_invites: Invite[]): Promise<InviteResult
 };
 
 const paste = (input: HTMLElement, text: string) => fireEvent.paste(input, { clipboardData: { getData: () => text } });
-const chips = () => [...document.querySelectorAll('[data-slot="invite-email"]')].map((chip) => chip.getAttribute('data-email'));
+const chips = () => [...document.querySelectorAll('[data-slot="chip-input-chip"]')].map((chip) => chip.getAttribute('data-value'));
 const submit = () => fireEvent.click(screen.getByRole('button', { name: 'Send invitations' }));
 
 afterEach(cleanup);
@@ -67,7 +67,7 @@ describe('InviteMembersDialog', () => {
   it('marks an invalid address and blocks sending with a message', async () => {
     const { input, onInvite } = setup();
     paste(input, 'a@x.com nope');
-    const invalid = document.querySelector('[data-email="nope"]')!;
+    const invalid = document.querySelector('[data-value="nope"]')!;
     expect(invalid.getAttribute('data-invalid')).toBe('true');
     expect(invalid.textContent).toContain('not a valid email address');
     submit();
@@ -100,9 +100,11 @@ describe('InviteMembersDialog', () => {
     // A real click leaves the focus on the send button.
     screen.getByRole('button', { name: 'Send invitations' }).focus();
     submit();
-    expect(await screen.findByText('Already a member')).toBeTruthy();
+    // The reason shows in the alert, and is read with the address's chip.
+    await waitFor(() => expect(screen.getByRole('alert').textContent).toContain('Already a member'));
+    expect(document.querySelector('[data-value="b@x.com"]')!.textContent).toContain('Already a member');
     expect(chips()).toEqual(['b@x.com']);
-    expect(document.querySelector('[data-email="b@x.com"]')!.getAttribute('data-invalid')).toBe('true');
+    expect(document.querySelector('[data-value="b@x.com"]')!.getAttribute('data-invalid')).toBe('true');
     expect(screen.getByRole('dialog')).toBeTruthy();
     // Back in the addresses, ready to fix or resend (the send button was disabled while sending).
     await waitFor(() => expect(document.activeElement).toBe(input));

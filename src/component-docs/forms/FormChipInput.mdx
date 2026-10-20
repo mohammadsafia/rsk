@@ -1,0 +1,74 @@
+---
+id: form-chip-input
+title: FormChipInput
+section: Components
+category: Forms
+description: 'ChipInput bound to react-hook-form: a string[] value with label, help text, required mark and inline error.'
+tags: [forms, chips, tags, multiple, email]
+---
+
+import { useForm } from 'react-hook-form';
+import { FormChipInput, FormContainer } from '@components/forms';
+
+export const isEmail = (value) => /^[^\s@]+@[^\s@.]+\.[^\s@]+$/.test(value);
+
+export const RecipientsDemo = () => {
+  const form = useForm({ defaultValues: { cc: ['lina@example.com'] } });
+
+  return (
+    <FormContainer formContext={form} onSuccess={() => {}} className="grid w-96 gap-3">
+      <FormChipInput
+        name="cc"
+        label="CC"
+        description="Separate addresses with a comma, or press Enter after each."
+        placeholder="name@example.com"
+        inputMode="email"
+        validate={isEmail}
+        invalidLabel="(not a valid email address)"
+      />
+    </FormContainer>
+  );
+};
+
+## Recipients
+
+The value is the list of chips (`string[]`). Validate the list in your schema or `rules`; `validate` marks the chips themselves.
+
+<Example
+  title="CC"
+  code={`const form = useForm({ defaultValues: { cc: [] } });
+
+<FormContainer formContext={form} onSuccess={send}>
+  <FormChipInput
+    name="cc"
+    label="CC"
+    description="Separate addresses with a comma, or press Enter after each."
+    placeholder="name@example.com"
+    inputMode="email"
+    validate={isEmail}
+    invalidLabel="(not a valid email address)"
+  />
+</FormContainer>`}
+>
+  <RecipientsDemo />
+</Example>
+
+The invite dialog block (`pnpm kit:add invite-members-dialog`) is built on it.
+
+## API
+
+<PropsTable
+  rows={[
+    { prop: 'name · label · description · tooltip · required · rules', type: 'FieldBaseProps', description: 'As every form field.' },
+    { prop: 'validate · flagged · invalidLabel · separators', type: 'see ChipInput', description: 'Passed to ChipInput.' },
+    { prop: 'listLabel', type: 'string', default: 'the label', description: 'Names the list of chips.' },
+  ]}
+/>
+
+## Accessibility
+
+- The label names the input and the list of chips; the error or help text describes the input.
+
+## RTL notes
+
+- As ChipInput: chips flow from the start and each item is isolated, so addresses read correctly in Arabic.

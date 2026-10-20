@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 
 import { Alert, Button, Dialog } from '@components/ui';
 
-import { FormContainer, FormSelect } from '@components/forms';
+import { FormChipInput, FormContainer, FormSelect } from '@components/forms';
 import { Conditional } from '@components/utils';
 
 import { toast, useBlockTranslation } from '@hooks/shared';
@@ -12,8 +12,7 @@ import { toast, useBlockTranslation } from '@hooks/shared';
 import { formResolver } from '@utils';
 
 import { LOCALE } from './locale';
-import EmailsField from './EmailsField';
-import { type InviteForm, inviteSchema } from './InviteMembersDialog.schemas';
+import { type InviteForm, inviteSchema, isEmail } from './InviteMembersDialog.schemas';
 
 export type InviteRole = { value: string; label: string };
 export type Invite = { email: string; role: string };
@@ -96,7 +95,17 @@ function InviteMembersDialog({ open, onOpenChange, roles, defaultRole, onInvite 
       <Dialog.Content title={t('title')} description={t('description')} dismissible={!submitting}>
         <FormContainer formContext={form} onSuccess={handleInvite} className="flex flex-col gap-4">
           <fieldset disabled={submitting} className="flex min-w-0 flex-col gap-4">
-            <EmailsField failures={failures} />
+            <FormChipInput<InviteForm>
+              name="emails"
+              label={t('emails')}
+              description={t('emailsHint')}
+              placeholder={t('emailsPlaceholder')}
+              invalidLabel={t('notValid')}
+              inputMode="email"
+              required
+              validate={isEmail}
+              flagged={failures}
+            />
 
             <FormSelect<InviteForm, InviteRole>
               name="role"
