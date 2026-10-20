@@ -73,6 +73,7 @@
     "dto:clean": "tsx scripts/cli/bin-cli/dto-gen.ts clean",
     "docs:new": "tsx src/component-docs/scripts/new.ts",
     "docs:lint": "tsx src/component-docs/scripts/lint.ts",
+    "theme:accent": "tsx scripts/design-system/theme-accent.ts",
     "ds:baseline": "tsx scripts/design-system/update-forbidden-baseline.ts",
     "ds:migrate": "tsx scripts/design-system/codemods/migrate.ts",
     "ds:classes": "tsx scripts/design-system/codemods/migrate-classes.ts",

@@ -22,6 +22,15 @@ vp install
 vp dev
 ```
 
+## Your brand colour
+
+```bash
+pnpm theme:accent "<your brand colour>"   # a hex value or an OKLCH colour; --dry-run to preview
+```
+
+It sets the accent for light and dark at the lightness that passes WCAG AA, in `src/styles/tokens.css`; `vp test`
+rechecks every contrast pair.
+
 ## Everyday commands
 
 ```bash

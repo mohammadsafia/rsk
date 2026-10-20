@@ -16,6 +16,20 @@ import { Badge, Tag } from '@components/ui';
 2. **`tokens.css`** — semantic roles for light (`:root, .light`) and dark (`.dark`): `canvas`, `surface`, `surface-raised`, `surface-sunken`, `fg`, `fg-muted`, `fg-subtle`, `border`, `border-strong`, `accent`, and the status roles `success`, `warning`, `danger`, `info`, each with a `-subtle` tint.
 3. **`theme.css`** — maps the roles to Tailwind utilities (`bg-surface`, `text-fg-muted`, …) and clears Tailwind's default palette, so only tokens generate colour classes.
 
+## Your brand colour
+
+The accent (links, the current item's ink, focus rings, primary emphasis) comes from one colour. Give it yours:
+
+```bash
+pnpm theme:accent "<your brand colour>"   # a hex value or an OKLCH colour; --dry-run to preview
+```
+
+The command keeps your colour's hue and as much of its chroma as screens can show. It then picks the lightness in each
+mode that passes WCAG AA wherever the accent appears: as text on every surface, and behind the accent's own text and
+its hover. It writes `--accent`, `--accent-hover` and `--accent-subtle` for light and dark into `src/styles/tokens.css`,
+and `--ring`, `--ink` and the first chart colour follow. A very light brand colour (a yellow) is darkened in light mode
+so text stays readable; that is the cost of contrast, not a bug. `vp test` rechecks every contrast pair afterwards.
+
 ## Status colours
 
 <Example title="Status tones">
