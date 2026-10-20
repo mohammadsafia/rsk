@@ -233,6 +233,7 @@ export default defineConfig({
       { find: '@utils', replacement: path.resolve(__dirname, 'src/lib/utils') },
       { find: '@hoc', replacement: path.resolve(__dirname, 'src/lib/hoc') },
       { find: '@components', replacement: path.resolve(__dirname, 'src/components') },
+      { find: '@blocks', replacement: path.resolve(__dirname, 'src/blocks') },
       { find: '@pages', replacement: path.resolve(__dirname, 'src/pages') },
       { find: '@views', replacement: path.resolve(__dirname, 'src/views') },
       { find: '@layouts', replacement: path.resolve(__dirname, 'src/layouts') },

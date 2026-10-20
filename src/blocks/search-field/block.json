@@ -1,0 +1,12 @@
+{
+  "id": "search-field",
+  "title": "Search field",
+  "level": "molecule",
+  "family": "search",
+  "description": "A search input with debounced, keyboard-navigable suggestions.",
+  "tags": ["search", "autocomplete", "combobox", "suggestions"],
+  "dependsOn": [],
+  "packages": {},
+  "routes": [],
+  "nav": []
+}
