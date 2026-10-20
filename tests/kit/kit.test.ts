@@ -274,3 +274,49 @@ describe('kit:update with added blocks', () => {
     expect(existsSync(path.join(app, 'src/blocks/other'))).toBe(false);
   });
 });
+
+describe('kit:update and the block index', () => {
+  const META = (routes: { path: string; component: string; layout: 'app' | 'bare' }[]) =>
+    JSON.stringify({
+      id: 'pages',
+      title: 'Pages',
+      level: 'template',
+      family: 'x',
+      description: 'x',
+      tags: [],
+      dependsOn: [],
+      packages: {},
+      routes,
+      nav: [],
+    });
+
+  it('keeps a block the kit no longer offers, as the app’s own, instead of deleting it', () => {
+    const app = dir();
+    const starter = dir();
+    put(starter, 'registry/index.json', '[]');
+    put(app, 'src/blocks/pages/block.json', META([]));
+    put(app, 'src/blocks/pages/index.ts', 'export {};\n');
+    put(app, 'src/locales/en/block-pages.json', '{}\n');
+    writeLock(app, 'aaaaaaa', readTree(app), ['pages']);
+    const result = applyUpdate({ appDir: app, upstreamDir: stageUpstream(starter, ['pages']), kit: 'bbbbbbb' });
+    expect(result.removed).toEqual([]);
+    expect(result.released).toEqual(['pages']);
+    expect(existsSync(path.join(app, 'src/blocks/pages/index.ts'))).toBe(true);
+    const lock = JSON.parse(read(app, 'kit.lock.json'));
+    expect(lock.blocks).toEqual([]);
+    expect(Object.keys(lock.files).some((file) => file.includes('pages'))).toBe(false);
+  });
+
+  it('regenerates src/blocks/index.ts when an update changes a block’s routes', () => {
+    const app = dir();
+    const starter = dir();
+    put(app, 'src/blocks/pages/block.json', META([]));
+    put(app, 'src/blocks/pages/index.ts', 'export {};\n');
+    put(app, 'src/blocks/index.ts', '// stale\n');
+    writeLock(app, 'aaaaaaa', readTree(app), ['pages']);
+    put(starter, 'registry/blocks/pages/files/src/blocks/pages/block.json', META([{ path: '/new', component: 'NewPage', layout: 'app' }]));
+    put(starter, 'registry/blocks/pages/files/src/blocks/pages/index.ts', 'export const NewPage = () => null;\n');
+    applyUpdate({ appDir: app, upstreamDir: stageUpstream(starter, ['pages']), kit: 'bbbbbbb' });
+    expect(read(app, 'src/blocks/index.ts')).toContain("import('./pages')).NewPage");
+  });
+});

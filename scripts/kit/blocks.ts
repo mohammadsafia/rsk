@@ -1,6 +1,6 @@
 // Blocks: ready-made molecules, organisms and page templates an app adds with kit:add. A block lives in
 // src/blocks/<id>/ with a block.json; its copy lives in src/locales/{en,ar}/block-<id>.json.
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 export type BlockLevel = 'molecule' | 'organism' | 'template';
@@ -137,4 +137,10 @@ export function generateBlockIndex(blocks: BlockMeta[]): string {
     `export const blockNav: AppMenu[] = ${list(nav.map(({ block, item }) => `  { id: '${item.id}', path: '${item.path}', icon: ${item.icon}, labelKey: 'block-${block.id}:nav.${item.id}' },`))};`,
     '',
   ].join('\n');
+}
+
+/** Regenerates src/blocks/index.ts from the app's own blocks (their block.json), whatever the catalogue has now. */
+export function writeIndex(appDir: string) {
+  mkdirSync(path.join(appDir, 'src/blocks'), { recursive: true });
+  writeFileSync(path.join(appDir, 'src/blocks/index.ts'), generateBlockIndex(readBlocks(appDir)));
 }

@@ -20,6 +20,7 @@ import {
   parseArgs,
   readLock,
   readTree,
+  releaseDroppedBlocks,
   stageUpstream,
   type Status,
 } from './core';
@@ -53,8 +54,11 @@ async function main() {
 
     const listed = (file: string) =>
       !paths.length || paths.some((prefix) => file.startsWith(prefix.replace(/\\/g, '/').replace(/^\.\//, '')));
-    const rows = classify(lock, readTree(appDir), readTree(upstreamDir)).filter((row) => row.status !== 'same' && listed(row.path));
+    const { lock: kept, released } = releaseDroppedBlocks(lock, upstreamDir);
+    const rows = classify(kept, readTree(appDir), readTree(upstreamDir)).filter((row) => row.status !== 'same' && listed(row.path));
     console.log(`Kit: you have rsk@${lock.kit.slice(0, 7)}, the starter has rsk@${kit.slice(0, 7)}.`);
+    if (released.length)
+      console.log(`\nNo longer in the kit, so ${command === 'status' ? 'kit:update keeps' : 'kept'} as your own: ${released.join(', ')}.`);
     if (!rows.length) console.log('Every kit file is up to date.');
     for (const status of Object.keys(LABELS) as (keyof typeof LABELS)[]) {
       const files = rows.filter((row) => row.status === status).map((row) => row.path);

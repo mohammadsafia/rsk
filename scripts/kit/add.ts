@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 import { autocompleteMultiselect, isCancel } from '@clack/prompts';
 
-import { type BlockLevel, type BlockMeta, generateBlockIndex, readBlocks, resolveDependencies } from './blocks';
+import { type BlockLevel, type BlockMeta, readBlocks, resolveDependencies, writeIndex } from './blocks';
 import { dependencyChanges, hashFile, LOCK_FILE, readLock, writeLock } from './core';
 import { download, REPO } from './download';
 
@@ -44,12 +44,6 @@ export function readCatalogue(starterDir: string): Catalogue {
 /** A block's registry files, as app-relative paths. */
 const filesOf = (catalogue: Catalogue, id: string) => walk(path.join(catalogue.dir, 'registry/blocks', id, 'files'));
 const source = (catalogue: Catalogue, id: string, file: string) => path.join(catalogue.dir, 'registry/blocks', id, 'files', file);
-
-/** Regenerates src/blocks/index.ts from the app's own blocks (their block.json), whatever the catalogue has now. */
-export const writeIndex = (appDir: string) => {
-  mkdirSync(path.join(appDir, 'src/blocks'), { recursive: true });
-  writeFileSync(path.join(appDir, 'src/blocks/index.ts'), generateBlockIndex(readBlocks(appDir)));
-};
 
 /**
  * What an app made before blocks still lacks for added blocks to work: the wiring lives in files the app owns, so

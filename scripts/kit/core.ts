@@ -6,6 +6,8 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, 
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
+import { writeIndex } from './blocks';
+
 /**
  * Folders the kit owns. Everything else (pages, routes, layouts, api, config) belongs to the app; of src/locales/, only
  * the added blocks' own copy (block-<id>.json) is the kit's.
@@ -157,7 +159,36 @@ export function classify(lock: Lock, local: Map<string, string>, upstream: Map<s
   return rows;
 }
 
-export type UpdateResult = { updated: string[]; added: string[]; removed: string[]; merged: string[]; conflicts: string[]; kept: string[] };
+export type UpdateResult = {
+  updated: string[];
+  added: string[];
+  removed: string[];
+  merged: string[];
+  conflicts: string[];
+  kept: string[];
+  /** Blocks the kit no longer offers: they stay in the app as its own, out of the lock. */
+  released: string[];
+};
+
+/** A block's files in the lock: its folder and its locale files. */
+const isBlockFile = (id: string) => (file: string) =>
+  file.startsWith(`src/blocks/${id}/`) || file === `src/locales/en/block-${id}.json` || file === `src/locales/ar/block-${id}.json`;
+
+/**
+ * The lock as kit:update and kit:status should read it: a block the kit no longer offers (absent from the upstream
+ * registry) stays in the app as its own, so it leaves the lock instead of being deleted as "removed from the kit".
+ */
+export function releaseDroppedBlocks(lock: Lock, upstreamDir: string): { lock: Lock; released: string[] } {
+  const released = (lock.blocks ?? []).filter((id) => !existsSync(path.join(upstreamDir, 'registry/blocks', id)));
+  return {
+    released,
+    lock: {
+      ...lock,
+      blocks: (lock.blocks ?? []).filter((id) => !released.includes(id)),
+      files: Object.fromEntries(Object.entries(lock.files).filter(([file]) => !released.some((id) => isBlockFile(id)(file)))),
+    },
+  };
+}
 
 /**
  * Three-way merge of one file into the app's copy. 'cannot' (binary, or git refused) leaves the app's file untouched.
@@ -194,7 +225,8 @@ export function applyUpdate(options: {
   only?: string[];
 }): UpdateResult {
   const { appDir, upstreamDir, baseDir, kit, dryRun = false, only } = options;
-  const lock = readLock(appDir);
+  const appLock = readLock(appDir);
+  const { lock, released } = releaseDroppedBlocks(appLock, upstreamDir);
   const upstream = readTree(upstreamDir);
   const rows = classify(lock, readTree(appDir), upstream);
   const prefixes = (only ?? []).map(normalise);
@@ -203,7 +235,7 @@ export function applyUpdate(options: {
   // Check before touching anything: a missing git must not stop an update halfway.
   if (rows.some((row) => row.status === 'conflict' && wanted(row.path)) && baseDir && !gitAvailable())
     throw new Error('kit:update needs git to merge files changed on both sides; install git and run it again.');
-  const result: UpdateResult = { updated: [], added: [], removed: [], merged: [], conflicts: [], kept: [] };
+  const result: UpdateResult = { updated: [], added: [], removed: [], merged: [], conflicts: [], kept: [], released };
   const nextLock = new Map(Object.entries(lock.files));
 
   const copy = (file: string) => {
@@ -246,6 +278,8 @@ export function applyUpdate(options: {
   // A partial update keeps the kit version the lock had: the files it didn't take still came from that version, and
   // their three-way merges need it as their base.
   if (!dryRun) writeLock(appDir, prefixes.length ? lock.kit : kit, nextLock, lock.blocks ?? []);
+  // The blocks' routes, menu entries and error page follow their (maybe updated) block.json.
+  if (!dryRun && (appLock.blocks?.length || existsSync(path.join(appDir, 'src/blocks/index.ts')))) writeIndex(appDir);
   return result;
 }
 
