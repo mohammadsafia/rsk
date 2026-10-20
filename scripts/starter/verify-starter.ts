@@ -42,18 +42,11 @@ try {
   run(out, 'corepack', [...pnpm, 'exec', 'vp', 'test', '--run']);
   run(out, 'corepack', [...pnpm, 'exec', 'vp', 'build']);
   // First-load budget: each route's gzipped JS, page errors and untranslated keys (a dropped side-effect module).
-  // /auth/login isn't measured: the starter's useAuth is always signed in, so it only ever redirects to /dashboard.
-  run(out, 'node', [
-    'scripts/bundle/first-load.mjs',
-    '--dist',
-    'dist',
-    '--budget',
-    'starter',
-    '--routes',
-    '/,/dashboard,/settings',
-    '--redirects',
-    '/=/dashboard',
-  ]);
+  // The app's pages signed in as the demo user, and the sign-in pages as a signed-out visitor sees them.
+  const budget = (...args: string[]) =>
+    run(out, 'node', ['scripts/bundle/first-load.mjs', '--dist', 'dist', '--budget', 'starter', ...args]);
+  budget('--session', '--routes', '/,/dashboard,/settings', '--redirects', '/=/dashboard', '--report', 'first-load-signed-in.json');
+  budget('--routes', '/auth/login,/auth/forgot-password', '--report', 'first-load-signed-out.json');
   console.log(`\nStarter verified: ${out}`);
 } finally {
   if (!process.env.KEEP_STARTER) rmSync(out, { recursive: true, force: true });

@@ -3,7 +3,8 @@
 //
 //   node scripts/bundle/first-load.mjs --dist dist                 # discover routes from "/" and report
 //   node scripts/bundle/first-load.mjs --dist dist --budget 150    # fail a route over 150 KB gz
-//   node scripts/bundle/first-load.mjs --dist dist --budget starter --routes /,/dashboard --redirects /=/dashboard
+//   node scripts/bundle/first-load.mjs --dist dist --budget starter --routes /,/dashboard --redirects /=/dashboard --session
+//                                      (--session: signed in as the mock backend's demo user)
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import path from 'node:path';
@@ -12,6 +13,7 @@ import { gzipSync } from 'node:zlib';
 import { chromium } from 'playwright';
 
 import { discoverRoutes } from '../a11y/audit.mjs';
+import { seedDemoSession } from '../lib/demo-session.mjs';
 import { isEntry } from '../lib/is-entry.mjs';
 
 /**
@@ -88,16 +90,21 @@ export const serve = (dist) =>
   });
 
 /** Per route: the gzipped JS the browser downloaded to show it, where it landed, page errors and raw keys on it. */
-export async function measureFirstLoad({ dist, routes, localesDir }) {
+export async function measureFirstLoad({ dist, routes, localesDir, session = false }) {
   const keys = localesDir && existsSync(localesDir) ? localeKeys(localesDir) : new Set();
   const server = await serve(dist);
   const base = `http://127.0.0.1:${server.address().port}`;
   const browser = await chromium.launch();
   try {
-    const list = routes ?? (await discoverRoutes(browser, { base, max: 50 })).routes;
+    // --session: signed in as the mock backend's demo user, to measure the pages behind sign-in.
+    const context = await browser.newContext();
+    if (session) await seedDemoSession(context);
+    const list = routes ?? (await discoverRoutes(context, { base, max: 50 })).routes;
     const results = [];
     for (const route of list) {
-      const page = await browser.newPage();
+      const page = await context.newPage();
+      // A fresh cache per route: each measures a first visit.
+      await page.route('**/*', (route) => route.continue());
       const errors = [];
       const scripts = new Map();
       page.on('pageerror', (error) => errors.push(String(error)));
@@ -161,7 +168,12 @@ async function main() {
   const budget = resolveBudget(arg('budget'));
   // Only an explicit route list is held to where each route lands; discovered routes are wherever links lead.
   const redirects = routes ? parseRedirects(arg('redirects')) : undefined;
-  const results = await measureFirstLoad({ dist, routes, localesDir: path.resolve('src/locales/en') });
+  const results = await measureFirstLoad({
+    dist,
+    routes,
+    localesDir: path.resolve('src/locales/en'),
+    session: process.argv.includes('--session'),
+  });
   const failed = [];
   for (const result of results) {
     const flags = failuresOf(result, { budget, redirects });

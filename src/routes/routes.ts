@@ -22,6 +22,7 @@ export const FULL_ROUTES_PATH = {
   AUTH: {
     INDEX: '/auth',
     LOGIN: '/auth/login',
+    FORGOT_PASSWORD: '/auth/forgot-password',
   },
   COMPONENTS: {
     INDEX: '/components',

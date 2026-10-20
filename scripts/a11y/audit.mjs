@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright';
 
+import { seedDemoSession } from '../lib/demo-session.mjs';
 import { isEntry } from '../lib/is-entry.mjs';
 
 const require = createRequire(import.meta.url);
@@ -27,6 +28,8 @@ const arg = (name, fallback) => {
 const BASE = arg('base', 'http://localhost:5173');
 const MAX_PAGES = Number(arg('max', '400'));
 const WORKERS = 4;
+/** Pages a signed-in visitor never sees (they're sent on): audited signed out. */
+const SIGNED_OUT = arg('signed-out', '/auth/login,/auth/forgot-password').split(',').filter(Boolean);
 const COMBOS = [
   { theme: 'light', lang: 'en' },
   { theme: 'dark', lang: 'en' },
@@ -141,23 +144,33 @@ async function main() {
   let browser;
   try {
     browser = await chromium.launch();
-    const { routes, truncated } = await discoverRoutes(browser, { base: BASE, max: MAX_PAGES });
+    // Signed in as the mock backend's demo user, so the pages behind sign-in are found and audited.
+    const discovery = await browser.newContext();
+    await seedDemoSession(discovery);
+    const { routes, truncated } = await discoverRoutes(discovery, { base: BASE, max: MAX_PAGES });
+    await discovery.close();
     if (truncated) console.warn(`Stopped discovering at --max ${MAX_PAGES}: some pages are not audited. Raise --max to audit them all.`);
-    console.log(`Auditing ${routes.length} pages × ${COMBOS.length} (light/dark × en/ar)…`);
+    console.log(`Auditing ${routes.length} pages signed in and ${SIGNED_OUT.length} signed out × ${COMBOS.length} (light/dark × en/ar)…`);
     const results = [];
     for (const combo of COMBOS) {
-      const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' });
-      await context.addInitScript(({ theme, lang }) => {
-        localStorage.setItem('vite-ui-theme', JSON.stringify(theme));
-        localStorage.setItem('i18nextLng', lang);
-      }, combo);
-      const queue = [...routes];
-      await Promise.all(
-        Array.from({ length: WORKERS }, async () => {
-          while (queue.length) results.push({ ...combo, ...(await audit(context, queue.shift())) });
-        }),
-      );
-      await context.close();
+      for (const [signedIn, list] of [
+        [true, routes],
+        [false, SIGNED_OUT],
+      ]) {
+        const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' });
+        await context.addInitScript(({ theme, lang }) => {
+          localStorage.setItem('vite-ui-theme', JSON.stringify(theme));
+          localStorage.setItem('i18nextLng', lang);
+        }, combo);
+        if (signedIn) await seedDemoSession(context);
+        const queue = [...list];
+        await Promise.all(
+          Array.from({ length: WORKERS }, async () => {
+            while (queue.length) results.push({ ...combo, signedIn, ...(await audit(context, queue.shift())) });
+          }),
+        );
+        await context.close();
+      }
     }
 
     writeFileSync(path.join(ROOT, 'a11y-report.json'), `${JSON.stringify({ truncated, results }, null, 1)}\n`);

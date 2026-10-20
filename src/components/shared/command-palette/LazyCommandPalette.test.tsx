@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { LazyCommandPalette } from '@components/shared';
 
-import { CommandPaletteProvider, ThemeProvider } from '@contexts';
+import { AuthProvider, CommandPaletteProvider, ThemeProvider } from '@contexts';
 
 import '../../../i18n';
 
@@ -15,9 +15,11 @@ const renderShell = () =>
   render(
     <MemoryRouter>
       <ThemeProvider>
-        <CommandPaletteProvider>
-          <LazyCommandPalette />
-        </CommandPaletteProvider>
+        <AuthProvider>
+          <CommandPaletteProvider>
+            <LazyCommandPalette />
+          </CommandPaletteProvider>
+        </AuthProvider>
       </ThemeProvider>
     </MemoryRouter>,
   );
@@ -45,15 +47,17 @@ describe('LazyCommandPalette', () => {
       return importOriginal();
     });
     const { default: Lazy } = await import('./LazyCommandPalette');
-    const { CommandPaletteProvider: Provider, ThemeProvider: Theme } = await import('@contexts');
+    const { AuthProvider: Auth, CommandPaletteProvider: Provider, ThemeProvider: Theme } = await import('@contexts');
     const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
     render(
       <MemoryRouter>
         <Theme>
-          <Provider>
-            <p>Page content</p>
-            <Lazy />
-          </Provider>
+          <Auth>
+            <Provider>
+              <p>Page content</p>
+              <Lazy />
+            </Provider>
+          </Auth>
         </Theme>
       </MemoryRouter>,
     );

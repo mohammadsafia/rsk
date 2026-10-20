@@ -5,7 +5,7 @@ import { AppLayout, AuthGuard, AuthLayout, ErrorBoundary } from '@layouts';
 
 import { docsRoutes } from './docs-routes';
 import { FULL_ROUTES_PATH } from './routes';
-import { LoginPlaceholder, NotFound, SettingsPlaceholder } from './RoutePlaceholders';
+import { NotFound, SettingsPlaceholder } from './RoutePlaceholders';
 
 const HomePage = lazy(() => import('@pages/home/HomePage'));
 const OperationsDashboard = lazy(() => import('@pages/clinic/dashboard/OperationsDashboard'));
@@ -15,6 +15,8 @@ const BillingPage = lazy(() => import('@pages/clinic/billing/BillingPage'));
 const SchedulePage = lazy(() => import('@pages/clinic/schedule/SchedulePage'));
 const PatientProfilePage = lazy(() => import('@pages/clinic/patient-profile/PatientProfilePage'));
 const NewPatientPage = lazy(() => import('@pages/clinic/intake/NewPatientPage'));
+const LoginPage = lazy(() => import('@pages/auth/LoginPage'));
+const ForgotPasswordPage = lazy(() => import('@pages/auth/ForgotPasswordPage'));
 
 export const router = createBrowserRouter([
   // Public documentation site (no auth) and redirects from the old /components gallery
@@ -44,7 +46,19 @@ export const router = createBrowserRouter([
     children: [
       {
         path: FULL_ROUTES_PATH.AUTH.LOGIN,
-        element: <LoginPlaceholder />,
+        element: (
+          <Suspense>
+            <LoginPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: FULL_ROUTES_PATH.AUTH.FORGOT_PASSWORD,
+        element: (
+          <Suspense>
+            <ForgotPasswordPage />
+          </Suspense>
+        ),
       },
     ],
   },

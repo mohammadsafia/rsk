@@ -11,7 +11,10 @@ describe('mock auth backend', () => {
 
   it('accepts the email in any case, and refuses a wrong password with a 401-shaped error', async () => {
     await expect(mockAuth.signIn({ ...DEMO_CREDENTIALS, email: 'DEMO@example.com' }, 0)).resolves.toBeTruthy();
-    await expect(mockAuth.signIn({ ...DEMO_CREDENTIALS, password: 'nope' }, 0)).rejects.toMatchObject({ status: 401, message: expect.any(String) });
+    await expect(mockAuth.signIn({ ...DEMO_CREDENTIALS, password: 'nope' }, 0)).rejects.toMatchObject({
+      status: 401,
+      message: expect.any(String),
+    });
   });
 
   it('accepts any reset request, so it never tells whether an account exists', async () => {

@@ -1,12 +1,14 @@
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router';
 
 import { AppLayout, AuthGuard, AuthLayout, ErrorBoundary } from '@layouts';
 
 import { FULL_ROUTES_PATH } from './routes';
-import { LoginPlaceholder, NotFound, SettingsPlaceholder } from './RoutePlaceholders';
+import { NotFound, SettingsPlaceholder } from './RoutePlaceholders';
 
 const DashboardPage = lazy(() => import('@pages/dashboard/DashboardPage'));
+const LoginPage = lazy(() => import('@pages/auth/LoginPage'));
+const ForgotPasswordPage = lazy(() => import('@pages/auth/ForgotPasswordPage'));
 
 export const router = createBrowserRouter([
   // The app starts on the dashboard; replace with a public landing page if you need one.
@@ -15,7 +17,7 @@ export const router = createBrowserRouter([
     element: <Navigate to={FULL_ROUTES_PATH.HOME.DASHBOARD} replace />,
   },
 
-  // Auth routes (login, register, etc.)
+  // Sign in and password reset; a signed-in visitor is sent on to ?next= or the dashboard
   {
     path: FULL_ROUTES_PATH.AUTH.INDEX,
     element: <AuthLayout />,
@@ -23,7 +25,19 @@ export const router = createBrowserRouter([
     children: [
       {
         path: FULL_ROUTES_PATH.AUTH.LOGIN,
-        element: <LoginPlaceholder />,
+        element: (
+          <Suspense>
+            <LoginPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: FULL_ROUTES_PATH.AUTH.FORGOT_PASSWORD,
+        element: (
+          <Suspense>
+            <ForgotPasswordPage />
+          </Suspense>
+        ),
       },
     ],
   },

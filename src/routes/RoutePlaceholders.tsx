@@ -28,9 +28,3 @@ export function SettingsPlaceholder() {
 
   return <PageHeader title={t('settings')} />;
 }
-
-export function LoginPlaceholder() {
-  const { t } = useAppTranslation('auth');
-
-  return <h1 className="text-fg text-xl font-semibold">{t('login.title')}</h1>;
-}
