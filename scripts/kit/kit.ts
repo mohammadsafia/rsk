@@ -8,9 +8,7 @@
  * Options: --from <dir> (a local starter instead of GitHub), --base <dir> (the version you took, for three-way merges),
  * --dry-run. RSK_STARTER_REPO picks another GitHub repository (default mohammadsafia/rsk-starter).
  */
-import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import os from 'node:os';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
 import {
@@ -25,8 +23,7 @@ import {
   stageUpstream,
   type Status,
 } from './core';
-
-const REPO = process.env.RSK_STARTER_REPO ?? 'mohammadsafia/rsk-starter';
+import { download, REPO } from './download';
 
 const LABELS: Record<Exclude<Status, 'same'>, string> = {
   updated: 'updated in the kit',
@@ -35,25 +32,6 @@ const LABELS: Record<Exclude<Status, 'same'>, string> = {
   modified: 'changed by you (kept)',
   conflict: 'changed on both sides',
 };
-
-/** Downloads a ref of the starter repository and unpacks it; null when the ref doesn't exist. */
-async function download(ref: string): Promise<string | null> {
-  const response = await fetch(`https://codeload.github.com/${REPO}/tar.gz/${ref}`);
-  if (response.status === 404) return null;
-  if (!response.ok) throw new Error(`Downloading ${REPO}@${ref} failed: HTTP ${response.status}`);
-  const dir = mkdtempSync(path.join(os.tmpdir(), 'rsk-kit-'));
-  try {
-    writeFileSync(path.join(dir, 'starter.tar.gz'), Buffer.from(await response.arrayBuffer()));
-    // A relative archive path: some Windows tars read "C:\…" as a remote host.
-    const unpack = spawnSync('tar', ['-xzf', 'starter.tar.gz', '--strip-components=1'], { cwd: dir, encoding: 'utf8' });
-    if (unpack.status !== 0) throw new Error(`Unpacking ${REPO}@${ref} failed: ${unpack.stderr || unpack.error?.message}`);
-    rmSync(path.join(dir, 'starter.tar.gz'));
-    return dir;
-  } catch (error) {
-    rmSync(dir, { recursive: true, force: true });
-    throw error;
-  }
-}
 
 async function main() {
   const { command, paths, from: fromArg, base: baseArg, dryRun } = parseArgs(process.argv.slice(2));
