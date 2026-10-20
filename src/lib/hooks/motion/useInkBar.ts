@@ -43,8 +43,8 @@ export function useInkBar(barRef: RefObject<HTMLElement | null>, selector: strin
       const move = planInkMove(instant ? null : previous, geometry, modeRef.current);
       // Where the bar is now: mid-flight, the running animation's position, so an interrupted move doesn't jump back.
       const style = getComputedStyle(bar);
-      const startLeft = parseFloat(style.left) || 0;
-      const start = { left: startLeft, right: startLeft + (parseFloat(style.width) || 0) };
+      const startLeft = Number.parseFloat(style.left) || 0;
+      const start = { left: startLeft, right: startLeft + (Number.parseFloat(style.width) || 0) };
       running.current?.cancel();
       running.current = null;
       // The resting place is written first; the animation plays over it and ends where the style already is.

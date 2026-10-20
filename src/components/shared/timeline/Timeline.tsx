@@ -77,13 +77,12 @@ const Item: FC<TimelineItemProps> = ({ title, time, meta, icon, avatar, tone = '
           </Conditional.If>
           <Conditional.If condition={hasTime}>
             <Tooltip content={hasTime ? formatDate(time, constants.DateFormats.SHORT_MONTH_DAY_YEAR_TIME) : ''}>
-              <time
-                tabIndex={0}
-                dateTime={hasTime ? toDate(time, constants.DateFormats.ISO_DATETIME) : undefined}
-                className="text-fg-muted focus-ring ms-auto rounded-sm text-xs"
-              >
-                {hasTime ? getTimeAgo(time) : ''}
-              </time>
+              {/* A button, so the full date in the tooltip is reachable by keyboard. */}
+              <button type="button" className="text-fg-muted focus-ring ms-auto rounded-sm text-xs">
+                <time dateTime={hasTime ? toDate(time, constants.DateFormats.ISO_DATETIME) : undefined}>
+                  {hasTime ? getTimeAgo(time) : ''}
+                </time>
+              </button>
             </Tooltip>
           </Conditional.If>
         </div>

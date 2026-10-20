@@ -153,8 +153,8 @@ const Loader: FC<TableLoaderProps> = ({ colSpan, loaderType = 'skeleton', isLoad
           </Row>
         ))}
         <tr className="sr-only">
-          <td colSpan={colSpan} role="status">
-            {t('loading')}
+          <td colSpan={colSpan}>
+            <span role="status">{t('loading')}</span>
           </td>
         </tr>
       </Conditional.Else>

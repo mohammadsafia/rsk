@@ -7,17 +7,24 @@ export type Oklch = { l: number; c: number; h: number; alpha: number };
 
 export type Rgb = [number, number, number];
 
-const OKLCH_PATTERN = /^oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*(?:\/\s*([\d.]+)%)?\s*\)$/;
+const NUMBER = /^[\d.]+$/;
 
+/** `oklch(l c h)` or `oklch(l c h / a%)`, read piece by piece (a single pattern for it backtracks). */
 export function parseOklch(value: string): Oklch {
-  const match = OKLCH_PATTERN.exec(value.trim());
-  if (!match) throw new Error(`Not an oklch() color: ${value}`);
+  const text = value.trim();
+  const fail = () => new Error(`Not an oklch() color: ${value}`);
+  if (!text.startsWith('oklch(') || !text.endsWith(')')) throw fail();
+  const [channels, alpha, ...extra] = text.slice('oklch('.length, -1).split('/');
+  const [l, c, h, ...more] = channels.trim().split(/\s+/);
+  const alphaText = alpha?.trim();
+  if (extra.length || more.length || ![l, c, h].every((part) => part !== undefined && NUMBER.test(part))) throw fail();
+  if (alphaText !== undefined && !(alphaText.endsWith('%') && NUMBER.test(alphaText.slice(0, -1)))) throw fail();
 
   return {
-    l: Number(match[1]),
-    c: Number(match[2]),
-    h: Number(match[3]),
-    alpha: match[4] === undefined ? 1 : Number(match[4]) / 100,
+    l: Number(l),
+    c: Number(c),
+    h: Number(h),
+    alpha: alphaText === undefined ? 1 : Number(alphaText.slice(0, -1)) / 100,
   };
 }
 
@@ -65,7 +72,7 @@ export function hexToOklch(hex: string): Oklch {
   // #rgb, #rrggbb, or #rrggbbaa (the alpha is ignored: an accent is opaque).
   const full = value.length === 3 ? value.replace(/./g, '$&$&') : value.length === 8 ? value.slice(0, 6) : value;
   if (!/^[\da-f]{6}$/i.test(full)) throw new Error(`Not a hex colour: ${hex}`);
-  const channels = [0, 2, 4].map((index) => parseInt(full.slice(index, index + 2), 16) / 255) as Rgb;
+  const channels = [0, 2, 4].map((index) => Number.parseInt(full.slice(index, index + 2), 16) / 255) as Rgb;
   return srgbToOklch(channels);
 }
 

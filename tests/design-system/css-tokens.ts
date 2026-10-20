@@ -23,7 +23,7 @@ export function extractBlock(css: string, selector: string): Record<string, stri
   const close = css.indexOf('}', open);
   const vars: Record<string, string> = {};
 
-  for (const match of css.slice(open + 1, close).matchAll(/--([\w-]+)\s*:\s*([^;]+);/g)) {
+  for (const match of css.slice(open + 1, close).matchAll(/--([\w-]+)\s*:([^;]+);/g)) {
     vars[match[1]] = match[2].trim();
   }
 

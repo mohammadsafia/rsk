@@ -5,7 +5,7 @@
 import { select, checkbox } from '@inquirer/prompts';
 import type { EnumStrategy } from '../types/index.js';
 
-export async function selectEnumStrategy(): Promise<EnumStrategy> {
+export function selectEnumStrategy(): Promise<EnumStrategy> {
   return select({
     message: 'How should enum-like types be generated?',
     choices: [

@@ -9,7 +9,7 @@ import { logger } from '../../utils/logger.js';
 export function createFilterStep(): PipelineStep {
   return {
     name: 'Filter',
-    async execute(ctx) {
+    execute(ctx) {
       // If selectedSchemas is empty, it means "all schemas"
       if (ctx.selectedSchemas.length === 0) {
         ctx.selectedSchemas = Array.from(ctx.schemas.keys());

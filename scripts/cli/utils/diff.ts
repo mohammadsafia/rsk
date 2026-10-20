@@ -52,15 +52,15 @@ export async function computeSchemaDiffs(
 
 function normalizeForCompare(content: string): string {
   return content
-    .replace(/\r\n/g, '\n')
+    .replaceAll('\r\n', '\n')
     .split('\n')
     .filter((line) => line.trim() !== '')
     .join('\n');
 }
 
 function computeLineDiff(oldContent: string, newContent: string): DiffLine[] {
-  const oldLines = oldContent.replace(/\r\n/g, '\n').split('\n');
-  const newLines = newContent.replace(/\r\n/g, '\n').split('\n');
+  const oldLines = oldContent.replaceAll('\r\n', '\n').split('\n');
+  const newLines = newContent.replaceAll('\r\n', '\n').split('\n');
   const diff: DiffLine[] = [];
 
   let i = 0;

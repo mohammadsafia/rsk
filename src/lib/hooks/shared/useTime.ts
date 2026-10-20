@@ -5,7 +5,7 @@ export const useTime = () => {
     // oxlint-disable-next-line prefer-const
     let [h, m, am] = val.split(/\W/g);
     if (h === '12' && am !== undefined) h = '0';
-    return [parseInt(h) + (am?.toLowerCase() === 'pm' ? 12 : 0), parseInt(m), am];
+    return [Number.parseInt(h, 10) + (am?.toLowerCase() === 'pm' ? 12 : 0), Number.parseInt(m, 10), am];
   };
 
   const minsToTimeString = (mins: number, ampm: boolean = true) => {

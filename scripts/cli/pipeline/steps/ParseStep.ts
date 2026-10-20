@@ -11,7 +11,7 @@ export function createParseStep(): PipelineStep {
     name: 'Parse',
     beforeHook: 'beforeParse',
     afterHook: 'afterParse',
-    async execute(ctx) {
+    execute(ctx) {
       const parser = new SchemaParser();
 
       const spinner = logger.spinner('Parsing OpenAPI schemas...');

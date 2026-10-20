@@ -57,8 +57,10 @@ const alertVariants = cva(
   },
 );
 
-const Title: FC<TitleProps> = ({ className, ...props }) => (
-  <h5 data-slot="alert-title" className={cn('text-fg leading-snug font-semibold', className)} {...props} />
+const Title: FC<TitleProps> = ({ className, children, ...props }) => (
+  <h5 data-slot="alert-title" className={cn('text-fg leading-snug font-semibold', className)} {...props}>
+    {children}
+  </h5>
 );
 
 const Description: FC<DescriptionProps> = ({ className, ...props }) => (
