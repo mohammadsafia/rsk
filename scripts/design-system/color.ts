@@ -62,7 +62,7 @@ export function srgbToOklch([red, green, blue]: Rgb): Oklch {
 /** "#rgb" or "#rrggbb" as OKLCH. */
 export function hexToOklch(hex: string): Oklch {
   const value = hex.trim().replace(/^#/, '');
-  const full = value.length === 3 ? [...value].map((digit) => digit + digit).join('') : value;
+  const full = value.length === 3 ? value.replace(/./g, '$&$&') : value;
   if (!/^[\da-f]{6}$/i.test(full)) throw new Error(`Not a hex colour: ${hex}`);
   const channels = [0, 2, 4].map((index) => parseInt(full.slice(index, index + 2), 16) / 255) as Rgb;
   return srgbToOklch(channels);
