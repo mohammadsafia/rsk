@@ -1,17 +1,17 @@
 // @vitest-environment happy-dom
 // tests/docs/mdx-links.test.tsx — links written in MDX stay inside the site wherever it is served (/rsk/ on Pages).
 import { readFileSync } from 'node:fs';
-import { createElement } from 'react';
+import { createElement, type ReactNode } from 'react';
 import { cleanup, render, screen } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
-import { mdxComponents } from '@component-docs/mdx-components';
+import { mdxComponents } from '../../src/component-docs/mdx-components';
 
 afterEach(cleanup);
 
 const renderLink = (href: string, text: string) => {
-  const A = mdxComponents.a as (props: { href: string; children: string }) => React.ReactNode;
+  const A = mdxComponents.a as (props: { href: string; children: string }) => ReactNode;
   const router = createMemoryRouter([{ path: '/docs', element: createElement(A, { href, children: text }) }], {
     basename: '/rsk',
     initialEntries: ['/rsk/docs'],
