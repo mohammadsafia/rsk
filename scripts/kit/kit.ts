@@ -13,7 +13,18 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import os from 'node:os';
 import path from 'node:path';
 
-import { applyUpdate, checkUpstream, classify, dependencyChanges, LOCK_FILE, parseArgs, readLock, readTree, type Status } from './core';
+import {
+  applyUpdate,
+  checkUpstream,
+  classify,
+  dependencyChanges,
+  LOCK_FILE,
+  parseArgs,
+  readLock,
+  readTree,
+  stageUpstream,
+  type Status,
+} from './core';
 
 const REPO = process.env.RSK_STARTER_REPO ?? 'mohammadsafia/rsk-starter';
 
@@ -51,9 +62,13 @@ async function main() {
   const temporary: string[] = [];
 
   try {
-    const upstreamDir = fromArg ? path.resolve(fromArg) : await download('refs/heads/main');
-    if (!upstreamDir) throw new Error(`${REPO} has no main branch.`);
-    if (!fromArg) temporary.push(upstreamDir);
+    const starterDir = fromArg ? path.resolve(fromArg) : await download('refs/heads/main');
+    if (!starterDir) throw new Error(`${REPO} has no main branch.`);
+    if (!fromArg) temporary.push(starterDir);
+    // The starter plus the registry files of the blocks this app added, at their app paths.
+    const blocks = lock.blocks ?? [];
+    const upstreamDir = stageUpstream(starterDir, blocks);
+    temporary.push(upstreamDir);
     const upstreamLock = existsSync(path.join(upstreamDir, LOCK_FILE)) ? readLock(upstreamDir) : null;
     checkUpstream(upstreamLock);
     const { kit } = upstreamLock;
@@ -76,8 +91,10 @@ async function main() {
     if (command === 'status') return;
 
     const needsBase = rows.some((row) => row.status === 'conflict');
-    const baseDir = baseArg ? path.resolve(baseArg) : needsBase ? await download(`refs/tags/kit/${lock.kit.slice(0, 7)}`) : null;
-    if (baseDir && !baseArg) temporary.push(baseDir);
+    const baseStarter = baseArg ? path.resolve(baseArg) : needsBase ? await download(`refs/tags/kit/${lock.kit.slice(0, 7)}`) : null;
+    if (baseStarter && !baseArg) temporary.push(baseStarter);
+    const baseDir = baseStarter ? stageUpstream(baseStarter, blocks) : null;
+    if (baseDir) temporary.push(baseDir);
     if (needsBase && !baseDir)
       console.log(`\nNo kit/${lock.kit.slice(0, 7)} tag to merge against: files changed on both sides get a .upstream copy beside them.`);
 

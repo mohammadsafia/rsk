@@ -2,12 +2,18 @@
 // kit's changes without ever losing the app's own.
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 
-/** Folders the kit owns. Everything else (pages, routes, layouts, api, locales, config) belongs to the app. */
+/**
+ * Folders the kit owns. Everything else (pages, routes, layouts, api, config) belongs to the app; of src/locales/, only
+ * the added blocks' own copy (block-<id>.json) is the kit's.
+ */
 export const KIT_PATHS = [
   'src/components/',
+  'src/blocks/',
+  'src/locales/',
   'src/lib/hooks/',
   'src/lib/utils/',
   'src/lib/contexts/',
@@ -26,14 +32,23 @@ export const KIT_PATHS = [
 
 export const LOCK_FILE = 'kit.lock.json';
 
-export type Lock = { kit: string; files: Record<string, string> };
+export type Lock = { kit: string; files: Record<string, string>; /** The blocks the app added with kit:add. */ blocks?: string[] };
 export type Status = 'same' | 'updated' | 'added' | 'removed' | 'modified' | 'conflict';
 export type Row = { path: string; status: Status };
 
 /** Repo-relative, posix separators. */
 const posix = (file: string) => file.split(path.sep).join('/');
 
-export const inScope = (file: string) => KIT_PATHS.some((prefix) => posix(file).startsWith(prefix)) && !file.endsWith('.upstream');
+const BLOCK_LOCALE = /^src\/locales\/(en|ar)\/block-[\w-]+\.json$/;
+
+export const inScope = (file: string) => {
+  const rel = posix(file);
+  // The block index is generated from the app's own blocks by kit:add/kit:remove.
+  if (rel.endsWith('.upstream') || rel === 'src/blocks/index.ts') return false;
+  // Locales are the app's own, except each block's own copy.
+  if (rel.startsWith('src/locales/')) return BLOCK_LOCALE.test(rel);
+  return KIT_PATHS.some((prefix) => rel.startsWith(prefix));
+};
 
 /** A file with a NUL byte is binary: it is hashed as is and never merged. */
 const isBinary = (bytes: Buffer) => bytes.includes(0);
@@ -98,9 +113,26 @@ export function readLock(appDir: string): Lock {
   return JSON.parse(readFileSync(file, 'utf8')) as Lock;
 }
 
-export function writeLock(appDir: string, kit: string, files: Map<string, string>) {
+export function writeLock(appDir: string, kit: string, files: Map<string, string>, blocks: string[] = []) {
   const sorted = Object.fromEntries([...files].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
-  writeFileSync(path.join(appDir, LOCK_FILE), `${JSON.stringify({ kit, files: sorted }, null, 2)}\n`);
+  writeFileSync(path.join(appDir, LOCK_FILE), `${JSON.stringify({ kit, blocks: [...blocks].sort(), files: sorted }, null, 2)}\n`);
+}
+
+/**
+ * The starter as an app sees it: the starter's own files plus, for each block the app added, the block's registry
+ * files at their app paths. kit:status and kit:update compare against this, so an added block is updated from the
+ * registry rather than read as "removed", and a block the app never added never appears.
+ */
+export function stageUpstream(starterDir: string, blocks: string[]): string {
+  const view = mkdtempSync(path.join(tmpdir(), 'rsk-kit-view-'));
+  // A local starter (--from) may have its dependencies and history beside it; the comparison needs neither.
+  const skip = new Set(['node_modules', '.git'].map((name) => path.join(starterDir, name)));
+  cpSync(starterDir, view, { recursive: true, filter: (source) => !skip.has(source) });
+  for (const id of blocks) {
+    const files = path.join(starterDir, 'registry/blocks', id, 'files');
+    if (existsSync(files)) cpSync(files, view, { recursive: true });
+  }
+  return view;
 }
 
 /**
@@ -213,7 +245,7 @@ export function applyUpdate(options: {
 
   // A partial update keeps the kit version the lock had: the files it didn't take still came from that version, and
   // their three-way merges need it as their base.
-  if (!dryRun) writeLock(appDir, prefixes.length ? lock.kit : kit, nextLock);
+  if (!dryRun) writeLock(appDir, prefixes.length ? lock.kit : kit, nextLock, lock.blocks ?? []);
   return result;
 }
 
