@@ -1,0 +1,12 @@
+{
+  "id": "invite-members-dialog",
+  "title": "Invite members dialog",
+  "level": "organism",
+  "family": "team",
+  "description": "A dialog to invite people by email with a role, validation and per-address errors.",
+  "tags": ["invite", "members", "team", "email", "roles"],
+  "dependsOn": [],
+  "packages": {},
+  "routes": [],
+  "nav": []
+}
