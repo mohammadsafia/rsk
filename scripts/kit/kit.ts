@@ -13,7 +13,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import os from 'node:os';
 import path from 'node:path';
 
-import { applyUpdate, classify, dependencyChanges, LOCK_FILE, readLock, readTree, type Status } from './core';
+import { applyUpdate, checkUpstream, classify, dependencyChanges, LOCK_FILE, parseArgs, readLock, readTree, type Status } from './core';
 
 const REPO = process.env.RSK_STARTER_REPO ?? 'mohammadsafia/rsk-starter';
 
@@ -31,36 +31,36 @@ async function download(ref: string): Promise<string | null> {
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(`Downloading ${REPO}@${ref} failed: HTTP ${response.status}`);
   const dir = mkdtempSync(path.join(os.tmpdir(), 'rsk-kit-'));
-  const archive = path.join(dir, 'starter.tar.gz');
-  writeFileSync(archive, Buffer.from(await response.arrayBuffer()));
-  const unpack = spawnSync('tar', ['-xzf', archive, '-C', dir, '--strip-components=1'], { encoding: 'utf8' });
-  if (unpack.status !== 0) throw new Error(`Unpacking ${REPO}@${ref} failed: ${unpack.stderr}`);
-  rmSync(archive);
-  return dir;
+  try {
+    writeFileSync(path.join(dir, 'starter.tar.gz'), Buffer.from(await response.arrayBuffer()));
+    // A relative archive path: some Windows tars read "C:\…" as a remote host.
+    const unpack = spawnSync('tar', ['-xzf', 'starter.tar.gz', '--strip-components=1'], { cwd: dir, encoding: 'utf8' });
+    if (unpack.status !== 0) throw new Error(`Unpacking ${REPO}@${ref} failed: ${unpack.stderr || unpack.error?.message}`);
+    rmSync(path.join(dir, 'starter.tar.gz'));
+    return dir;
+  } catch (error) {
+    rmSync(dir, { recursive: true, force: true });
+    throw error;
+  }
 }
 
-const arg = (name: string) => {
-  const index = process.argv.indexOf(`--${name}`);
-  return index > -1 ? process.argv[index + 1] : undefined;
-};
-
 async function main() {
-  const [command = 'status', ...rest] = process.argv.slice(2);
-  if (command !== 'status' && command !== 'update')
-    throw new Error('usage: kit.ts status|update [paths…] [--from dir] [--base dir] [--dry-run]');
+  const { command, paths, from: fromArg, base: baseArg, dryRun } = parseArgs(process.argv.slice(2));
   const appDir = process.cwd();
   const lock = readLock(appDir);
   const temporary: string[] = [];
 
   try {
-    const fromArg = arg('from');
     const upstreamDir = fromArg ? path.resolve(fromArg) : await download('refs/heads/main');
     if (!upstreamDir) throw new Error(`${REPO} has no main branch.`);
     if (!fromArg) temporary.push(upstreamDir);
     const upstreamLock = existsSync(path.join(upstreamDir, LOCK_FILE)) ? readLock(upstreamDir) : null;
-    const kit = upstreamLock?.kit ?? 'unknown';
+    checkUpstream(upstreamLock);
+    const { kit } = upstreamLock;
 
-    const rows = classify(lock, readTree(appDir), readTree(upstreamDir)).filter((row) => row.status !== 'same');
+    const listed = (file: string) =>
+      !paths.length || paths.some((prefix) => file.startsWith(prefix.replace(/\\/g, '/').replace(/^\.\//, '')));
+    const rows = classify(lock, readTree(appDir), readTree(upstreamDir)).filter((row) => row.status !== 'same' && listed(row.path));
     console.log(`Kit: you have rsk@${lock.kit.slice(0, 7)}, the starter has rsk@${kit.slice(0, 7)}.`);
     if (!rows.length) console.log('Every kit file is up to date.');
     for (const status of Object.keys(LABELS) as (keyof typeof LABELS)[]) {
@@ -75,17 +75,13 @@ async function main() {
     if (install) console.log(`\nThe kit's dependencies changed. To match them:\n  ${install}`);
     if (command === 'status') return;
 
-    const baseArg = arg('base');
     const needsBase = rows.some((row) => row.status === 'conflict');
     const baseDir = baseArg ? path.resolve(baseArg) : needsBase ? await download(`refs/tags/kit/${lock.kit.slice(0, 7)}`) : null;
     if (baseDir && !baseArg) temporary.push(baseDir);
     if (needsBase && !baseDir)
       console.log(`\nNo kit/${lock.kit.slice(0, 7)} tag to merge against: files changed on both sides get a .upstream copy beside them.`);
 
-    const options = new Set(['--from', '--base']);
-    const only = rest.filter((value, index) => !value.startsWith('--') && !options.has(rest[index - 1] ?? ''));
-    const dryRun = process.argv.includes('--dry-run');
-    const result = applyUpdate({ appDir, upstreamDir, baseDir: baseDir ?? undefined, kit, dryRun, only });
+    const result = applyUpdate({ appDir, upstreamDir, baseDir: baseDir ?? undefined, kit, dryRun, only: paths });
     const summary = [
       [result.updated.length, 'updated'],
       [result.added.length, 'added'],

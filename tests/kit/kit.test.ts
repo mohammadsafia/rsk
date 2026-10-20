@@ -5,7 +5,17 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { applyUpdate, classify, dependencyChanges, hashFile, inScope, readTree, writeLock } from '../../scripts/kit/core';
+import {
+  applyUpdate,
+  checkUpstream,
+  classify,
+  dependencyChanges,
+  hashFile,
+  inScope,
+  parseArgs,
+  readTree,
+  writeLock,
+} from '../../scripts/kit/core';
 
 const dir = () => mkdtempSync(path.join(tmpdir(), 'kit-'));
 const put = (root: string, file: string, text: string) => {
@@ -152,5 +162,70 @@ describe('dependency changes', () => {
     };
     expect(dependencyChanges(local, upstream)).toBe('pnpm add clsx@^2.1.0 react@^19.3.0 && pnpm add -D playwright@1.50.0');
     expect(dependencyChanges(local, local)).toBeNull();
+  });
+});
+
+describe('kit:update safety', () => {
+  it('a partial update keeps the lock’s kit version, so a later full update still merges against the right base', () => {
+    const { base, app, upstream } = scenario();
+    applyUpdate({ appDir: app, upstreamDir: upstream, baseDir: base, kit: 'bbbbbbb', only: ['src/components/ui/new/'] });
+    const lock = JSON.parse(read(app, 'kit.lock.json'));
+    expect(lock.kit).toBe('aaaaaaa');
+    expect(lock.files[NEW]).toBe(hashFile(path.join(upstream, NEW)));
+  });
+
+  it('accepts ./ and backslash paths, and refuses a path that matches no kit file', () => {
+    const { base, app, upstream } = scenario();
+    applyUpdate({ appDir: app, upstreamDir: upstream, baseDir: base, kit: 'bbbbbbb', only: ['./src\\components\\ui\\new'] });
+    expect(read(app, NEW)).toBe('new\n');
+    expect(() => applyUpdate({ appDir: app, upstreamDir: upstream, baseDir: base, kit: 'bbbbbbb', only: ['src/componnets/'] })).toThrow(
+      /matches no kit file/,
+    );
+  });
+
+  it('never empties a binary file it cannot merge: the app’s copy stays and the kit’s goes beside it', () => {
+    const { base, app, upstream } = scenario();
+    const ICON = 'src/assets/icons/logo.png';
+    const bytes = (tail: number) => Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00, 0x01, tail]);
+    for (const root of [base, app]) {
+      mkdirSync(path.join(root, 'src/assets/icons'), { recursive: true });
+      writeFileSync(path.join(root, ICON), bytes(1));
+    }
+    writeLock(app, 'aaaaaaa', readTree(base));
+    writeFileSync(path.join(app, ICON), bytes(2));
+    mkdirSync(path.join(upstream, 'src/assets/icons'), { recursive: true });
+    writeFileSync(path.join(upstream, ICON), bytes(3));
+    const result = applyUpdate({ appDir: app, upstreamDir: upstream, baseDir: base, kit: 'bbbbbbb' });
+    expect(result.conflicts).toContain(ICON);
+    expect(readFileSync(path.join(app, ICON))).toEqual(bytes(2));
+    expect(readFileSync(path.join(app, `${ICON}.upstream`))).toEqual(bytes(3));
+  });
+
+  it('reads a CRLF checkout (Windows) as the same file, not a local edit', () => {
+    const root = dir();
+    put(root, 'a.css', 'a {\n  color: red;\n}\n');
+    put(root, 'b.css', 'a {\r\n  color: red;\r\n}\r\n');
+    expect(hashFile(path.join(root, 'b.css'))).toBe(hashFile(path.join(root, 'a.css')));
+  });
+
+  it('refuses a starter folder with no kit.lock.json (it can’t tell what the kit removed)', () => {
+    expect(() => checkUpstream(null)).toThrow(/kit\.lock\.json/);
+    expect(() => checkUpstream({ kit: 'bbbbbbb', files: {} })).not.toThrow();
+  });
+});
+
+describe('kit CLI arguments', () => {
+  it('reads --flag value and --flag=value, keeps paths, and refuses unknown or valueless flags', () => {
+    expect(parseArgs(['update', 'src/components/', '--from', '../s', '--base=../b', '--dry-run'])).toEqual({
+      command: 'update',
+      paths: ['src/components/'],
+      from: '../s',
+      base: '../b',
+      dryRun: true,
+    });
+    expect(parseArgs([])).toMatchObject({ command: 'status', paths: [] });
+    expect(() => parseArgs(['update', '--from'])).toThrow(/--from needs a value/);
+    expect(() => parseArgs(['update', '--force'])).toThrow(/Unknown option --force/);
+    expect(() => parseArgs(['upgrade'])).toThrow(/usage/);
   });
 });

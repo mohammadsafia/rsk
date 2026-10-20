@@ -35,7 +35,47 @@ const posix = (file: string) => file.split(path.sep).join('/');
 
 export const inScope = (file: string) => KIT_PATHS.some((prefix) => posix(file).startsWith(prefix)) && !file.endsWith('.upstream');
 
-export const hashFile = (file: string) => createHash('sha256').update(readFileSync(file)).digest('hex');
+/** A file with a NUL byte is binary: it is hashed as is and never merged. */
+const isBinary = (bytes: Buffer) => bytes.includes(0);
+
+/** sha256 of a file; text is hashed with CRLF read as LF, so a Windows checkout isn't mistaken for a local edit. */
+export function hashFile(file: string) {
+  const bytes = readFileSync(file);
+  const content = isBinary(bytes) ? bytes : Buffer.from(bytes.toString('utf8').replace(/\r\n/g, '\n'), 'utf8');
+  return createHash('sha256').update(content).digest('hex');
+}
+
+/** The kit to update from must say which kit files it has (its kit.lock.json); otherwise "removed" can't be told apart. */
+export function checkUpstream(upstreamLock: Lock | null): asserts upstreamLock is Lock {
+  if (!upstreamLock)
+    throw new Error(`The starter to update from has no ${LOCK_FILE}: use the published starter or a folder built by starter:build.`);
+}
+
+export type Args = { command: 'status' | 'update'; paths: string[]; from?: string; base?: string; dryRun: boolean };
+
+/** kit.ts's arguments: `status|update [paths…] [--from dir] [--base dir] [--dry-run]` (also --from=dir). */
+export function parseArgs(argv: string[]): Args {
+  const [command = 'status', ...rest] = argv;
+  if (command !== 'status' && command !== 'update')
+    throw new Error('usage: kit.ts status|update [paths…] [--from dir] [--base dir] [--dry-run]');
+  const args: Args = { command, paths: [], dryRun: false };
+  for (let index = 0; index < rest.length; index += 1) {
+    const value = rest[index];
+    if (!value.startsWith('--')) {
+      args.paths.push(value);
+      continue;
+    }
+    const [flag, inline] = value.split(/=(.*)/s);
+    if (flag === '--dry-run') args.dryRun = true;
+    else if (flag === '--from' || flag === '--base') {
+      const given = inline ?? rest[index + 1];
+      if (!given || given.startsWith('--')) throw new Error(`${flag} needs a value`);
+      if (inline === undefined) index += 1;
+      args[flag === '--from' ? 'from' : 'base'] = given;
+    } else throw new Error(`Unknown option ${flag}`);
+  }
+  return args;
+}
 
 /** Every in-scope file under `root`, as path → sha256. */
 export function readTree(root: string): Map<string, string> {
@@ -87,15 +127,25 @@ export function classify(lock: Lock, local: Map<string, string>, upstream: Map<s
 
 export type UpdateResult = { updated: string[]; added: string[]; removed: string[]; merged: string[]; conflicts: string[]; kept: string[] };
 
-/** Three-way merge of one file into the app's copy. Returns whether it merged cleanly. */
-function mergeFile(appFile: string, baseFile: string, upstreamFile: string, dryRun: boolean): boolean {
-  const merge = spawnSync('git', ['merge-file', '-p', '-L', 'yours', '-L', 'original', '-L', 'kit', appFile, baseFile, upstreamFile], {
-    encoding: 'utf8',
-  });
-  if (merge.status === null || merge.status < 0) throw new Error(`git merge-file failed: ${merge.stderr}`);
+/**
+ * Three-way merge of one file into the app's copy. 'cannot' (binary, or git refused) leaves the app's file untouched.
+ */
+function mergeFile(appFile: string, baseFile: string, upstreamFile: string, dryRun: boolean): 'clean' | 'conflict' | 'cannot' {
+  if ([appFile, baseFile, upstreamFile].some((file) => isBinary(readFileSync(file)))) return 'cannot';
+  const merge = spawnSync('git', ['merge-file', '-p', '-L', 'yours', '-L', 'original', '-L', 'kit', appFile, baseFile, upstreamFile]);
+  // 0 = clean, 1–127 = that many conflicts, above (or no status) = git couldn't merge.
+  if (merge.status === null || merge.status > 127 || merge.status < 0) return 'cannot';
   if (!dryRun) writeFileSync(appFile, merge.stdout);
-  return merge.status === 0;
+  return merge.status === 0 ? 'clean' : 'conflict';
 }
+
+const gitAvailable = () => spawnSync('git', ['--version']).status === 0;
+
+/** "./src\\components" → "src/components/": paths as the lock writes them. */
+const normalise = (prefix: string) => {
+  const clean = prefix.replace(/\\/g, '/').replace(/^\.\//, '');
+  return clean;
+};
 
 /**
  * Takes the kit's changes into the app: updated and added files are copied, files the kit removed are deleted (only if
@@ -115,7 +165,12 @@ export function applyUpdate(options: {
   const lock = readLock(appDir);
   const upstream = readTree(upstreamDir);
   const rows = classify(lock, readTree(appDir), upstream);
-  const wanted = (file: string) => !only?.length || only.some((prefix) => file.startsWith(prefix));
+  const prefixes = (only ?? []).map(normalise);
+  for (const prefix of prefixes) if (!rows.some((row) => row.path.startsWith(prefix))) throw new Error(`"${prefix}" matches no kit file.`);
+  const wanted = (file: string) => !prefixes.length || prefixes.some((prefix) => file.startsWith(prefix));
+  // Check before touching anything: a missing git must not stop an update halfway.
+  if (rows.some((row) => row.status === 'conflict' && wanted(row.path)) && baseDir && !gitAvailable())
+    throw new Error('kit:update needs git to merge files changed on both sides; install git and run it again.');
   const result: UpdateResult = { updated: [], added: [], removed: [], merged: [], conflicts: [], kept: [] };
   const nextLock = new Map(Object.entries(lock.files));
 
@@ -140,9 +195,14 @@ export function applyUpdate(options: {
       const appFile = path.join(appDir, file);
       const baseFile = baseDir ? path.join(baseDir, file) : '';
       const canMerge = theirs !== undefined && existsSync(appFile) && baseFile && existsSync(baseFile);
-      if (canMerge && mergeFile(appFile, baseFile, path.join(upstreamDir, file), dryRun)) result.merged.push(file);
+      const outcome = canMerge ? mergeFile(appFile, baseFile, path.join(upstreamDir, file), dryRun) : 'cannot';
+      if (outcome === 'clean') result.merged.push(file);
       else {
-        if (!canMerge && theirs !== undefined && !dryRun) cpSync(path.join(upstreamDir, file), `${appFile}.upstream`);
+        // Without a merge, the app's file stays as it is and the kit's version goes beside it.
+        if (outcome === 'cannot' && theirs !== undefined && !dryRun) {
+          mkdirSync(path.dirname(appFile), { recursive: true });
+          cpSync(path.join(upstreamDir, file), `${appFile}.upstream`);
+        }
         result.conflicts.push(file);
       }
     }
@@ -151,7 +211,9 @@ export function applyUpdate(options: {
     else nextLock.set(file, theirs);
   }
 
-  if (!dryRun) writeLock(appDir, kit, nextLock);
+  // A partial update keeps the kit version the lock had: the files it didn't take still came from that version, and
+  // their three-way merges need it as their base.
+  if (!dryRun) writeLock(appDir, prefixes.length ? lock.kit : kit, nextLock);
   return result;
 }
 
