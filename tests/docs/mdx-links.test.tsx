@@ -11,8 +11,8 @@ import { mdxComponents } from '../../src/component-docs/mdx-components';
 afterEach(cleanup);
 
 const renderLink = (href: string, text: string) => {
-  const A = mdxComponents.a as (props: { href: string; children: string }) => ReactNode;
-  const router = createMemoryRouter([{ path: '/docs', element: createElement(A, { href, children: text }) }], {
+  const A = mdxComponents.a as (props: { href: string; children?: ReactNode }) => ReactNode;
+  const router = createMemoryRouter([{ path: '/docs', element: createElement(A, { href }, text) }], {
     basename: '/rsk',
     initialEntries: ['/rsk/docs'],
   });
