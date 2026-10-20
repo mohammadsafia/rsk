@@ -58,6 +58,12 @@ describe('buildStarter', () => {
     expect(pkg.devDependencies['@clack/prompts']).toBeDefined();
   });
 
+  it('gives the blocks’ pages outside the app shell an error page too', () => {
+    const router = readFileSync(path.join(out, 'src/routes/router.tsx'), 'utf8');
+    // A pathless parent with the error element, so a /maintenance or 404 chunk that fails to load isn't React Router's default page.
+    expect(router).toMatch(/errorElement:[\s\S]{0,160}children: bareBlockRoutes/);
+  });
+
   it('ships none of the starter tooling, its tests or its sync workflow', () => {
     expect(existsSync(path.join(out, 'scripts/starter'))).toBe(false);
     expect(existsSync(path.join(out, 'tests/starter'))).toBe(false);

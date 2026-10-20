@@ -77,8 +77,16 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // Blocks' pages without the app shell; a block's 404 comes before the one below, so it wins
-  ...bareBlockRoutes,
+  // Blocks' pages without the app shell; a block's 404 comes before the one below, so it wins. The pathless parent
+  // gives them the error page (e.g. when their chunk fails to load).
+  {
+    errorElement: (
+      <Suspense>
+        <RouteError />
+      </Suspense>
+    ),
+    children: bareBlockRoutes,
+  },
 
   // Catch-all 404
   {
