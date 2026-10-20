@@ -57,6 +57,7 @@ jobs:
       - name: Commit the starter
         run: pnpm starter:publish "$RUNNER_TEMP/starter" "$RUNNER_TEMP/publish"
 
-      # A no-op when the previous step reported "starter unchanged".
+      # A no-op when the previous step reported "starter unchanged". --follow-tags sends the kit/<sha> tag that apps'
+      # kit:update merges against.
       - name: Push
-        run: git -C "$RUNNER_TEMP/publish" push origin HEAD:main
+        run: git -C "$RUNNER_TEMP/publish" push --follow-tags origin HEAD:main

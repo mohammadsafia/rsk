@@ -104,4 +104,27 @@ describe('publish', () => {
     publish(starter, clone, { ...SOURCE, subject });
     expect(git(clone, 'log', '-1', '--format=%s').trim()).toBe(`sync: rsk@0d74983 — ${subject}`);
   });
+
+  it('tags each starter commit kit/<short sha>, so apps can fetch the version they took as a merge base', () => {
+    const starter = tmp();
+    write(starter, 'package.json', '{}\n');
+    write(starter, 'kit.lock.json', `{"kit":"${SOURCE.sha}"}\n`);
+    const clone = emptyClone();
+    publish(starter, clone, SOURCE);
+    expect(git(clone, 'tag', '--points-at', 'HEAD').trim()).toBe('kit/0d74983');
+    expect(git(clone, 'cat-file', '-t', 'kit/0d74983').trim()).toBe('tag'); // annotated, so --follow-tags pushes it
+  });
+
+  it("makes no commit when only the lock's kit version moved (a kit change that changes no starter file)", () => {
+    const starter = tmp();
+    write(starter, 'package.json', '{}\n');
+    write(starter, 'kit.lock.json', `{"kit":"${SOURCE.sha}"}\n`);
+    const clone = emptyClone();
+    publish(starter, clone, SOURCE);
+    write(starter, 'kit.lock.json', '{"kit":"1111111aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}\n');
+    expect(publish(starter, clone, { ...SOURCE, sha: '1111111aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' })).toBe('unchanged');
+    expect(commitCount(clone)).toBe(1);
+    // The clone keeps the lock that matches its tag.
+    expect(readFileSync(path.join(clone, 'kit.lock.json'), 'utf8')).toContain(SOURCE.sha);
+  });
 });

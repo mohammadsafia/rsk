@@ -6,6 +6,8 @@
  *   pnpm starter:build [outDir]      (default: .starter)
  */
 import { execFileSync } from 'node:child_process';
+
+import { readTree, writeLock } from '../kit/core';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -124,7 +126,14 @@ export function buildStarter(outDir: string) {
   delete pkg.Author;
   for (const script of DOCS_ONLY_SCRIPTS) delete pkg.scripts[script];
   for (const dependency of DOCS_ONLY_DEV_DEPENDENCIES) delete pkg.devDependencies[dependency];
+  // The kit updater: compare the app's kit files with the latest starter, and take the kit's changes.
+  pkg.scripts['kit:status'] = 'tsx scripts/kit/kit.ts status';
+  pkg.scripts['kit:update'] = 'tsx scripts/kit/kit.ts update';
   writeFileSync(pkgFile, `${JSON.stringify(pkg, null, 2)}\n`);
+
+  // 4b. The kit version this app starts from, and a fingerprint of each kit file (what kit:update compares against).
+  const kitCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
+  writeLock(out, kitCommit, readTree(out));
 
   // 5. Environment template: the keys, never this repo's values.
   const env = readFileSync(path.join(ROOT, '.env'), 'utf8').replace(/^﻿/, '');
