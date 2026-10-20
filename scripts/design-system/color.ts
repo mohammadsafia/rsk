@@ -62,7 +62,8 @@ export function srgbToOklch([red, green, blue]: Rgb): Oklch {
 /** "#rgb" or "#rrggbb" as OKLCH. */
 export function hexToOklch(hex: string): Oklch {
   const value = hex.trim().replace(/^#/, '');
-  const full = value.length === 3 ? value.replace(/./g, '$&$&') : value;
+  // #rgb, #rrggbb, or #rrggbbaa (the alpha is ignored: an accent is opaque).
+  const full = value.length === 3 ? value.replace(/./g, '$&$&') : value.length === 8 ? value.slice(0, 6) : value;
   if (!/^[\da-f]{6}$/i.test(full)) throw new Error(`Not a hex colour: ${hex}`);
   const channels = [0, 2, 4].map((index) => parseInt(full.slice(index, index + 2), 16) / 255) as Rgb;
   return srgbToOklch(channels);
@@ -86,4 +87,14 @@ export function contrastRatio(first: Rgb, second: Rgb): number {
 export function compositeOver(top: Oklch, bottom: Rgb): Rgb {
   const topRgb = oklchToSrgb(top);
   return topRgb.map((channel, index) => channel * top.alpha + bottom[index] * (1 - top.alpha)) as Rgb;
+}
+
+/** A colour as people paste it: `#rgb`, `#rrggbb`, `#rrggbbaa`, or `oklch(L C H)` with L as 0–1 or a %, H optionally in deg. */
+export function parseColor(input: string): Oklch {
+  const value = input.trim();
+  if (value.startsWith('#')) return hexToOklch(value);
+  const match = /^oklch\(\s*([\d.]+)(%?)\s+([\d.]+)\s+([\d.]+)(?:deg)?\s*\)$/i.exec(value);
+  if (!match) throw new Error(`Not a colour this accepts: ${input}. Use a hex value (#0f766e) or oklch(0.55 0.12 190).`);
+  const l = Number(match[1]) / (match[2] ? 100 : 1);
+  return { l, c: Number(match[3]), h: Number(match[4]), alpha: 1 };
 }
