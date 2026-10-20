@@ -72,4 +72,16 @@ describe('buildStarter', () => {
     expect(ignored('.env')).toBe(true);
     expect(ignored('.env.example')).toBe(false);
   });
+
+  it('ships none of the screenshot tests (they shoot the docs site), their config or their runner', () => {
+    expect(existsSync(path.join(out, 'tests/visual'))).toBe(false);
+    expect(existsSync(path.join(out, 'playwright.config.ts'))).toBe(false);
+    expect(existsSync(path.join(out, '.github/workflows/visual.yml'))).toBe(false);
+    const pkg = JSON.parse(readFileSync(path.join(out, 'package.json'), 'utf8')) as {
+      scripts: Record<string, string>;
+      devDependencies: Record<string, string>;
+    };
+    expect(pkg.devDependencies['@playwright/test']).toBeUndefined();
+    expect(pkg.scripts['visual:test']).toBeUndefined();
+  });
 });

@@ -33,6 +33,10 @@ export const DROP = [
   // Renders RSK's own logo favicons; an app replaces public/ favicons with its own.
   'scripts/design-system/favicons/',
   'tests/starter/',
+  // Screenshot tests shoot the docs site, which the starter doesn't have.
+  'tests/visual/',
+  'playwright.config.ts',
+  '.github/workflows/visual.yml',
   '.github/workflows/starter-sync.yml',
   'docs/',
   '.superpowers/',
@@ -56,12 +60,22 @@ export const DOCS_ONLY_DEV_DEPENDENCIES = [
   'remark-gfm',
   'remark-mdx-frontmatter',
   'shiki',
+  // The screenshot tests' runner (tests/visual).
+  '@playwright/test',
 ] as const;
 
 /** `nav.json` labels that only the showcase menu uses. */
 export const SHOWCASE_NAV_KEYS = ['schedule', 'patients', 'billing', 'components', 'members'] as const;
 
-export const DOCS_ONLY_SCRIPTS = ['docs:new', 'docs:lint', 'starter:build', 'starter:verify', 'starter:publish'] as const;
+export const DOCS_ONLY_SCRIPTS = [
+  'docs:new',
+  'docs:lint',
+  'starter:build',
+  'starter:verify',
+  'starter:publish',
+  'visual:test',
+  'visual:update',
+] as const;
 
 /** Words that must not survive in the starter's src/ (showcase leftovers). */
 export const LEFTOVER_PATTERNS = [
