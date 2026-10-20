@@ -92,10 +92,17 @@ function EmailsField({ failures }: EmailsFieldProps): ReactElement {
         <div
           data-slot="invite-emails"
           data-invalid={invalid || undefined}
-          className={cn(fieldVariants({ size: 'md' }), 'data-invalid:border-danger h-auto min-h-control-md flex-wrap gap-1.5 px-2 py-1.5')}
+          // No size variant: its fixed height would keep a second row of chips outside the box. The box grows with the
+          // chips instead, keeping an even inset around them; typed text starts where other fields' text does.
+          className={cn(
+            fieldVariants({ size: null }),
+            'data-invalid:border-danger min-h-control-md flex-wrap content-center items-center gap-1 py-0.5 ps-1 pe-2 text-sm',
+          )}
         >
           <Conditional.If condition={field.value.length > 0}>
-            <ul aria-label={t('emails')} className="flex min-w-0 flex-wrap gap-1.5">
+            {/* `contents`: the chips and the input share one row flow, so typing continues after the last chip. The explicit
+                role keeps the list a list (some browsers drop it with display: contents). */}
+            <ul role="list" aria-label={t('emails')} className="contents">
               {field.value.map((email) => (
                 <li key={email} data-slot="invite-email" data-email={email} data-invalid={flagged(email) || undefined}>
                   <Tag tone={flagged(email) ? 'danger' : 'neutral'} label={email} onRemove={() => handleRemove(email)}>
@@ -122,8 +129,9 @@ function EmailsField({ failures }: EmailsFieldProps): ReactElement {
             inputMode="email"
             autoComplete="off"
             aria-invalid={invalid || undefined}
+            placeholder={field.value.length ? undefined : t('emailsPlaceholder')}
             value={draft}
-            className="text-fg placeholder:text-fg-muted min-w-40 flex-1 bg-transparent text-sm outline-none"
+            className="text-fg placeholder:text-fg-muted h-6 min-w-24 flex-1 bg-transparent px-2 text-sm outline-none"
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}

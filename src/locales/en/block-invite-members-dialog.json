@@ -3,6 +3,7 @@
   "description": "Each person gets an email with a link to join.",
   "emails": "Email addresses",
   "emailsHint": "Separate addresses with a comma, or press Enter after each.",
+  "emailsPlaceholder": "name@example.com",
   "notValid": "(not a valid email address)",
   "role": "Role",
   "roleRequired": "Choose a role.",

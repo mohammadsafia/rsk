@@ -3,6 +3,7 @@
   "description": "يصل كلَّ شخص بريدٌ فيه رابط للانضمام.",
   "emails": "عناوين البريد الإلكتروني",
   "emailsHint": "افصل بين العناوين بفاصلة، أو اضغط Enter بعد كل عنوان.",
+  "emailsPlaceholder": "name@example.com",
   "notValid": "(عنوان بريد غير صالح)",
   "role": "الدور",
   "roleRequired": "اختر دورًا.",
