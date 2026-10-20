@@ -53,7 +53,7 @@ async function main() {
     const { kit } = upstreamLock;
 
     const listed = (file: string) =>
-      !paths.length || paths.some((prefix) => file.startsWith(prefix.replace(/\\/g, '/').replace(/^\.\//, '')));
+      !paths.length || paths.some((prefix) => file.startsWith(prefix.replaceAll('\\', '/').replace(/^\.\//, '')));
     const { lock: kept, released } = releaseDroppedBlocks(lock, upstreamDir);
     const rows = classify(kept, readTree(appDir), readTree(upstreamDir)).filter((row) => row.status !== 'same' && listed(row.path));
     console.log(`Kit: you have rsk@${lock.kit.slice(0, 7)}, the starter has rsk@${kit.slice(0, 7)}.`);

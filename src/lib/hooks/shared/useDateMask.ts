@@ -367,7 +367,9 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
       inputRef.current = e.target;
 
       const rangeSepIndex = rawValue.indexOf(' - ');
-      const altRangeSepIndex = rawValue.search(/\s+-\s+/);
+      // Where a "<spaces>-<spaces>" separator starts: find " - ", then step back over the spaces before it.
+      let altRangeSepIndex = /\s-\s/.exec(rawValue)?.index ?? -1;
+      while (altRangeSepIndex > 0 && /\s/.test(rawValue[altRangeSepIndex - 1])) altRangeSepIndex -= 1;
       const sepIndex = rangeSepIndex !== -1 ? rangeSepIndex : altRangeSepIndex;
 
       let fromPart: string;
@@ -523,7 +525,7 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
       e.preventDefault();
       const pastedText = e.clipboardData.getData('text');
 
-      const parts = pastedText.split(/\s*[-–—]\s*/);
+      const parts = pastedText.split(/[-–—]/).map((part) => part.trim());
 
       if (parts.length >= 2) {
         const maskedFrom = applyMask(parts[0], dateFormat);

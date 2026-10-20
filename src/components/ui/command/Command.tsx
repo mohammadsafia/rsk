@@ -46,7 +46,7 @@ type CommandComponent = FC<CommandProps> & {
 };
 
 const CommandInput: FC<CommandInputProps> = ({ className, children, ...props }) => (
-  <div className="border-border-subtle flex items-center gap-2 border-b px-3" cmdk-input-wrapper="">
+  <div className="border-border-subtle flex items-center gap-2 border-b px-3" data-cmdk-input-wrapper="">
     <Search size={16} className="text-fg-muted shrink-0" />
 
     <CommandPrimitive.Input
@@ -153,9 +153,9 @@ const CommandDialog: FC<CommandDialogProps> = ({ title, filter, children, ...pro
         filter={filter}
         className={cn(
           '**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium',
-          '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5',
-          '[&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5 **:[[cmdk-group]]:px-2',
-          '**:[[cmdk-input]]:h-12 **:[[cmdk-item]]:p-3 **:[[cmdk-input-wrapper]]:pe-12',
+          '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[data-cmdk-input-wrapper]_svg]:h-5',
+          '[&_[data-cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5 **:[[cmdk-group]]:px-2',
+          '**:[[cmdk-input]]:h-12 **:[[cmdk-item]]:p-3 **:[[data-cmdk-input-wrapper]]:pe-12',
         )}
       >
         {children}

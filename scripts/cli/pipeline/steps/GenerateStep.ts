@@ -18,7 +18,7 @@ export function createGenerateStep(): PipelineStep {
     name: 'Generate',
     beforeHook: 'beforeGenerate',
     afterHook: 'afterGenerate',
-    async execute(ctx) {
+    execute(ctx) {
       const registry = GeneratorRegistry.createDefault();
       const codeGen = new CodeGenerator(registry);
       const barrelGen = new BarrelGenerator();

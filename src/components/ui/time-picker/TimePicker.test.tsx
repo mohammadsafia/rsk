@@ -19,7 +19,7 @@ describe('TimePicker', () => {
   it('emits "10:30" after picking 10 and 30 in 24h mode', async () => {
     const handleChange = vi.fn();
     renderPicker({ use24hFormat: true, onChange: handleChange });
-    fireEvent.click(screen.getByRole('button', { name: /Select time/ }));
+    fireEvent.click(screen.getByRole('combobox', { name: /Select time/ }));
     fireEvent.click(within(await screen.findByRole('listbox', { name: 'Hours' })).getByRole('option', { name: '10' }));
     fireEvent.click(within(screen.getByRole('listbox', { name: 'Minutes' })).getByRole('option', { name: '30' }));
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
@@ -28,14 +28,14 @@ describe('TimePicker', () => {
 
   it('marks the chosen option selected', async () => {
     renderPicker({ use24hFormat: true, value: '14:45', step: 15 });
-    fireEvent.click(screen.getByRole('button', { name: /14:45/ }));
+    fireEvent.click(screen.getByRole('combobox', { name: /14:45/ }));
     const hours = await screen.findByRole('listbox', { name: 'Hours' });
     expect(within(hours).getByRole('option', { name: '14' }).getAttribute('aria-selected')).toBe('true');
   });
 
   it('has the same field shape and height as Input, and exposes invalid', () => {
     renderPicker({ invalid: true });
-    const trigger = screen.getByRole('button', { name: /Select time/ });
+    const trigger = screen.getByRole('combobox', { name: /Select time/ });
     expect(trigger.className).toContain('h-control-md');
     expect(trigger.getAttribute('aria-invalid')).toBe('true');
   });
@@ -44,14 +44,14 @@ describe('TimePicker', () => {
     const handleChange = vi.fn();
     renderPicker({ value: '09:00', use24hFormat: true, onChange: handleChange });
     const clear = screen.getByRole('button', { name: 'Clear' });
-    expect(screen.getByRole('button', { name: /09:00/ }).contains(clear)).toBe(false);
+    expect(screen.getByRole('combobox', { name: /09:00/ }).contains(clear)).toBe(false);
     fireEvent.click(clear);
     expect(handleChange).toHaveBeenCalledWith(undefined);
   });
 
   it('uses one tab stop per column and moves with the arrow keys', async () => {
     renderPicker({ use24hFormat: true, value: '10:00', step: 30 });
-    fireEvent.click(screen.getByRole('button', { name: /10:00/ }));
+    fireEvent.click(screen.getByRole('combobox', { name: /10:00/ }));
     const hours = await screen.findByRole('listbox', { name: 'Hours' });
     const tabbable = within(hours)
       .getAllByRole('option')

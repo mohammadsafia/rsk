@@ -5,7 +5,7 @@ import searchableCheckbox from './searchableCheckbox.js';
 
 type GenerationMode = 'all' | 'select' | 'enums-only' | 'dtos-only';
 
-export async function selectGenerationMode(): Promise<GenerationMode> {
+export function selectGenerationMode(): Promise<GenerationMode> {
   return select({
     message: 'Select generation mode:',
     choices: [
@@ -29,7 +29,7 @@ export async function selectGenerationMode(): Promise<GenerationMode> {
   });
 }
 
-export async function selectSchemas(schemas: Map<string, IRSchema>, diffs?: Map<string, SchemaDiffResult>): Promise<string[]> {
+export function selectSchemas(schemas: Map<string, IRSchema>, diffs?: Map<string, SchemaDiffResult>): Promise<string[]> {
   const choices = Array.from(schemas.entries())
     .map(([key, schema]) => {
       const name = key.split('::')[1];

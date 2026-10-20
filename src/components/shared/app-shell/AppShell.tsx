@@ -112,7 +112,7 @@ const MenuButton: FC<{ className?: string }> = ({ className }) => {
 
 const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY, className, children }) => {
   const { t } = useAppTranslation('nav');
-  const shellId = useId().replace(/:/g, '');
+  const shellId = useId().replaceAll(':', '');
   const sidebarId = `app-sidebar-${shellId}`;
   const contentId = `main-content-${shellId}`;
   const menuButtonRef = useRef<HTMLButtonElement>(null);

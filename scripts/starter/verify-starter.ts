@@ -80,7 +80,9 @@ try {
   budget('--routes', '/auth/login,/auth/forgot-password,/maintenance,/no-such-page', '--report', 'first-load-blocks-signed-out.json');
   run(out, 'corepack', [...pnpm, 'exec', 'tsx', 'scripts/kit/add.ts', 'remove', ...ids, '--from', '.']);
   const after = fingerprint(out);
-  const changed = [...new Set([...before.keys(), ...after.keys()])].filter((file) => before.get(file) !== after.get(file)).sort();
+  const changed = [...new Set([...before.keys(), ...after.keys()])]
+    .filter((file) => before.get(file) !== after.get(file))
+    .sort((a, b) => a.localeCompare(b));
   if (changed.length)
     throw new Error(`kit:add then kit:remove left the starter different:\n${changed.map((file) => `  ${file}`).join('\n')}`);
   console.log(`\nStarter verified: ${out}`);

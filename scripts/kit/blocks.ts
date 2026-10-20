@@ -37,7 +37,7 @@ export function blockFiles(root: string, id: string): string[] {
   return [
     ...walk(root, `src/blocks/${id}`),
     ...LANGS.map((lang) => `src/locales/${lang}/block-${id}.json`).filter((file) => existsSync(path.join(root, file))),
-  ].sort();
+  ].sort((a, b) => a.localeCompare(b));
 }
 
 export function readBlocks(root: string): BlockMeta[] {
@@ -131,7 +131,7 @@ export function generateBlockIndex(blocks: BlockMeta[]): string {
       .sort((a, b) => Number(a.entry.path === '*') - Number(b.entry.path === '*'))
       .map(({ block, entry }) => route(block.id, entry));
   const nav = blocks.flatMap((block) => block.nav.map((item) => ({ block, item })));
-  const icons = [...new Set(nav.map(({ item }) => item.icon))].sort();
+  const icons = [...new Set(nav.map(({ item }) => item.icon))].sort((a, b) => a.localeCompare(b));
   const errorBlock = blocks.find((block) => block.errorElement);
   // The menu lists blocks' pages on every page, before any block loads: their labels (only `nav`) come with the index.
   const labelled = blocks.filter((block) => block.nav.length);

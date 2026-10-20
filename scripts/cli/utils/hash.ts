@@ -10,10 +10,10 @@ import crypto from 'node:crypto';
  */
 export function computeContentHash(content: string): string {
   const normalized = content
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n')
+    .replaceAll('\r\n', '\n')
+    .replaceAll('\r', '\n')
     .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/\/\/.*$/gm, '')
+    .replace(/\/\/[^\n]*/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 
