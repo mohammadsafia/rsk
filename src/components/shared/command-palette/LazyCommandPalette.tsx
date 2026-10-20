@@ -1,5 +1,7 @@
 import { Component, type FC, lazy, type ReactNode, Suspense, useState } from 'react';
 
+import { Conditional } from '@components/utils';
+
 import { useCommandPalette } from '@contexts';
 
 const load = () => import('./CommandPalette');
@@ -18,7 +20,7 @@ class LoadBoundary extends Component<{ children: ReactNode; onError: () => void 
   }
 
   render() {
-    return this.state.failed ? null : this.props.children;
+    return <Conditional.If condition={!this.state.failed}>{this.props.children}</Conditional.If>;
   }
 }
 
@@ -34,19 +36,21 @@ const LazyCommandPalette: FC = () => {
   const [CommandPalette, setCommandPalette] = useState(() => lazy(load));
   if (open && !wanted) setWanted(true);
 
-  const retryLater = () => {
+  const handleLoadError = () => {
     setWanted(false);
     setOpen(false);
     setCommandPalette(() => lazy(load));
   };
 
-  return wanted ? (
-    <LoadBoundary onError={retryLater}>
-      <Suspense fallback={null}>
-        <CommandPalette />
-      </Suspense>
-    </LoadBoundary>
-  ) : null;
+  return (
+    <Conditional.If condition={wanted}>
+      <LoadBoundary onError={handleLoadError}>
+        <Suspense fallback={null}>
+          <CommandPalette />
+        </Suspense>
+      </LoadBoundary>
+    </Conditional.If>
+  );
 };
 
 export default LazyCommandPalette;
