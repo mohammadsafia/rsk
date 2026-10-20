@@ -2,7 +2,8 @@
 // They shoot the docs site, which only exists in development, so they start their own dev server.
 import { defineConfig } from '@playwright/test';
 
-const PORT = 5180;
+// Its own port, never another dev server's: a server left running from another branch would be tested instead.
+const PORT = Number(process.env.VISUAL_PORT ?? 5181);
 
 export default defineConfig({
   testDir: 'tests/visual',
@@ -20,13 +21,15 @@ export default defineConfig({
     reducedMotion: 'reduce',
   },
   expect: {
-    // Tolerates anti-aliasing noise, not a moved border or a changed colour.
-    toHaveScreenshot: { maxDiffPixelRatio: 0.002, animations: 'disabled', caret: 'hide' },
+    // A few pixels of anti-aliasing noise, not a changed token: threshold is how different one pixel's colour may be
+    // (Playwright's default 0.2 lets subtle colour shifts through), maxDiffPixels how many may differ at all. Measured:
+    // unchanged code differs by 0 pixels; a button's radius going from 6 to 8px moves 5.
+    toHaveScreenshot: { threshold: 0.05, maxDiffPixels: 2, animations: 'disabled', caret: 'hide' },
   },
   webServer: {
     command: `corepack pnpm@10.34.7 exec vp dev --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}/docs`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });

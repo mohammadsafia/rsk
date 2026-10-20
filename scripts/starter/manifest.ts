@@ -36,6 +36,7 @@ export const DROP = [
   // Screenshot tests shoot the docs site, which the starter doesn't have.
   'tests/visual/',
   'playwright.config.ts',
+  '.github/workflows/visual.yml',
   '.github/workflows/starter-sync.yml',
   'docs/',
   '.superpowers/',

@@ -1,0 +1,50 @@
+# Screenshot tests in Playwright's pinned Linux image, so baselines don't drift with anyone's OS or fonts.
+#
+# Linux baselines are recorded once: run this workflow with "record" checked, download the linux-baselines artifact,
+# commit it under tests/visual/__screenshots__/linux/, then enable the pull_request trigger below.
+name: visual
+
+on:
+  workflow_dispatch:
+    inputs:
+      record:
+        description: Record new Linux baselines (uploaded as an artifact) instead of comparing
+        type: boolean
+        default: false
+  # pull_request:   # enable once tests/visual/__screenshots__/linux/ is committed
+
+permissions:
+  contents: read
+
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.64.1-noble
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Screenshot tests
+        run: pnpm ${{ inputs.record && 'visual:update' || 'visual:test' }}
+
+      - name: Linux baselines
+        if: inputs.record
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-baselines
+          path: tests/visual/__screenshots__/linux/
+
+      - name: Report (expected, actual and diff images)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-report
+          path: visual-report/
