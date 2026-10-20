@@ -10,7 +10,7 @@ import { logger, type TreeNode } from '../../utils/logger.js';
 export function createResolveStep(): PipelineStep {
   return {
     name: 'Resolve',
-    async execute(ctx) {
+    execute(ctx) {
       const originalSelected = new Set(ctx.selectedSchemas);
       const resolvedSet = new Set(ctx.selectedSchemas);
 

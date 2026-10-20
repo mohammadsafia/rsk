@@ -12,7 +12,7 @@ export type PipelineStep = {
   name: string;
   beforeHook?: HookName;
   afterHook?: HookName;
-  execute: (ctx: PipelineContext) => Promise<void>;
+  execute: (ctx: PipelineContext) => void | Promise<void>;
 };
 
 export class Pipeline {

@@ -61,7 +61,11 @@ export const FORBIDDEN_PATTERNS: ReadonlyArray<{ id: PatternId; regex: RegExp; w
     ),
     why: 'The theme clears the Tailwind palette (--color-*: initial); palette classes render nothing',
   },
-  { id: 'arbitrary-length', regex: /\b[a-z][\w-]*-\[-?\d*\.?\d+(?:px|rem)\]/g, why: 'Use the Tailwind scale (README code standards)' },
+  {
+    id: 'arbitrary-length',
+    regex: /\b[a-z][\w-]*(?<=-)\[-?(?:\d+(?:\.\d+)?|\.\d+)(?:px|rem)\]/g,
+    why: 'Use the Tailwind scale (README code standards)',
+  },
   {
     id: 'state-fill',
     regex: /(?:data-\[state=(?:active|on)\]|aria-selected|aria-\[selected=true\]|aria-\[current=page\]|data-\[active=true\]):bg-/g,

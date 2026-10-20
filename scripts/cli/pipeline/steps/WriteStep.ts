@@ -11,7 +11,7 @@ export function createWriteStep(): PipelineStep {
     name: 'Write',
     beforeHook: 'beforeWrite',
     afterHook: 'afterWrite',
-    async execute(ctx) {
+    execute(ctx) {
       const writer = new FileWriter();
       const dryRun = ctx.config.dryRun;
 

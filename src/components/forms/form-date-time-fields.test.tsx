@@ -41,7 +41,7 @@ describe('date and time fields', () => {
         <FormTimePicker name="time" label="Time" />
       </FormHarness>,
     );
-    const trigger = screen.getByRole('button', { name: /Time|Select time/ });
+    const trigger = screen.getByRole('combobox', { name: /Time|Select time/ });
     await waitFor(() => expect(describedText(trigger)).toBe('Pick a time'));
     expect(trigger.getAttribute('aria-invalid')).toBe('true');
   });

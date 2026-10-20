@@ -26,7 +26,12 @@ const useRevealKey = () => {
     .join('/')
     .replace(/\/{2,}/g, '/');
   if (pattern) return pattern;
-  return typeof window === 'undefined' ? '' : window.location.pathname.replace(/(.)\/+$/, '$1');
+  if (typeof window === 'undefined') return '';
+  // Without trailing slashes, but "/" stays "/".
+  const path = window.location.pathname;
+  let end = path.length;
+  while (end > 1 && path[end - 1] === '/') end -= 1;
+  return path.slice(0, end);
 };
 
 const Sections: FC<ComponentPropsWithoutRef<'div'>> = ({ className, ...props }) => {

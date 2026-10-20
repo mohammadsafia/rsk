@@ -7,7 +7,7 @@ export const toLatinDigits = (value: string): string => {
   if (!value) return value;
 
   return value.replace(/[٠-٩۰-۹]/g, (digit) => {
-    const code = digit.charCodeAt(0);
+    const code = digit.codePointAt(0) ?? 0;
     const base = code >= EXTENDED_ARABIC_INDIC_OFFSET ? EXTENDED_ARABIC_INDIC_OFFSET : ARABIC_INDIC_OFFSET;
 
     return String(code - base);

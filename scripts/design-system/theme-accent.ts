@@ -156,11 +156,11 @@ export function applyAccent(css: string, theme: AccentTheme): string {
 
 /** The custom properties declared in one `selector { … }` block. */
 function blockVars(source: string, selector: string): Vars {
-  const css = source.replace(/\r\n/g, '\n');
+  const css = source.replaceAll('\r\n', '\n');
   const start = css.indexOf(`${selector} {`);
   if (start < 0) throw new Error(`tokens.css has no "${selector.replace('\n', ' ')} { … }" block`);
   const body = css.slice(start, css.indexOf('\n}', start));
-  return Object.fromEntries([...body.matchAll(/--([\w-]+):\s*([^;]+);/g)].map((match) => [match[1], match[2].trim()]));
+  return Object.fromEntries([...body.matchAll(/--([\w-]+):([^;]+);/g)].map((match) => [match[1], match[2].trim()]));
 }
 
 function main() {

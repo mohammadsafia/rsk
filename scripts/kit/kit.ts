@@ -59,7 +59,7 @@ async function main() {
     const { kit } = upstreamLock;
 
     const listed = (file: string) =>
-      !paths.length || paths.some((prefix) => file.startsWith(prefix.replace(/\\/g, '/').replace(/^\.\//, '')));
+      !paths.length || paths.some((prefix) => file.startsWith(prefix.replaceAll('\\', '/').replace(/^\.\//, '')));
     const rows = classify(lock, readTree(appDir), readTree(upstreamDir)).filter((row) => row.status !== 'same' && listed(row.path));
     console.log(`Kit: you have rsk@${lock.kit.slice(0, 7)}, the starter has rsk@${kit.slice(0, 7)}.`);
     if (!rows.length) console.log('Every kit file is up to date.');

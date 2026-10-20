@@ -4,6 +4,7 @@ import {
   type FC,
   type KeyboardEvent,
   useEffect,
+  useId,
   useMemo,
   useState,
 } from 'react';
@@ -160,32 +161,43 @@ const TimePickerTrigger: FC<TimePickerTriggerProps> = ({
   displayValue,
   disabled,
   ...props
-}) => (
-  <button
-    ref={ref}
-    type="button"
-    disabled={disabled}
-    aria-invalid={invalid || undefined}
-    className={cn(fieldVariants({ size }), 'group cursor-pointer gap-2 text-start', className)}
-    {...props}
-    // After the spread: Popover.Trigger asChild injects its own data-slot.
-    data-slot="time-picker-trigger"
-  >
-    <Clock4Icon aria-hidden="true" className="text-fg-muted group-data-[state=open]:text-accent size-4 shrink-0" />
+}) => {
+  // role="combobox" isn't named by its content (as Combobox's trigger): without a label, its own visible text names it.
+  const textId = useId();
+  const labelledBy = props['aria-labelledby'] ?? (props['aria-label'] ? undefined : textId);
 
-    <Conditional>
-      <Conditional.If condition={!!displayValue}>
-        <span className="text-fg min-w-0 flex-1 truncate font-mono tabular-nums">
-          <bdi dir="ltr">{displayValue}</bdi>
-        </span>
-      </Conditional.If>
+  return (
+    <button
+      ref={ref}
+      type="button"
+      // A field that opens a panel of options, like Select's trigger: combobox also supports aria-invalid (button doesn't).
+      role="combobox"
+      disabled={disabled}
+      aria-invalid={invalid || undefined}
+      className={cn(fieldVariants({ size }), 'group cursor-pointer gap-2 text-start', className)}
+      {...props}
+      aria-labelledby={labelledBy}
+      // After the spread: Popover.Trigger asChild injects its own data-slot.
+      data-slot="time-picker-trigger"
+    >
+      <Clock4Icon aria-hidden="true" className="text-fg-muted group-data-[state=open]:text-accent size-4 shrink-0" />
 
-      <Conditional.Else>
-        <span className="text-fg-muted min-w-0 flex-1 truncate">{placeholder}</span>
-      </Conditional.Else>
-    </Conditional>
-  </button>
-);
+      <Conditional>
+        <Conditional.If condition={!!displayValue}>
+          <span id={textId} className="text-fg min-w-0 flex-1 truncate font-mono tabular-nums">
+            <bdi dir="ltr">{displayValue}</bdi>
+          </span>
+        </Conditional.If>
+
+        <Conditional.Else>
+          <span id={textId} className="text-fg-muted min-w-0 flex-1 truncate">
+            {placeholder}
+          </span>
+        </Conditional.Else>
+      </Conditional>
+    </button>
+  );
+};
 
 const TimePickerContent: FC<TimePickerContentProps> = ({
   className,

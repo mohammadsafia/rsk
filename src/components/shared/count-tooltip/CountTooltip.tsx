@@ -19,7 +19,7 @@ type CountTooltipContextType = {
   count: number;
 };
 
-type CountTooltipTriggerProps = ComponentProps<'span'>;
+type CountTooltipTriggerProps = ComponentProps<'button'>;
 
 type CountTooltipItemProps = ComponentPropsWithoutRef<'div'> & { icon?: ReactNode };
 
@@ -48,15 +48,16 @@ const Trigger: FC<CountTooltipTriggerProps> = ({ ref, className, children, ...pr
   const { count } = useCountTooltipContext();
 
   return (
-    <span
+    // A button, so the hidden names are reachable by keyboard (focus opens the tooltip).
+    <button
       ref={ref}
+      type="button"
       data-slot="count-tooltip-trigger"
-      tabIndex={0}
-      className={cn('bg-hover text-fg-muted inline-flex items-center justify-center rounded-full px-1.5 text-xs', className)}
+      className={cn('bg-hover text-fg-muted focus-ring inline-flex items-center justify-center rounded-full px-1.5 text-xs', className)}
       {...props}
     >
       {children ?? `+${count}`}
-    </span>
+    </button>
   );
 };
 

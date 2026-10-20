@@ -35,14 +35,17 @@ describe('choice fields', () => {
     expect(screen.getAllByText('I agree to the terms')).toHaveLength(1);
   });
 
-  it('FormCheckboxGroup is a named, invalid, described group', async () => {
+  it('FormCheckboxGroup is a named, described group whose checkboxes are invalid', async () => {
     render(
       <FormHarness defaultValues={{ allergies: [] }} errors={{ allergies: 'Pick at least one' }}>
         <FormCheckboxGroup name="allergies" label="Allergies" {...optionProps} />
       </FormHarness>,
     );
     const group = screen.getByRole('group', { name: 'Allergies' });
-    await waitFor(() => expect(group.getAttribute('aria-invalid')).toBe('true'));
+    // aria-invalid isn't supported on role="group" (ARIA 1.2): each checkbox carries it.
+    await waitFor(() => expect(group.getAttribute('data-invalid')).toBe('true'));
+    expect(group.getAttribute('aria-invalid')).toBeNull();
+    for (const checkbox of screen.getAllByRole('checkbox')) expect(checkbox.getAttribute('aria-invalid')).toBe('true');
     expect(describedText(group)).toBe('Pick at least one');
   });
 
