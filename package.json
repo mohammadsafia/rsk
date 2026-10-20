@@ -76,6 +76,7 @@
     "ds:baseline": "tsx scripts/design-system/update-forbidden-baseline.ts",
     "ds:migrate": "tsx scripts/design-system/codemods/migrate.ts",
     "ds:classes": "tsx scripts/design-system/codemods/migrate-classes.ts",
+    "theme:accent": "tsx scripts/design-system/theme-accent.ts",
     "bundle:report": "vp build && node scripts/bundle/first-load.mjs --dist dist",
     "starter:build": "tsx scripts/starter/build-starter.ts",
     "starter:verify": "tsx scripts/starter/verify-starter.ts",
