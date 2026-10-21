@@ -71,6 +71,9 @@ export function buildStarter(outDir: string) {
     "ignorePatterns: ['**/*.hbs', 'registry/**', 'kit.lock.json', 'first-load-*.json']",
     out,
   );
+  // Pre-commit: vp create sets up the hooks and adds a `staged` block in its own (double-quoted) style unless the
+  // config has one, which the formatter would then flag on the app's first check.
+  edit('vite.config.ts', '\n  fmt: {', "\n  staged: {\n    '*': 'vp check --fix',\n  },\n  fmt: {", out);
   edit('tsconfig.app.json', /,?\n\s*"@component-docs": \[[^\]]*\]/, '', out);
   edit('tsconfig.app.json', /,?\n\s*"@component-docs\/\*": \[[^\]]*\]/, '', out);
 

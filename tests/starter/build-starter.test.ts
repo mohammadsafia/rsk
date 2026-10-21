@@ -58,6 +58,10 @@ describe('buildStarter', () => {
     expect(pkg.devDependencies['@clack/prompts']).toBeDefined();
   });
 
+  it('has a pre-commit staged block of its own, so vp create doesn’t add one the formatter rejects', () => {
+    expect(readFileSync(path.join(out, 'vite.config.ts'), 'utf8')).toContain("staged: {\n    '*': 'vp check --fix',\n  },");
+  });
+
   it('gives the blocks’ pages outside the app shell an error page too', () => {
     const router = readFileSync(path.join(out, 'src/routes/router.tsx'), 'utf8');
     // A pathless parent with the error element, so a /maintenance or 404 chunk that fails to load isn't React Router's default page.
