@@ -4,7 +4,7 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { addBlocks, readCatalogue, removeBlocks, wiringGaps } from '../../scripts/kit/add';
+import { addBlocks, rankBlocks, readCatalogue, removeBlocks, wiringGaps } from '../../scripts/kit/add';
 import { readTree, writeLock } from '../../scripts/kit/core';
 
 const dir = () => mkdtempSync(path.join(tmpdir(), 'kit-add-'));
@@ -146,5 +146,20 @@ describe('kit:add and the app’s kit version', () => {
     const root = path.resolve(import.meta.dirname, '../..');
     const overlay = path.join(root, 'scripts/starter/overlay');
     expect(wiringGaps(existsSync(overlay) ? overlay : root, root)).toEqual([]);
+  });
+});
+
+describe('the picker’s ranking', () => {
+  it('puts a name or tag match before a match only in the description, and keeps catalogue order otherwise', () => {
+    const blocks = [
+      block('invite-members-dialog', { title: 'Invite members dialog', description: 'Invites with per-address errors.' }),
+      block('search-field', { title: 'Search field', tags: ['search'] }),
+      block('system-pages', { title: 'System pages', tags: ['error', '404'] }),
+    ];
+    // block() is untyped test data; rankBlocks reads only id, title, tags, level, family and description.
+    const ranked = (search: string) => rankBlocks(blocks as Parameters<typeof rankBlocks>[0], search).map((meta) => meta.id);
+    expect(ranked('error')).toEqual(['system-pages', 'invite-members-dialog', 'search-field']);
+    expect(ranked('search')).toEqual(['search-field', 'invite-members-dialog', 'system-pages']);
+    expect(ranked('')).toEqual(['invite-members-dialog', 'search-field', 'system-pages']);
   });
 });

@@ -75,6 +75,9 @@ export function validateBlocks(root: string): string[] {
     const exports = (name: string) =>
       new RegExp(`export\\s+(?:const|function|default\\s+function)\\s+${name}\\b|export\\s*\\{[^}]*\\b${name}\\b`).test(exported);
     for (const route of block.routes ?? [])
+      if (route.layout !== 'app' && route.layout !== 'bare')
+        errors.push(`${folder}: route ${route.path} has layout "${String(route.layout as unknown)}"; use "app" or "bare"`);
+    for (const route of block.routes ?? [])
       if (!exports(route.component))
         errors.push(`${folder}: route ${route.path} names "${route.component}", which src/blocks/${folder}/index.ts doesn't export`);
     if (block.errorElement && !exports(block.errorElement))
@@ -90,6 +93,22 @@ export function validateBlocks(root: string): string[] {
           errors.push(`${folder}: menu entry "${item.id}" has no nav.${item.id} in src/locales/${lang}/block-${folder}.json`);
     }
   }
+
+  // Across the catalogue: dependencies resolve without a cycle, and only one block may own the catch-all or the error
+  // page (the generated index would silently take the first).
+  const blocks = readBlocks(root);
+  try {
+    resolveDependencies(
+      blocks.map((block) => block.id),
+      blocks.map((block) => ({ ...block, dependsOn: (block.dependsOn ?? []).filter((id) => ids.has(id)) })),
+    );
+  } catch (error) {
+    errors.push((error as Error).message);
+  }
+  const catchAll = blocks.filter((block) => block.routes?.some((route) => route.path === '*')).map((block) => block.id);
+  if (catchAll.length > 1) errors.push(`more than one block routes "*": ${catchAll.join(', ')}`);
+  const errorPages = blocks.filter((block) => block.errorElement).map((block) => block.id);
+  if (errorPages.length > 1) errors.push(`more than one block has an errorElement: ${errorPages.join(', ')}`);
   return errors;
 }
 

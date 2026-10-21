@@ -57,6 +57,19 @@ describe('blocks', () => {
     expect(validateBlocks(root)).toEqual([]);
   });
 
+  it('reports a dependency cycle, a route layout that isn’t app or bare, and two blocks claiming * or the error page', () => {
+    const root = kit([
+      meta('a', { dependsOn: ['b'], routes: [{ path: '*', component: 'APage', layout: 'bare' }], errorElement: 'APage' }),
+      meta('b', { dependsOn: ['a'], routes: [{ path: '*', component: 'BPage', layout: 'bare' }], errorElement: 'BPage' }),
+      meta('c', { routes: [{ path: '/c', component: 'CPage', layout: 'side' as 'app' }] }),
+    ]);
+    const errors = validateBlocks(root).join('\n');
+    expect(errors).toMatch(/depend on each other in a cycle: a → b → a/);
+    expect(errors).toMatch(/c: route \/c has layout "side"; use "app" or "bare"/);
+    expect(errors).toMatch(/more than one block routes "\*": a, b/);
+    expect(errors).toMatch(/more than one block has an errorElement: a, b/);
+  });
+
   it('accepts a valid catalogue', () => {
     expect(validateBlocks(kit([meta('a'), meta('b', { dependsOn: ['a'] })]))).toEqual([]);
   });

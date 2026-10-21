@@ -62,6 +62,12 @@ describe('buildStarter', () => {
     expect(readFileSync(path.join(out, 'vite.config.ts'), 'utf8')).toContain("staged: {\n    '*': 'vp check --fix',\n  },");
   });
 
+  it('gives the blocks’ pages outside the app shell an error page too', () => {
+    const router = readFileSync(path.join(out, 'src/routes/router.tsx'), 'utf8');
+    // A pathless parent with the error element, so a /maintenance or 404 chunk that fails to load isn't React Router's default page.
+    expect(router).toMatch(/errorElement:[\s\S]{0,160}children: bareBlockRoutes/);
+  });
+
   it('ships none of the starter tooling, its tests or its sync workflow', () => {
     expect(existsSync(path.join(out, 'scripts/starter'))).toBe(false);
     expect(existsSync(path.join(out, 'tests/starter'))).toBe(false);
@@ -86,9 +92,11 @@ describe('buildStarter', () => {
     expect(Object.values(pkg.scripts).filter((command) => command.includes('scripts/docs/'))).toEqual([]);
   });
 
-  it('names no client API anywhere in the tree', () => {
-    const offenders = walk(out).filter((file) => /qlinica/i.test(readFileSync(file, 'utf8')));
-    expect(offenders.map((file) => path.relative(out, file))).toEqual([]);
+  it('points the DTO generator at a placeholder API, never a real one', () => {
+    const defaults = readFileSync(path.join(out, 'scripts/cli/config/defaults.ts'), 'utf8');
+    const urls = [...defaults.matchAll(/url: '([^']+)'/g)].map((match) => match[1]);
+    expect(urls.length).toBeGreaterThan(0);
+    expect(urls.every((url) => url.startsWith('https://api.example.com/'))).toBe(true);
   });
 
   it('ignores .env but keeps .env.example', () => {

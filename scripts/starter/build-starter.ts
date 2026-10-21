@@ -91,10 +91,6 @@ export function buildStarter(outDir: string) {
   const viteConfig = path.join(out, 'vite.config.ts');
   writeFileSync(viteConfig, readFileSync(viteConfig, 'utf8').replace(/\n{3,}/g, '\n\n'));
 
-  // The DTO generator's sample sources point at a client's API; the starter names a placeholder.
-  edit('scripts/cli/config/defaults.ts', /https:\/\/dev-api\.qlinica\.app\/med-legal/g, 'https://api.example.com', out);
-  edit('scripts/cli/README.md', /https:\/\/dev-api\.qlinica\.app\/med-legal/g, 'https://api.example.com', out);
-
   // An app keeps its real settings in .env (this repo tracks an empty one instead).
   const gitignore = path.join(out, '.gitignore');
   writeFileSync(
