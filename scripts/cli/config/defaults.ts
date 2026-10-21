@@ -7,12 +7,12 @@ import type { DtoGenConfig, SwaggerEndpoint } from '../types/index.js';
 export const DEFAULT_ENDPOINTS: SwaggerEndpoint[] = [
   {
     name: 'v1',
-    url: 'https://dev-api.qlinica.app/med-legal/swagger/v1/swagger.json',
+    url: 'https://api.example.com/swagger/v1/swagger.json',
     outputDir: 'src/types/api',
   },
   {
     name: 'v2',
-    url: 'https://dev-api.qlinica.app/med-legal/swagger/v2/swagger.json',
+    url: 'https://api.example.com/swagger/v2/swagger.json',
     outputDir: 'src/types/api-v2',
   },
 ];
