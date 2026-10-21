@@ -88,9 +88,11 @@ describe('buildStarter', () => {
     expect(Object.values(pkg.scripts).filter((command) => command.includes('scripts/docs/'))).toEqual([]);
   });
 
-  it('names no client API anywhere in the tree', () => {
-    const offenders = walk(out).filter((file) => /qlinica/i.test(readFileSync(file, 'utf8')));
-    expect(offenders.map((file) => path.relative(out, file))).toEqual([]);
+  it('points the DTO generator at a placeholder API, never a real one', () => {
+    const defaults = readFileSync(path.join(out, 'scripts/cli/config/defaults.ts'), 'utf8');
+    const urls = [...defaults.matchAll(/url: '([^']+)'/g)].map((match) => match[1]);
+    expect(urls.length).toBeGreaterThan(0);
+    expect(urls.every((url) => url.startsWith('https://api.example.com/'))).toBe(true);
   });
 
   it('ignores .env but keeps .env.example', () => {

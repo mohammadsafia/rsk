@@ -19,7 +19,7 @@ pnpm docs:lint
 
 View in UI (local):
 
-- [http://localhost:3000/med-legal/components](http://localhost:3000/med-legal/components)
+- [http://localhost:5173/docs/components](http://localhost:5173/docs/components)
 
 ## Folder structure
 

@@ -2193,7 +2193,7 @@ Replace the file with:
 
 ## Target audience
 
-Frontend developers and teams evaluating or cloning RSK, a production-grade React + TypeScript + Vite+ starter for data-heavy admin products (clinical / med-legal records is the reference domain). Technical, design-aware, value DX and consistency.
+Frontend developers and teams evaluating or cloning RSK, a production-grade React + TypeScript + Vite+ starter for data-heavy admin products (clinical records is the reference domain). Technical, design-aware, value DX and consistency.
 
 ## Brand personality / tone
 
