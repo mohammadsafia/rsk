@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type ComponentPropsWithoutRef, createContext, type FC, use } from 'react';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 

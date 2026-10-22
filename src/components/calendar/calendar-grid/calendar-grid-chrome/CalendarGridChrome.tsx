@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, type FC, useMemo } from 'react';
 
 import { IconButton, Select, ToggleGroup } from '@components/ui';

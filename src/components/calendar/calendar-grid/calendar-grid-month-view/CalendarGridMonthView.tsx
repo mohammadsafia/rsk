@@ -1,3 +1,5 @@
+'use client';
+
 import { type FC, useMemo, useRef, useState } from 'react';
 
 import { Button, CalendarMonthGrid, Popover } from '@components/ui';

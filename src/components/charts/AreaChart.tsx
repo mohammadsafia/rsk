@@ -1,3 +1,5 @@
+'use client';
+
 import { Area, AreaChart as RechartsAreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { AXIS, axisLabel, GRID } from './chart-theme';

@@ -1,3 +1,5 @@
+'use client';
+
 import { Button, IconButton } from '@components/ui';
 
 import { THEME_TYPES, useTheme } from '@contexts';

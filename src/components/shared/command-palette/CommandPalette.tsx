@@ -1,3 +1,5 @@
+'use client';
+
 import { Command } from '@components/ui';
 
 import { THEME_TYPES, useCommandPalette, useKitNavigate, useTheme } from '@contexts';

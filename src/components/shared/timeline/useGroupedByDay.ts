@@ -1,3 +1,5 @@
+'use client';
+
 import { useMemo, useState } from 'react';
 
 import { type DateInput, useAppTranslation, useDate } from '@hooks/shared';

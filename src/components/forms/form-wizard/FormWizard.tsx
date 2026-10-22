@@ -1,3 +1,5 @@
+'use client';
+
 import { Children, type FormEvent, Fragment, isValidElement, type ReactElement, type ReactNode, useEffect, useRef, useState } from 'react';
 import { type FieldErrors, type FieldValues, FormProvider, type Path, type UseFormReturn } from 'react-hook-form';
 

@@ -1,3 +1,5 @@
+'use client';
+
 import { Children, type ComponentPropsWithoutRef, type FC, Fragment, isValidElement, type ReactNode } from 'react';
 
 import { Divider } from '@components/ui';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useTranslation as useI18nTranslation } from 'react-i18next';
 
 import { LANGUAGE_OPTIONS, LANGUAGES, type LanguageOption } from '@constants';

@@ -1,3 +1,5 @@
+'use client';
+
 import { Bar, BarChart as RechartsBarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { AXIS, axisLabel, GRID } from './chart-theme';

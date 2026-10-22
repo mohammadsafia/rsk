@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, type FC, type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { IconButton } from '@components/ui';

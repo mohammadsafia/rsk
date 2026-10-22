@@ -1,3 +1,5 @@
+'use client';
+
 import { type FC, isValidElement, type ReactElement, type ReactNode } from 'react';
 
 type WhenProps = {

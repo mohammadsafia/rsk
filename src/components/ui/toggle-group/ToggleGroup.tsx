@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, createContext, type FC, type ReactNode, useContext } from 'react';
 
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';

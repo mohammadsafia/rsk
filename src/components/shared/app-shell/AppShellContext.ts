@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, type RefObject, useContext } from 'react';
 
 export type AppShellState = {

@@ -1,3 +1,5 @@
+'use client';
+
 import { type AnchorHTMLAttributes, createElement, type ReactElement, useSyncExternalStore } from 'react';
 import i18n from 'i18next';
 

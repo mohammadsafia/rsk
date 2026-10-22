@@ -1,7 +1,9 @@
 export * from './ThemeContext';
+export { THEME_TYPES } from './themeTypes';
 export * from './CommandPaletteContext';
 export * from './DirectionContext';
 export * from './MotionContext';
 export * from './AuthContext';
+export { type CurrentUser, notifyUnauthorized, readSession, type Session, SESSION_KEY } from './authSession';
 export * from './KitRouterContext';
 export { fallbackKitRouter } from './kitRouterFallback';

@@ -1,3 +1,5 @@
+'use client';
+
 import { type RefCallback, useCallback, useEffect, useRef } from 'react';
 
 import { MOTION_DURATIONS, MOTION_EASINGS } from '@constants';

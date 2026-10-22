@@ -1,3 +1,5 @@
+'use client';
+
 import { type FC, type ReactNode, useId } from 'react';
 import { type FieldError } from 'react-hook-form';
 import * as LabelPrimitive from '@radix-ui/react-label';

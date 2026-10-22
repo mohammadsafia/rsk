@@ -2,7 +2,8 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { THEME_TYPES, ThemeProvider, useTheme } from './ThemeContext';
+import { ThemeProvider, useTheme } from './ThemeContext';
+import { THEME_TYPES } from './themeTypes';
 
 function Probe() {
   const { setTheme } = useTheme();

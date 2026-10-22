@@ -1,3 +1,5 @@
+'use client';
+
 import { type ReactElement, type ReactNode } from 'react';
 
 import { Button } from '@components/ui';

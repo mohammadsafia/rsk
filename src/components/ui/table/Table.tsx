@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, type FC, type ReactNode } from 'react';
 
 import { Skeleton } from '@components/ui';

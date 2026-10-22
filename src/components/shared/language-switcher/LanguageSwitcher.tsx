@@ -1,3 +1,5 @@
+'use client';
+
 import { Button, IconButton } from '@components/ui';
 
 import { type KitLanguage, useSetLanguage } from '@contexts';

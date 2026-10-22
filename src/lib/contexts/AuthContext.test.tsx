@@ -2,7 +2,8 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test';
 
-import { AuthProvider, notifyUnauthorized, SESSION_KEY, type Session, useAuth } from './AuthContext';
+import { AuthProvider, useAuth } from './AuthContext';
+import { notifyUnauthorized, type Session, SESSION_KEY } from './authSession';
 
 const SESSION: Session = { token: 't-123', user: { userId: '7', name: 'Lina Haddad', email: 'lina@example.com', picture: '' } };
 

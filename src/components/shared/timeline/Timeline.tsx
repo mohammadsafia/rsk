@@ -1,3 +1,5 @@
+'use client';
+
 import { Children, type ComponentPropsWithoutRef, type FC, type ReactNode } from 'react';
 
 import { Button, Skeleton, Tooltip } from '@components/ui';

@@ -1,3 +1,5 @@
+'use client';
+
 import { type ChangeEvent, type ComponentProps, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { type DateRange, DayButton, DayPicker, type DropdownProps, getDefaultClassNames } from 'react-day-picker';
 import { ar, enUS } from 'react-day-picker/locale';

@@ -1,3 +1,5 @@
+'use client';
+
 import { usePathname } from '@contexts';
 
 export const useRouteUtils = () => {

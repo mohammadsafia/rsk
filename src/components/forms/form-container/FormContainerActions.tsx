@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, type FC, type ReactNode, useState } from 'react';
 import { useFormContext, useFormState } from 'react-hook-form';
 

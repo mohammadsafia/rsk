@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, type FC, type ReactNode, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
 import type { ArrayPath, FieldArray, FieldPath, FieldValues, Path, UseFieldArrayReturn, UseFormReturn } from 'react-hook-form';

@@ -1,6 +1,6 @@
-import { Children, type ReactNode, useCallback, useId, useState } from 'react';
+'use client';
 
-import { cva } from 'class-variance-authority';
+import { Children, type ReactNode, useCallback, useId, useState } from 'react';
 
 import { Button, type ButtonVariants, Dialog, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
@@ -8,6 +8,8 @@ import { Conditional } from '@components/utils';
 import { useAppTranslation } from '@hooks/shared';
 
 import { AlertTriangle, CheckCircle, Info, XCircle, XIcon } from 'lucide-react';
+
+import { confirmDialogIconVariants } from './variants';
 
 export type ConfirmDialogTone = 'danger' | 'warning' | 'success' | 'info';
 
@@ -47,20 +49,6 @@ const TONE_BUTTON: Record<ConfirmDialogTone, ButtonVariants['tone']> = {
   warning: 'neutral',
   info: 'neutral',
 };
-
-export const confirmDialogIconVariants = cva('mb-4', {
-  variants: {
-    tone: {
-      warning: 'text-warning',
-      success: 'text-success',
-      danger: 'text-danger',
-      info: 'text-info',
-    },
-  },
-  defaultVariants: {
-    tone: 'danger',
-  },
-});
 
 /**
  * # ConfirmDialog

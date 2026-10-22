@@ -1,3 +1,5 @@
+'use client';
+
 import { type FC, type HTMLAttributes, type ReactNode } from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';

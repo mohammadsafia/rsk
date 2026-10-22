@@ -1,3 +1,5 @@
+'use client';
+
 import { type FC, type RefCallback, useCallback, useId, useMemo, useState } from 'react';
 
 import { type DateRange } from 'react-day-picker';

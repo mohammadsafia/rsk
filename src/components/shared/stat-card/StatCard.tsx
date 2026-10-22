@@ -1,3 +1,5 @@
+'use client';
+
 import { type FC, type ReactNode, useEffect, useRef } from 'react';
 
 import { RollingText, Skeleton } from '@components/ui';

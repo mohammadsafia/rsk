@@ -1,3 +1,5 @@
+'use client';
+
 import { type TextareaHTMLAttributes, useId } from 'react';
 import { type FieldValues, useController, useFormContext } from 'react-hook-form';
 

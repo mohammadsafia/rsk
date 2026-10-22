@@ -1,3 +1,5 @@
+'use client';
+
 import { type PointerEvent, useCallback } from 'react';
 
 import { MOTION_DURATIONS, MOTION_EASINGS } from '@constants';

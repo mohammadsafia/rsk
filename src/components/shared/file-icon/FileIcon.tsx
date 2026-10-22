@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type FC } from 'react';
 
 import { Conditional } from '@components/utils';

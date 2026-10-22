@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useContext } from 'react';
 import type { RowData } from '@tanstack/react-table';
 import { type KitRow, type KitTable } from '@utils';

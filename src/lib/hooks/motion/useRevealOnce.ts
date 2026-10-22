@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 
 const storageKey = (key: string) => `rsk:revealed:${key}`;

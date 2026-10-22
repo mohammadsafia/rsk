@@ -1,3 +1,5 @@
+'use client';
+
 import { type ReactNode } from 'react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 

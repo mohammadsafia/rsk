@@ -1,9 +1,11 @@
+'use client';
+
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 
 import { useStorage } from '@hooks/shared';
 
-type Theme = 'dark' | 'light' | 'system';
+import { THEME_TYPES, type Theme } from './themeTypes';
 
 type ThemeProps = {
   children: ReactNode;
@@ -15,12 +17,6 @@ type ThemeState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
 };
-
-export const THEME_TYPES = {
-  SYSTEM: 'system',
-  LIGHT: 'light',
-  DARK: 'dark',
-} satisfies Readonly<Record<string, Theme>>;
 
 const initialState: ThemeState = {
   theme: THEME_TYPES.DARK,

@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, type FC } from 'react';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 
