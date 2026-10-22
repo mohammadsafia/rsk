@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from 'vite-plus/test';
 import { Tooltip } from '@components/ui';
 
 import { Documented, Features, GetGoing, LandingFooter, Structure, Tooling } from '@views/home';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 
 import i18n from '../../i18n';
 
@@ -17,14 +18,16 @@ afterEach(async () => {
 const renderAll = () =>
   render(
     <Tooltip.Provider>
-      <MemoryRouter>
-        <Features />
-        <Documented />
-        <Tooling />
-        <Structure />
-        <GetGoing />
-        <LandingFooter />
-      </MemoryRouter>
+      <ReactRouterKitProvider>
+        <MemoryRouter>
+          <Features />
+          <Documented />
+          <Tooling />
+          <Structure />
+          <GetGoing />
+          <LandingFooter />
+        </MemoryRouter>
+      </ReactRouterKitProvider>
     </Tooltip.Provider>,
   );
 

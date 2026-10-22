@@ -8,6 +8,7 @@ import { Tooltip } from '@components/ui';
 
 import { ThemeProvider } from '@contexts';
 import { docsRoutes } from '@routes';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 
 import i18n from '../../i18n';
 
@@ -19,7 +20,9 @@ const at = (path: string) => {
     <ThemeProvider>
       <NuqsTestingAdapter>
         <Tooltip.Provider>
-          <RouterProvider router={router} />
+          <ReactRouterKitProvider>
+            <RouterProvider router={router} />
+          </ReactRouterKitProvider>
         </Tooltip.Provider>
       </NuqsTestingAdapter>
     </ThemeProvider>,

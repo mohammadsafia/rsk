@@ -1,3 +1,5 @@
+'use client';
+
 import { type FC, useRef } from 'react';
 
 import { useInkBar } from '@hooks/motion';

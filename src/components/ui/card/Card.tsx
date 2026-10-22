@@ -1,3 +1,5 @@
+'use client';
+
 import { Children, type ComponentPropsWithoutRef, createContext, type FC, isValidElement, type ReactNode, useContext } from 'react';
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible';
 

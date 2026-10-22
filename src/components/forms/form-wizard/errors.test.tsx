@@ -2,12 +2,12 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { z } from 'zod';
 
 import { Tooltip } from '@components/ui';
 import { FormInput, FormWizard, FormWizardError } from '@components/forms';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import '../../../i18n';
 
@@ -33,7 +33,7 @@ function Harness({
       : undefined,
   });
   return (
-    <MemoryRouter>
+    <MemoryKitRouter>
       <Tooltip.Provider>
         <FormWizard form={form} onSubmit={onSubmit} onCancel={onCancel}>
           {/* With rejectName, a lenient step schema owns `name` and passes Next; the stricter resolver rejects at submit. */}
@@ -53,7 +53,7 @@ function Harness({
           </FormWizard.Step>
         </FormWizard>
       </Tooltip.Provider>
-    </MemoryRouter>
+    </MemoryKitRouter>
   );
 }
 

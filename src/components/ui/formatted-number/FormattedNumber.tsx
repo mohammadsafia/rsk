@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, type FC, type FocusEvent, type KeyboardEvent, type Ref } from 'react';
 import { type NumberFormatValues, NumericFormat } from 'react-number-format';
 

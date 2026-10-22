@@ -1,3 +1,5 @@
+'use client';
+
 import { type CSSProperties, type FC, useMemo, useState } from 'react';
 
 import { Button, CalendarMonthGrid, Popover } from '@components/ui';

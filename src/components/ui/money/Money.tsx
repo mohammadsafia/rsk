@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, type FC } from 'react';
 
 import { cn, type FormatMoneyOptions, useMoneyFormat } from '@utils';

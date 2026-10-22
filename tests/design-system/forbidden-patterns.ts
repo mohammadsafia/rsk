@@ -3,7 +3,7 @@
  * Counts may only go down; the committed baseline records today's violations per file.
  */
 
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 
 export type PatternId =
@@ -109,7 +109,10 @@ export function listSourceFiles(repoRoot: string): string[] {
       return statSync(full).isDirectory() ? walk(full) : [full];
     });
 
-  return walk(join(repoRoot, 'src'))
+  // src/, plus a Next app's app/.
+  return ['src', 'app']
+    .filter((dir) => existsSync(join(repoRoot, dir)))
+    .flatMap((dir) => walk(join(repoRoot, dir)))
     .filter((file) => /\.(tsx?|mdx)$/.test(file) && !/\.(test|d)\.tsx?$/.test(file))
     .map((file) => toPosix(relative(repoRoot, file)))
     .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));

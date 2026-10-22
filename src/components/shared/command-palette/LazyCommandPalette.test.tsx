@@ -1,11 +1,11 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { LazyCommandPalette } from '@components/shared';
 
 import { AuthProvider, CommandPaletteProvider, ThemeProvider } from '@contexts';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import '../../../i18n';
 
@@ -13,7 +13,7 @@ afterEach(cleanup);
 
 const renderShell = () =>
   render(
-    <MemoryRouter>
+    <MemoryKitRouter>
       <ThemeProvider>
         <AuthProvider>
           <CommandPaletteProvider>
@@ -21,7 +21,7 @@ const renderShell = () =>
           </CommandPaletteProvider>
         </AuthProvider>
       </ThemeProvider>
-    </MemoryRouter>,
+    </MemoryKitRouter>,
   );
 
 describe('LazyCommandPalette', () => {
@@ -50,7 +50,7 @@ describe('LazyCommandPalette', () => {
     const { AuthProvider: Auth, CommandPaletteProvider: Provider, ThemeProvider: Theme } = await import('@contexts');
     const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
     render(
-      <MemoryRouter>
+      <MemoryKitRouter>
         <Theme>
           <Auth>
             <Provider>
@@ -59,7 +59,7 @@ describe('LazyCommandPalette', () => {
             </Provider>
           </Auth>
         </Theme>
-      </MemoryRouter>,
+      </MemoryKitRouter>,
     );
     act(() => {
       fireEvent.keyDown(document, { key: 'k', metaKey: true });

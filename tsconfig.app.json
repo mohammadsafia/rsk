@@ -37,6 +37,7 @@
       "@layouts": ["./src/layouts/index"],
       "@app-types": ["./src/types/index"],
       "@routes": ["./src/routes/index"],
+      "@routes/*": ["./src/routes/*"],
       "@locales": ["./src/locales/index"],
       "@locales/*": ["./src/locales/*"],
       "@component-docs": ["./src/component-docs/index.ts"],

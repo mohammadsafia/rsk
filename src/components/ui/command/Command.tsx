@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type ComponentPropsWithoutRef, type FC, type HTMLAttributes, useLayoutEffect, useRef } from 'react';
 
 import { Command as CommandPrimitive, useCommandState } from 'cmdk';

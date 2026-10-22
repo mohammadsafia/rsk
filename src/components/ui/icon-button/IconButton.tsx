@@ -1,3 +1,5 @@
+'use client';
+
 import { type FC } from 'react';
 
 import { Button, type ButtonProps, Tooltip } from '@components/ui';

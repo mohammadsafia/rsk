@@ -1,10 +1,10 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { PageHeader } from '@components/shared';
 import { Badge, Tooltip } from '@components/ui';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import '../../../i18n';
 
@@ -13,13 +13,13 @@ afterEach(cleanup);
 describe('PageHeader', () => {
   it('renders a level-1 title, description, breadcrumb and actions', () => {
     render(
-      <MemoryRouter>
+      <MemoryKitRouter>
         <PageHeader title="Members" description="People with access to this workspace." breadcrumb={[{ title: 'Members' }]}>
           <PageHeader.Actions>
             <button type="button">Add member</button>
           </PageHeader.Actions>
         </PageHeader>
-      </MemoryRouter>,
+      </MemoryKitRouter>,
     );
     expect(screen.getByRole('heading', { level: 1, name: 'Members' })).toBeTruthy();
     expect(screen.getByText('People with access to this workspace.')).toBeTruthy();
@@ -29,9 +29,9 @@ describe('PageHeader', () => {
 
   it('labels the back link and mirrors its chevron', () => {
     render(
-      <MemoryRouter>
+      <MemoryKitRouter>
         <PageHeader title="Sara Haddad" back="/members" />
-      </MemoryRouter>,
+      </MemoryKitRouter>,
     );
     const back = screen.getByRole('link', { name: 'Back' });
     expect(back.getAttribute('href')).toBe('/members');
@@ -53,9 +53,9 @@ describe('PageHeader', () => {
 describe('PageHeader media and meta', () => {
   it('renders media before the title and meta under it, keeping the h1', () => {
     render(
-      <MemoryRouter>
+      <MemoryKitRouter>
         <PageHeader title="Sara Haddad" media={<span data-testid="avatar" />} meta={<Badge tone="success">Active</Badge>} />
-      </MemoryRouter>,
+      </MemoryKitRouter>,
     );
     const heading = screen.getByRole('heading', { level: 1, name: 'Sara Haddad' });
     const media = screen.getByTestId('avatar');

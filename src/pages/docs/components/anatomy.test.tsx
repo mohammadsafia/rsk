@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { Tooltip } from '@components/ui';
 
 import { getComponentDocsRegistry } from '@component-docs/registry';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 
 import DocHeader from './DocHeader';
 import OnThisPage from './OnThisPage';
@@ -24,9 +25,11 @@ describe('DocHeader', () => {
   it('shows an LTR import line derived from the category', () => {
     render(
       <Tooltip.Provider>
-        <MemoryRouter>
-          <DocHeader entry={button()} />
-        </MemoryRouter>
+        <ReactRouterKitProvider>
+          <MemoryRouter>
+            <DocHeader entry={button()} />
+          </MemoryRouter>
+        </ReactRouterKitProvider>
       </Tooltip.Provider>,
     );
     const line = document.querySelector('[data-slot="docs-import"] code') as HTMLElement;
@@ -69,9 +72,11 @@ describe('OnThisPage', () => {
 describe('PrevNext', () => {
   it('links the neighbours in reading order', () => {
     render(
-      <MemoryRouter>
-        <PrevNext id="button" />
-      </MemoryRouter>,
+      <ReactRouterKitProvider>
+        <MemoryRouter>
+          <PrevNext id="button" />
+        </MemoryRouter>
+      </ReactRouterKitProvider>,
     );
     const links = screen.getAllByRole('link');
     expect(links.length).toBeGreaterThanOrEqual(1);

@@ -22,7 +22,7 @@ The catch-all route: any address that matches no page.
 
 ## Server error (500)
 
-`ServerErrorPage` is the error element of the whole router: a page that throws while rendering, or a loader that fails. **Try again** re-runs the route's loaders; a loader that throws a 404 response shows the not-found page instead. It needs a data router (`createBrowserRouter`), so this preview shows `ServerErrorScreen`, the same page without the router, which you can use anywhere else.
+`ServerErrorPage` is the error page of the whole router: a page that throws while rendering, or a loader that fails. It takes `{ error, retry, retrying, notFound }` (`ErrorScreenProps`) and never reads the router itself: in a Vite app the block index's `BlockErrorElement` fills them from React Router (**Try again** re-runs the route's loaders; a loader that throws a 404 response shows the not-found page), in a Next app `error.tsx` maps its `{ error, reset }` onto them. This preview shows `ServerErrorScreen`, the same page without the error wiring, which you can use anywhere else.
 
 <Example title="500" code={`<ServerErrorScreen onRetry={() => window.location.reload()} />`}>
   <ServerErrorScreen layout="preview" onRetry={() => {}} />

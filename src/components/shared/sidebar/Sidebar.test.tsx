@@ -1,11 +1,11 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { type ReactNode } from 'react';
-import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { AppShell, Sidebar } from '@components/shared';
 import { Tooltip } from '@components/ui';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import { LayoutDashboard, Users } from 'lucide-react';
 
@@ -15,9 +15,9 @@ afterEach(cleanup);
 
 const wrap = (ui: ReactNode) =>
   render(
-    <MemoryRouter>
+    <MemoryKitRouter>
       <Tooltip.Provider>{ui}</Tooltip.Provider>
-    </MemoryRouter>,
+    </MemoryKitRouter>,
   );
 
 const menu = (collapsed = false) => (

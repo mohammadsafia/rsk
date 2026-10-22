@@ -1,3 +1,5 @@
+'use client';
+
 import type { TooltipContentProps } from 'recharts';
 
 import { useAppTranslation } from '@hooks/shared';

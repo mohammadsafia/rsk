@@ -1,3 +1,5 @@
+'use client';
+
 import type { ComponentPropsWithoutRef } from 'react';
 import { type FieldValues, FormProvider, type SubmitHandler, type UseFormReturn } from 'react-hook-form';
 

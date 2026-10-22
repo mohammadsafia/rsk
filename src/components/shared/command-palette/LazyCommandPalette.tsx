@@ -1,3 +1,5 @@
+'use client';
+
 import { Component, type FC, lazy, type ReactNode, Suspense, useState } from 'react';
 
 import { Conditional } from '@components/utils';

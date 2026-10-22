@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, createContext, type FC, type ReactNode, useContext } from 'react';
 
 import { Conditional } from '@components/utils';

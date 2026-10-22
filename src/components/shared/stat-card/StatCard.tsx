@@ -1,10 +1,11 @@
+'use client';
+
 import { type FC, type ReactNode, useEffect, useRef } from 'react';
-import { Link } from 'react-router';
 
 import { RollingText, Skeleton } from '@components/ui';
 import { Conditional } from '@components/utils';
 
-import { useMotion } from '@contexts';
+import { KitLink, useMotion } from '@contexts';
 import { useAppTranslation } from '@hooks/shared';
 import { MOTION_DURATIONS, MOTION_EASINGS } from '@constants';
 
@@ -134,13 +135,13 @@ const StatCard: FC<StatCardProps> = ({ label, value, trend, caption, sparkline, 
   return (
     <Conditional>
       <Conditional.If condition={!!href}>
-        <Link
-          to={href ?? ''}
+        <KitLink
+          href={href ?? ''}
           data-slot="stat-card"
           className={cn(CARD, 'hover:border-border-strong focus-ring transition-colors', className)}
         >
           {body}
-        </Link>
+        </KitLink>
       </Conditional.If>
       <Conditional.Else>
         <article data-slot="stat-card" aria-busy={loading || undefined} className={cn(CARD, className)}>

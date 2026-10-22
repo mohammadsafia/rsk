@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useState } from 'react';
 
 /** Current step, completed/errored sets and the jump rule: a step is reachable when every earlier step is completed. */

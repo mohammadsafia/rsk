@@ -1,3 +1,5 @@
+'use client';
+
 import { type FC, useId, useMemo, useState } from 'react';
 
 import { EmptyState, Popover } from '@components/ui';

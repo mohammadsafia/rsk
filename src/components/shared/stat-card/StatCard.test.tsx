@@ -1,10 +1,10 @@
 // @vitest-environment happy-dom
 import { cleanup, render, screen } from '@testing-library/react';
 import { StrictMode } from 'react';
-import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { StatCard } from '@components/shared';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import '../../../i18n';
 
@@ -45,9 +45,9 @@ describe('StatCard', () => {
     expect(document.querySelector('[data-slot="stat-card"] [aria-hidden="true"]')).not.toBeNull();
 
     rerender(
-      <MemoryRouter>
+      <MemoryKitRouter>
         <StatCard label="Visits" value="248" href="/visits" />
-      </MemoryRouter>,
+      </MemoryKitRouter>,
     );
     expect(screen.getByRole('link', { name: /Visits/ }).getAttribute('href')).toBe('/visits');
   });

@@ -1,8 +1,10 @@
 // @vitest-environment happy-dom
 import { act, cleanup, render, screen } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test';
+import { renderToString } from 'react-dom/server';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { AuthProvider, notifyUnauthorized, SESSION_KEY, type Session, useAuth } from './AuthContext';
+import { AuthProvider, useAuth } from './AuthContext';
+import { notifyUnauthorized, type Session, SESSION_KEY } from './authSession';
 
 const SESSION: Session = { token: 't-123', user: { userId: '7', name: 'Lina Haddad', email: 'lina@example.com', picture: '' } };
 
@@ -101,6 +103,58 @@ describe('AuthProvider', () => {
     localStorage.setItem(SESSION_KEY, JSON.stringify(SESSION));
     renderProbe();
     act(() => notifyUnauthorized('an-old-token'));
+    expect(screen.getByText('in as lina@example.com')).toBeTruthy();
+  });
+
+  it('restores a stored session on the first render (Vite: no signed-out flash)', () => {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(SESSION));
+    const seen: boolean[] = [];
+    function Seen() {
+      seen.push(useAuth().isAuthed);
+      return null;
+    }
+    render(
+      <AuthProvider>
+        <Seen />
+      </AuthProvider>,
+    );
+    expect(seen[0]).toBe(true);
+  });
+
+  it('on a server, renders the initial session and never reads storage', () => {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(SESSION));
+    const html = renderToString(
+      <AuthProvider initialSession={null}>
+        <Probe />
+      </AuthProvider>,
+    );
+    expect(html).toContain('signed out');
+  });
+
+  it("with persist 'none', keeps the session out of storage and signs in and out through the app's calls", async () => {
+    const signInWith = vi.fn();
+    const signOutWith = vi.fn();
+    render(
+      <AuthProvider persist="none" initialSession={null} signInWith={signInWith} signOutWith={signOutWith}>
+        <Probe />
+      </AuthProvider>,
+    );
+    await act(async () => screen.getByRole('button', { name: 'sign in' }).click());
+    expect(screen.getByText('in as lina@example.com')).toBeTruthy();
+    expect(signInWith).toHaveBeenCalledWith(SESSION);
+    expect(localStorage.getItem(SESSION_KEY)).toBeNull();
+    await act(async () => screen.getByRole('button', { name: 'sign out' }).click());
+    expect(screen.getByText('signed out')).toBeTruthy();
+    expect(signOutWith).toHaveBeenCalled();
+  });
+
+  it("with persist 'none', starts from initialSession whatever storage holds", () => {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ ...SESSION, user: { ...SESSION.user, email: 'old@example.com' } }));
+    render(
+      <AuthProvider persist="none" initialSession={SESSION}>
+        <Probe />
+      </AuthProvider>,
+    );
     expect(screen.getByText('in as lina@example.com')).toBeTruthy();
   });
 });

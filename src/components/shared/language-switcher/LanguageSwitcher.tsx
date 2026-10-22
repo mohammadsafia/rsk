@@ -1,14 +1,19 @@
+'use client';
+
 import { Button, IconButton } from '@components/ui';
 
-import { LANGUAGE_OPTIONS, type LANGUAGES } from '@constants';
+import { type KitLanguage, useSetLanguage } from '@contexts';
 import { useAppTranslation } from '@hooks/shared';
 
+import { LANGUAGE_OPTIONS } from '@constants';
+
 function LanguageSwitcher() {
-  const { t, currentLanguage, changeLanguage } = useAppTranslation('header');
+  const setLanguage = useSetLanguage();
+  const { t, currentLanguage } = useAppTranslation('header');
 
   const nextLanguage = LANGUAGE_OPTIONS.find((lang) => lang.code !== currentLanguage) ?? LANGUAGE_OPTIONS[0];
 
-  const handleToggle = () => changeLanguage(nextLanguage.code as LANGUAGES);
+  const handleToggle = () => setLanguage(nextLanguage.code as KitLanguage);
 
   return (
     // The name starts with the visible code, so voice control users can say what they see (WCAG 2.5.3).

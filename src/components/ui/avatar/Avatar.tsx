@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, type FC, type ReactElement } from 'react';
 
 import * as AvatarPrimitive from '@radix-ui/react-avatar';

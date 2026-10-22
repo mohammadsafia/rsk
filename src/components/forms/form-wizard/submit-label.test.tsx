@@ -1,11 +1,11 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { useForm } from 'react-hook-form';
-import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Tooltip } from '@components/ui';
 import { FormInput, FormWizard } from '@components/forms';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import '../../../i18n';
 
@@ -14,7 +14,7 @@ afterEach(cleanup);
 function Wizard({ submitLabel }: { submitLabel?: string }) {
   const form = useForm({ defaultValues: { name: '' } });
   return (
-    <MemoryRouter>
+    <MemoryKitRouter>
       <Tooltip.Provider>
         <FormWizard form={form} onSubmit={vi.fn()} submitLabel={submitLabel}>
           <FormWizard.Step id="one" title="One">
@@ -25,7 +25,7 @@ function Wizard({ submitLabel }: { submitLabel?: string }) {
           </FormWizard.Step>
         </FormWizard>
       </Tooltip.Provider>
-    </MemoryRouter>
+    </MemoryKitRouter>
   );
 }
 

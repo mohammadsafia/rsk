@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type ComponentPropsWithoutRef, type FC, type PropsWithChildren } from 'react';
 
 import { cn } from '@utils';

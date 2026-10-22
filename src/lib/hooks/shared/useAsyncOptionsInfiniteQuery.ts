@@ -1,3 +1,5 @@
+'use client';
+
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 
 import type { PaginatedDataTable } from '@app-types';

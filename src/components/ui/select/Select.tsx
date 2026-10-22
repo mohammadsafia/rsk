@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type ComponentPropsWithoutRef, type FC } from 'react';
 
 import * as SelectPrimitive from '@radix-ui/react-select';

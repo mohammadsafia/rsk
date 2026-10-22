@@ -246,9 +246,11 @@ const DELETED_COMPONENT_FOLDERS = [
 ] as const;
 
 const componentFolders = (dir: string): string[] =>
-  readdirSync(dir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .flatMap((entry) => [entry.name, ...componentFolders(`${dir}/${entry.name}`)]);
+  !existsSync(dir)
+    ? []
+    : readdirSync(dir, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .flatMap((entry) => [entry.name, ...componentFolders(`${dir}/${entry.name}`)]);
 
 describe('SP2 exit', () => {
   it('src/components/ui contains no forbidden patterns', () => {

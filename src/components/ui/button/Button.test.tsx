@@ -1,9 +1,10 @@
 // @vitest-environment happy-dom
-import { MemoryRouter, Link } from 'react-router';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Button } from '@components/ui';
+import { KitLink } from '@contexts';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 afterEach(cleanup);
 
@@ -65,11 +66,11 @@ describe('Button', () => {
 
   it('asChild renders the child element with button styling', () => {
     render(
-      <MemoryRouter>
+      <MemoryKitRouter>
         <Button asChild variant="outline">
-          <Link to="/patients">Patients</Link>
+          <KitLink href="/patients">Patients</KitLink>
         </Button>
-      </MemoryRouter>,
+      </MemoryKitRouter>,
     );
     const link = screen.getByRole('link', { name: 'Patients' });
     expect(link.getAttribute('href')).toBe('/patients');

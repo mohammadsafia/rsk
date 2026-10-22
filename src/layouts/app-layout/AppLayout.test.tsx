@@ -7,6 +7,7 @@ import { Tooltip } from '@components/ui';
 
 import { AuthProvider, SESSION_KEY, ThemeProvider } from '@contexts';
 import { AppLayout } from '@layouts';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 
 import '../../i18n';
 
@@ -32,7 +33,9 @@ const renderAt = (path: string) => {
     <ThemeProvider>
       <Tooltip.Provider>
         <AuthProvider>
-          <RouterProvider router={router} />
+          <ReactRouterKitProvider>
+            <RouterProvider router={router} />
+          </ReactRouterKitProvider>
         </AuthProvider>
       </Tooltip.Provider>
     </ThemeProvider>,

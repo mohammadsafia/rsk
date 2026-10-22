@@ -1,3 +1,5 @@
+'use client';
+
 import { type ReactElement } from 'react';
 
 import { Button } from '@components/ui';
@@ -15,7 +17,7 @@ export type ServerErrorScreenProps = Pick<SystemPageProps, 'layout'> & {
   retrying?: boolean;
 };
 
-/** The 500 page itself, without the router: `ServerErrorPage` wires it to the route; use this one anywhere else. */
+/** The 500 page itself, without the error wiring: `ServerErrorPage` takes the router's error; use this one anywhere else. */
 function ServerErrorScreen({ layout, onRetry, retrying = false }: ServerErrorScreenProps): ReactElement {
   const { t } = useBlockTranslation('block-system-pages', LOCALE);
 

@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import { discoverRoutes, isEntry } from '../../scripts/a11y/audit.mjs';
+import { discoverRoutes, isEntry, languageFree, routesFor } from '../../scripts/a11y/audit.mjs';
 
 const BASE = 'http://localhost:5173';
 
@@ -59,5 +59,11 @@ describe('a11y audit route discovery', () => {
     expect(isEntry(metaUrl, real)).toBe(true);
     expect(isEntry(metaUrl, path.join(dir, 'other.mjs'))).toBe(false);
     expect(isEntry(metaUrl, undefined)).toBe(false);
+  });
+
+  it('with the language in the path (a Next app), audits each language-free route under /{lang}', () => {
+    expect(languageFree(['/en', '/en/dashboard', '/ar/dashboard', '/about'])).toEqual(['/', '/dashboard', '/about']);
+    expect(routesFor(['/', '/dashboard'], 'ar', 'path')).toEqual(['/ar', '/ar/dashboard']);
+    expect(routesFor(['/', '/dashboard'], 'ar', 'storage')).toEqual(['/', '/dashboard']);
   });
 });

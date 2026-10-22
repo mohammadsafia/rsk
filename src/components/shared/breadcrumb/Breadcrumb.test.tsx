@@ -1,9 +1,9 @@
 // @vitest-environment happy-dom
 import { act, cleanup, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { Breadcrumb } from '@components/shared';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import i18n from '../../../i18n';
 
@@ -14,9 +14,9 @@ afterEach(async () => {
 
 const renderCrumbs = () =>
   render(
-    <MemoryRouter>
+    <MemoryKitRouter>
       <Breadcrumb withRoot links={[{ title: 'Members', href: 'members' }, { title: 'Sara Haddad' }]} />
-    </MemoryRouter>,
+    </MemoryKitRouter>,
   );
 
 describe('Breadcrumb', () => {

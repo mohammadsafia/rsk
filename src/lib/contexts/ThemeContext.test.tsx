@@ -2,7 +2,8 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { THEME_TYPES, ThemeProvider, useTheme } from './ThemeContext';
+import { ThemeProvider, useTheme } from './ThemeContext';
+import { THEME_TYPES } from './themeTypes';
 
 function Probe() {
   const { setTheme } = useTheme();
@@ -113,5 +114,32 @@ describe('ThemeProvider switch', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Light' }));
     expect(start).not.toHaveBeenCalled();
     expect(root.classList.contains('light')).toBe(true);
+  });
+});
+
+describe('ThemeProvider storage', () => {
+  it('keeps a theme saved under the old vite-ui-theme key, and saves it under rsk-theme', () => {
+    localStorage.setItem('vite-ui-theme', '"light"');
+    render(
+      <ThemeProvider defaultTheme={THEME_TYPES.DARK}>
+        <Probe />
+      </ThemeProvider>,
+    );
+    expect(root.classList.contains('light')).toBe(true);
+    expect(localStorage.getItem('rsk-theme')).toBe('"light"');
+  });
+
+  it('reads rsk-theme first and remembers a switch there', () => {
+    localStorage.setItem('rsk-theme', '"light"');
+    localStorage.setItem('vite-ui-theme', '"dark"');
+    render(
+      <ThemeProvider defaultTheme={THEME_TYPES.DARK}>
+        <Probe />
+      </ThemeProvider>,
+    );
+    expect(root.classList.contains('light')).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Dark' }));
+    expect(root.classList.contains('dark')).toBe(true);
+    expect(localStorage.getItem('rsk-theme')).toBe('"dark"');
   });
 });

@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type ComponentPropsWithoutRef, type FC, type PropsWithChildren, useId } from 'react';
 
 import { Command, type CommandProps, fieldVariants, type FieldVariants, Popover } from '@components/ui';

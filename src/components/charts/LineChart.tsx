@@ -1,3 +1,5 @@
+'use client';
+
 import { CartesianGrid, Line, LineChart as RechartsLineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { AXIS, axisLabel, GRID } from './chart-theme';

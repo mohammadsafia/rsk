@@ -11,6 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { clinicStore } from '@api/clinic';
 import { Toaster } from '@components/shared';
 import { Tooltip } from '@components/ui';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 
 import BillingPage from './billing/BillingPage';
 import OperationsDashboard from './dashboard/OperationsDashboard';
@@ -31,17 +32,19 @@ const renderApp = (route: string) => {
         {/* The app's query options (bootstrap.tsx), in a fresh client per test. */}
         <QueryClientProvider client={new QueryClient({ defaultOptions: appQueryClient.getDefaultOptions() })}>
           <Tooltip.Provider>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/dashboard" element={<OperationsDashboard />} />
-                <Route path="/schedule" element={<SchedulePage />} />
-                <Route path="/patients" element={<PatientsPage />} />
-                <Route path="/patients/new" element={<NewPatientPage />} />
-                <Route path="/patients/:id" element={<PatientProfilePage />} />
-                <Route path="/billing" element={<BillingPage />} />
-              </Routes>
-              <Toaster />
-            </BrowserRouter>
+            <ReactRouterKitProvider>
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/dashboard" element={<OperationsDashboard />} />
+                  <Route path="/schedule" element={<SchedulePage />} />
+                  <Route path="/patients" element={<PatientsPage />} />
+                  <Route path="/patients/new" element={<NewPatientPage />} />
+                  <Route path="/patients/:id" element={<PatientProfilePage />} />
+                  <Route path="/billing" element={<BillingPage />} />
+                </Routes>
+                <Toaster />
+              </BrowserRouter>
+            </ReactRouterKitProvider>
           </Tooltip.Provider>
         </QueryClientProvider>
       </NuqsAdapter>

@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ColumnFiltersState, OnChangeFn } from '@tanstack/react-table';
@@ -6,6 +8,8 @@ import { parseAsString, useQueryStates } from 'nuqs';
 import type { DataTableFilterMeta } from '@app-types';
 
 import { filterCodecFor, type KitColumnDef } from '@utils';
+
+import { useIsHydrated } from './useIsHydrated';
 import type { RowData } from '@tanstack/react-table';
 
 type Options<TData extends RowData> = {
@@ -94,7 +98,9 @@ export const useDataTableFilters = <TData extends RowData>({ columns, urlSync = 
     [filterable],
   );
 
-  // Read once, synchronously, so the toolbar's search box starts with the restored text.
+  const hydrated = useIsHydrated();
+  // Read once, synchronously, so the toolbar's search box starts with the restored text (on a server, and while
+  // hydrating, storage isn't readable: the table starts unfiltered, as the server rendered it).
   const [initial] = useState(() => {
     if (urlSync) {
       const fromUrl: Stored = { filters: {} };
@@ -106,7 +112,7 @@ export const useDataTableFilters = <TData extends RowData>({ columns, urlSync = 
       if (typeof q === 'string') fromUrl.q = q;
       if (Object.keys(fromUrl.filters).length > 0 || fromUrl.q) return decode(fromUrl);
     }
-    const stored = readSession(sessionKey);
+    const stored = hydrated ? readSession(sessionKey) : undefined;
     return stored?.filters ? decode(stored) : { columnFilters: [], globalFilter: '' };
   });
 

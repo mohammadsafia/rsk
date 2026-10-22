@@ -1,9 +1,13 @@
+'use client';
+
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 
-import { useStorage } from '@hooks/shared';
+import { useIsHydrated } from '@hooks/shared';
 
-type Theme = 'dark' | 'light' | 'system';
+import { getPersistentData, persistData } from '@utils';
+
+import { THEME_TYPES, type Theme } from './themeTypes';
 
 type ThemeProps = {
   children: ReactNode;
@@ -16,18 +20,17 @@ type ThemeState = {
   setTheme: (theme: Theme) => void;
 };
 
-export const THEME_TYPES = {
-  SYSTEM: 'system',
-  LIGHT: 'light',
-  DARK: 'dark',
-} satisfies Readonly<Record<string, Theme>>;
-
 const initialState: ThemeState = {
   theme: THEME_TYPES.DARK,
   setTheme: () => null,
 };
 
-const DEFAULT_STORAGE_KEY = 'vite-ui-theme';
+const DEFAULT_STORAGE_KEY = 'rsk-theme';
+/** Where the theme was kept before the key became framework-neutral: still read, so nobody loses their choice. */
+const LEGACY_STORAGE_KEY = 'vite-ui-theme';
+
+const readTheme = (key: string): Theme | null =>
+  getPersistentData<Theme>(key) ?? (key === DEFAULT_STORAGE_KEY ? getPersistentData<Theme>(LEGACY_STORAGE_KEY) : null);
 
 /** Puts the theme's class on <html> ('system' resolves to the OS setting). */
 function applyTheme(theme: Theme) {
@@ -59,9 +62,10 @@ function revealOrigin(press: { x: number; y: number; at: number } | null): { x: 
 }
 
 export function ThemeProvider({ children, defaultTheme = THEME_TYPES.DARK, storageKey = DEFAULT_STORAGE_KEY, ...props }: ThemeProps) {
-  const [storageTheme, setStorageTheme] = useStorage<Theme, Theme>(storageKey, defaultTheme);
-
-  const [theme, setTheme] = useState<Theme>(storageTheme);
+  const hydrated = useIsHydrated();
+  // Until the person switches: the stored theme once storage is readable (from the first render under createRoot).
+  const [chosen, setChosen] = useState<Theme | null>(null);
+  const theme = chosen ?? (hydrated ? (readTheme(storageKey) ?? defaultTheme) : defaultTheme);
 
   const lastPress = useRef<{ x: number; y: number; at: number } | null>(null);
   const switches = useRef(0);
@@ -77,8 +81,8 @@ export function ThemeProvider({ children, defaultTheme = THEME_TYPES.DARK, stora
     (newTheme: Theme) => {
       const root = window.document.documentElement;
       const commit = () => {
-        setStorageTheme(newTheme);
-        setTheme(newTheme);
+        persistData(storageKey, newTheme);
+        setChosen(newTheme);
       };
       const start = (document as ViewTransitionDocument).startViewTransition;
       const reduced = root.dataset.motion === 'reduced' || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -111,8 +115,15 @@ export function ThemeProvider({ children, defaultTheme = THEME_TYPES.DARK, stora
           if (switches.current === switchId) root.classList.remove('theme-switching');
         });
     },
-    [setStorageTheme],
+    [storageKey],
   );
+
+  // A theme saved under the old key moves to the new one.
+  useEffect(() => {
+    if (storageKey !== DEFAULT_STORAGE_KEY || getPersistentData(storageKey) !== null) return;
+    const legacy = getPersistentData<Theme>(LEGACY_STORAGE_KEY);
+    if (legacy) persistData(storageKey, legacy);
+  }, [storageKey]);
 
   useEffect(() => {
     applyTheme(theme);

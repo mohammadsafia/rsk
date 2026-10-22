@@ -2,11 +2,11 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Tooltip } from '@components/ui';
 import { FormInput, FormWizard } from '@components/forms';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import '../../../i18n';
 
@@ -28,7 +28,7 @@ function DraftHarness({ onSubmit = vi.fn() }: { onSubmit?: (values: Values) => v
   }, [form]);
 
   return (
-    <MemoryRouter>
+    <MemoryKitRouter>
       <Tooltip.Provider>
         <FormWizard form={form} onSubmit={onSubmit} draftKey="intake">
           <FormWizard.Step id="patient" title="Patient" fields={['name']}>
@@ -39,7 +39,7 @@ function DraftHarness({ onSubmit = vi.fn() }: { onSubmit?: (values: Values) => v
           </FormWizard.Step>
         </FormWizard>
       </Tooltip.Provider>
-    </MemoryRouter>
+    </MemoryKitRouter>
   );
 }
 

@@ -1,3 +1,5 @@
+'use client';
+
 import {
   type ComponentPropsWithoutRef,
   createContext,
@@ -9,12 +11,12 @@ import {
   useId,
   useState,
 } from 'react';
-import { Link } from 'react-router';
 
 import { IconButton, ScrollArea, Tooltip } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { useAppShell } from '@components/shared/app-shell/AppShellContext';
 
+import { KitLink } from '@contexts';
 import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
@@ -110,8 +112,8 @@ const Item: FC<ItemProps> = ({ href, icon: Icon, active = false, badge, classNam
 
   return (
     <Tooltip content={children} side={direction === 'rtl' ? 'left' : 'right'} disabled={!collapsed || mobileOpen}>
-      <Link
-        to={href}
+      <KitLink
+        href={href}
         data-slot="sidebar-item"
         aria-current={active ? 'page' : undefined}
         className={cn(
@@ -140,7 +142,7 @@ const Item: FC<ItemProps> = ({ href, icon: Icon, active = false, badge, classNam
             {badge}
           </span>
         </Conditional.If>
-      </Link>
+      </KitLink>
     </Tooltip>
   );
 };

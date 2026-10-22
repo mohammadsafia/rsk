@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, Fragment, useId } from 'react';
 import { Controller, type FieldValues } from 'react-hook-form';
 

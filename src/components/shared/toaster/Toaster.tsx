@@ -1,3 +1,5 @@
+'use client';
+
 import { Toast } from '@components/ui';
 
 import { useAppTranslation, useToast } from '@hooks/shared';

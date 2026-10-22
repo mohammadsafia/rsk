@@ -1,15 +1,10 @@
+'use client';
+
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { type DateFormat, useDate } from '@hooks/shared';
 
-export const DATE_INPUT_FORMATS = {
-  US_SLASH: 'MM/dd/yyyy',
-  US_DASH: 'MM-dd-yyyy',
-  EU_SLASH: 'dd/MM/yyyy',
-  EU_DASH: 'dd-MM-yyyy',
-} as const;
-
-export type DateInputFormat = (typeof DATE_INPUT_FORMATS)[keyof typeof DATE_INPUT_FORMATS];
+import { DATE_INPUT_FORMATS, type DateInputFormat } from './dateInputFormats';
 
 type UseDateMaskOptions = {
   dateFormat?: DateInputFormat;

@@ -10,7 +10,7 @@ import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } fr
 import path from 'node:path';
 
 import { blockFiles, generateBlockIndex, readBlocks, validateBlocks } from '../kit/blocks';
-import { readTree, writeLock } from '../kit/core';
+import { type KitTarget, readTree, writeLock } from '../kit/core';
 import { lockfileArgs } from './install';
 import { DOCS_ONLY_DEV_DEPENDENCIES, DOCS_ONLY_SCRIPTS, DROP, SHOWCASE_NAV_KEYS } from './manifest';
 
@@ -27,7 +27,11 @@ const edit = (file: string, find: string | RegExp, replace: string, out: string)
   writeFileSync(full, next);
 };
 
-export function buildStarter(outDir: string) {
+/** The published repository of each starter; its kit.lock.json names it, so kit:update and kit:add download from it. */
+export const STARTER_REPOS: Record<KitTarget, string> = { vite: 'mohammadsafia/rsk-starter', next: 'mohammadsafia/rsk-next-starter' };
+
+export function buildStarter(outDir: string, target: KitTarget = 'vite') {
+  if (target === 'next') throw new Error('starter:build --target next lands in Phase 3');
   const out = path.resolve(ROOT, outDir);
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
@@ -155,7 +159,7 @@ export function buildStarter(outDir: string) {
 
   // 4b. The kit version this app starts from, and a fingerprint of each kit file (what kit:update compares against).
   const kitCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
-  writeLock(out, kitCommit, readTree(out));
+  writeLock(out, kitCommit, readTree(out), [], { starter: STARTER_REPOS[target], target });
 
   // 5. Environment template: the keys, never this repo's values.
   const env = readFileSync(path.join(ROOT, '.env'), 'utf8').replace(/^﻿/, '');
@@ -170,7 +174,11 @@ export function refreshLockfile(out: string) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const out = buildStarter(process.argv[2] ?? '.starter');
+  const args = process.argv.slice(2);
+  const targetAt = args.indexOf('--target');
+  const target = targetAt === -1 ? 'vite' : args.splice(targetAt, 2)[1];
+  if (target !== 'vite' && target !== 'next') throw new Error(`--target must be vite or next, not "${target}"`);
+  const out = buildStarter(args[0] ?? '.starter', target);
   refreshLockfile(out);
   console.log(`Starter written to ${out}`);
 }

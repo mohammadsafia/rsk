@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, type FC } from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';

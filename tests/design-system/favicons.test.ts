@@ -4,6 +4,9 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vite-plus/test';
 
+import { checkFaviconLinks, NEXT_LAYOUT } from './target-checks';
+import { kitTarget } from '../../scripts/lib/kit-target.mjs';
+
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const read = (path: string) => readFileSync(`${ROOT}${path}`);
 
@@ -57,18 +60,13 @@ const isAccent = ([r, g, b]: number[]) => r > g + 60 && r > b + 40;
 const lightness = ([r, g, b]: number[]) => (r + g + b) / 3;
 
 describe('favicon set', () => {
-  it('ships every file the manifest and index.html reference', () => {
+  it('ships every file the manifest and the page head reference (index.html, or a Next app’s root layout)', () => {
     for (const file of ['favicon.svg', 'favicon.ico', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'site.webmanifest']) {
       expect(existsSync(`${ROOT}public/${file}`), file).toBe(true);
     }
-    const html = read('index.html').toString();
-    expect(html).toContain('<link rel="icon" type="image/svg+xml" href="/favicon.svg"');
-    expect(html).toContain('<link rel="icon" href="/favicon.ico" sizes="32x32"');
-    expect(html).toContain('<link rel="apple-touch-icon" href="/apple-touch-icon.png"');
-    expect(html).toContain('<link rel="manifest" href="/site.webmanifest"');
-    expect(html).toMatch(/<meta name="theme-color" media="\(prefers-color-scheme: dark\)"/);
-    expect(html).toMatch(/<meta name="theme-color" media="\(prefers-color-scheme: light\)"/);
-    expect(html).not.toMatch(/href=""|logo192|DM\+Sans|Playfair/);
+    expect(checkFaviconLinks(ROOT)).toEqual([]);
+    const head = read(kitTarget(ROOT) === 'next' ? NEXT_LAYOUT : 'index.html').toString();
+    expect(head).not.toMatch(/href=""|logo192|DM\+Sans|Playfair/);
   });
 
   it('switches inks by colour scheme inside the svg', () => {

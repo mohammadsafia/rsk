@@ -1,9 +1,11 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, type FC, type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
 
-import { useAppTranslation } from '@hooks/shared';
+import { useAppTranslation, useIsHydrated } from '@hooks/shared';
 
 import { cn } from '@utils';
 
@@ -35,6 +37,8 @@ export type AppShellProps = {
   sidebar: ReactNode;
   /** localStorage key for the collapsed preference; `null` disables persistence. */
   storageKey?: string | null;
+  /** The collapsed state a server renders before storage can be read (a Next app reads it from a cookie). */
+  initialCollapsed?: boolean;
   className?: string;
   children: ReactNode;
 };
@@ -110,8 +114,9 @@ const MenuButton: FC<{ className?: string }> = ({ className }) => {
   );
 };
 
-const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY, className, children }) => {
+const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY, initialCollapsed = false, className, children }) => {
   const { t } = useAppTranslation('nav');
+  const hydrated = useIsHydrated();
   const shellId = useId().replaceAll(':', '');
   const sidebarId = `app-sidebar-${shellId}`;
   const contentId = `main-content-${shellId}`;
@@ -119,13 +124,15 @@ const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY
   const asideRef = useRef<HTMLElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
 
-  const [collapsed, setCollapsedState] = useState(() => readStored(storageKey));
+  // Until the person toggles it: the stored choice once storage is readable (from the first render under createRoot).
+  const [chosen, setChosen] = useState<boolean | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const collapsed = chosen ?? (hydrated ? readStored(storageKey) : initialCollapsed);
 
   const setCollapsed = useCallback(
     (value: boolean) => {
-      setCollapsedState(value);
+      setChosen(value);
       writeStored(storageKey, value);
     },
     [storageKey],

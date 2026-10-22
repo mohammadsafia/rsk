@@ -1,3 +1,5 @@
+'use client';
+
 import { type RefObject, useEffect, useLayoutEffect, useRef } from 'react';
 
 import { MOTION_EASINGS } from '@constants';

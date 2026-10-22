@@ -1,4 +1,8 @@
+'use client';
+
 import { useEffect, useState } from 'react';
+
+import { useIsHydrated } from '../shared/useIsHydrated';
 
 const storageKey = (key: string) => `rsk:revealed:${key}`;
 
@@ -12,10 +16,12 @@ const seen = (key: string) => {
 
 /**
  * True on the first visit to `key` (a route) in this browser session, false afterwards — so back/forward and revisits
- * never replay a reveal. Read once when mounted (a read-only initializer, safe under StrictMode); recorded after.
+ * never replay a reveal. Read once when mounted (a read-only initializer, safe under StrictMode); recorded after. Never
+ * on a server-rendered page's hydration: the server can't know, so the page stays still as it was sent.
  */
 export function useRevealOnce(key: string) {
-  const [reveal] = useState(() => !seen(key));
+  const hydrated = useIsHydrated();
+  const [reveal] = useState(() => hydrated && !seen(key));
 
   useEffect(() => {
     try {

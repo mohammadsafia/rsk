@@ -4,6 +4,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { ErrorBoundary } from '@layouts';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 
 import '../../i18n';
 
@@ -20,7 +21,11 @@ describe('ErrorBoundary', () => {
   it('shows an error EmptyState as the page heading with recovery actions', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const router = createMemoryRouter([{ path: '/', element: <Boom />, errorElement: <ErrorBoundary /> }]);
-    render(<RouterProvider router={router} />);
+    render(
+      <ReactRouterKitProvider>
+        <RouterProvider router={router} />
+      </ReactRouterKitProvider>,
+    );
 
     const alert = await screen.findByRole('alert');
     expect(alert.getAttribute('data-kind')).toBe('error');

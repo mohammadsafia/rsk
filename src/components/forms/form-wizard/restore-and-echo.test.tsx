@@ -2,12 +2,12 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing';
 import { useForm, useWatch } from 'react-hook-form';
-import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { z } from 'zod';
 
 import { Tooltip } from '@components/ui';
 import { FormCheckbox, FormInput, FormWizard } from '@components/forms';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import '../../../i18n';
 
@@ -42,9 +42,9 @@ function Wizard({ urlSync = false, draftKey }: { urlSync?: boolean; draftKey?: s
 
 const wrap = (ui: React.ReactNode, onUrlUpdate?: (event: UrlUpdateEvent) => void, rateLimitFactor = 0) => (
   <NuqsTestingAdapter hasMemory onUrlUpdate={onUrlUpdate} rateLimitFactor={rateLimitFactor}>
-    <MemoryRouter>
+    <MemoryKitRouter>
       <Tooltip.Provider>{ui}</Tooltip.Provider>
-    </MemoryRouter>
+    </MemoryKitRouter>
   </NuqsTestingAdapter>
 );
 

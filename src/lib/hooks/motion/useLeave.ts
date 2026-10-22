@@ -1,15 +1,12 @@
+'use client';
+
 import { type RefObject, useCallback, useEffect, useRef } from 'react';
 
-import { MOTION_DURATIONS, MOTION_EASINGS } from '@constants';
+import { MOTION_DURATIONS } from '@constants';
 
 import { useMotion } from '../../contexts/MotionContext';
 
-/** How long an exit plays: quick, accelerating away (spec: exits are shorter than entrances). */
-export const LEAVE_TIMING: KeyframeAnimationOptions = {
-  duration: MOTION_DURATIONS.fast,
-  easing: MOTION_EASINGS.in,
-  fill: 'forwards',
-};
+import { LEAVE_TIMING } from './leaveTiming';
 
 const FOCUSABLE =
   'button:not(:disabled), [href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';

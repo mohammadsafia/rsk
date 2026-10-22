@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, type ReactNode, useContext, useEffect, useSyncExternalStore } from 'react';
 
 import { useAppTranslation } from '@hooks/shared';

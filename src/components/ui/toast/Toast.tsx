@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentPropsWithoutRef, createContext, type CSSProperties, type FC, useContext, useState } from 'react';
 import { createPortal } from 'react-dom';
 import * as ToastPrimitives from '@radix-ui/react-toast';

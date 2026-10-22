@@ -1,3 +1,5 @@
+'use client';
+
 import {
   createContext,
   type KeyboardEvent as ReactKeyboardEvent,

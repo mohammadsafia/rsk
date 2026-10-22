@@ -1,3 +1,5 @@
+'use client';
+
 import { type FC, type ReactNode, useMemo, useRef, useState } from 'react';
 
 import { Conditional } from '@components/utils';

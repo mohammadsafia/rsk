@@ -5,7 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vite-plus/test';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
-const SCOPES = ['src/components', 'src/layouts', 'src/pages', 'src/views'];
+// A Next app's app/ holds its layouts and pages.
+const SCOPES = ['src/components', 'src/layouts', 'src/pages', 'src/views', 'app'];
 
 const walk = (dir: string): string[] =>
   readdirSync(dir).flatMap((name) => {

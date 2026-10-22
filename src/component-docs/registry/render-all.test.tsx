@@ -11,6 +11,7 @@ import { ThemeProvider } from '@contexts';
 
 import { getComponentDocsRegistry } from '@component-docs/registry';
 import { mdxComponents } from '@component-docs/mdx-components';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 
 import '../../i18n';
 
@@ -38,13 +39,15 @@ describe('every docs page', () => {
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
         <ThemeProvider>
           <NuqsTestingAdapter>
-            <MemoryRouter>
-              <Tooltip.Provider>
-                <MDXProvider components={mdxComponents}>
-                  <Doc />
-                </MDXProvider>
-              </Tooltip.Provider>
-            </MemoryRouter>
+            <ReactRouterKitProvider>
+              <MemoryRouter>
+                <Tooltip.Provider>
+                  <MDXProvider components={mdxComponents}>
+                    <Doc />
+                  </MDXProvider>
+                </Tooltip.Provider>
+              </MemoryRouter>
+            </ReactRouterKitProvider>
           </NuqsTestingAdapter>
         </ThemeProvider>
       </QueryClientProvider>,
