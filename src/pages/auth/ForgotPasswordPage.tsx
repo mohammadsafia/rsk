@@ -1,5 +1,6 @@
+'use client';
+
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
 
 import { useForm } from 'react-hook-form';
 
@@ -8,6 +9,7 @@ import { Alert, Button } from '@components/ui';
 import { FormContainer, FormInput } from '@components/forms';
 import { Conditional } from '@components/utils';
 
+import { KitLink } from '@contexts';
 import { useAppTranslation } from '@hooks/shared';
 
 import { authApi } from '@api/handlers/auth';
@@ -89,12 +91,12 @@ function ForgotPasswordPage() {
         </Conditional.Else>
       </Conditional>
 
-      <Link
-        to={FULL_ROUTES_PATH.AUTH.LOGIN}
+      <KitLink
+        href={FULL_ROUTES_PATH.AUTH.LOGIN}
         className="text-fg-muted hover:text-fg focus-ring self-center rounded-sm text-sm underline-offset-4 hover:underline"
       >
         {t('forgot.back')}
-      </Link>
+      </KitLink>
     </section>
   );
 }
