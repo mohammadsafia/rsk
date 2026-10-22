@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm exec vp build --mode docs --base / --outDir dist-docs",
+  "outputDirectory": "dist-docs",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
