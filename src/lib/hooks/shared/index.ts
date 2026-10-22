@@ -1,4 +1,5 @@
 export * from './useToast';
+export * from './useIsHydrated';
 export * from './useStorage';
 export * from './useDebounce';
 export * from './dateFormats';

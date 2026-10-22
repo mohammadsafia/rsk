@@ -116,3 +116,30 @@ describe('ThemeProvider switch', () => {
     expect(root.classList.contains('light')).toBe(true);
   });
 });
+
+describe('ThemeProvider storage', () => {
+  it('keeps a theme saved under the old vite-ui-theme key, and saves it under rsk-theme', () => {
+    localStorage.setItem('vite-ui-theme', '"light"');
+    render(
+      <ThemeProvider defaultTheme={THEME_TYPES.DARK}>
+        <Probe />
+      </ThemeProvider>,
+    );
+    expect(root.classList.contains('light')).toBe(true);
+    expect(localStorage.getItem('rsk-theme')).toBe('"light"');
+  });
+
+  it('reads rsk-theme first and remembers a switch there', () => {
+    localStorage.setItem('rsk-theme', '"light"');
+    localStorage.setItem('vite-ui-theme', '"dark"');
+    render(
+      <ThemeProvider defaultTheme={THEME_TYPES.DARK}>
+        <Probe />
+      </ThemeProvider>,
+    );
+    expect(root.classList.contains('light')).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Dark' }));
+    expect(root.classList.contains('dark')).toBe(true);
+    expect(localStorage.getItem('rsk-theme')).toBe('"dark"');
+  });
+});

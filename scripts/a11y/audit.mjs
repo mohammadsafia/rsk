@@ -159,7 +159,7 @@ async function main() {
       ]) {
         const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' });
         await context.addInitScript(({ theme, lang }) => {
-          localStorage.setItem('vite-ui-theme', JSON.stringify(theme));
+          localStorage.setItem('rsk-theme', JSON.stringify(theme));
           localStorage.setItem('i18nextLng', lang);
         }, combo);
         if (signedIn) await seedDemoSession(context);

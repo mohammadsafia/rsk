@@ -67,7 +67,7 @@ for (const combo of COMBOS) {
         route.request().resourceType() === 'image' ? route.fulfill({ path: IMAGE }) : route.abort(),
       );
       await page.addInitScript(({ theme, lang }) => {
-        localStorage.setItem('vite-ui-theme', JSON.stringify(theme));
+        localStorage.setItem('rsk-theme', JSON.stringify(theme));
         localStorage.setItem('i18nextLng', lang);
       }, combo);
     });

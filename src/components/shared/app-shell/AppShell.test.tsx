@@ -1,8 +1,9 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { AppShell, Sidebar } from '@components/shared';
+import { AppShell, Sidebar, useAppShell } from '@components/shared';
 import { Tooltip } from '@components/ui';
 import { MemoryKitRouter } from '@contexts/testing';
 
@@ -159,5 +160,35 @@ describe('AppShell', () => {
     // The kit's outline ring: a box-shadow ring would be wiped out by shadow-overlay, leaving the browser default.
     expect(skip.className).toContain('focus-ring');
     expect(skip.className).not.toContain('focus-visible:ring-2');
+  });
+
+  it('restores the collapsed sidebar on the first render after a reload, with no flash (Vite)', () => {
+    localStorage.setItem('rsk:sidebar-collapsed', 'true');
+    const seen: boolean[] = [];
+    function Probe() {
+      seen.push(useAppShell().collapsed);
+      return null;
+    }
+    render(
+      <MemoryKitRouter>
+        <AppShell sidebar={<span />}>
+          <Probe />
+        </AppShell>
+      </MemoryKitRouter>,
+    );
+    expect(seen[0]).toBe(true);
+    expect(seen.every(Boolean)).toBe(true);
+  });
+
+  it('on a server, takes the collapsed state from initialCollapsed, not storage', () => {
+    localStorage.setItem('rsk:sidebar-collapsed', 'false');
+    const html = renderToString(
+      <MemoryKitRouter>
+        <AppShell sidebar={<span />} initialCollapsed>
+          <p>x</p>
+        </AppShell>
+      </MemoryKitRouter>,
+    );
+    expect(html).toMatch(/data-slot="app-shell-sidebar"[^>]*data-collapsed="true"|data-collapsed="true"[^>]*data-slot="app-shell-sidebar"/);
   });
 });

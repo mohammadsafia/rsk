@@ -6,4 +6,5 @@ export * from './MotionContext';
 export * from './AuthContext';
 export { type CurrentUser, notifyUnauthorized, readSession, type Session, SESSION_KEY } from './authSession';
 export * from './KitRouterContext';
+export { NowProvider } from './NowContext';
 export { fallbackKitRouter } from './kitRouterFallback';
