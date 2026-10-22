@@ -3,3 +3,5 @@ export * from './CommandPaletteContext';
 export * from './DirectionContext';
 export * from './MotionContext';
 export * from './AuthContext';
+export * from './KitRouterContext';
+export { fallbackKitRouter } from './kitRouterFallback';
