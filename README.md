@@ -259,24 +259,24 @@ Opens on http://localhost:3000.
 
 ### Scripts
 
-| Command           | Description                                                                                                                               |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm dev`        | Start the Vite development server                                                                                                         |
-| `pnpm build`      | Type-check and build for production                                                                                                       |
-| `pnpm build:dev`  | Build with the development mode flag                                                                                                      |
-| `pnpm preview`    | Serve the production build locally                                                                                                        |
-| `pnpm test`       | Run the Vitest test suite                                                                                                                 |
-| `pnpm lint`       | Lint the codebase with Oxlint (type-aware)                                                                                                |
-| `vp check`        | Format check (Oxfmt), lint, and type-check in one pass                                                                                    |
-| `vp fmt`          | Format the codebase with Oxfmt                                                                                                            |
-| `pnpm dto:gen`    | Interactive DTO generation with diff badges                                                                                               |
-| `pnpm dto:list`   | List all tracked schemas in the manifest                                                                                                  |
-| `pnpm dto:diff`   | Show schemas that have changed since last generation                                                                                      |
-| `pnpm dto:clean`  | Remove orphaned generated files and update the manifest                                                                                   |
-| `pnpm dto:init`   | Scaffold the `.dto-gen.json` configuration file                                                                                           |
-| `pnpm docs:build` | Build the hosted docs site (`dist-docs/`, under `/rsk/`); `.github/workflows/docs.yml` publishes it to GitHub Pages on every push to main |
-| `pnpm docs:new`   | Scaffold a new MDX component documentation file                                                                                           |
-| `pnpm docs:lint`  | Validate completeness of component documentation                                                                                          |
+| Command           | Description                                                                                                                                                    |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`        | Start the Vite development server                                                                                                                              |
+| `pnpm build`      | Type-check and build for production                                                                                                                            |
+| `pnpm build:dev`  | Build with the development mode flag                                                                                                                           |
+| `pnpm preview`    | Serve the production build locally                                                                                                                             |
+| `pnpm test`       | Run the Vitest test suite                                                                                                                                      |
+| `pnpm lint`       | Lint the codebase with Oxlint (type-aware)                                                                                                                     |
+| `vp check`        | Format check (Oxfmt), lint, and type-check in one pass                                                                                                         |
+| `vp fmt`          | Format the codebase with Oxfmt                                                                                                                                 |
+| `pnpm dto:gen`    | Interactive DTO generation with diff badges                                                                                                                    |
+| `pnpm dto:list`   | List all tracked schemas in the manifest                                                                                                                       |
+| `pnpm dto:diff`   | Show schemas that have changed since last generation                                                                                                           |
+| `pnpm dto:clean`  | Remove orphaned generated files and update the manifest                                                                                                        |
+| `pnpm dto:init`   | Scaffold the `.dto-gen.json` configuration file                                                                                                                |
+| `pnpm docs:build` | Build the hosted docs site (`dist-docs/`); Vercel deploys it (`vercel.json`), and `.github/workflows/docs.yml` checks it builds on every push and pull request |
+| `pnpm docs:new`   | Scaffold a new MDX component documentation file                                                                                                                |
+| `pnpm docs:lint`  | Validate completeness of component documentation                                                                                                               |
 
 ### Important Notes
 
