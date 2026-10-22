@@ -1,8 +1,6 @@
-import { useNavigate } from 'react-router';
-
 import { Command } from '@components/ui';
 
-import { THEME_TYPES, useCommandPalette, useTheme } from '@contexts';
+import { THEME_TYPES, useCommandPalette, useKitNavigate, useTheme } from '@contexts';
 import { useAppTranslation, useAuth } from '@hooks/shared';
 
 import { menuLabelKey } from '@utils';
@@ -11,7 +9,7 @@ import { APP_MENU } from '@routes';
 import { LogOut, Moon, Sun } from 'lucide-react';
 
 function CommandPalette() {
-  const navigate = useNavigate();
+  const navigate = useKitNavigate();
   const { open, setOpen } = useCommandPalette();
   const { theme, setTheme } = useTheme();
   const { signOut } = useAuth();

@@ -1,11 +1,11 @@
 import { type ComponentPropsWithoutRef, type FC, type ReactNode, useState } from 'react';
 import { useFormContext, useFormState } from 'react-hook-form';
-import { useNavigate } from 'react-router';
 
 import { Button } from '@components/ui';
 import { ConfirmDialog } from '@components/shared';
 import { Conditional } from '@components/utils';
 
+import { useKitNavigate } from '@contexts';
 import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
@@ -37,7 +37,7 @@ const FormContainerActions: FC<FormContainerActionsProps> = ({
   ...props
 }) => {
   const { t } = useAppTranslation('common');
-  const navigate = useNavigate();
+  const navigate = useKitNavigate();
   // useFormState subscribes to these flags, so the actions re-render when they change (a compiled component reading
   // formState through the context proxy would keep its first values).
   const { control } = useFormContext();

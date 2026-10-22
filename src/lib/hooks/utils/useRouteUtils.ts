@@ -1,7 +1,7 @@
-import { useLocation } from 'react-router';
+import { usePathname } from '@contexts';
 
 export const useRouteUtils = () => {
-  const { pathname } = useLocation();
+  const pathname = usePathname();
 
   const matchesRoute = (path: string): boolean => {
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;

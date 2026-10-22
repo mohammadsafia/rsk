@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { Tooltip } from '@components/ui';
 
 import { ThemeProvider } from '@contexts';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 
 import HomePage from './HomePage';
 
@@ -21,9 +22,11 @@ const renderHome = () =>
   render(
     <ThemeProvider>
       <Tooltip.Provider>
-        <MemoryRouter>
-          <HomePage />
-        </MemoryRouter>
+        <ReactRouterKitProvider>
+          <MemoryRouter>
+            <HomePage />
+          </MemoryRouter>
+        </ReactRouterKitProvider>
       </Tooltip.Provider>
     </ThemeProvider>,
   );

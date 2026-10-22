@@ -6,6 +6,7 @@ import { NuqsAdapter } from 'nuqs/adapters/react';
 
 import { queryClient } from '@api/config';
 import { ROUTER } from '@routes';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 import { AppDirectionProvider, AuthProvider, MotionProvider, ThemeProvider } from '@contexts';
 import { Tooltip } from '@components/ui';
 
@@ -28,7 +29,9 @@ export function renderApp(container: HTMLElement) {
               <NuqsAdapter>
                 <Tooltip.Provider delayDuration={300}>
                   <AuthProvider onSignOut={clearUserData}>
-                    <RouterProvider router={ROUTER} />
+                    <ReactRouterKitProvider>
+                      <RouterProvider router={ROUTER} />
+                    </ReactRouterKitProvider>
                   </AuthProvider>
                 </Tooltip.Provider>
               </NuqsAdapter>

@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test';
 import { AuthGuard, AuthLayout } from '@layouts';
 import { AuthProvider, SESSION_KEY } from '@contexts';
 import { DEMO_CREDENTIALS } from '@api/mock/auth';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 
 import i18n from '../../i18n';
 import ForgotPasswordPage from './ForgotPasswordPage';
@@ -44,7 +45,9 @@ const renderAt = (path: string) => {
   );
   render(
     <AuthProvider>
-      <RouterProvider router={router} />
+      <ReactRouterKitProvider>
+        <RouterProvider router={router} />
+      </ReactRouterKitProvider>
     </AuthProvider>,
   );
   return router;
@@ -149,7 +152,9 @@ describe('forgot password', () => {
       );
       render(
         <AuthProvider>
-          <RouterProvider router={router} />
+          <ReactRouterKitProvider>
+            <RouterProvider router={router} />
+          </ReactRouterKitProvider>
         </AuthProvider>,
       );
       await waitFor(() => expect(router.state.navigation.state).toBe('loading'));

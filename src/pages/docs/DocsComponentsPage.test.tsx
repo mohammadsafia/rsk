@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it } from 'vite-plus/test';
 import { Tooltip } from '@components/ui';
 
 import { getComponentDocsRegistry, normalizeCategoryKey } from '@component-docs/registry';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 
 import DocsComponentsPage from './DocsComponentsPage';
 
@@ -18,9 +19,11 @@ const mount = (search = '') =>
   render(
     <NuqsTestingAdapter searchParams={search}>
       <Tooltip.Provider>
-        <MemoryRouter>
-          <DocsComponentsPage />
-        </MemoryRouter>
+        <ReactRouterKitProvider>
+          <MemoryRouter>
+            <DocsComponentsPage />
+          </MemoryRouter>
+        </ReactRouterKitProvider>
       </Tooltip.Provider>
     </NuqsTestingAdapter>,
   );

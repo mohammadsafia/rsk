@@ -1,7 +1,6 @@
 import { type ComponentPropsWithoutRef, createContext, type FC, type ReactNode, useContext } from 'react';
 
-import { UNSAFE_RouteContext as RouteContext } from 'react-router';
-
+import { usePathname, useRoutePattern } from '@contexts';
 import { useRevealOnce } from '@hooks/motion';
 
 import { cn } from '@utils';
@@ -18,17 +17,11 @@ const SectionsContext = createContext(false);
  * Which page this is, for the once-per-session reveal: the matched route pattern ("/patients/:id"), so every patient's
  * profile counts as one page; outside a router, the path without a trailing slash.
  */
-const useRevealKey = () => {
-  const { matches } = useContext(RouteContext);
-  const pattern = matches
-    .map((match) => match.route.path)
-    .filter(Boolean)
-    .join('/')
-    .replace(/\/{2,}/g, '/');
+const useRevealKey = (): string => {
+  const pattern = useRoutePattern();
+  const path = usePathname();
   if (pattern) return pattern;
-  if (typeof window === 'undefined') return '';
   // Without trailing slashes, but "/" stays "/".
-  const path = window.location.pathname;
   let end = path.length;
   while (end > 1 && path[end - 1] === '/') end -= 1;
   return path.slice(0, end);

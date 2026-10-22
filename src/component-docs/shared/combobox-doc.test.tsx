@@ -8,6 +8,7 @@ import { Tooltip } from '@components/ui';
 import { getComponentDocsRegistry } from '@component-docs/registry';
 import { mdxComponents } from '@component-docs/mdx-components';
 import { MDXProvider } from '@mdx-js/react';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 
 import '../../i18n';
 
@@ -19,13 +20,15 @@ const renderDoc = async () => {
     .load();
   render(
     // A docs page always renders inside the router (its links are router links).
-    <MemoryRouter>
-      <Tooltip.Provider>
-        <MDXProvider components={mdxComponents}>
-          <Doc />
-        </MDXProvider>
-      </Tooltip.Provider>
-    </MemoryRouter>,
+    <ReactRouterKitProvider>
+      <MemoryRouter>
+        <Tooltip.Provider>
+          <MDXProvider components={mdxComponents}>
+            <Doc />
+          </MDXProvider>
+        </Tooltip.Provider>
+      </MemoryRouter>
+    </ReactRouterKitProvider>,
   );
   return document.querySelector('[data-slot="combobox-value"]')!.closest('button') as HTMLElement;
 };

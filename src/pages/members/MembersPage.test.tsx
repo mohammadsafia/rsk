@@ -6,6 +6,7 @@ import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { Tooltip } from '@components/ui';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 
 import MembersPage from './MembersPage';
 
@@ -19,9 +20,11 @@ describe('MembersPage', () => {
       <NuqsTestingAdapter>
         <QueryClientProvider client={new QueryClient()}>
           <Tooltip.Provider>
-            <MemoryRouter>
-              <MembersPage />
-            </MemoryRouter>
+            <ReactRouterKitProvider>
+              <MemoryRouter>
+                <MembersPage />
+              </MemoryRouter>
+            </ReactRouterKitProvider>
           </Tooltip.Provider>
         </QueryClientProvider>
       </NuqsTestingAdapter>,
@@ -42,9 +45,11 @@ describe('MembersPage filters', () => {
         <NuqsTestingAdapter>
           <QueryClientProvider client={new QueryClient()}>
             <Tooltip.Provider>
-              <MemoryRouter>
-                <MembersPage />
-              </MemoryRouter>
+              <ReactRouterKitProvider>
+                <MemoryRouter>
+                  <MembersPage />
+                </MemoryRouter>
+              </ReactRouterKitProvider>
             </Tooltip.Provider>
           </QueryClientProvider>
         </NuqsTestingAdapter>,

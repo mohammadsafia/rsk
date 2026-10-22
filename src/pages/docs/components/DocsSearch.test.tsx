@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from 'vite-plus/test';
 import { Tooltip } from '@components/ui';
 
 import { getComponentDocsRegistry } from '@component-docs/registry';
+import { ReactRouterKitProvider } from '@routes/routerAdapter';
 
 import DocsSearch from './DocsSearch';
 import { buildSearchIndex } from './docs-search-index';
@@ -21,7 +22,9 @@ const mount = () => {
   const router = createMemoryRouter([{ path: '*', element: <DocsSearch /> }], { initialEntries: ['/docs'] });
   render(
     <Tooltip.Provider>
-      <RouterProvider router={router} />
+      <ReactRouterKitProvider>
+        <RouterProvider router={router} />
+      </ReactRouterKitProvider>
     </Tooltip.Provider>,
   );
   return router;

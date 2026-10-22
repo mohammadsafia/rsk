@@ -1,7 +1,8 @@
 import { type ReactNode } from 'react';
-import { Link } from 'react-router';
+
 import { Conditional } from '@components/utils';
 
+import { KitLink } from '@contexts';
 import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
@@ -40,12 +41,12 @@ const Breadcrumb = ({ className, links, separator, withRoot = false }: Breadcrum
             <li key={`${title}-${idx}`} data-slot="breadcrumb-item" className="flex items-center gap-1">
               <Conditional>
                 <Conditional.If condition={!!href && !isLastItem}>
-                  <Link
+                  <KitLink
                     className="hover:text-fg focus-visible:ring-ring rounded-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
-                    to={href === PLAIN_ROUTES.HOME.INDEX || href === PLAIN_ROUTES.ROOT.INDEX ? href! : `/${href}`}
+                    href={href === PLAIN_ROUTES.HOME.INDEX || href === PLAIN_ROUTES.ROOT.INDEX ? href! : `/${href}`}
                   >
                     {title}
-                  </Link>
+                  </KitLink>
                 </Conditional.If>
 
                 <Conditional.Else>

@@ -1,10 +1,10 @@
 import { type ComponentPropsWithoutRef, type FC, type ReactNode } from 'react';
-import { Link } from 'react-router';
 
 import { IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
 import Breadcrumb, { type BreadcrumbLink } from '@components/shared/breadcrumb/Breadcrumb';
 
+import { KitLink } from '@contexts';
 import { useAppTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
@@ -48,9 +48,9 @@ const PageHeader: PageHeaderComponent = ({ className, title, description, back, 
         <div className="flex min-w-0 items-start gap-3">
           <Conditional>
             <Conditional.If condition={typeof back === 'string'}>
-              <Link to={back as string} aria-label={t('pageHeader.back')} className={BACK_CLASSES}>
+              <KitLink href={back as string} aria-label={t('pageHeader.back')} className={BACK_CLASSES}>
                 {icon}
-              </Link>
+              </KitLink>
             </Conditional.If>
 
             <Conditional.If condition={typeof back === 'function'}>
