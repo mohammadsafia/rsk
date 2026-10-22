@@ -1,11 +1,11 @@
 import { type ReactElement, type ReactNode } from 'react';
-import { Link } from 'react-router';
 
 import { Button } from '@components/ui';
 
 import { EmptyState, Logo } from '@components/shared';
 import { Conditional } from '@components/utils';
 
+import { KitLink } from '@contexts';
 import { useBlockTranslation } from '@hooks/shared';
 
 import { cn } from '@utils';
@@ -69,10 +69,10 @@ function SystemPage({ code, icon, title, description, kind = 'first-use', layout
           {children}
 
           <Button variant={children ? 'outline' : 'solid'} asChild>
-            <Link to="/">
+            <KitLink href="/">
               <Home aria-hidden="true" />
               {t('home')}
-            </Link>
+            </KitLink>
           </Button>
         </EmptyState.Actions>
       </EmptyState>

@@ -1,12 +1,13 @@
 // @vitest-environment happy-dom
-import type { ReactNode } from 'react';
+import type { ReactElement } from 'react';
 
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider } from 'react-router';
+import { act, cleanup, fireEvent, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+
+import { renderWithKitRouter } from '@contexts/testing';
 
 import { MaintenancePage, NoAccessPage, NotFoundPage, ServerErrorPage, ServerErrorScreen } from './index';
 
@@ -19,65 +20,30 @@ afterEach(async () => {
   await act(() => i18n.changeLanguage('en'));
 });
 
-const renderAt = (element: ReactNode) => {
-  const router = createMemoryRouter(
-    [
-      { path: '/', element: <p>Home page</p> },
-      { path: '/page', element },
-    ],
-    { initialEntries: ['/page'] },
-  );
-  render(<RouterProvider router={router} />);
-  return router;
-};
+const renderAt = (element: ReactElement) => renderWithKitRouter(element, { initialPath: '/page' });
 
 describe('system pages', () => {
   it.each([
     ['NotFoundPage', <NotFoundPage key="404" />, 'Page not found'],
-    ['ServerErrorPage', <ServerErrorPage key="500" />, 'Something went wrong on our side'],
+    ['ServerErrorPage', <ServerErrorPage key="500" error={new Error('boom')} retry={() => {}} />, 'Something went wrong on our side'],
     ['MaintenancePage', <MaintenancePage key="maint" />, 'We’ll be back soon'],
     ['NoAccessPage', <NoAccessPage key="403" />, 'You don’t have access to this page'],
   ])('%s has its title as the page heading and a working link home', async (_name, page, title) => {
-    renderAt(page);
+    const { history } = renderAt(page);
     expect(await screen.findByRole('heading', { level: 1, name: title })).toBeTruthy();
     fireEvent.click(screen.getByRole('link', { name: 'Back to home' }));
-    expect(await screen.findByText('Home page')).toBeTruthy();
+    expect(history).toEqual(['/page', '/']);
   });
 
-  it('as a route’s error element, shows the server error and retries the route', async () => {
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    let fail = true;
-    const router = createMemoryRouter([
-      {
-        path: '/',
-        loader: () => {
-          if (fail) throw new Error('database down');
-          return null;
-        },
-        element: <p>Loaded</p>,
-        errorElement: <ServerErrorPage />,
-      },
-    ]);
-    render(<RouterProvider router={router} />);
-    expect(await screen.findByRole('heading', { level: 1, name: 'Something went wrong on our side' })).toBeTruthy();
-    fail = false;
+  it('shows the server error with a retry, and the not-found page for a 404', () => {
+    const retry = vi.fn();
+    renderAt(<ServerErrorPage error={new Error('boom')} retry={retry} />);
+    expect(screen.getByRole('heading', { level: 1, name: 'Something went wrong on our side' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
-    expect(await screen.findByText('Loaded')).toBeTruthy();
-  });
-
-  it('shows the not-found page when the route error is a 404 response', async () => {
-    const router = createMemoryRouter([
-      {
-        path: '/',
-        loader: () => {
-          throw new Response('Not here', { status: 404 });
-        },
-        element: <p>Loaded</p>,
-        errorElement: <ServerErrorPage />,
-      },
-    ]);
-    render(<RouterProvider router={router} />);
-    expect(await screen.findByRole('heading', { level: 1, name: 'Page not found' })).toBeTruthy();
+    expect(retry).toHaveBeenCalled();
+    cleanup();
+    renderAt(<ServerErrorPage error={null} retry={retry} notFound />);
+    expect(screen.getByRole('heading', { level: 1, name: 'Page not found' })).toBeTruthy();
   });
 
   it.each([
@@ -105,13 +71,7 @@ describe('system pages', () => {
     expect(source).toContain("{ path: '/no-access', lazy: async () => ({ Component: (await import('./system-pages')).NoAccessPage }) }");
     expect(source.indexOf("path: '/maintenance'")).toBeLessThan(source.indexOf("path: '*'"));
     // Lazy: the error page loads when a route fails, never with the first load.
-    expect(source).toContain(
-      [
-        'export const BlockErrorElement: LazyExoticComponent<ComponentType> | null = lazy(async () => ({',
-        "  default: (await import('./system-pages')).ServerErrorPage,",
-        '}));',
-      ].join('\n'),
-    );
+    expect(source).toContain("const ErrorPage = lazy(async () => ({ default: (await import('./system-pages')).ServerErrorPage }));");
     expect(source).not.toMatch(/^export \{.*\} from/m);
   });
 });

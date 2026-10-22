@@ -2,6 +2,6 @@
   // The repo's scripts and tests: the app's settings (JSX, DOM, path aliases, Vite and Node types), since the tests
   // render the app's components and the scripts run on Node. Part of `tsc -b`, so they are type-checked like src/.
   "extends": "./tsconfig.app.json",
-  "include": ["scripts", "tests"],
+  "include": ["scripts", "tests", "src/**/*.d.ts"],
   "exclude": ["scripts/starter/overlay"]
 }
