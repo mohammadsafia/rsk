@@ -80,6 +80,11 @@ describe('typography', () => {
   });
 
   it('exposes the sans and mono stacks', () => {
+    // A Next app sets --font-brand-* from next/font; a Vite app leaves them unset and gets the named families.
+    expect(FONT_FAMILIES.sans).toBe(
+      "var(--font-brand-sans, 'Schibsted Grotesk'), var(--font-brand-arabic, 'Noto Kufi Arabic'), system-ui, sans-serif",
+    );
+    expect(FONT_FAMILIES.mono).toBe("var(--font-brand-mono, 'Spline Sans Mono'), ui-monospace, 'SFMono-Regular', monospace");
     expect(themeCss).toContain(`--font-sans: ${FONT_FAMILIES.sans};`);
     expect(themeCss).toContain(`--font-mono: ${FONT_FAMILIES.mono};`);
     expect(themeCss).not.toContain('--font-family-sans');

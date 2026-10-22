@@ -99,9 +99,9 @@ export const useDataTableFilters = <TData extends RowData>({ columns, urlSync = 
   );
 
   const hydrated = useIsHydrated();
-  // Read once, synchronously, so the toolbar's search box starts with the restored text (on a server, and while
-  // hydrating, storage isn't readable: the table starts unfiltered, as the server rendered it).
-  const [initial] = useState(() => {
+  // Read once storage is readable — from the first render under createRoot, so the toolbar's search box starts with the
+  // restored text; on a server-rendered page right after hydration (the server rendered the URL's filters, or none).
+  const restored = useMemo(() => {
     if (urlSync) {
       const fromUrl: Stored = { filters: {} };
       for (const { id } of filterable) {
@@ -114,12 +114,17 @@ export const useDataTableFilters = <TData extends RowData>({ columns, urlSync = 
     }
     const stored = hydrated ? readSession(sessionKey) : undefined;
     return stored?.filters ? decode(stored) : { columnFilters: [], globalFilter: '' };
-  });
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- read once, and again only when storage becomes readable
+  }, [hydrated]);
 
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(initial.columnFilters);
-  const [globalFilter, setGlobalFilter] = useState<string>(initial.globalFilter);
+  // The person's own filters and search, once they change one; until then, what was restored.
+  const [chosen, setChosen] = useState<{ columnFilters: ColumnFiltersState; globalFilter: string } | null>(null);
+  const columnFilters = chosen?.columnFilters ?? restored.columnFilters;
+  const globalFilter = chosen?.globalFilter ?? restored.globalFilter;
 
   useEffect(() => {
+    // While hydrating, storage isn't read yet: writing now would erase what is stored.
+    if (!hydrated) return;
     const stored = encode(columnFilters, globalFilter);
     writeSession(sessionKey, stored);
 
@@ -127,21 +132,26 @@ export const useDataTableFilters = <TData extends RowData>({ columns, urlSync = 
     const next: Record<string, string | null> = { [`${prefix}q`]: stored?.q ?? null };
     for (const { id } of filterable) next[`${prefix}${id}`] = stored?.filters[id] ?? null;
     void setParams(next);
-  }, [columnFilters, globalFilter, encode, sessionKey, urlSync, prefix, filterable, setParams]);
+  }, [hydrated, columnFilters, globalFilter, encode, sessionKey, urlSync, prefix, filterable, setParams]);
 
   const onColumnFiltersChange: OnChangeFn<ColumnFiltersState> = useCallback(
-    (updater) => setColumnFilters((current) => (typeof updater === 'function' ? updater(current) : updater)),
-    [],
+    (updater) =>
+      setChosen((current) => {
+        const base = current ?? restored;
+        return { ...base, columnFilters: typeof updater === 'function' ? updater(base.columnFilters) : updater };
+      }),
+    [restored],
   );
   const onGlobalFilterChange: OnChangeFn<string> = useCallback(
-    (updater) => setGlobalFilter((current) => String((typeof updater === 'function' ? updater(current) : updater) ?? '')),
-    [],
+    (updater) =>
+      setChosen((current) => {
+        const base = current ?? restored;
+        return { ...base, globalFilter: String((typeof updater === 'function' ? updater(base.globalFilter) : updater) ?? '') };
+      }),
+    [restored],
   );
 
-  const reset = useCallback(() => {
-    setColumnFilters([]);
-    setGlobalFilter('');
-  }, []);
+  const reset = useCallback(() => setChosen({ columnFilters: [], globalFilter: '' }), []);
 
   return { state: { columnFilters, globalFilter }, onColumnFiltersChange, onGlobalFilterChange, reset };
 };

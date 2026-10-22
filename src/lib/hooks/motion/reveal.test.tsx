@@ -1,4 +1,7 @@
 // @vitest-environment happy-dom
+import { act } from 'react';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test';
 
@@ -28,5 +31,18 @@ describe('useRevealOnce', () => {
     cleanup();
     render(<Probe id="/patients" />);
     expect(revealed()).toBe(true);
+  });
+
+  it('never reveals on a server-rendered page’s hydration (the page stays still as it was sent), and records the visit', async () => {
+    function Probe() {
+      return <p>{useRevealOnce('/patients') ? 'reveal' : 'still'}</p>;
+    }
+    const container = document.createElement('div');
+    container.innerHTML = renderToString(<Probe />);
+    document.body.append(container);
+    await act(async () => void hydrateRoot(container, <Probe />));
+    expect(container.textContent).toBe('still');
+    expect(sessionStorage.getItem('rsk:revealed:/patients')).not.toBeNull();
+    container.remove();
   });
 });

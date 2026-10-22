@@ -1,5 +1,7 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useTable } from '@tanstack/react-table';
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing';
@@ -151,6 +153,33 @@ describe('useDataTableFilters', () => {
       </NuqsTestingAdapter>,
     );
     expect(screen.getByTestId('nested').textContent).toBe('Irbid');
+  });
+
+  it('on a server-rendered page, restores the session’s filters once hydrated, and never erases them while hydrating', async () => {
+    sessionStorage.setItem('rsk:table:members', JSON.stringify({ filters: { amount: '100..' }, q: 'om' }));
+    const tree = (
+      <NuqsTestingAdapter>
+        <QueryClientProvider client={new QueryClient()}>
+          <Tooltip.Provider>
+            <Page storageKey="members" />
+          </Tooltip.Provider>
+        </QueryClientProvider>
+      </NuqsTestingAdapter>
+    );
+    const container = document.createElement('div');
+    // On a server the storage isn't readable: the table renders unfiltered.
+    const getItem = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('no storage on a server');
+    });
+    container.innerHTML = renderToString(tree);
+    getItem.mockRestore();
+    expect(container.querySelector('[data-testid="names"]')?.textContent).toBe('Sara,Omar');
+    document.body.append(container);
+    await act(async () => void hydrateRoot(container, tree));
+    expect(names()).toBe('Omar');
+    expect(search().value).toBe('om');
+    expect(JSON.parse(sessionStorage.getItem('rsk:table:members') ?? 'null')).toEqual({ filters: { amount: '100..' }, q: 'om' });
+    container.remove();
   });
 });
 

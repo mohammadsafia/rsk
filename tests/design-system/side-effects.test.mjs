@@ -1,5 +1,6 @@
 // tests/design-system/side-effects.test.mjs — package.json "sideEffects" names every module whose import must run.
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -38,6 +39,7 @@ const TIED_TO_EXPORTS = {
 const GENERATED = {
   './src/blocks/index.ts': "registers added blocks' menu labels; the menu always uses its blockNav, so it is always kept",
 };
+const MARKERS = new Set(['server-only', 'client-only']);
 const rel = (file) => `./${path.relative(ROOT, file).split(path.sep).join('/')}`;
 
 /** Whether a package.json sideEffects entry covers a file ("*.css" matches by extension; "./src/x.ts" exactly). */
@@ -80,7 +82,8 @@ const effectsIn = (file) => {
   return ast.program.body.flatMap((node) => {
     if (node.type.startsWith('TS')) return [];
     if (node.type === 'ImportDeclaration')
-      return node.specifiers.length || node.importKind === 'type' || node.source.value.endsWith('.css')
+      // 'server-only' / 'client-only' mark where a module may run (they throw elsewhere); they change nothing on import.
+      return node.specifiers.length || node.importKind === 'type' || node.source.value.endsWith('.css') || MARKERS.has(node.source.value)
         ? []
         : [`bare import '${node.source.value}'`];
     if (ALLOWED.has(node.type)) return [];
@@ -114,5 +117,14 @@ describe('package.json sideEffects', () => {
 
   it('lists nothing stale: every entry matches a file', () => {
     expect(listed.filter((entry) => !all.some((file) => covers(entry, file)))).toEqual([]);
+  });
+
+  it('reads a bare server-only or client-only import as a marker, not an effect', () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'side-effects-'));
+    const file = path.join(dir, 'secret.ts');
+    writeFileSync(file, "import 'server-only';\nimport 'client-only';\nexport const secret = () => 'x';\n");
+    expect(effectsIn(file)).toEqual([]);
+    writeFileSync(file, "import './register';\nexport const secret = () => 'x';\n");
+    expect(effectsIn(file)).toEqual(["bare import './register'"]);
   });
 });

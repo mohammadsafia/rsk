@@ -67,8 +67,8 @@ export const TEXT_SCALE: ReadonlyArray<TextScaleStep> = [
 ];
 
 export const FONT_FAMILIES = {
-  sans: "'Schibsted Grotesk', 'Noto Kufi Arabic', system-ui, sans-serif",
-  mono: "'Spline Sans Mono', ui-monospace, 'SFMono-Regular', monospace",
+  sans: "var(--font-brand-sans, 'Schibsted Grotesk'), var(--font-brand-arabic, 'Noto Kufi Arabic'), system-ui, sans-serif",
+  mono: "var(--font-brand-mono, 'Spline Sans Mono'), ui-monospace, 'SFMono-Regular', monospace",
 } as const;
 
 export type FoundationScaleStep = Readonly<{

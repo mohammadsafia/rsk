@@ -65,8 +65,8 @@
   --color-code-muted: var(--code-muted);
 
   /* fonts — per-glyph fallback: Latin + digits render in Schibsted, Arabic in Noto Kufi */
-  --font-sans: 'Schibsted Grotesk', 'Noto Kufi Arabic', system-ui, sans-serif;
-  --font-mono: 'Spline Sans Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --font-sans: var(--font-brand-sans, 'Schibsted Grotesk'), var(--font-brand-arabic, 'Noto Kufi Arabic'), system-ui, sans-serif;
+  --font-mono: var(--font-brand-mono, 'Spline Sans Mono'), ui-monospace, 'SFMono-Regular', monospace;
 
   /* type scale — line heights grow by --leading-rtl-boost under [dir='rtl'] (tokens.css) */
   --text-*: initial;

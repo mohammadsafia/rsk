@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
+import { hydrateRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { AppShell, Sidebar, useAppShell } from '@components/shared';
@@ -190,5 +191,36 @@ describe('AppShell', () => {
       </MemoryKitRouter>,
     );
     expect(html).toMatch(/data-slot="app-shell-sidebar"[^>]*data-collapsed="true"|data-collapsed="true"[^>]*data-slot="app-shell-sidebar"/);
+  });
+
+  it('with no storage (a Next app), keeps the server’s collapsed state through hydration and reports a toggle', async () => {
+    const seen: boolean[] = [];
+    const changes: boolean[] = [];
+    function Probe() {
+      const { collapsed, toggleCollapsed } = useAppShell();
+      seen.push(collapsed);
+      return (
+        <button type="button" onClick={toggleCollapsed}>
+          toggle
+        </button>
+      );
+    }
+    const tree = (
+      <MemoryKitRouter>
+        <AppShell sidebar={<span />} storageKey={null} initialCollapsed onCollapsedChange={(value) => changes.push(value)}>
+          <Probe />
+        </AppShell>
+      </MemoryKitRouter>
+    );
+    const container = document.createElement('div');
+    container.innerHTML = renderToString(tree);
+    document.body.append(container);
+    seen.length = 0;
+    await act(async () => void hydrateRoot(container, tree));
+    expect(seen.length).toBeGreaterThan(0);
+    expect(seen.every(Boolean)).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'toggle' }));
+    expect(changes).toEqual([false]);
+    container.remove();
   });
 });
