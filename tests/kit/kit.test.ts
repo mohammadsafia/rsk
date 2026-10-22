@@ -72,6 +72,11 @@ describe('kit scope', () => {
       'src/api/x.ts',
       'src/locales/en/common.json',
       'package.json',
+      // A Next app's own routes, proxy and router adapter.
+      'app/[lang]/layout.tsx',
+      'app/[lang]/(app)/dashboard/page.tsx',
+      'proxy.ts',
+      'src/routes/routerAdapter.tsx',
     ])
       expect(inScope(file)).toBe(false);
   });

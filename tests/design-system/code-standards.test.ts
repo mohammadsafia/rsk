@@ -15,6 +15,8 @@ export const SCOPE = [
   'src/pages/auth',
   'src/layouts/auth-layout',
   'src/components/shared/command-palette/LazyCommandPalette.tsx',
+  // A Next app's routes and layouts, when there are any.
+  'app',
 ];
 
 type Rule = { id: string; standard: string; pattern: RegExp; tsxOnly?: boolean };

@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { corpusFiles } from './dependency-corpus';
+import { checkEntryScripts, checkEnvDeclarations, checkRouterDependency, envDeclarationFiles } from './target-checks';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const pkg = JSON.parse(readFileSync(`${ROOT}package.json`, 'utf8')) as {
@@ -30,6 +31,10 @@ const IMPLICIT_DEPENDENCIES = new Set([
   'tailwindcss',
   'tw-animate-css',
   '@tailwindcss/vite',
+  // A Next app's framework and its Tailwind PostCSS plugin, named by config files and the CLI rather than imported.
+  'next',
+  '@tailwindcss/postcss',
+  'postcss',
   'tsx',
   // Babel peers of @rolldown/plugin-babel + the React Compiler preset (loaded by name, never imported).
   '@babel/core',
@@ -89,23 +94,18 @@ describe('dependencies', () => {
   });
 
   it('declares no environment variable that nothing reads', () => {
-    // Comment lines are documentation (an example key), not declarations.
-    const declarations = readFileSync(`${ROOT}src/vite-env.d.ts`, 'utf8').replace(/^\s*\/\/.*$/gm, '');
-    const declared = declarations.match(/\bVITE_[A-Z0-9_]+/g) ?? [];
-    const readers = tracked.filter((file) => file !== 'src/vite-env.d.ts' && file !== '.env' && !file.endsWith('.md'));
-    const read = readers.map((file) => readFileSync(`${ROOT}${file}`, 'utf8')).join('\n');
-    expect([...new Set(declared)].filter((name) => !read.includes(name))).toEqual([]);
+    const declarations = envDeclarationFiles(ROOT);
+    const readers = tracked.filter((file) => !declarations.includes(file) && !file.endsWith('.md'));
+    expect(checkEnvDeclarations(ROOT, readers.map((file) => readFileSync(`${ROOT}${file}`, 'utf8')).join('\n'))).toEqual([]);
   });
 
-  it('routes come from react-router (v8 has no react-router-dom)', () => {
+  it('routes come from the framework (Vite: react-router 8, which has no react-router-dom; Next: its own router)', () => {
     // Built in two pieces so this file doesn't match itself.
     expect(corpus.includes(`from '${'react-router'}-dom'`)).toBe(false);
-    expect(pkg.dependencies?.['react-router']).toMatch(/^\^8/);
+    expect(checkRouterDependency(ROOT)).toEqual([]);
   });
 
-  it('index.html loads no local script that does not exist (a 404 on every page load)', () => {
-    const html = readFileSync(`${ROOT}index.html`, 'utf8');
-    const local = [...html.matchAll(/<script[^>]+src="\/([^"]+)"/g)].map((match) => match[1]);
-    expect(local.filter((src) => !tracked.includes(src) && !tracked.includes(`public/${src}`))).toEqual([]);
+  it('index.html loads no local script that does not exist (a 404 on every page load); a Next app has none', () => {
+    expect(checkEntryScripts(ROOT, (file) => tracked.includes(file))).toEqual([]);
   });
 });

@@ -16,6 +16,7 @@ import {
   TEXT_SCALE,
 } from '../../src/lib/constants/DesignTokens';
 import { extractBlock, readProjectFile } from './css-tokens';
+import { checkFontLoading } from './target-checks';
 
 const SRC_DIR = fileURLToPath(new URL('../../src/', import.meta.url));
 
@@ -74,12 +75,8 @@ describe('legacy accent migration', () => {
 });
 
 describe('typography', () => {
-  it('loads exactly the three approved families', () => {
-    const fontImport = indexCss.split('\n')[0];
-    expect(fontImport).toContain('family=Schibsted+Grotesk');
-    expect(fontImport).toContain('family=Noto+Kufi+Arabic');
-    expect(fontImport).toContain('family=Spline+Sans+Mono');
-    expect(fontImport).not.toMatch(/DM\+Sans|Fraunces|IBM\+Plex/);
+  it('loads exactly the three approved families (Vite: Google Fonts in index.css; Next: next/font in the root layout)', () => {
+    expect(checkFontLoading(fileURLToPath(new URL('../../', import.meta.url)))).toEqual([]);
   });
 
   it('exposes the sans and mono stacks', () => {

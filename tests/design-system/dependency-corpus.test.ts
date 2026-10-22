@@ -18,6 +18,8 @@ describe('corpusFiles', () => {
   });
 
   it('reads sources only, never package.json or the lockfile', () => {
-    expect(corpusFiles(['package.json', 'pnpm-lock.yaml', 'README.md', 'src/main.tsx'], ROOT)).toEqual(['src/main.tsx']);
+    // A kit file: every app has it, whatever its framework.
+    const kitFile = 'src/components/ui/button/Button.tsx';
+    expect(corpusFiles(['package.json', 'pnpm-lock.yaml', 'README.md', kitFile], ROOT)).toEqual([kitFile]);
   });
 });

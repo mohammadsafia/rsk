@@ -1,5 +1,5 @@
 // tests/design-system/side-effects.test.mjs — package.json "sideEffects" names every module whose import must run.
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -15,7 +15,8 @@ const walk = (dir) =>
     const full = path.join(dir, name);
     return statSync(full).isDirectory() ? walk(full) : [full];
   });
-const all = walk(path.join(ROOT, 'src'));
+// src/, plus a Next app's app/ (its layouts and pages are modules too).
+const all = ['src', 'app'].filter((dir) => existsSync(path.join(ROOT, dir))).flatMap((dir) => walk(path.join(ROOT, dir)));
 // CLI scripts under component-docs/scripts run with tsx and are never bundled, so they are not modules here.
 const sources = all.filter(
   (file) => /\.(ts|tsx)$/.test(file) && !/\.(test|d)\.tsx?$/.test(file) && !/test-utils|component-docs\/scripts\//.test(file),

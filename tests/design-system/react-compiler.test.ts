@@ -4,13 +4,14 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vite-plus/test';
 
+import { checkCompilerConfig } from './target-checks';
+
+const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const config = readFileSync(fileURLToPath(new URL('../../vite.config.ts', import.meta.url)), 'utf8');
 
 describe('React Compiler', () => {
-  it('builds with @vitejs/plugin-react and its React Compiler preset, not SWC', () => {
-    expect(config).toContain("from '@vitejs/plugin-react'");
-    expect(config).toContain('reactCompilerPreset');
-    expect(config).not.toContain('plugin-react-swc');
+  it('builds with the React Compiler (Vite: the React plugin’s preset, not SWC; Next: reactCompiler)', () => {
+    expect(checkCompilerConfig(ROOT)).toEqual([]);
   });
 
   it('keeps compiler rules as errors, so new code stays compilable', () => {
