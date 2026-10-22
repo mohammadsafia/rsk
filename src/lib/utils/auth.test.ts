@@ -7,6 +7,15 @@ describe('safeNext', () => {
     expect(safeNext('/patients?page=2')).toBe('/patients?page=2');
   });
 
+  it('refuses a next whose dot segments climb out of the path into another host', () => {
+    // Each starts with "/" and stays same-origin while parsing, but normalises to "//evil.example", which a router
+    // then reads as another site.
+    for (const value of ['/en/..//evil.example', '/en/%2e%2e//evil.example', '/a/.%2e//evil.example/x', '/..//evil.example'])
+      expect(safeNext(value, '/dashboard')).toBe('/dashboard');
+    expect(safeNext('/en/settings?tab=a#x', '/dashboard')).toBe('/en/settings?tab=a#x');
+    expect(safeNext('/en/../settings', '/dashboard')).toBe('/settings');
+  });
+
   it('refuses anything that could leave the app, falling back', () => {
     for (const value of ['//evil.example', 'https://evil.example', '/\\evil.example', 'javascript:alert(1)', '', null, undefined])
       expect(safeNext(value, '/dashboard')).toBe('/dashboard');
