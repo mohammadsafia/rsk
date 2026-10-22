@@ -1,6 +1,6 @@
 /**
  * Proves an app made from the starter before this kit updates cleanly: builds the starter as it was published
- * (`git merge-base HEAD main`), adds a block, runs the app's own kit:update (the old updater) onto the new starter,
+ * (UPGRADE_FROM), adds a block, runs the app's own kit:update (the old updater) onto the new starter,
  * expects its type check to pass before any wiring, runs kit:update again (now the new updater, which names the
  * missing router adapter), wires the adapter as it says (bootstrap and the app's memory-router tests), and expects the
  * type check, lint, tests and build to pass.
@@ -8,13 +8,29 @@
  * Run by starter:verify with the starter it just built; on its own: tsx scripts/starter/verify-upgrade.ts <new-starter>
  */
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
 import { installArgs } from './install';
 
 const ROOT = path.resolve(import.meta.dirname, '../..');
+
+/**
+ * The kit the published starter's apps were made from: the oldest an app updates from in this fixture. Pinned, not
+ * derived from git history: on main (and in CI's shallow clone) the merge-base with main is HEAD itself. Move it
+ * forward when apps are asked to have taken a newer kit.
+ */
+export const UPGRADE_FROM = 'd8ee5a26b79c373f5e860c40256a93643ceb40c5';
+
+/** A shallow clone (CI) lacks the baseline commit: fetch just that one. */
+const ensureCommit = (sha: string) => {
+  try {
+    execFileSync('git', ['cat-file', '-e', `${sha}^{commit}`], { cwd: ROOT, stdio: 'ignore' });
+  } catch {
+    execFileSync('git', ['fetch', '--depth', '1', 'origin', sha], { cwd: ROOT, stdio: 'inherit' });
+  }
+};
 const pnpm = ['pnpm@10.34.7'];
 
 const run = (cwd: string, args: string[], capture = false): string => {
@@ -64,10 +80,13 @@ export function verifyUpgrade(newStarter: string) {
   const scratch = mkdtempSync(path.join(os.tmpdir(), 'rsk-upgrade-'));
   const oldTree = path.join(scratch, 'kit');
   const app = path.join(scratch, 'app');
-  const base = execFileSync('git', ['merge-base', 'HEAD', 'main'], { cwd: ROOT, encoding: 'utf8' }).trim();
+  const base = UPGRADE_FROM;
   try {
     // 1. The starter as it was published before this branch, and an app made from it that added a block.
+    ensureCommit(base);
     execFileSync('git', ['worktree', 'add', '--detach', oldTree, base], { cwd: ROOT, stdio: 'inherit' });
+    // A baseline from before the router adapter: the new updater must ask for it, and the fixture wires it.
+    const wireAdapter = !existsSync(path.join(oldTree, 'src/routes/routerAdapter.tsx'));
     run(oldTree, installArgs());
     run(oldTree, ['exec', 'tsx', 'scripts/starter/build-starter.ts', app]);
     run(app, installArgs());
@@ -79,23 +98,25 @@ export function verifyUpgrade(newStarter: string) {
 
     // 3. kit:update again, now the new updater: it names the router adapter the app still lacks.
     const output = run(app, ['exec', 'tsx', 'scripts/kit/kit.ts', 'update', '--from', newStarter], true);
-    if (!/To finish this update:[\s\S]*KitRouterProvider/.test(output))
+    if (wireAdapter && !/To finish this update:[\s\S]*KitRouterProvider/.test(output))
       throw new Error('verify-upgrade: the second kit:update did not name the missing KitRouterProvider');
 
     // 4. Wire it as the message says, then the app checks, tests and builds.
-    copyFileSync(path.join(newStarter, 'src/routes/routerAdapter.tsx'), path.join(app, 'src/routes/routerAdapter.tsx'));
-    const bootstrap = path.join(app, 'src/bootstrap.tsx');
-    edit(
-      bootstrap,
-      "import { ROUTER } from '@routes';",
-      "import { ROUTER } from '@routes';\nimport { ReactRouterKitProvider } from './routes/routerAdapter';",
-    );
-    edit(
-      bootstrap,
-      '<RouterProvider router={ROUTER} />',
-      '<ReactRouterKitProvider>\n                      <RouterProvider router={ROUTER} />\n                    </ReactRouterKitProvider>',
-    );
-    const tests = wrapRouterTests(app);
+    if (wireAdapter) {
+      copyFileSync(path.join(newStarter, 'src/routes/routerAdapter.tsx'), path.join(app, 'src/routes/routerAdapter.tsx'));
+      const bootstrap = path.join(app, 'src/bootstrap.tsx');
+      edit(
+        bootstrap,
+        "import { ROUTER } from '@routes';",
+        "import { ROUTER } from '@routes';\nimport { ReactRouterKitProvider } from './routes/routerAdapter';",
+      );
+      edit(
+        bootstrap,
+        '<RouterProvider router={ROUTER} />',
+        '<ReactRouterKitProvider>\n                      <RouterProvider router={ROUTER} />\n                    </ReactRouterKitProvider>',
+      );
+    }
+    const tests = wireAdapter ? wrapRouterTests(app) : [];
     run(app, ['exec', 'tsx', 'scripts/kit/kit.ts', 'status', '--from', newStarter]);
     run(app, ['exec', 'tsc', '-b']);
     run(app, ['exec', 'vp', 'fmt', 'src/bootstrap.tsx', ...tests]);

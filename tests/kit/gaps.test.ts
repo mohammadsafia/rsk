@@ -27,6 +27,15 @@ describe('kit:update wiring gaps', () => {
     expect(updateGaps(viteApp('<ReactRouterKitProvider><RouterProvider router={ROUTER} /></ReactRouterKitProvider>'))).toEqual([]);
   });
 
+  it('still reports it when the adapter file was copied but nothing renders it', () => {
+    const dir = viteApp();
+    writeFileSync(
+      path.join(dir, 'src/routes/routerAdapter.tsx'),
+      'export const ReactRouterKitProvider = ({ children }) => <KitRouterProvider router={adapter}>{children}</KitRouterProvider>;',
+    );
+    expect(updateGaps(dir).join('\n')).toMatch(/KitRouterProvider/);
+  });
+
   it('names the adapter file to copy from the starter it updated from', () => {
     const starter = viteApp();
     writeFileSync(path.join(starter, 'src/routes/routerAdapter.tsx'), 'export const reactRouterKitAdapter = {};');

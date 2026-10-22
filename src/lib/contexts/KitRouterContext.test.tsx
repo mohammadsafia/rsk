@@ -53,6 +53,21 @@ describe('KitRouter', () => {
     vi.unstubAllGlobals();
   });
 
+  it('without a provider, follows client-side navigation the app’s own router does (pushState, via the Navigation API)', () => {
+    const navigation = new EventTarget();
+    vi.stubGlobal('navigation', navigation);
+    window.history.replaceState({}, '', '/dashboard');
+    render(<Where />);
+    expect(screen.getByText('/dashboard')).toBeTruthy();
+    act(() => {
+      window.history.pushState({}, '', '/patients');
+      navigation.dispatchEvent(new Event('currententrychange'));
+    });
+    expect(screen.getByText('/patients')).toBeTruthy();
+    vi.unstubAllGlobals();
+    window.history.replaceState({}, '', '/');
+  });
+
   it('without a provider, changing language changes i18n (Vite behaviour)', async () => {
     function Switch() {
       const setLanguage = useSetLanguage();

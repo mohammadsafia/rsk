@@ -102,7 +102,8 @@ async function main() {
 
     // A newer updater (scripts/kit/) takes the update first, then runs the rest: its own code, not this one's.
     if (!dryRun && !paths.length && process.env[SELF_UPDATED] !== '1' && needsSelfUpdate(rows)) {
-      const own = applyUpdate({ appDir, upstreamDir, baseDir: baseDir ?? undefined, kit, only: ['scripts/kit/'] });
+      // The updater and what it imports (scripts/lib/), so the new version starts with the modules it expects.
+      const own = applyUpdate({ appDir, upstreamDir, baseDir: baseDir ?? undefined, kit, only: ['scripts/kit/', 'scripts/lib/'] });
       if (own.conflicts.length) {
         console.log(
           `\nResolve these in the kit updater first, then run kit:update again:\n${own.conflicts.map((file) => `  ${file}`).join('\n')}`,

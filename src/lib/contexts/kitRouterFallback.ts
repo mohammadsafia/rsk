@@ -5,9 +5,17 @@ import i18n from 'i18next';
 
 import type { KitLanguage, KitLinkProps, KitNavigate, KitRouter } from './KitRouterContext';
 
+/** The Navigation API, where the browser has it (Chromium, Safari): it also hears pushState, which popstate doesn't. */
+const navigationApi = (): EventTarget | undefined => (window as Window & { navigation?: EventTarget }).navigation;
+
+/** Back/forward, and the app's own router moving (its pushState) where the Navigation API reports it. */
 const subscribe = (onChange: () => void): (() => void) => {
   window.addEventListener('popstate', onChange);
-  return () => window.removeEventListener('popstate', onChange);
+  navigationApi()?.addEventListener('currententrychange', onChange);
+  return () => {
+    window.removeEventListener('popstate', onChange);
+    navigationApi()?.removeEventListener('currententrychange', onChange);
+  };
 };
 
 const readPathname = (): string => window.location.pathname;

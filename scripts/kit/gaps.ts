@@ -10,20 +10,22 @@ import { wiringGaps } from './add';
 import type { Row } from './core';
 
 const ADAPTER = 'src/routes/routerAdapter.tsx';
-const PROVIDER = /\b(KitRouterProvider|ReactRouterKitProvider)\b/;
+/** The provider rendered as an element (not just named or defined). */
+const PROVIDER = /<(KitRouterProvider|ReactRouterKitProvider)\b/;
 
 const sources = (dir: string): string[] =>
   !existsSync(dir)
     ? []
     : readdirSync(dir).flatMap((name) => {
         const full = path.join(dir, name);
-        return statSync(full).isDirectory() ? sources(full) : /\.tsx?$/.test(name) && !/\.test\./.test(name) ? [full] : [];
+        // Tests and their helpers wrap their own trees: only the app's code counts.
+        return statSync(full).isDirectory() ? sources(full) : /\.tsx?$/.test(name) && !/\.test\.|test-utils/.test(full) ? [full] : [];
       });
 
-/** Whether any of the app's own sources (outside the kit's contexts) renders the kit's router provider. */
+/** Whether the app's own sources render the kit's router provider: not the kit's contexts, nor the adapter that defines it. */
 const rendersProvider = (appDir: string): boolean =>
   sources(path.join(appDir, 'src'))
-    .filter((file) => !file.includes(`${path.sep}lib${path.sep}contexts${path.sep}`))
+    .filter((file) => !file.includes(`${path.sep}lib${path.sep}contexts${path.sep}`) && file !== path.join(appDir, ADAPTER))
     .some((file) => PROVIDER.test(readFileSync(file, 'utf8')));
 
 /**
@@ -31,6 +33,11 @@ const rendersProvider = (appDir: string): boolean =>
  * wiring kit:add needs. `starterDir` is the starter kit:update read, whose adapter is printed to copy.
  */
 export function updateGaps(appDir: string, starterDir?: string): string[] {
+  return [...adapterGaps(appDir, starterDir), ...wiringGaps(appDir)];
+}
+
+/** The router adapter a Vite app still lacks: without it kit links reload the page. */
+export function adapterGaps(appDir: string, starterDir?: string): string[] {
   if (kitTarget(appDir) === 'next') return [];
   const gaps: string[] = [];
   if (!rendersProvider(appDir)) {
@@ -55,7 +62,7 @@ export function updateGaps(appDir: string, starterDir?: string): string[] {
       ].join('\n'),
     );
   }
-  return [...gaps, ...wiringGaps(appDir)];
+  return gaps;
 }
 
 /** True when kit:update brings a new version of the updater itself, which must run the rest of the update. */
