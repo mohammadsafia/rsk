@@ -36,13 +36,13 @@ describe('docs site build', () => {
     expect(readdirSync(path.join(app, 'assets')).filter((file) => /mdx|DocsLayout|docs-nav|Docs.*Page/i.test(file))).toEqual([]);
   });
 
-  it('ships the docs in the docs build, under the /rsk/ path GitHub Pages serves it from', () => {
+  it('ships the docs in the docs build, at the site root Vercel serves it from', () => {
     const dist = path.join(out, 'docs');
     expect(scripts(dist)).toContain(DOCS_MARK);
-    expect(readFileSync(path.join(dist, 'index.html'), 'utf8')).toMatch(/src="\/rsk\/assets\//);
+    expect(readFileSync(path.join(dist, 'index.html'), 'utf8')).toMatch(/src="\/assets\//);
   });
 
-  it('answers deep links on GitHub Pages: 404.html is the app itself', () => {
+  it('answers deep links on hosts that serve 404.html for unknown paths: it is the app itself', () => {
     const dist = path.join(out, 'docs');
     expect(existsSync(path.join(dist, '404.html'))).toBe(true);
     expect(readFileSync(path.join(dist, '404.html'), 'utf8')).toBe(readFileSync(path.join(dist, 'index.html'), 'utf8'));

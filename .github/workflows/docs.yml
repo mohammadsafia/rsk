@@ -1,19 +1,20 @@
-# Publishes the kit's docs site to GitHub Pages (https://mohammadsafia.github.io/rsk/) on every push to main.
-# One-time setup: Settings → Pages → Source: "GitHub Actions".
+# Checks that the kit's docs site still builds, on every push to main and every pull request. Vercel hosts and deploys
+# the site itself (vercel.json), so this workflow publishes nothing.
 name: docs
 
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
 
-# One deployment at a time; a newer push waits rather than cancelling one halfway (GitHub's Pages template does the same).
+# A newer push to the same branch replaces a check still running for an older one.
 concurrency:
-  group: docs-pages
-  cancel-in-progress: false
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -30,23 +31,5 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Build the docs site (base /rsk/)
+      - name: Build the docs site
         run: pnpm docs:build
-
-      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
-        with:
-          path: dist-docs
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    # Only this job can deploy: install and build scripts in the build job never get a Pages token.
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
