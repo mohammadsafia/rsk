@@ -26,8 +26,15 @@ afterAll(() => {
 
 describe('buildStarter', () => {
   it('ships a kit.lock.json naming the kit commit and fingerprinting every kit file, and the kit:status/kit:update scripts', () => {
-    const lock = JSON.parse(readFileSync(path.join(out, 'kit.lock.json'), 'utf8')) as { kit: string; files: Record<string, string> };
+    const lock = JSON.parse(readFileSync(path.join(out, 'kit.lock.json'), 'utf8')) as {
+      kit: string;
+      starter?: string;
+      target?: string;
+      files: Record<string, string>;
+    };
     expect(lock.kit).toBe(execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim());
+    // kit:update and kit:add download from the repository the lock names.
+    expect(lock).toMatchObject({ starter: 'mohammadsafia/rsk-starter', target: 'vite' });
     const button = 'src/components/ui/button/Button.tsx';
     expect(lock.files[button]).toBe(hashFile(path.join(out, button)));
     expect(lock.files['src/pages/dashboard/DashboardPage.tsx']).toBeUndefined(); // app-owned

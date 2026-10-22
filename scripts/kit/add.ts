@@ -16,7 +16,7 @@ import { autocompleteMultiselect, isCancel } from '@clack/prompts';
 
 import { type BlockLevel, type BlockMeta, readBlocks, resolveDependencies, writeIndex } from './blocks';
 import { dependencyChanges, hashFile, LOCK_FILE, readLock, writeLock } from './core';
-import { download, REPO } from './download';
+import { download, starterRepo } from './download';
 
 /** The blocks a starter offers: `dir` is the starter checkout, with registry/. */
 export type Catalogue = { dir: string; blocks: BlockMeta[]; /** The starter's kit version (its kit.lock.json). */ kit?: string };
@@ -274,7 +274,7 @@ async function main() {
   }
 
   const starterDir = from ? path.resolve(from) : await download('refs/heads/main');
-  if (!starterDir) throw new Error(`${REPO} has no main branch.`);
+  if (!starterDir) throw new Error(`${starterRepo()} has no main branch.`);
 
   try {
     const catalogue = readCatalogue(starterDir);

@@ -34,7 +34,18 @@ export const KIT_PATHS = [
 
 export const LOCK_FILE = 'kit.lock.json';
 
-export type Lock = { kit: string; files: Record<string, string>; /** The blocks the app added with kit:add. */ blocks?: string[] };
+export type KitTarget = 'vite' | 'next';
+export type Lock = {
+  kit: string;
+  files: Record<string, string>;
+  /** The blocks the app added with kit:add. */
+  blocks?: string[];
+  /** The starter repository the app came from (owner/repo); older locks have none: the Vite starter. */
+  starter?: string;
+  /** Which starter: a Vite or a Next app; older locks have none: vite. */
+  target?: KitTarget;
+};
+export type LockMeta = Pick<Lock, 'starter' | 'target'>;
 export type Status = 'same' | 'updated' | 'added' | 'removed' | 'modified' | 'conflict';
 export type Row = { path: string; status: Status };
 
@@ -115,12 +126,20 @@ export function readLock(appDir: string): Lock {
   return JSON.parse(readFileSync(file, 'utf8')) as Lock;
 }
 
-export function writeLock(appDir: string, kit: string, files: Map<string, string>, blocks: string[] = []) {
+/** Writes kit.lock.json. `meta` names the starter and target; left out, the lock keeps the ones it has. */
+export function writeLock(appDir: string, kit: string, files: Map<string, string>, blocks: string[] = [], meta?: LockMeta) {
+  const file = path.join(appDir, LOCK_FILE);
+  const { starter, target } = meta ?? (existsSync(file) ? (JSON.parse(readFileSync(file, 'utf8')) as Lock) : {});
   const sorted = Object.fromEntries([...files].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
-  writeFileSync(
-    path.join(appDir, LOCK_FILE),
-    `${JSON.stringify({ kit, blocks: [...blocks].sort((a, b) => a.localeCompare(b)), files: sorted }, null, 2)}\n`,
-  );
+  // Keys left out when absent, so an older app's lock stays byte for byte what it was.
+  const lock = {
+    kit,
+    ...(starter && { starter }),
+    ...(target && { target }),
+    blocks: [...blocks].sort((a, b) => a.localeCompare(b)),
+    files: sorted,
+  };
+  writeFileSync(file, `${JSON.stringify(lock, null, 2)}\n`);
 }
 
 /**

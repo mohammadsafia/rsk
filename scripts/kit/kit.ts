@@ -6,7 +6,8 @@
  *   pnpm kit:update src/components/ui/button/ --dry-run
  *
  * Options: --from <dir> (a local starter instead of GitHub), --base <dir> (the version you took, for three-way merges),
- * --dry-run. RSK_STARTER_REPO picks another GitHub repository (default mohammadsafia/rsk-starter).
+ * --dry-run. The GitHub repository is the one kit.lock.json names (`starter`); for an older lock without one,
+ * RSK_STARTER_REPO picks it (default mohammadsafia/rsk-starter).
  */
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
@@ -24,7 +25,7 @@ import {
   stageUpstream,
   type Status,
 } from './core';
-import { download, REPO } from './download';
+import { download, starterRepo } from './download';
 
 const LABELS: Record<Exclude<Status, 'same'>, string> = {
   updated: 'updated in the kit',
@@ -42,7 +43,7 @@ async function main() {
 
   try {
     const starterDir = fromArg ? path.resolve(fromArg) : await download('refs/heads/main');
-    if (!starterDir) throw new Error(`${REPO} has no main branch.`);
+    if (!starterDir) throw new Error(`${starterRepo()} has no main branch.`);
     if (!fromArg) temporary.push(starterDir);
     // The starter plus the registry files of the blocks this app added, at their app paths.
     const blocks = lock.blocks ?? [];
