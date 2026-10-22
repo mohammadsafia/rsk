@@ -3,6 +3,7 @@
 //
 //   pnpm a11y:audit                        # starts the dev server if nothing answers on --base
 //   pnpm a11y:audit -- --base http://localhost:5173 --max 300
+//   pnpm a11y:audit -- --base http://localhost:3000 --seed cookie --lang-in path   # a running Next app (next start)
 //
 // Pages are discovered by following same-site links from "/", so the kit audits its docs and showcase pages and an
 // app made from the starter audits its own routes, with nothing to keep in sync.
@@ -15,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
 import { seedDemoSession } from '../lib/demo-session.mjs';
+import { stripLang, withLang } from '../lib/lang-routes.mjs';
 import { isEntry } from '../lib/is-entry.mjs';
 
 const require = createRequire(import.meta.url);
@@ -27,6 +29,10 @@ const arg = (name, fallback) => {
 };
 const BASE = arg('base', 'http://localhost:5173');
 const MAX_PAGES = Number(arg('max', '400'));
+/** How the demo user signs in: localStorage (a Vite app) or a session cookie (a Next app). */
+const SEED = arg('seed', 'storage');
+/** Where the language lives: storage (a Vite app's i18nextLng) or the path (a Next app's /en/…, /ar/…). */
+const LANG_IN = arg('lang-in', 'storage');
 const WORKERS = 4;
 /** Pages a signed-in visitor never sees (they're sent on): audited signed out. */
 const SIGNED_OUT = arg('signed-out', '/auth/login,/auth/forgot-password').split(',').filter(Boolean);
@@ -37,6 +43,15 @@ const COMBOS = [
   { theme: 'dark', lang: 'ar' },
 ];
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
+
+/**
+ * The routes to audit in `lang`: language-free routes as they are when the language lives in storage, each under
+ * /{lang} when it lives in the path.
+ */
+export const routesFor = (routes, lang, langIn) => (langIn === 'path' ? routes.map((route) => withLang(lang, route)) : routes);
+
+/** Discovered routes without their language (a Next app links /en/…), each once. */
+export const languageFree = (routes) => [...new Set(routes.map(stripLang))];
 
 const responds = async (url) => {
   try {
@@ -146,8 +161,10 @@ async function main() {
     browser = await chromium.launch();
     // Signed in as the mock backend's demo user, so the pages behind sign-in are found and audited.
     const discovery = await browser.newContext();
-    await seedDemoSession(discovery);
-    const { routes, truncated } = await discoverRoutes(discovery, { base: BASE, max: MAX_PAGES });
+    await seedDemoSession(discovery, { via: SEED, url: BASE });
+    const discovered = await discoverRoutes(discovery, { base: BASE, max: MAX_PAGES });
+    const { truncated } = discovered;
+    const routes = LANG_IN === 'path' ? languageFree(discovered.routes) : discovered.routes;
     await discovery.close();
     if (truncated) console.warn(`Stopped discovering at --max ${MAX_PAGES}: some pages are not audited. Raise --max to audit them all.`);
     console.log(`Auditing ${routes.length} pages signed in and ${SIGNED_OUT.length} signed out × ${COMBOS.length} (light/dark × en/ar)…`);
@@ -158,12 +175,15 @@ async function main() {
         [false, SIGNED_OUT],
       ]) {
         const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' });
-        await context.addInitScript(({ theme, lang }) => {
-          localStorage.setItem('rsk-theme', JSON.stringify(theme));
-          localStorage.setItem('i18nextLng', lang);
-        }, combo);
-        if (signedIn) await seedDemoSession(context);
-        const queue = [...list];
+        await context.addInitScript(
+          ({ theme, lang, langInStorage }) => {
+            localStorage.setItem('rsk-theme', JSON.stringify(theme));
+            if (langInStorage) localStorage.setItem('i18nextLng', lang);
+          },
+          { ...combo, langInStorage: LANG_IN === 'storage' },
+        );
+        if (signedIn) await seedDemoSession(context, { via: SEED, url: BASE });
+        const queue = [...routesFor(list, combo.lang, LANG_IN)];
         await Promise.all(
           Array.from({ length: WORKERS }, async () => {
             while (queue.length) results.push({ ...combo, signedIn, ...(await audit(context, queue.shift())) });

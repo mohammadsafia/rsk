@@ -10,6 +10,7 @@ import {
   localeKeys,
   rawKeysIn,
   failuresOf,
+  localizedRoutes,
   parseRedirects,
   resolveBudget,
   resolveFile,
@@ -72,5 +73,11 @@ describe('first-load page check', () => {
     expect(failuresOf(result, { budget: 210, redirects: {} })).toEqual(['redirected to /dashboard']);
     expect(failuresOf({ ...result, route: '/' }, { budget: 210, redirects: parseRedirects('/=/dashboard') })).toEqual([]);
     expect(failuresOf({ ...result, landed: '/auth/login', gzipKb: 300 }, { budget: 210, redirects: {} })).toEqual(['over 210 KB']);
+  });
+
+  it('puts each route under each language when the language is in the path (a Next app), and leaves it alone otherwise', () => {
+    expect(localizedRoutes(['/', '/dashboard'], 'path')).toEqual(['/en', '/en/dashboard', '/ar', '/ar/dashboard']);
+    expect(localizedRoutes(['/', '/dashboard'], 'storage')).toEqual(['/', '/dashboard']);
+    expect(() => localizedRoutes(['/'], 'query')).toThrow(/--lang-in/);
   });
 });

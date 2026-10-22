@@ -7,6 +7,16 @@ export const DEMO_SESSION = {
   user: { userId: 'demo', name: 'Demo User', email: 'demo@example.com', picture: '' },
 };
 
-/** A Playwright init script that signs the page in as the demo user before the app reads storage. */
-export const seedDemoSession = async (context) =>
-  context.addInitScript(([key, session]) => localStorage.setItem(key, JSON.stringify(session)), [SESSION_KEY, DEMO_SESSION]);
+/**
+ * Signs a Playwright context in as the demo user before the app reads its session: in localStorage (a Vite app), or as
+ * a `session` cookie for `url` (a Next app, whose server reads the cookie).
+ */
+export const seedDemoSession = async (context, { via = 'storage', url } = {}) => {
+  if (via === 'cookie') {
+    if (!url) throw new Error('seedDemoSession: a cookie needs the url it is for');
+    await context.addCookies([{ name: SESSION_KEY, value: encodeURIComponent(JSON.stringify(DEMO_SESSION)), url }]);
+    return;
+  }
+  if (via !== 'storage') throw new Error(`--seed must be storage or cookie, not "${via}"`);
+  await context.addInitScript(([key, session]) => localStorage.setItem(key, JSON.stringify(session)), [SESSION_KEY, DEMO_SESSION]);
+};

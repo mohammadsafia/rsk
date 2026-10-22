@@ -5,6 +5,9 @@
 //   node scripts/bundle/first-load.mjs --dist dist --budget 150    # fail a route over 150 KB gz
 //   node scripts/bundle/first-load.mjs --dist dist --budget starter --routes /,/dashboard --redirects /=/dashboard --session
 //                                      (--session: signed in as the mock backend's demo user)
+//   node scripts/bundle/first-load.mjs --url http://localhost:3000 --routes /login --session --seed cookie --lang-in path
+//                                      (a running server, e.g. a Next app's `next start`: signed in by cookie, each
+//                                      route measured under /en and /ar)
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import path from 'node:path';
@@ -14,7 +17,10 @@ import { chromium } from 'playwright';
 
 import { discoverRoutes } from '../a11y/audit.mjs';
 import { seedDemoSession } from '../lib/demo-session.mjs';
+import { localizedRoutes } from '../lib/lang-routes.mjs';
 import { isEntry } from '../lib/is-entry.mjs';
+
+export { localizedRoutes };
 
 /**
  * The starter's first-load budget per route, in KB of gzipped JS: 200.8 KB measured when the budget was set
@@ -89,17 +95,20 @@ export const serve = (dist) =>
     server.listen(0, '127.0.0.1', () => resolve(server));
   });
 
-/** Per route: the gzipped JS the browser downloaded to show it, where it landed, page errors and raw keys on it. */
-export async function measureFirstLoad({ dist, routes, localesDir, session = false }) {
+/**
+ * Per route: the gzipped JS the browser downloaded to show it, where it landed, page errors and raw keys on it. Serves
+ * `dist` itself, or measures the server already running at `url` (scripts gzipped from what it sent).
+ */
+export async function measureFirstLoad({ dist, url, routes, localesDir, session = false, seed = 'storage', langIn = 'storage' }) {
   const keys = localesDir && existsSync(localesDir) ? localeKeys(localesDir) : new Set();
-  const server = await serve(dist);
-  const base = `http://127.0.0.1:${server.address().port}`;
+  const server = url ? null : await serve(dist);
+  const base = url ? url.replace(/\/$/, '') : `http://127.0.0.1:${server.address().port}`;
   const browser = await chromium.launch();
   try {
     // --session: signed in as the mock backend's demo user, to measure the pages behind sign-in.
     const context = await browser.newContext();
-    if (session) await seedDemoSession(context);
-    const list = routes ?? (await discoverRoutes(context, { base, max: 50 })).routes;
+    if (session) await seedDemoSession(context, { via: seed, url: base });
+    const list = routes ? localizedRoutes(routes, langIn) : (await discoverRoutes(context, { base, max: 50 })).routes;
     const results = [];
     for (const route of list) {
       const page = await context.newPage();
@@ -108,13 +117,26 @@ export async function measureFirstLoad({ dist, routes, localesDir, session = fal
       const errors = [];
       const scripts = new Map();
       page.on('pageerror', (error) => errors.push(String(error)));
+      const reads = [];
       page.on('response', (response) => {
         const { pathname } = new URL(response.url());
+        if (!pathname.endsWith('.js')) return;
+        if (url) {
+          // A running server's own bytes, gzipped the same way as a dist's files.
+          reads.push(
+            response.body().then(
+              (body) => scripts.set(pathname, gzipSync(body).length),
+              () => {},
+            ),
+          );
+          return;
+        }
         const file = path.join(dist, pathname);
-        if (pathname.endsWith('.js') && existsSync(file)) scripts.set(pathname, gzipSync(readFileSync(file)).length);
+        if (existsSync(file)) scripts.set(pathname, gzipSync(readFileSync(file)).length);
       });
       await page.goto(`${base}${route}`, { waitUntil: 'networkidle' });
       await page.waitForTimeout(300);
+      await Promise.all(reads);
       const text = await page.evaluate(() => document.body.innerText);
       results.push({
         route,
@@ -129,7 +151,7 @@ export async function measureFirstLoad({ dist, routes, localesDir, session = fal
     return results;
   } finally {
     await browser.close();
-    server.close();
+    server?.close();
   }
 }
 
@@ -163,6 +185,7 @@ export function failuresOf(result, { budget, redirects }) {
 }
 
 async function main() {
+  const url = arg('url');
   const dist = path.resolve(arg('dist', 'dist'));
   const routes = arg('routes')?.split(',');
   const budget = resolveBudget(arg('budget'));
@@ -170,7 +193,10 @@ async function main() {
   const redirects = routes ? parseRedirects(arg('redirects')) : undefined;
   const results = await measureFirstLoad({
     dist,
+    url,
     routes,
+    seed: arg('seed', 'storage'),
+    langIn: arg('lang-in', 'storage'),
     localesDir: path.resolve('src/locales/en'),
     session: process.argv.includes('--session'),
   });
