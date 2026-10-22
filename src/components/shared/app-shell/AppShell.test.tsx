@@ -1,10 +1,10 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { AppShell, Sidebar } from '@components/shared';
 import { Tooltip } from '@components/ui';
+import { MemoryKitRouter } from '@contexts/testing';
 
 import { Users } from 'lucide-react';
 
@@ -18,7 +18,7 @@ afterEach(() => {
 
 const renderShell = () =>
   render(
-    <MemoryRouter>
+    <MemoryKitRouter>
       <Tooltip.Provider>
         <AppShell
           sidebar={
@@ -40,7 +40,7 @@ const renderShell = () =>
           <AppShell.Content>Page</AppShell.Content>
         </AppShell>
       </Tooltip.Provider>
-    </MemoryRouter>,
+    </MemoryKitRouter>,
   );
 
 const aside = () => document.querySelector('[data-slot="app-shell-sidebar"]') as HTMLElement;

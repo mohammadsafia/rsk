@@ -2,11 +2,11 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing';
 import { useForm } from 'react-hook-form';
-import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Tooltip } from '@components/ui';
 import { FormInput, FormWizard } from '@components/forms';
+import { MemoryKitRouter } from '@contexts/testing';
 
 import '../../../i18n';
 
@@ -31,11 +31,11 @@ function Wizard({ urlSync }: { urlSync?: boolean }) {
 const renderAt = (search: string, onUrlUpdate: (event: UrlUpdateEvent) => void, urlSync = true) =>
   render(
     <NuqsTestingAdapter searchParams={search} onUrlUpdate={onUrlUpdate}>
-      <MemoryRouter>
+      <MemoryKitRouter>
         <Tooltip.Provider>
           <Wizard urlSync={urlSync} />
         </Tooltip.Provider>
-      </MemoryRouter>
+      </MemoryKitRouter>
     </NuqsTestingAdapter>,
   );
 

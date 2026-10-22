@@ -5,12 +5,12 @@ import { parseAsString, useQueryState } from 'nuqs';
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing';
 import { StrictMode } from 'react';
 import { useForm } from 'react-hook-form';
-import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { z } from 'zod';
 
 import { Tooltip } from '@components/ui';
 import { FormInput, FormWizard, FormWizardError } from '@components/forms';
+import { MemoryKitRouter } from '@contexts/testing';
 
 import '../../../i18n';
 
@@ -20,9 +20,9 @@ afterEach(() => {
 });
 
 const wrap = (ui: React.ReactNode) => (
-  <MemoryRouter>
+  <MemoryKitRouter>
     <Tooltip.Provider>{ui}</Tooltip.Provider>
-  </MemoryRouter>
+  </MemoryKitRouter>
 );
 
 const next = () => fireEvent.click(screen.getByRole('button', { name: 'Next' }));

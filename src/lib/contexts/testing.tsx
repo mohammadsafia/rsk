@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactElement, useSyncExternalStore } from 'react';
+import { type ReactElement, type ReactNode, useState, useSyncExternalStore } from 'react';
 import { render, type RenderResult } from '@testing-library/react';
 import i18n from 'i18next';
 
@@ -49,6 +49,12 @@ export function createMemoryKitRouter({ initialPath = '/', pattern = '' }: Memor
     useSetLanguage: () => (language) => void i18n.changeLanguage(language),
     basePath: '/',
   };
+}
+
+/** A drop-in for React Router's MemoryRouter in kit tests: one memory KitRouter for the life of the tree. */
+export function MemoryKitRouter({ children, ...options }: MemoryOptions & { children: ReactNode }): ReactElement {
+  const [router] = useState(() => createMemoryKitRouter(options));
+  return <KitRouterProvider router={router}>{children}</KitRouterProvider>;
 }
 
 /** Renders `ui` under a memory KitRouter; the result carries the router's `history`. */

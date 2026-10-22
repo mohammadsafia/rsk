@@ -1,11 +1,11 @@
 // @vitest-environment happy-dom
 import { useForm } from 'react-hook-form';
-import { MemoryRouter } from 'react-router';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { FormContainer, FormInput } from '@components/forms';
 import { Tooltip } from '@components/ui';
+import { MemoryKitRouter } from '@contexts/testing';
 
 import '../../../i18n';
 
@@ -25,11 +25,11 @@ const Example = ({ onSuccess, onCancel }: { onSuccess: () => Promise<void> | voi
 const renderExample = (props: { onSuccess?: () => Promise<void> | void; onCancel?: () => void } = {}) => {
   const onCancel = props.onCancel ?? vi.fn();
   render(
-    <MemoryRouter>
+    <MemoryKitRouter>
       <Tooltip.Provider>
         <Example onSuccess={props.onSuccess ?? (() => undefined)} onCancel={onCancel} />
       </Tooltip.Provider>
-    </MemoryRouter>,
+    </MemoryKitRouter>,
   );
   return { onCancel };
 };

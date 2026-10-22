@@ -1,12 +1,12 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useForm } from 'react-hook-form';
-import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { z } from 'zod';
 
 import { Tooltip } from '@components/ui';
 import { FormInput, FormWizard } from '@components/forms';
+import { MemoryKitRouter } from '@contexts/testing';
 
 import '../../../i18n';
 
@@ -20,7 +20,7 @@ type Values = { name: string; phone: string; insurer: string; notes: string };
 function Intake({ onSubmit = vi.fn() }: { onSubmit?: (values: Values) => void }) {
   const form = useForm<Values>({ defaultValues: { name: '', phone: '', insurer: '', notes: '' } });
   return (
-    <MemoryRouter>
+    <MemoryKitRouter>
       <Tooltip.Provider>
         <FormWizard form={form} onSubmit={onSubmit}>
           <FormWizard.Step id="patient" title="Patient" schema={z.object({ name: z.string().min(1, 'Enter the name') })}>
@@ -34,7 +34,7 @@ function Intake({ onSubmit = vi.fn() }: { onSubmit?: (values: Values) => void })
           </FormWizard.Step>
         </FormWizard>
       </Tooltip.Provider>
-    </MemoryRouter>
+    </MemoryKitRouter>
   );
 }
 
@@ -132,7 +132,7 @@ type Intake2 = { name: string; insured: boolean; insurer: string; notes: string 
 function ReviewHarness({ insured = true }: { insured?: boolean }) {
   const form = useForm<Intake2>({ defaultValues: { name: 'Sara Haddad', insured, insurer: '', notes: '' } });
   return (
-    <MemoryRouter>
+    <MemoryKitRouter>
       <Tooltip.Provider>
         <FormWizard form={form} onSubmit={vi.fn()}>
           <FormWizard.Step id="patient" title="Patient" fields={['name']} review={[{ name: 'name', label: 'Full name' }]}>
@@ -144,7 +144,7 @@ function ReviewHarness({ insured = true }: { insured?: boolean }) {
           <FormWizard.Review />
         </FormWizard>
       </Tooltip.Provider>
-    </MemoryRouter>
+    </MemoryKitRouter>
   );
 }
 
