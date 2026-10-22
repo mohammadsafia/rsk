@@ -14,6 +14,8 @@ import { fileURLToPath } from 'node:url';
 
 import { autocompleteMultiselect, isCancel } from '@clack/prompts';
 
+import { kitTarget } from '../lib/kit-target.mjs';
+
 import { type BlockLevel, type BlockMeta, readBlocks, resolveDependencies, writeIndex } from './blocks';
 import { dependencyChanges, hashFile, LOCK_FILE, readLock, writeLock } from './core';
 import { download, starterRepo } from './download';
@@ -50,6 +52,8 @@ const source = (catalogue: Catalogue, id: string, file: string) => path.join(cat
  * kit:update can't add it. [] when the app has it. `configDir` holds tsconfig.app.json and src/locales (the app).
  */
 export function wiringGaps(appDir: string, configDir = appDir): string[] {
+  // A Next app's block routes are generated files (Phase 4), not wiring the app adds by hand.
+  if (kitTarget(appDir) === 'next') return [];
   const text = (dir: string, file: string) => (existsSync(path.join(dir, file)) ? readFileSync(path.join(dir, file), 'utf8') : '');
   const router = text(appDir, 'src/routes/router.tsx');
   const routes = text(appDir, 'src/routes/routes.ts');

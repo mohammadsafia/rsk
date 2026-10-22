@@ -14,9 +14,11 @@ import { type SystemPageProps } from './SystemPage';
  * page instead; "Try again" calls `retry` (Vite: re-runs the route's loaders). The router supplies the props: the
  * block index's BlockErrorElement in a Vite app, error.tsx in a Next app.
  */
+const reloadPage = (): void => window.location.reload();
+
 function ServerErrorPage({
   layout,
-  retry,
+  retry = reloadPage,
   retrying = false,
   notFound = false,
 }: ErrorScreenProps & Pick<SystemPageProps, 'layout'>): ReactElement {

@@ -3,7 +3,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { Tooltip } from '@components/ui';
-import { renderWithKitRouter } from '@contexts/testing';
+import { renderWithKitRouter } from '../../../lib/contexts/testing';
 
 import { LanguageSwitcher } from './index';
 

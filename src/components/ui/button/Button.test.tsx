@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { Button } from '@components/ui';
 import { KitLink } from '@contexts';
-import { MemoryKitRouter } from '@contexts/testing';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 afterEach(cleanup);
 

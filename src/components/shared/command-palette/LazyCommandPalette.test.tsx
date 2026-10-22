@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { LazyCommandPalette } from '@components/shared';
 
 import { AuthProvider, CommandPaletteProvider, ThemeProvider } from '@contexts';
-import { MemoryKitRouter } from '@contexts/testing';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import '../../../i18n';
 

@@ -3,7 +3,7 @@ import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { SectionMarker, Sections, SectionsReset } from '@components/ui';
-import { renderWithKitRouter } from '@contexts/testing';
+import { renderWithKitRouter } from '../../../lib/contexts/testing';
 
 afterEach(cleanup);
 

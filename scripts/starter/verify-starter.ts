@@ -1,7 +1,7 @@
 /**
  * Proves the starter stands on its own: builds it into a temporary folder, installs (offline from the pnpm store locally, online in CI),
  * then runs its type check, lint/format check, tests and production build, checks each route's first-load budget, and
- * looks for showcase leftovers.
+ * looks for showcase leftovers; then proves an app from the published starter updates onto it (verify-upgrade.ts).
  *
  *   pnpm starter:verify
  */
@@ -14,6 +14,7 @@ import { hashFile } from '../kit/core';
 import { buildStarter, refreshLockfile } from './build-starter';
 import { installArgs } from './install';
 import { LEFTOVER_PATTERNS } from './manifest';
+import { verifyUpgrade } from './verify-upgrade';
 
 const run = (cwd: string, command: string, args: string[]) => {
   console.log(`\n$ ${command} ${args.join(' ')}`);
@@ -85,6 +86,8 @@ try {
     .sort((a, b) => a.localeCompare(b));
   if (changed.length)
     throw new Error(`kit:add then kit:remove left the starter different:\n${changed.map((file) => `  ${file}`).join('\n')}`);
+  // An app made from the published starter updates onto this one: old updater first, then the new one.
+  verifyUpgrade(out);
   console.log(`\nStarter verified: ${out}`);
 } finally {
   if (!process.env.KEEP_STARTER) rmSync(out, { recursive: true, force: true });

@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import { Tooltip } from '@components/ui';
 import { FormInput, FormWizard } from '@components/forms';
-import { MemoryKitRouter } from '@contexts/testing';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import '../../../i18n';
 

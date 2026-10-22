@@ -3,7 +3,7 @@ import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { Breadcrumb } from '@components/shared';
-import { MemoryKitRouter } from '@contexts/testing';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import i18n from '../../../i18n';
 

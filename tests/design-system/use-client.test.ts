@@ -5,7 +5,7 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { exportsServerValues, hasUseClient, isClientCandidate, needsUseClient } from '../../scripts/design-system/use-client';
+import { exportsServerValues, hasUseClient, isClientCandidate, needsUseClient } from '../../scripts/lib/use-client';
 import { readTree } from '../../scripts/kit/core';
 
 const ROOT = path.resolve(import.meta.dirname, '../..');

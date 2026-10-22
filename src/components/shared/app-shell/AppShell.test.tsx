@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import { AppShell, Sidebar, useAppShell } from '@components/shared';
 import { Tooltip } from '@components/ui';
-import { MemoryKitRouter } from '@contexts/testing';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import { Users } from 'lucide-react';
 

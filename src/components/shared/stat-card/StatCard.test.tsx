@@ -4,7 +4,7 @@ import { StrictMode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { StatCard } from '@components/shared';
-import { MemoryKitRouter } from '@contexts/testing';
+import { MemoryKitRouter } from '../../../lib/contexts/testing';
 
 import '../../../i18n';
 

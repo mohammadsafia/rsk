@@ -3,7 +3,7 @@
  * a class component. Everything else (barrels, cva variants, constants, pure helpers) stays directive-free, so a server
  * file can call it. tests/design-system/use-client.test.ts checks both halves; this adds or removes the directive:
  *
- *   tsx scripts/design-system/use-client.ts --write
+ *   tsx scripts/lib/use-client.ts --write
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';

@@ -9,6 +9,7 @@
  * --dry-run. The GitHub repository is the one kit.lock.json names (`starter`); for an older lock without one,
  * RSK_STARTER_REPO picks it (default mohammadsafia/rsk-starter).
  */
+import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
@@ -26,6 +27,24 @@ import {
   type Status,
 } from './core';
 import { download, starterRepo } from './download';
+import { needsSelfUpdate, updateGaps } from './gaps';
+
+/** Set on the run a self-updated kit:update hands over to, so it never hands over again. */
+const SELF_UPDATED = 'RSK_KIT_SELF_UPDATED';
+
+/** The same command for the new updater: the starter (and base) already downloaded, instead of fetching them again. */
+const handOverArgs = (argv: string[], starterDir: string, baseStarter: string | null): string[] => {
+  const kept: string[] = [];
+  for (let index = 0; index < argv.length; index += 1) {
+    const [flag, inline] = argv[index].split(/=(.*)/s);
+    if (flag === '--from' || flag === '--base') {
+      if (inline === undefined) index += 1;
+      continue;
+    }
+    kept.push(argv[index]);
+  }
+  return [...kept, '--from', starterDir, ...(baseStarter ? ['--base', baseStarter] : [])];
+};
 
 const LABELS: Record<Exclude<Status, 'same'>, string> = {
   updated: 'updated in the kit',
@@ -81,6 +100,26 @@ async function main() {
     if (needsBase && !baseDir)
       console.log(`\nNo kit/${lock.kit.slice(0, 7)} tag to merge against: files changed on both sides get a .upstream copy beside them.`);
 
+    // A newer updater (scripts/kit/) takes the update first, then runs the rest: its own code, not this one's.
+    if (!dryRun && !paths.length && process.env[SELF_UPDATED] !== '1' && needsSelfUpdate(rows)) {
+      const own = applyUpdate({ appDir, upstreamDir, baseDir: baseDir ?? undefined, kit, only: ['scripts/kit/'] });
+      if (own.conflicts.length) {
+        console.log(
+          `\nResolve these in the kit updater first, then run kit:update again:\n${own.conflicts.map((file) => `  ${file}`).join('\n')}`,
+        );
+        process.exitCode = 1;
+        return;
+      }
+      console.log('\nkit:update updated itself; the new version takes the rest of the update.');
+      const child = spawnSync(
+        process.execPath,
+        [...process.execArgv, path.join(appDir, 'scripts/kit/kit.ts'), ...handOverArgs(process.argv.slice(2), starterDir, baseStarter)],
+        { cwd: appDir, stdio: 'inherit', env: { ...process.env, [SELF_UPDATED]: '1' } },
+      );
+      process.exitCode = child.status ?? 1;
+      return;
+    }
+
     const result = applyUpdate({ appDir, upstreamDir, baseDir: baseDir ?? undefined, kit, dryRun, only: paths });
     const summary = [
       [result.updated.length, 'updated'],
@@ -98,6 +137,8 @@ async function main() {
         `Resolve these (look for <<<<<<< or a .upstream file beside them):\n${result.conflicts.map((file) => `  ${file}`).join('\n')}`,
       );
     if (result.conflicts.length) process.exitCode = 1;
+    const gaps = dryRun ? [] : updateGaps(appDir, upstreamDir);
+    if (gaps.length) console.log(`\nTo finish this update:\n${gaps.map((gap) => `  - ${gap}`).join('\n')}`);
   } finally {
     for (const dir of temporary) rmSync(dir, { recursive: true, force: true });
   }
