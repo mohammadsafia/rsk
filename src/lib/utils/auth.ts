@@ -8,7 +8,11 @@ export function safeNext(next: string | null | undefined, fallback = '/'): strin
   if (!next || !next.startsWith('/') || /[\u0000-\u001f\u007f\\]/.test(next)) return fallback;
   const base = 'https://app.invalid';
   const url = new URL(next, base);
-  return url.origin === base ? `${url.pathname}${url.search}${url.hash}` : fallback;
+  if (url.origin !== base) return fallback;
+  // Dot segments can normalise "/en/..//evil.com" into "//evil.com", which a router reads as another host: check the
+  // path the caller will navigate to, not only the one it was given.
+  const path = `${url.pathname}${url.search}${url.hash}`;
+  return path.startsWith('//') || path.includes('\\') ? fallback : path;
 }
 
 /** A message to show for a failed request: the API's `message`, an Error's, a plain string; else `fallback`. */
