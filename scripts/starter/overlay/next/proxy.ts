@@ -38,8 +38,9 @@ export function proxy(request: NextRequest): NextResponse {
     headers.set('x-pathname', `${pathname}${search}`);
     response = NextResponse.next({ request: { headers } });
   }
-  // A cookie this server can't open (another secret, changed, expired) is dropped, so it can't loop sign-in.
-  if (cookie && !session) response.cookies.set(SESSION_COOKIE, '', { path: '/', maxAge: 0 });
+  // A cookie this server can't open (another secret, changed, expired) is dropped, so it can't loop sign-in. Not on
+  // /api: the route handler sets or clears it there, and a second Set-Cookie could undo a fresh sign-in.
+  if (cookie && !session && !pathname.startsWith('/api/')) response.cookies.set(SESSION_COOKIE, '', { path: '/', maxAge: 0 });
   return response;
 }
 

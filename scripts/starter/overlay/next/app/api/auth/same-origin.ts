@@ -1,8 +1,11 @@
+import { clientEnv } from '@env';
+
 // The auth endpoints take JSON from this app's own pages only: a cross-site form (login CSRF) or fetch is refused.
 export function sameOrigin(request: Request): boolean {
   if (!(request.headers.get('content-type') ?? '').startsWith('application/json')) return false;
   const origin = request.headers.get('origin');
-  if (origin) return hostOf(origin) === addressedHost(request);
+  // The site's own URL counts too, for proxies that rewrite Host and send no X-Forwarded-Host (nginx by default).
+  if (origin) return hostOf(origin) === addressedHost(request) || origin === new URL(clientEnv.NEXT_PUBLIC_SITE_URL).origin;
   return request.headers.get('sec-fetch-site') === 'same-origin';
 }
 

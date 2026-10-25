@@ -72,6 +72,18 @@ describe('sign-in route handlers', () => {
     expect((await login(forwarded)).status).toBe(200);
   });
 
+  it('trusts the origin NEXT_PUBLIC_SITE_URL names, behind a proxy that rewrites Host without X-Forwarded-Host', async () => {
+    // NEXT_PUBLIC_SITE_URL defaults to http://localhost:3000.
+    const behindProxy = (origin: string) =>
+      new Request('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(DEMO),
+        headers: { 'Content-Type': 'application/json', Origin: origin, Host: 'upstream:8080' },
+      });
+    expect((await login(behindProxy('http://localhost:3000'))).status).toBe(200);
+    expect((await login(behindProxy('http://evil.example'))).status).toBe(403);
+  });
+
   it('signs out by expiring the cookie', async () => {
     const response = await logout(post('/api/auth/logout', {}));
     expect(response.status).toBe(204);
