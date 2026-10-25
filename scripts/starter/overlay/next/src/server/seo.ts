@@ -10,6 +10,12 @@ import { clientEnv, LANGS } from '@env';
 
 const SITE_NAME = 'RSK';
 
+/**
+ * The link preview app/[lang]/opengraph-image.tsx draws. Named here because a page's openGraph replaces the one that
+ * file would add, so without it no page would have an image.
+ */
+const ogImage = (lang: KitLanguage) => `/${lang}/opengraph-image`;
+
 /** Open Graph wants a territory too. */
 const OG_LOCALE: Record<KitLanguage, string> = { en: 'en_US', ar: 'ar_AR' };
 
@@ -44,7 +50,14 @@ export function pageMetadata({ lang, path, title, description, absoluteTitle }: 
       canonical: url,
       languages: { ...Object.fromEntries(LANGS.map((each) => [each, localizedPath(each, path)])), 'x-default': path },
     },
-    openGraph: { type: 'website', siteName: SITE_NAME, ...text, locale: OG_LOCALE[lang], url },
-    twitter: { card: 'summary_large_image', ...text },
+    openGraph: {
+      type: 'website',
+      siteName: SITE_NAME,
+      ...text,
+      locale: OG_LOCALE[lang],
+      url,
+      images: [{ url: ogImage(lang), width: 1200, height: 630, alt: SITE_NAME }],
+    },
+    twitter: { card: 'summary_large_image', ...text, images: [ogImage(lang)] },
   };
 }

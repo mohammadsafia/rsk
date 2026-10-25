@@ -52,9 +52,8 @@ function addMember(members: Member[], body: unknown): ApiResponse {
   return { status: 201, body: member };
 }
 
-/** A mock backend with its own members: GET /members (page, pageSize, search, sort=field:asc|desc) and POST /members. */
-export function createMockMembers(): (request: ApiRequest) => ApiResponse {
-  const members = seed();
+/** A mock backend over `members`: GET /members (page, pageSize, search, sort=field:asc|desc) and POST /members. */
+export function createMockMembers(members: Member[] = seed()): (request: ApiRequest) => ApiResponse {
   return ({ method, path, search, body }) => {
     if (path === '/members' && method === 'GET') return listMembers(members, new URLSearchParams(search));
     if (path === '/members' && method === 'POST') return addMember(members, body);
@@ -62,5 +61,9 @@ export function createMockMembers(): (request: ApiRequest) => ApiResponse {
   };
 }
 
+// Next bundles route handlers and server actions apart, each with its own copy of this module: the members live on
+// globalThis so an invite (a server action) shows in the list (the /api route).
+const shared = globalThis as typeof globalThis & { rskMockMembers?: Member[] };
+
 /** The app's one mock backend (src/server/api.ts asks it while AUTH_MOCK is on). */
-export const mockApi = createMockMembers();
+export const mockApi = createMockMembers((shared.rskMockMembers ??= seed()));

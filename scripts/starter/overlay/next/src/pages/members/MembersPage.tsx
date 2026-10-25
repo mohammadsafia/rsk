@@ -1,20 +1,23 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 
 import { Badge, Button } from '@components/ui';
 import { PageHeader } from '@components/shared';
 import { DataTable } from '@components/tables';
+import { Conditional } from '@components/utils';
 
 import { useAppTranslation, useDataTableQuery } from '@hooks/shared';
 import { useDataTable } from '@hooks/utils';
 
 import { type Member, MEMBERS_PAGE_SIZE, MEMBERS_QUERY_KEY, membersApi } from '@api/handlers/members';
 
-import InviteMemberForm from './InviteMemberForm';
 import type { InviteMember } from './inviteSchema';
 
 import { UserPlus } from 'lucide-react';
+
+// The form (react-hook-form, Zod, the select) loads the first time someone opens it, not with the table.
+const InviteMemberForm = lazy(() => import('./InviteMemberForm'));
 
 type MembersPageProps = {
   /** The invite server action, from the route. */
@@ -28,6 +31,7 @@ type MembersPageProps = {
 function MembersPage({ invite }: MembersPageProps) {
   const { t, i18n } = useAppTranslation('members');
   const [inviting, setInviting] = useState(false);
+  const [invitedOnce, setInvitedOnce] = useState(false);
   const { data, tableUtils, isFetching } = useDataTableQuery<Member>({
     queryKey: MEMBERS_QUERY_KEY,
     queryFn: membersApi.list,
@@ -77,7 +81,12 @@ function MembersPage({ invite }: MembersPageProps) {
     <div className="flex flex-col gap-6">
       <PageHeader title={t('title')} description={t('description')}>
         <PageHeader.Actions>
-          <Button onClick={() => setInviting(true)}>
+          <Button
+            onClick={() => {
+              setInvitedOnce(true);
+              setInviting(true);
+            }}
+          >
             <UserPlus aria-hidden="true" />
             {t('invite.button')}
           </Button>
@@ -90,7 +99,11 @@ function MembersPage({ invite }: MembersPageProps) {
         <DataTable.Pagination pageSizeOptions={[MEMBERS_PAGE_SIZE]} />
       </DataTable>
 
-      <InviteMemberForm open={inviting} onOpenChange={setInviting} invite={invite} />
+      <Conditional.If condition={invitedOnce}>
+        <Suspense fallback={null}>
+          <InviteMemberForm open={inviting} onOpenChange={setInviting} invite={invite} />
+        </Suspense>
+      </Conditional.If>
     </div>
   );
 }

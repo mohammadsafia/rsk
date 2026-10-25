@@ -12,7 +12,7 @@ import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, wr
 import os from 'node:os';
 import path from 'node:path';
 
-import { chromium, type Page } from 'playwright';
+import { type Browser, chromium, type Page } from 'playwright';
 
 import { hashFile } from '../kit/core';
 import { buildStarter, refreshLockfile } from './build-starter';
@@ -23,6 +23,8 @@ const PORT = 5410;
 const BASE = `http://127.0.0.1:${PORT}`;
 const pnpm = ['pnpm@10.34.7'];
 const SENTINEL = `rsk-sentinel-${randomBytes(6).toString('hex')}`;
+/** The public site URL the app is built with: canonical, hreflang, sitemap and OG URLs are absolute on it. */
+const SITE = 'https://rsk-verify.example';
 
 const run = (cwd: string, args: string[], env: NodeJS.ProcessEnv = {}) => {
   console.log(`\n$ corepack ${[...pnpm, ...args].join(' ')}`);
@@ -123,6 +125,66 @@ async function checkPages(app: string) {
   check(foreign.status === 403, 'sign-in refuses a request from another site');
 }
 
+/** The attributes of every `<tag …>` in `html`, lower-cased names. */
+const tagsOf = (html: string, tag: string) =>
+  [...html.matchAll(new RegExp(`<${tag}\\b([^>]*)>`, 'gi'))].map(([, attributes]) =>
+    Object.fromEntries([...attributes.matchAll(/([\w:-]+)="([^"]*)"/g)].map(([, name, value]) => [name.toLowerCase(), value])),
+  );
+
+/** A session cookie for the demo account, as the browser gets it from sign-in. */
+async function demoCookie(): Promise<string> {
+  const response = await fetch(`${BASE}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: BASE },
+    body: JSON.stringify({ email: 'demo@example.com', password: 'demo-password' }),
+  });
+  return (response.headers.get('set-cookie') ?? '').split(';')[0];
+}
+
+/** What a crawler and a link preview read: the Arabic home page's HTML, the sitemap, robots and the OG image. */
+async function checkSeo(app: string) {
+  const arLanding = JSON.parse(readFileSync(path.join(app, 'src/locales/ar/landing.json'), 'utf8')) as {
+    hero: { title: string; description: string };
+  };
+  const html = await (await get('/ar')).text();
+  check(html.includes('<html lang="ar" dir="rtl"'), '/ar is server-rendered right to left');
+  check(html.includes(`<title>${arLanding.hero.title}</title>`), '…with its Arabic title');
+  const meta = tagsOf(html, 'meta');
+  const content = (key: string) => meta.find((tag) => tag.name === key || tag.property === key)?.content;
+  check(content('description') === arLanding.hero.description, '…and its Arabic description');
+  const links = tagsOf(html, 'link');
+  check(
+    links.some((tag) => tag.rel === 'canonical' && tag.href === `${SITE}/ar`),
+    `…a canonical URL on the site (${SITE}/ar)`,
+  );
+  const alternates = Object.fromEntries(
+    links.filter((tag) => tag.rel === 'alternate' && tag.hreflang).map((tag) => [tag.hreflang, tag.href]),
+  );
+  check(
+    alternates.en === `${SITE}/en` && alternates.ar === `${SITE}/ar` && [SITE, `${SITE}/`].includes(alternates['x-default']),
+    '…hreflang alternates for en, ar and x-default',
+  );
+  const image = content('og:image');
+  const picture = image ? await fetch(`${BASE}${new URL(image).pathname}${new URL(image).search}`) : null;
+  check(
+    image?.startsWith(`${SITE}/ar/opengraph-image`) && picture?.status === 200 && picture.headers.get('content-type') === 'image/png',
+    '…and an Open Graph image that answers as a PNG',
+  );
+  check(content('og:locale') === 'ar_AR' && content('twitter:card') === 'summary_large_image', '…with Open Graph and Twitter data');
+
+  const sitemap = await (await get('/sitemap.xml')).text();
+  check(sitemap.includes(`<loc>${SITE}/en</loc>`) && sitemap.includes(`<loc>${SITE}/ar</loc>`), '/sitemap.xml lists both languages');
+  const robots = await (await get('/robots.txt')).text();
+  check(robots.includes('Disallow: /api/') && robots.includes(`Sitemap: ${SITE}/sitemap.xml`), '/robots.txt keeps crawlers out of /api');
+
+  const cookie = await demoCookie();
+  const members = await get('/en/members', { cookie });
+  check(
+    members.status === 200 && /<meta name="robots" content="noindex, nofollow"/.test(await members.text()),
+    'signed-in pages answer noindex',
+  );
+}
+
 async function signIn(page: Page, route: string) {
   await page.goto(`${BASE}${route}`);
   await page.getByLabel('Email').fill('demo@example.com');
@@ -205,8 +267,9 @@ async function checkInBrowser(app: string) {
       '…and is remembered',
     );
     await page.goto(BASE);
-    await page.waitForURL(`${BASE}/ar/dashboard`);
+    await page.waitForURL(`${BASE}/ar`);
     check(true, 'the next visit to / opens in Arabic');
+    await page.goto(`${BASE}/ar/dashboard`);
 
     // Sign out ends the session at the server.
     const arHeader = JSON.parse(readFileSync(path.join(app, 'src/locales/ar/header.json'), 'utf8')) as {
@@ -229,10 +292,52 @@ async function checkInBrowser(app: string) {
     check(new URL(freshPage.url()).origin === BASE, 'a crafted ?next= stays on the app');
     await fresh.close();
 
+    await checkMembers(browser, watch);
+
     check(problems.length === 0, `no page error or console error${problems.length ? `:\n${problems.join('\n')}` : ''}`);
   } finally {
     await browser.close();
   }
+}
+
+/**
+ * The three full-stack examples as a person meets them: the members table arrives with the page (no request from the
+ * browser), an invite the API refuses shows its field error, and one it takes lands in the table.
+ */
+async function checkMembers(browser: Browser, watch: (page: Page) => void) {
+  const cookie = await demoCookie();
+  const second = (await (await get('/api/members?page=2&pageSize=10', { cookie })).json()) as { data: { name: string; email: string }[] };
+  const html = await (await get('/en/members?page=2', { cookie })).text();
+  check(html.includes(second.data[0].name), "/en/members?page=2 arrives with page 2's members in its HTML");
+
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  watch(page);
+  const fetched: string[] = [];
+  page.on('request', (request) => new URL(request.url()).pathname.startsWith('/api/members') && fetched.push(request.url()));
+  await signIn(page, '/en/login?next=%2Fen%2Fmembers%3Fpage%3D2');
+  await page.waitForURL(`${BASE}/en/members?page=2`);
+  await page.getByRole('cell', { name: second.data[0].name, exact: true }).waitFor();
+  await page.waitForLoadState('networkidle');
+  check(fetched.length === 0, `…and the browser shows them without fetching again${fetched.length ? `: ${fetched.join(', ')}` : ''}`);
+
+  const sheet = page.getByRole('dialog');
+  await page.getByRole('button', { name: 'Invite member' }).click();
+  await sheet.getByLabel(/^Name/).fill('Taken Email');
+  await sheet.getByLabel(/^Email/).fill(second.data[0].email);
+  await sheet.getByRole('button', { name: 'Send invite' }).click();
+  await sheet.getByText('That email is already a member.').waitFor();
+  check(true, "an invite the API refuses shows the server's error under Email");
+
+  const name = `Verify ${randomBytes(3).toString('hex')}`;
+  await sheet.getByLabel(/^Name/).fill(name);
+  await sheet.getByLabel(/^Email/).fill(`${name.replace(' ', '.').toLowerCase()}@example.com`);
+  await sheet.getByRole('button', { name: 'Send invite' }).click();
+  await sheet.waitFor({ state: 'detached' });
+  await page.goto(`${BASE}/en/members?globalFilter=${encodeURIComponent(name)}`);
+  await page.getByRole('cell', { name, exact: true }).waitFor();
+  check(true, '…and one it takes, through the server action, lands in the table');
+  await context.close();
 }
 
 /**
@@ -361,7 +466,7 @@ export async function verifyNext() {
 
     // Built without its secret (a first deploy), with a sentinel API_URL that must never reach the browser's files.
     const tsconfig = readFileSync(path.join(app, 'tsconfig.app.json'), 'utf8');
-    run(app, ['exec', 'next', 'build'], { SESSION_SECRET: '', API_URL: `https://${SENTINEL}.invalid` });
+    run(app, ['exec', 'next', 'build'], { SESSION_SECRET: '', API_URL: `https://${SENTINEL}.invalid`, NEXT_PUBLIC_SITE_URL: SITE });
     check(readFileSync(path.join(app, 'tsconfig.app.json'), 'utf8') === tsconfig, 'next build leaves tsconfig.app.json as it is');
     const leaked = walk(path.join(app, '.next/static')).filter((file) => readFileSync(file, 'latin1').includes(SENTINEL));
     check(leaked.length === 0, `no server setting in the browser's files${leaked.length ? `: ${leaked.join(', ')}` : ''}`);
@@ -382,15 +487,35 @@ export async function verifyNext() {
 
     stop = await serve(app, { SESSION_SECRET: randomBytes(32).toString('hex'), AUTH_MOCK: 'true' });
     await checkPages(app);
+    await checkSeo(app);
 
     const budget = (...args: string[]) =>
       run(app, ['exec', 'node', 'scripts/bundle/first-load.mjs', '--url', BASE, '--lang-in', 'path', '--budget', 'next-starter', ...args]);
-    budget('--routes', '/login,/forgot-password', '--report', 'first-load-next-signed-out.json');
+    budget('--routes', '/,/login,/forgot-password', '--report', 'first-load-next-signed-out.json');
     budget('--session', '--seed', 'api', '--routes', '/dashboard,/settings', '--report', 'first-load-next-signed-in.json');
+    // The members example carries the kit data table, measured against its own budget.
+    run(app, [
+      'exec',
+      'node',
+      'scripts/bundle/first-load.mjs',
+      '--url',
+      BASE,
+      '--lang-in',
+      'path',
+      '--budget',
+      'next-table',
+      '--session',
+      '--seed',
+      'api',
+      '--routes',
+      '/members',
+      '--report',
+      'first-load-next-table.json',
+    ]);
 
     const audit = (...args: string[]) =>
       run(app, ['exec', 'node', 'scripts/a11y/audit.mjs', '--base', BASE, '--seed', 'api', '--lang-in', 'path', ...args]);
-    audit('--signed-out', '/login,/forgot-password');
+    audit('--signed-out', '/,/login,/forgot-password');
     await checkInBrowser(app);
     stop();
     stop = undefined;

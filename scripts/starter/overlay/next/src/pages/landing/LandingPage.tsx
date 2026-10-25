@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card } from '@components/ui';
+import { Button } from '@components/ui';
 import { LanguageSwitcher, Logo, ThemeSwitcher } from '@components/shared';
 
 import { KitLink } from '@contexts';
@@ -41,13 +41,10 @@ function LandingPage() {
           </h2>
           <ul className="grid gap-4 sm:grid-cols-3">
             {FEATURES.map((feature) => (
-              <li key={feature}>
-                <Card className="h-full">
-                  <Card.Header>
-                    <Card.Title>{t(`features.${feature}.title`)}</Card.Title>
-                    <Card.Description>{t(`features.${feature}.description`)}</Card.Description>
-                  </Card.Header>
-                </Card>
+              // Plain tiles, not the kit Card: every app page's links prefetch this page, so it stays light.
+              <li key={feature} className="border-border bg-surface flex flex-col gap-1 rounded-lg border p-5">
+                <h3 className="text-fg font-semibold">{t(`features.${feature}.title`)}</h3>
+                <p className="text-fg-muted text-sm">{t(`features.${feature}.description`)}</p>
               </li>
             ))}
           </ul>

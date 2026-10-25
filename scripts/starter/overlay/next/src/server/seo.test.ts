@@ -9,8 +9,16 @@ describe('pageMetadata', () => {
       title: 'T',
       description: 'D',
       alternates: { canonical: '/ar/login', languages: { en: '/en/login', ar: '/ar/login', 'x-default': '/login' } },
-      openGraph: { type: 'website', siteName: 'RSK', title: 'T', description: 'D', locale: 'ar_AR', url: '/ar/login' },
-      twitter: { card: 'summary_large_image', title: 'T', description: 'D' },
+      openGraph: {
+        type: 'website',
+        siteName: 'RSK',
+        title: 'T',
+        description: 'D',
+        locale: 'ar_AR',
+        url: '/ar/login',
+        images: [{ url: '/ar/opengraph-image', width: 1200, height: 630, alt: 'RSK' }],
+      },
+      twitter: { card: 'summary_large_image', title: 'T', description: 'D', images: ['/ar/opengraph-image'] },
     });
   });
 

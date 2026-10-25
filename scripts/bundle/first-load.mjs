@@ -35,11 +35,22 @@ export const BUNDLE_BUDGET_KB = 210;
  */
 export const NEXT_BUDGET_KB = 306;
 
-/** --budget: 'starter' is BUNDLE_BUDGET_KB, 'next-starter' NEXT_BUDGET_KB, a number is itself, absent means report only. */
+/**
+ * A Next page with a kit data table (the starter's members example): 406 KB measured when the budget was set
+ * (2026-10-25), plus ~5%. The kit table brings its filter widgets (calendar, combobox, date-fns, ~90 KB) whether a
+ * table uses them or not; splitting those out would let this budget come down.
+ */
+export const NEXT_TABLE_BUDGET_KB = 426;
+
+/**
+ * --budget: 'starter' is BUNDLE_BUDGET_KB, 'next-starter' NEXT_BUDGET_KB, 'next-table' NEXT_TABLE_BUDGET_KB, a number
+ * is itself, absent means report only.
+ */
 export function resolveBudget(value) {
   if (value === undefined) return undefined;
   if (value === 'starter') return BUNDLE_BUDGET_KB;
   if (value === 'next-starter') return NEXT_BUDGET_KB;
+  if (value === 'next-table') return NEXT_TABLE_BUDGET_KB;
   const budget = Number(value);
   if (!Number.isFinite(budget) || budget <= 0) throw new Error(`--budget must be a number of KB or "starter", not "${value}"`);
   return budget;
