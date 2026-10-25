@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import {
   BUNDLE_BUDGET_KB,
+  NEXT_BUDGET_KB,
   localeKeys,
   rawKeysIn,
   failuresOf,
@@ -79,5 +80,22 @@ describe('first-load page check', () => {
     expect(localizedRoutes(['/', '/dashboard'], 'path')).toEqual(['/en', '/en/dashboard', '/ar', '/ar/dashboard']);
     expect(localizedRoutes(['/', '/dashboard'], 'storage')).toEqual(['/', '/dashboard']);
     expect(() => localizedRoutes(['/'], 'query')).toThrow(/--lang-in/);
+  });
+
+  it("resolves --budget next-starter to the Next starter's own budget", () => {
+    expect(NEXT_BUDGET_KB).toBeGreaterThan(BUNDLE_BUDGET_KB);
+    expect(resolveBudget('next-starter')).toBe(NEXT_BUDGET_KB);
+  });
+
+  it('fails a route whose page logged a hydration error (the server and the browser rendered differently)', () => {
+    const result = {
+      route: '/en/login',
+      landed: '/en/login',
+      gzipKb: 100,
+      errors: [],
+      rawKeys: [],
+      hydrationErrors: ['Hydration failed because …'],
+    };
+    expect(failuresOf(result, { budget: 400, redirects: {} })).toEqual(['hydration errors: Hydration failed because …']);
   });
 });
