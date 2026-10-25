@@ -3,7 +3,7 @@
 //
 //   pnpm a11y:audit                        # starts the dev server if nothing answers on --base
 //   pnpm a11y:audit -- --base http://localhost:5173 --max 300
-//   pnpm a11y:audit -- --base http://localhost:3000 --seed cookie --lang-in path   # a running Next app (next start)
+//   pnpm a11y:audit -- --base http://localhost:3000 --seed api --lang-in path   # a running Next app (next start)
 //
 // Pages are discovered by following same-site links from "/", so the kit audits its docs and showcase pages and an
 // app made from the starter audits its own routes, with nothing to keep in sync.

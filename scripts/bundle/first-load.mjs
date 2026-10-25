@@ -5,8 +5,8 @@
 //   node scripts/bundle/first-load.mjs --dist dist --budget 150    # fail a route over 150 KB gz
 //   node scripts/bundle/first-load.mjs --dist dist --budget starter --routes /,/dashboard --redirects /=/dashboard --session
 //                                      (--session: signed in as the mock backend's demo user)
-//   node scripts/bundle/first-load.mjs --url http://localhost:3000 --routes /login --session --seed cookie --lang-in path
-//                                      (a running server, e.g. a Next app's `next start`: signed in by cookie, each
+//   node scripts/bundle/first-load.mjs --url http://localhost:3000 --routes /login --session --seed api --lang-in path
+//                                      (a running server, e.g. a Next app's `next start`: signed in through its API, each
 //                                      route measured under /en and /ar)
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
