@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
-import { Badge } from '@components/ui';
+import { Badge, Button } from '@components/ui';
 import { PageHeader } from '@components/shared';
 import { DataTable } from '@components/tables';
 
@@ -11,9 +11,23 @@ import { useDataTable } from '@hooks/utils';
 
 import { type Member, MEMBERS_PAGE_SIZE, MEMBERS_QUERY_KEY, membersApi } from '@api/handlers/members';
 
-/** The members example: a kit table over /api/members, its first page sent by the server (app/[lang]/(app)/members). */
-function MembersPage() {
+import InviteMemberForm from './InviteMemberForm';
+import type { InviteMember } from './inviteSchema';
+
+import { UserPlus } from 'lucide-react';
+
+type MembersPageProps = {
+  /** The invite server action, from the route. */
+  invite: InviteMember;
+};
+
+/**
+ * The members example: a kit table over /api/members, its first page sent by the server, and an invite form that
+ * submits through a server action (both in app/[lang]/(app)/members).
+ */
+function MembersPage({ invite }: MembersPageProps) {
   const { t, i18n } = useAppTranslation('members');
+  const [inviting, setInviting] = useState(false);
   const { data, tableUtils, isFetching } = useDataTableQuery<Member>({
     queryKey: MEMBERS_QUERY_KEY,
     queryFn: membersApi.list,
@@ -61,13 +75,22 @@ function MembersPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title={t('title')} description={t('description')} />
+      <PageHeader title={t('title')} description={t('description')}>
+        <PageHeader.Actions>
+          <Button onClick={() => setInviting(true)}>
+            <UserPlus aria-hidden="true" />
+            {t('invite.button')}
+          </Button>
+        </PageHeader.Actions>
+      </PageHeader>
 
       <DataTable table={table} isLoading={isFetching && !data.length}>
         <DataTable.Toolbar totalCount={tableUtils.totalCount} totalLabel={t('total')} placeholder={t('search')} />
         <DataTable.Content />
         <DataTable.Pagination pageSizeOptions={[MEMBERS_PAGE_SIZE]} />
       </DataTable>
+
+      <InviteMemberForm open={inviting} onOpenChange={setInviting} invite={invite} />
     </div>
   );
 }

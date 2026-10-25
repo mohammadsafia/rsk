@@ -9,6 +9,8 @@ import { prefetchMembers } from '@server/members';
 import { pageMetadata } from '@server/seo';
 import { requireSession } from '@server/session';
 
+import { inviteMember } from './actions';
+
 type PageProps = { params: Promise<{ lang: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -16,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return isLang(lang) ? pageMetadata({ lang, path: '/members', title: (await getT(lang, 'members'))('title') }) : {};
 }
 
-/** The members example: the server fetches the page the URL asks for and sends it with the HTML. */
+/** The members example: the server fetches the page the URL asks for and sends it with the HTML; invites go through a server action. */
 export default async function Page({ params, searchParams }: PageProps) {
   const { lang } = await params;
   if (!isLang(lang)) return null;
@@ -25,7 +27,7 @@ export default async function Page({ params, searchParams }: PageProps) {
   await prefetchMembers(client, session, await searchParams);
   return (
     <HydrationBoundary state={dehydrate(client)}>
-      <MembersPage />
+      <MembersPage invite={inviteMember} />
     </HydrationBoundary>
   );
 }

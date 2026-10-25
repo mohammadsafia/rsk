@@ -47,7 +47,7 @@ async function serverRender(search: string) {
       </QueryClientProvider>
     </NuqsTestingAdapter>
   );
-  renderWithKitRouter(wrap(<MembersPage />));
+  renderWithKitRouter(wrap(<MembersPage invite={vi.fn()} />));
   return { list, state };
 }
 
