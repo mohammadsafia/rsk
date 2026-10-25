@@ -65,6 +65,19 @@ describe('blocks in a Next app', () => {
     expect(fingerprint(app)).toEqual(before);
   });
 
+  it('an edited error page stops only the blocks that would replace it, and the refusal lists every file in the way', () => {
+    const app = newApp();
+    const edited = `${read(app, 'app/[lang]/error.tsx')}// ours\n`;
+    writeFileSync(path.join(app, 'app/[lang]/error.tsx'), edited);
+    addBlocks({ appDir: app, catalogue: readCatalogue(app), ids: ['search-field'] });
+    expect(readLock(app).blocks).toEqual(['search-field']);
+    expect(read(app, 'app/[lang]/error.tsx')).toBe(edited);
+    writeFileSync(path.join(app, 'app/[lang]/not-found.tsx'), `${read(app, 'app/[lang]/not-found.tsx')}// ours\n`);
+    expect(() => addBlocks({ appDir: app, catalogue: readCatalogue(app), ids: ['system-pages'] })).toThrow(
+      "app/[lang]/error.tsx, app/[lang]/not-found.tsx aren't pages kit:add wrote (or you changed them); move them away to add system-pages.",
+    );
+  });
+
   it("removes the block's unedited pages and brings the starter defaults back", () => {
     const app = newApp();
     const before = fingerprint(app);

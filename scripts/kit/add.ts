@@ -16,7 +16,7 @@ import { autocompleteMultiselect, isCancel } from '@clack/prompts';
 
 import { kitTarget } from '../lib/kit-target.mjs';
 
-import { planBlockRoutes } from './block-routes';
+import { nextRouteFiles, planBlockRoutes } from './block-routes';
 import { type BlockLevel, type BlockMeta, readBlocks, resolveDependencies, writeIndex } from './blocks';
 import { dependencyChanges, hashFile, LOCK_FILE, readLock, writeLock } from './core';
 import { download, starterRepo } from './download';
@@ -109,11 +109,21 @@ export function addBlocks({
     if (existsSync(target) && hashFile(target) !== hashFile(source(catalogue, id, file)))
       throw new Error(`${file} already exists in this app with other content; move it away to add "${id}".`);
   }
-  // A Next app's pages for them are generated: none may land on a file the app wrote or changed.
+  // A Next app's pages for them are generated: none may land on a file the app wrote or changed. Files these blocks
+  // leave as they are (an edited 404, when no added block has one) don't stand in the way.
   if (wanted.length && kitTarget(appDir) === 'next') {
-    const blocks = [...readBlocks(appDir), ...catalogue.blocks.filter((block) => wanted.includes(block.id))];
-    const [inTheWay] = planBlockRoutes(appDir, blocks).refused;
-    if (inTheWay) throw new Error(`${inTheWay} isn't a page kit:add wrote (or you changed it); move it away to add ${wanted.join(', ')}.`);
+    const current = readBlocks(appDir);
+    const blocks = [...current, ...catalogue.blocks.filter((block) => wanted.includes(block.id))];
+    const [now, next] = [nextRouteFiles(current), nextRouteFiles(blocks)];
+    const inTheWay = planBlockRoutes(appDir, blocks)
+      .refused.filter((file) => next.get(file) !== now.get(file))
+      .sort();
+    if (inTheWay.length === 1)
+      throw new Error(`${inTheWay[0]} isn't a page kit:add wrote (or you changed it); move it away to add ${wanted.join(', ')}.`);
+    if (inTheWay.length)
+      throw new Error(
+        `${inTheWay.join(', ')} aren't pages kit:add wrote (or you changed them); move them away to add ${wanted.join(', ')}.`,
+      );
   }
   const packages: Record<string, string> = Object.assign(
     {},
