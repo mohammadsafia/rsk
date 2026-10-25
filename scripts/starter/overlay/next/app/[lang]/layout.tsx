@@ -4,7 +4,7 @@ import type { Metadata, Viewport } from 'next';
 import { Noto_Kufi_Arabic, Schibsted_Grotesk, Spline_Sans_Mono } from 'next/font/google';
 import { notFound } from 'next/navigation';
 
-import { THEME_COLORS } from '@constants';
+import { THEME_COLORS } from '@app-config';
 import { LOCALES } from '@locales';
 
 import { dirOf, isLang, LANGS } from '@env';

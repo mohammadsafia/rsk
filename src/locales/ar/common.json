@@ -222,5 +222,8 @@
   },
   "chipInput": {
     "invalid": "(غير صالح)"
+  },
+  "app": {
+    "description": "نقطة بداية مدروسة لتطبيقات React وTypeScript لمن يقدّر الإتقان."
   }
 }

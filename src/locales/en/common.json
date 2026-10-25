@@ -202,5 +202,8 @@
   },
   "chipInput": {
     "invalid": "(not valid)"
+  },
+  "app": {
+    "description": "A considered React + TypeScript starter for developers who value craft."
   }
 }

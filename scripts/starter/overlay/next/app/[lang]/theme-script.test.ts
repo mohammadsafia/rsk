@@ -5,7 +5,9 @@ import { THEME_SCRIPT } from './theme-script';
 
 const root = document.documentElement;
 const run = (reduced = false) => {
-  window.matchMedia = ((query: string) => ({ matches: reduced && query.includes('reduced-motion') })) as unknown as typeof window.matchMedia;
+  window.matchMedia = ((query: string) => ({
+    matches: reduced && query.includes('reduced-motion'),
+  })) as unknown as typeof window.matchMedia;
   new Function(THEME_SCRIPT)();
 };
 
