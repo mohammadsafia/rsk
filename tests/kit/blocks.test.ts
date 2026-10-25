@@ -70,6 +70,12 @@ describe('blocks', () => {
     expect(errors).toMatch(/more than one block has an errorElement: a, b/);
   });
 
+  it('reports a route title key missing from either locale file', () => {
+    const root = kit([meta('a', { routes: [{ path: '/x', component: 'XPage', layout: 'app', titleKey: 'nope.title' }] })]);
+    put(root, 'src/locales/ar/block-a.json', JSON.stringify({ nope: { title: 'عنوان' } }));
+    expect(validateBlocks(root)).toEqual(['a: route /x has titleKey "nope.title", missing in src/locales/en/block-a.json']);
+  });
+
   it('accepts a valid catalogue', () => {
     expect(validateBlocks(kit([meta('a'), meta('b', { dependsOn: ['a'] })]))).toEqual([]);
   });

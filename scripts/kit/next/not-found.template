@@ -1,0 +1,11 @@
+'use client';
+
+import { NotFound } from '@routes/RoutePlaceholders';
+
+export default function NotFoundPage() {
+  return (
+    <main>
+      <NotFound />
+    </main>
+  );
+}

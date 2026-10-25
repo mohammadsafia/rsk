@@ -6,7 +6,13 @@ import path from 'node:path';
 import { kitTarget } from '../lib/kit-target.mjs';
 
 export type BlockLevel = 'molecule' | 'organism' | 'template';
-export type BlockRoute = { path: string; component: string; layout: 'app' | 'bare' };
+export type BlockRoute = {
+  path: string;
+  component: string;
+  layout: 'app' | 'bare';
+  /** A key in the block's own locale files: the page's title (a Next app's generated page reads it). */
+  titleKey?: string;
+};
 export type BlockNav = { id: string; path: string; icon: string };
 export type BlockMeta = {
   id: string;
@@ -82,6 +88,16 @@ export function validateBlocks(root: string): string[] {
     for (const route of block.routes ?? [])
       if (!exports(route.component))
         errors.push(`${folder}: route ${route.path} names "${route.component}", which src/blocks/${folder}/index.ts doesn't export`);
+    for (const route of block.routes ?? []) {
+      if (!route.titleKey) continue;
+      for (const lang of LANGS) {
+        const localeFile = `src/locales/${lang}/block-${folder}.json`;
+        const copy: unknown = existsSync(path.join(root, localeFile)) ? JSON.parse(readFileSync(path.join(root, localeFile), 'utf8')) : {};
+        const value = route.titleKey.split('.').reduce<unknown>((node, key) => (node as Record<string, unknown> | undefined)?.[key], copy);
+        if (typeof value !== 'string')
+          errors.push(`${folder}: route ${route.path} has titleKey "${route.titleKey}", missing in ${localeFile}`);
+      }
+    }
     if (block.errorElement && !exports(block.errorElement))
       errors.push(`${folder}: errorElement "${block.errorElement}" isn't exported by src/blocks/${folder}/index.ts`);
     // The menu shows a block's entries by `nav.<id>` in its own locale files.

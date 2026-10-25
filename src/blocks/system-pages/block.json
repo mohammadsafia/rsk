@@ -8,9 +8,9 @@
   "dependsOn": [],
   "packages": {},
   "routes": [
-    { "path": "*", "component": "NotFoundPage", "layout": "bare" },
-    { "path": "/maintenance", "component": "MaintenancePage", "layout": "bare" },
-    { "path": "/no-access", "component": "NoAccessPage", "layout": "app" }
+    { "path": "*", "component": "NotFoundPage", "layout": "bare", "titleKey": "notFound.title" },
+    { "path": "/maintenance", "component": "MaintenancePage", "layout": "bare", "titleKey": "maintenance.title" },
+    { "path": "/no-access", "component": "NoAccessPage", "layout": "app", "titleKey": "noAccess.title" }
   ],
   "nav": [],
   "errorElement": "ServerErrorPage"
