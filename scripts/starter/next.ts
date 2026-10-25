@@ -4,7 +4,7 @@
  * writes, CSS without the remote font import) and writes a static locale map. The kit's own files are untouched, so
  * both starters ship the same kit.
  */
-import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { NEXT_DROP, NEXT_DROP_SCRIPTS, NEXT_RUNTIME_DEPENDENCIES } from './manifest';
@@ -50,7 +50,7 @@ export function writeStaticLocales(out: string): void {
   const map = (lang: string) =>
     [
       `const ${lang.toUpperCase()}: ResourceLanguage = {`,
-      ...namespaces(lang).map((ns) => `  '${ns}': ${identifier(lang, ns)},`),
+      ...namespaces(lang).map((ns) => `  ${/^[A-Za-z_$][\w$]*$/.test(ns) ? ns : `'${ns}'`}: ${identifier(lang, ns)},`),
       '};',
     ].join('\n');
   const source = [
@@ -72,6 +72,12 @@ export function writeStaticLocales(out: string): void {
 
 export function nextTransform(out: string): void {
   for (const file of NEXT_DROP) rmSync(path.join(out, file), { recursive: true, force: true });
+
+  // Next reads a pages/ folder (src/pages too) as Pages Router routes, beside app/: the shared screens move to
+  // src/screens, and @pages points there, so imports stay as they are.
+  renameSync(path.join(out, 'src/pages'), path.join(out, 'src/screens'));
+  replaceIn(out, 'tsconfig.app.json', '"@pages/*": ["./src/pages/*"],', '"@pages/*": ["./src/screens/*"],');
+  replaceIn(out, 'vite.config.ts', "path.resolve(__dirname, 'src/pages')", "path.resolve(__dirname, 'src/screens')");
 
   // package.json: Next runs the app; Vite+ stays for lint, format and tests.
   const pkgFile = path.join(out, 'package.json');

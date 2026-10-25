@@ -111,7 +111,6 @@ export const NEXT_DROP = [
   'src/i18n.test.ts',
   'src/routes/router.tsx',
   'src/routes/RoutePlaceholders.test.tsx',
-  'src/routes/routerAdapter.tsx',
   'src/layouts/auth-guard/',
   'src/layouts/error-boundary/',
   'src/layouts/app-layout/AppLayout.tsx',

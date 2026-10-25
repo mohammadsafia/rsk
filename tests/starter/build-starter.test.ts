@@ -160,8 +160,12 @@ describe('buildStarter --target next', () => {
   });
 
   it('is a Next app: next config and app/, no Vite entry, no React Router, Next scripts', () => {
-    for (const file of ['next.config.ts', 'postcss.config.mjs', 'app/[lang]/layout.tsx'])
+    for (const file of ['next.config.ts', 'postcss.config.mjs', 'app/[lang]/layout.tsx', 'src/routes/routerAdapter.tsx'])
       expect(existsSync(path.join(next, file)), file).toBe(true);
+    // Next would read src/pages as Pages Router routes: the shared screens live in src/screens (still @pages).
+    expect(existsSync(path.join(next, 'src/pages'))).toBe(false);
+    expect(existsSync(path.join(next, 'src/screens/auth/LoginPage.tsx'))).toBe(true);
+    expect(readFileSync(path.join(next, 'src/routes/routerAdapter.tsx'), 'utf8')).toContain("from 'next/navigation'");
     for (const file of ['index.html', 'src/main.tsx', 'src/bootstrap.tsx', 'vercel.json', 'src/blocks/index.ts'])
       expect(existsSync(path.join(next, file)), file).toBe(false);
     const pkg = json<Pkg>(next, 'package.json');
@@ -205,6 +209,8 @@ describe('buildStarter --target next', () => {
   it('maps every locale namespace statically, with no Vite-only import.meta', () => {
     const locales = readFileSync(path.join(next, 'src/locales/index.ts'), 'utf8');
     expect(locales).not.toContain('import.meta');
+    // In the formatter's own style, so the app's first vp check passes.
+    expect(locales).toContain('  common: enCommon,');
     for (const lang of ['en', 'ar'])
       for (const file of readdirSync(path.join(next, 'src/locales', lang)).filter(
         (name) => name.endsWith('.json') && !name.startsWith('block-'),

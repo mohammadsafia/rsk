@@ -14,9 +14,31 @@ export const NEXT_LAYOUT = 'app/[lang]/layout.tsx';
 
 const read = (root: string, file: string): string => (existsSync(path.join(root, file)) ? readFileSync(path.join(root, file), 'utf8') : '');
 const readPkg = (root: string): Pkg => JSON.parse(read(root, 'package.json') || '{}') as Pkg;
-/** tsconfig files allow comments; strip whole-line ones before parsing. */
-const readTsconfig = (root: string, file: string): Record<string, unknown> =>
-  JSON.parse(read(root, file).replace(/^\s*\/\/.*$/gm, '') || '{}') as Record<string, unknown>;
+/** JSON with comments, as tsconfig files are: line and block comments (outside strings) and trailing commas dropped. */
+export function parseJsonc(text: string): unknown {
+  let json = '';
+  let index = 0;
+  while (index < text.length) {
+    if (text[index] === '"') {
+      // A string, escapes included, copied as it is.
+      let close = index + 1;
+      while (close < text.length && text[close] !== '"') close += text[close] === '\\' ? 2 : 1;
+      json += text.slice(index, close + 1);
+      index = close + 1;
+    } else if (text.startsWith('//', index)) {
+      const newline = text.indexOf('\n', index);
+      index = newline === -1 ? text.length : newline;
+    } else if (text.startsWith('/*', index)) {
+      index = text.indexOf('*/', index) + 2;
+    } else {
+      json += text[index];
+      index += 1;
+    }
+  }
+  return JSON.parse(json.replace(/,(\s*[}\]])/g, '$1') || '{}');
+}
+
+const readTsconfig = (root: string, file: string): Record<string, unknown> => parseJsonc(read(root, file)) as Record<string, unknown>;
 const nextConfig = (root: string): string => NEXT_CONFIGS.map((file) => read(root, file)).find(Boolean) ?? '';
 const missing = (source: string, needles: string[], where: string): string[] =>
   needles.filter((needle) => !source.includes(needle)).map((needle) => `${where} lacks ${needle}`);

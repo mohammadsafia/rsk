@@ -107,6 +107,13 @@ describe('target-aware gates in a Next app', () => {
     ]);
   });
 
+  it('reads tsconfig files the way TypeScript does: block comments and trailing commas', () => {
+    const dir = nextApp({
+      'tsconfig.app.json': `{\n  "compilerOptions": {\n    /* Bundler mode */\n    "strict": true, // on\n  },\n  "include": ["src", "app", "next-env.d.ts", ".next/types/**/*.ts",],\n}\n`,
+    });
+    expect(checkTypecheckProjects(dir)).toEqual([]);
+  });
+
   it('catches an index.html left in a Next app', () => {
     expect(checkEntryScripts(nextApp({ 'index.html': '<html></html>' }), () => true)).toEqual(['a Next app ships an index.html']);
   });
