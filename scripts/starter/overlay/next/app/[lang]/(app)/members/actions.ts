@@ -25,6 +25,8 @@ export async function inviteMember(lang: string, input: unknown): Promise<Invite
   }
 
   const { status, body } = await callApi(session, { method: 'POST', path: '/members', body: parsed.data });
+  // The cookie is still good but the API no longer takes its token (expired or revoked there).
+  if (status === 401) return { ok: false, formError: t('invite.signedOut') };
   if (status === 409) return { ok: false, fieldErrors: { email: t('invite.errors.taken') } };
   if (status !== 200 && status !== 201) return { ok: false, formError: t('invite.failed') };
   return { ok: true, member: body as Member };

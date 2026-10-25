@@ -14,7 +14,7 @@ import { formResolver } from '@utils';
 
 import { MEMBERS_QUERY_KEY } from '@api/handlers/members';
 
-import { type InviteInput, type InviteMember, inviteSchema, MEMBER_ROLES } from './inviteSchema';
+import { type InviteInput, type InviteMember, type InviteResult, inviteSchema, MEMBER_ROLES } from './inviteSchema';
 
 type InviteMemberFormProps = { open: boolean; onOpenChange: (open: boolean) => void; invite: InviteMember };
 
@@ -33,7 +33,14 @@ function InviteMemberForm({ open, onOpenChange, invite }: InviteMemberFormProps)
 
   const handleSubmit = async (values: InviteInput) => {
     setFormError(null);
-    const result = await invite(i18n.language, values);
+    let result: InviteResult;
+    try {
+      result = await invite(i18n.language, values);
+    } catch {
+      // The action never answered: offline, refused, or gone after a deploy (the page is older than the server).
+      setFormError(t('invite.failed'));
+      return;
+    }
     if (!result.ok) {
       for (const [field, message] of Object.entries(result.fieldErrors ?? {}))
         if (message) form.setError(field as keyof InviteInput, { message }, { shouldFocus: true });

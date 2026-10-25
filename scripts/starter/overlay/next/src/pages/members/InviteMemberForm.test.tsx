@@ -18,10 +18,13 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function renderForm(answer: InviteResult) {
+function renderForm(answer: InviteResult | Error) {
   const client = new QueryClient();
   const invalidate = vi.spyOn(client, 'invalidateQueries');
-  const invite = vi.fn(async () => answer);
+  const invite = vi.fn(async () => {
+    if (answer instanceof Error) throw answer;
+    return answer;
+  });
   const onDone = vi.fn();
   renderWithKitRouter(
     <QueryClientProvider client={client}>
@@ -62,6 +65,13 @@ describe('InviteMemberForm', () => {
     fill('Rana', 'rana@example.com');
     submit();
     expect(await screen.findByText('Sign in again to invite someone.')).toBeTruthy();
+  });
+
+  it("says the invite didn't go through when the action can't be reached", async () => {
+    renderForm(new Error('Failed to find Server Action'));
+    fill('Rana', 'rana@example.com');
+    submit();
+    expect(await screen.findByText("The invite didn't go through. Try again.")).toBeTruthy();
   });
 
   it('closes and refreshes the members table once the member is added', async () => {
