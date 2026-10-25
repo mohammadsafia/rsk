@@ -309,7 +309,7 @@ pnpm starter:verify                         # build it in a temp folder, install
 pnpm starter:verify -- --target next        # the same for the Next starter, then serve it, audit it and sign in through it
 ```
 
-**Vite or Next?** Both starters ship the same kit. Pick the Vite starter for an app that runs behind a sign-in and is served as static files. Pick the Next starter when pages need server rendering (SEO, shared links that preview), the session should live in an httpOnly cookie, or the app needs its own server routes. The Next starter's README covers its folders, environment variables and deploying to Vercel. Blocks (`pnpm kit:add`) work in the Vite starter only, for now.
+**Vite or Next?** Both starters ship the same kit. Pick the Vite starter for an app that runs behind a sign-in and is served as static files. Pick the Next starter when pages need server rendering (SEO, shared links that preview), the session should live in an httpOnly cookie, or the app needs its own server routes. The Next starter's README covers its folders, environment variables, blocks and deploying to Vercel. Blocks (`pnpm kit:add`) work in both.
 
 `vp create` takes GitHub repositories and npm packages, not local folders. The starter is published to [mohammadsafia/rsk-starter](https://github.com/mohammadsafia/rsk-starter), and apps start with:
 

@@ -4,6 +4,8 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSy
 import path from 'node:path';
 
 import { kitTarget } from '../lib/kit-target.mjs';
+import { writeBlockRoutes } from './block-routes';
+import { readLock, writeLock } from './core';
 
 export type BlockLevel = 'molecule' | 'organism' | 'template';
 export type BlockRoute = {
@@ -269,8 +271,19 @@ export function generateBlockIndex(blocks: BlockMeta[], target: 'vite' | 'next' 
   ].join('\n');
 }
 
-/** Regenerates src/blocks/index.ts from the app's own blocks (their block.json), whatever the catalogue has now. */
-export function writeIndex(appDir: string) {
+/**
+ * Regenerates src/blocks/index.ts from the app's own blocks (their block.json), whatever the catalogue has now; in a
+ * Next app also their App Router files, recorded in the lock. Returns the generated files kept because the app changed
+ * them.
+ */
+export function writeIndex(appDir: string): string[] {
+  const target = kitTarget(appDir);
+  const blocks = readBlocks(appDir);
   mkdirSync(path.join(appDir, 'src/blocks'), { recursive: true });
-  writeFileSync(path.join(appDir, 'src/blocks/index.ts'), generateBlockIndex(readBlocks(appDir), kitTarget(appDir)));
+  writeFileSync(path.join(appDir, 'src/blocks/index.ts'), generateBlockIndex(blocks, target));
+  if (target !== 'next') return [];
+  const { generated, kept } = writeBlockRoutes(appDir, blocks);
+  const lock = readLock(appDir);
+  writeLock(appDir, lock.kit, new Map(Object.entries(lock.files)), lock.blocks ?? [], { generated });
+  return kept;
 }

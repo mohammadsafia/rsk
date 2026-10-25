@@ -197,6 +197,8 @@ export type UpdateResult = {
   kept: string[];
   /** Blocks the kit no longer offers: they stay in the app as its own, out of the lock. */
   released: string[];
+  /** A Next app's generated pages the app changed: the update left them as they are. */
+  keptPages: string[];
 };
 
 /** A block's files in the lock: its folder and its locale files. */
@@ -264,7 +266,7 @@ export function applyUpdate(options: {
   // Check before touching anything: a missing git must not stop an update halfway.
   if (rows.some((row) => row.status === 'conflict' && wanted(row.path)) && baseDir && !gitAvailable())
     throw new Error('kit:update needs git to merge files changed on both sides; install git and run it again.');
-  const result: UpdateResult = { updated: [], added: [], removed: [], merged: [], conflicts: [], kept: [], released };
+  const result: UpdateResult = { updated: [], added: [], removed: [], merged: [], conflicts: [], kept: [], released, keptPages: [] };
   const nextLock = new Map(Object.entries(lock.files));
 
   const copy = (file: string) => {
@@ -308,7 +310,7 @@ export function applyUpdate(options: {
   // their three-way merges need it as their base.
   if (!dryRun) writeLock(appDir, prefixes.length ? lock.kit : kit, nextLock, lock.blocks ?? []);
   // The blocks' routes, menu entries and error page follow their (maybe updated) block.json.
-  if (!dryRun && (appLock.blocks?.length || existsSync(path.join(appDir, 'src/blocks/index.ts')))) writeIndex(appDir);
+  if (!dryRun && (appLock.blocks?.length || existsSync(path.join(appDir, 'src/blocks/index.ts')))) result.keptPages = writeIndex(appDir);
   return result;
 }
 
