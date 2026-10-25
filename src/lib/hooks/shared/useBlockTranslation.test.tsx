@@ -1,5 +1,7 @@
 // @vitest-environment happy-dom
+import { I18nextProvider, initReactI18next } from 'react-i18next';
 import { act, cleanup, render, screen } from '@testing-library/react';
+import { createInstance } from 'i18next';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { LOCALES } from '@locales';
@@ -40,6 +42,23 @@ describe('useBlockTranslation', () => {
     }
     render(<Page />);
     expect(screen.getByText('Welcome')).toBeTruthy();
+  });
+
+  it('registers the copy with each i18n instance it renders under (a server makes one per request)', () => {
+    const instance = () => {
+      const created = createInstance();
+      void created.use(initReactI18next).init({ lng: 'ar', resources: { ar: {} }, initAsync: false });
+      return created;
+    };
+    for (const i18nInstance of [instance(), instance()]) {
+      render(
+        <I18nextProvider i18n={i18nInstance}>
+          <Greeting />
+        </I18nextProvider>,
+      );
+      expect(screen.getByText('مرحبا')).toBeTruthy();
+      cleanup();
+    }
   });
 
   it('keeps blocks’ copy out of the app’s eagerly loaded locales: it travels with the block', () => {

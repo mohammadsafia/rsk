@@ -1,11 +1,12 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
+import type { i18n as I18n } from 'i18next';
 
 import { type BlockNamespace, useAppTranslation } from './useAppTranslation';
 
-/** The bundles already added to i18next. */
-const registered = new WeakSet<BlockResources>();
+/** The bundles already added, per i18next instance: a server renders each request with its own. */
+const registered = new WeakMap<I18n, WeakSet<BlockResources>>();
 
 /** A block's copy, by language: its src/locales/{en,ar}/block-<id>.json. */
 export type BlockResources = { en: Record<string, unknown>; ar: Record<string, unknown> };
@@ -18,11 +19,13 @@ export type BlockResources = { en: Record<string, unknown>; ar: Record<string, u
 export const useBlockTranslation = (namespace: BlockNamespace, resources: BlockResources) => {
   const { i18n } = useTranslation();
 
-  // Once per bundle (a new one after an edit in development), merged in: the block index may have added the
-  // namespace's menu labels already.
-  if (!registered.has(resources)) {
+  // Once per bundle and instance (a new bundle after an edit in development), merged in: the block index may have
+  // added the namespace's menu labels already.
+  const added = registered.get(i18n) ?? new WeakSet<BlockResources>();
+  if (!added.has(resources)) {
     for (const [language, bundle] of Object.entries(resources)) i18n.addResourceBundle(language, namespace, bundle, true, true);
-    registered.add(resources);
+    added.add(resources);
+    registered.set(i18n, added);
   }
 
   return useAppTranslation(namespace);
