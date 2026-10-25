@@ -1,0 +1,8 @@
+{
+  "title": "Members",
+  "description": "Everyone with access to this workspace.",
+  "search": "Search members",
+  "total": "members",
+  "columns": { "name": "Name", "email": "Email", "role": "Role", "joined": "Joined" },
+  "roles": { "admin": "Admin", "member": "Member" }
+}

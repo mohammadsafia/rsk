@@ -6,9 +6,13 @@ export type MemberRole = 'admin' | 'member';
 
 export type Member = { id: string; name: string; email: string; role: MemberRole; joinedAt: string };
 
+/** The members table's cache key and page size, shared by the server that prefetches it and the page that reads it. */
+export const MEMBERS_QUERY_KEY = ['members'];
+export const MEMBERS_PAGE_SIZE = 10;
+
 export const membersApi = {
   /** A page of members; `params` is the query string the kit table builds (page, pageSize, search, sort). */
-  async list(params: string): Promise<PaginatedResult<Member>> {
+  list: async (params: string): Promise<PaginatedResult<Member>> => {
     const response = await fetch(`/api/members?${params}`, { headers: { Accept: 'application/json' } });
     if (!response.ok)
       throw { status: response.status, message: ((await response.json().catch(() => ({}))) as { message?: string }).message };
