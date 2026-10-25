@@ -12,7 +12,8 @@ import path from 'node:path';
 import { blockFiles, generateBlockIndex, readBlocks, validateBlocks } from '../kit/blocks';
 import { type KitTarget, readTree, writeLock } from '../kit/core';
 import { lockfileArgs } from './install';
-import { DOCS_ONLY_DEV_DEPENDENCIES, DOCS_ONLY_SCRIPTS, DROP, SHOWCASE_NAV_KEYS } from './manifest';
+import { DOCS_ONLY_DEV_DEPENDENCIES, DOCS_ONLY_SCRIPTS, DROP, NEXT_ONLY_DEPENDENCIES, SHOWCASE_NAV_KEYS } from './manifest';
+import { nextTransform } from './next';
 
 const ROOT = path.resolve(import.meta.dirname, '../..');
 const OVERLAY = path.join(ROOT, 'scripts/starter/overlay');
@@ -31,7 +32,6 @@ const edit = (file: string, find: string | RegExp, replace: string, out: string)
 export const STARTER_REPOS: Record<KitTarget, string> = { vite: 'mohammadsafia/rsk-starter', next: 'mohammadsafia/rsk-next-starter' };
 
 export function buildStarter(outDir: string, target: KitTarget = 'vite') {
-  if (target === 'next') throw new Error('starter:build --target next lands in Phase 3');
   const out = path.resolve(ROOT, outDir);
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
@@ -45,8 +45,10 @@ export function buildStarter(outDir: string, target: KitTarget = 'vite') {
     cpSync(path.join(ROOT, file), path.join(out, file));
   }
 
-  // 2. Maintained replacements (router, menu, starter dashboard, README).
-  cpSync(OVERLAY, out, { recursive: true });
+  // 2. Maintained replacements: what both starters share (the starter dashboard), then the target's own (Vite: router,
+  // menu, README; Next: app/, proxy, Next config).
+  cpSync(path.join(OVERLAY, 'common'), out, { recursive: true });
+  cpSync(path.join(OVERLAY, target), out, { recursive: true });
 
   // 3. Config without the docs site.
   for (const line of [
@@ -132,7 +134,8 @@ export function buildStarter(outDir: string, target: KitTarget = 'vite') {
   mkdirSync(path.join(out, 'registry'), { recursive: true });
   writeFileSync(path.join(out, 'registry/index.json'), `${JSON.stringify(blocks, null, 2)}\n`);
   mkdirSync(path.join(out, 'src/blocks'), { recursive: true });
-  writeFileSync(path.join(out, 'src/blocks/index.ts'), generateBlockIndex([]));
+  // The Vite app's block index (its router reads it); a Next app's block routes are generated files (Phase 4).
+  if (target === 'vite') writeFileSync(path.join(out, 'src/blocks/index.ts'), generateBlockIndex([]));
 
   // 4. package.json for a new app.
   const pkgFile = path.join(out, 'package.json');
@@ -149,6 +152,8 @@ export function buildStarter(outDir: string, target: KitTarget = 'vite') {
   for (const [script, command] of Object.entries(pkg.scripts))
     if (DROP.some((prefix) => prefix.startsWith('scripts/') && command.includes(prefix))) delete pkg.scripts[script];
   for (const dependency of DOCS_ONLY_DEV_DEPENDENCIES) delete pkg.devDependencies[dependency];
+  // The repo carries the Next starter's packages for its lockfile; a Vite app has none of them.
+  for (const dependency of NEXT_ONLY_DEPENDENCIES) delete pkg.devDependencies[dependency];
   // The kit updater: compare the app's kit files with the latest starter, and take the kit's changes.
   pkg.scripts['kit:status'] = 'tsx scripts/kit/kit.ts status';
   pkg.scripts['kit:update'] = 'tsx scripts/kit/kit.ts update';
@@ -156,12 +161,20 @@ export function buildStarter(outDir: string, target: KitTarget = 'vite') {
   pkg.scripts['kit:add'] = 'tsx scripts/kit/add.ts add';
   pkg.scripts['kit:remove'] = 'tsx scripts/kit/add.ts remove';
   writeFileSync(pkgFile, `${JSON.stringify(pkg, null, 2)}\n`);
+  if (target === 'next') {
+    // The Next packages back in (from the repo's own versions), and the Vite entry files out.
+    const repoPkg = JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf8')) as { devDependencies: Record<string, string> };
+    for (const dependency of NEXT_ONLY_DEPENDENCIES) pkg.devDependencies[dependency] = repoPkg.devDependencies[dependency];
+    writeFileSync(pkgFile, `${JSON.stringify(pkg, null, 2)}\n`);
+    nextTransform(out);
+  }
 
   // 4b. The kit version this app starts from, and a fingerprint of each kit file (what kit:update compares against).
   const kitCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
   writeLock(out, kitCommit, readTree(out), [], { starter: STARTER_REPOS[target], target });
 
-  // 5. Environment template: the keys, never this repo's values.
+  // 5. Environment template: the keys, never this repo's values (the Next overlay ships its own).
+  if (target === 'next') return out;
   const env = readFileSync(path.join(ROOT, '.env'), 'utf8').replace(/^﻿/, '');
   writeFileSync(path.join(out, '.env.example'), env.replace(/^([A-Z0-9_]+)=.*$/gm, '$1='));
 
