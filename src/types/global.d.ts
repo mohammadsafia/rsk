@@ -6,9 +6,3 @@ declare module 'axios' {
     withToken?: boolean;
   }
 }
-
-declare module 'material-react-table' {
-  interface MRT_ColumnDef {
-    enableRowSelection?: boolean;
-  }
-}

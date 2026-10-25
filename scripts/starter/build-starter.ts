@@ -97,6 +97,9 @@ export function buildStarter(outDir: string, target: KitTarget = 'vite') {
   const viteConfig = path.join(out, 'vite.config.ts');
   writeFileSync(viteConfig, readFileSync(viteConfig, 'utf8').replace(/\n{3,}/g, '\n\n'));
 
+  // The docs site's code-block styles: from their comment to the end of the base layer.
+  edit('src/index.css', /\n\n {2}\/\* Rehype Pretty Code[\s\S]*\n {2}\}\n(?=\}\n$)/, '\n', out);
+
   // An app keeps its real settings in .env (this repo tracks an empty one instead).
   const gitignore = path.join(out, '.gitignore');
   writeFileSync(

@@ -23,7 +23,7 @@ import {
 import { ConfirmDialog, DateNavigation } from '@components/shared';
 
 import { useToast } from '@hooks/shared';
-import { LookupHandler as LookupService } from '@api/handlers';
+import { LookupHandler as LookupService } from '@api/clinic/lookup';
 
 import { z } from 'zod';
 
