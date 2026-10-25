@@ -303,17 +303,22 @@ Opens on http://localhost:3000.
 This repository is the kit's development home: the component docs, the docs site and the clinic example pages live here. New apps start from a generated starter that has the kit and the app shell, but none of the showcase.
 
 ```bash
-pnpm starter:build [outDir]   # write the starter (default: .starter)
-pnpm starter:verify           # build it in a temp folder, install offline, run tsc, vp check, vp test and vp build
+pnpm starter:build [outDir]                 # write the Vite starter (default: .starter)
+pnpm starter:build --target next [outDir]   # write the Next.js starter
+pnpm starter:verify                         # build it in a temp folder, install offline, run tsc, vp check, vp test and vp build
+pnpm starter:verify -- --target next        # the same for the Next starter, then serve it, audit it and sign in through it
 ```
+
+**Vite or Next?** Both starters ship the same kit. Pick the Vite starter for an app that runs behind a sign-in and is served as static files. Pick the Next starter when pages need server rendering (SEO, shared links that preview), the session should live in an httpOnly cookie, or the app needs its own server routes. The Next starter's README covers its folders, environment variables and deploying to Vercel. Blocks (`pnpm kit:add`) work in the Vite starter only, for now.
 
 `vp create` takes GitHub repositories and npm packages, not local folders. The starter is published to [mohammadsafia/rsk-starter](https://github.com/mohammadsafia/rsk-starter), and apps start with:
 
 ```bash
-vp create github:mohammadsafia/rsk-starter -- my-app
+vp create github:mohammadsafia/rsk-starter -- my-app        # Vite
+vp create github:mohammadsafia/rsk-next-starter -- my-app   # Next.js
 ```
 
-On every push to `main`, the `Starter sync` workflow (`.github/workflows/starter-sync.yml`) runs `pnpm starter:verify`, then builds the starter and commits it to `rsk-starter` as `sync: rsk@<sha> — <subject>`. A starter that fails verification is never published. The workflow pushes with the `STARTER_DEPLOY_KEY` secret, a deploy key with write access to `rsk-starter` only.
+Every pull request runs the `Starter verify` workflow (`.github/workflows/starter-verify.yml`), which verifies both starters without secrets. On every push to `main`, the `Starter sync` workflow (`.github/workflows/starter-sync.yml`) runs `pnpm starter:verify` for each starter, then builds it and commits it to its repository as `sync: rsk@<sha> — <subject>`. A starter that fails verification is never published, and one failing doesn't hold back the other. Each push uses its own deploy key, with write access to that repository only: `STARTER_DEPLOY_KEY` for `rsk-starter`, `NEXT_STARTER_DEPLOY_KEY` for `rsk-next-starter`.
 
 The `-- my-app` names the folder. Without it, `vp create` names it after the repository. For a private registry, the starter can instead be bundled under `templates/` in an `@org/create` package, and apps start with `vp create @org:web`. Rename `.gitignore` to `_gitignore` there, because `npm publish` drops `.gitignore` files.
 

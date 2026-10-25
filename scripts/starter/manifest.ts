@@ -41,6 +41,7 @@ export const DROP = [
   'playwright.config.ts',
   '.github/workflows/visual.yml',
   '.github/workflows/starter-sync.yml',
+  '.github/workflows/starter-verify.yml',
   'docs/',
   '.superpowers/',
   '.claude/',

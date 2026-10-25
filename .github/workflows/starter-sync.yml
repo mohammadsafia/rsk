@@ -1,16 +1,12 @@
-# Publishes the generated app starter to mohammadsafia/rsk-starter, so
-# `vp create github:mohammadsafia/rsk-starter -- my-app` always has the latest kit.
-# Nothing is pushed unless `pnpm starter:verify` passes.
+# Publishes the generated starters, each to its own repository, so `vp create github:mohammadsafia/rsk-starter -- my-app`
+# (Vite) and `vp create github:mohammadsafia/rsk-next-starter -- my-app` (Next) always have the latest kit. Nothing is
+# pushed unless that starter's `pnpm starter:verify` passes; one failing doesn't stop the other.
 name: Starter sync
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
-
-concurrency:
-  group: starter-sync
-  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -21,7 +17,16 @@ env:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
+    concurrency:
+      group: starter-sync-${{ matrix.target }}
+      cancel-in-progress: false
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: vite, repo: rsk-starter, key: STARTER_DEPLOY_KEY }
+          - { target: next, repo: rsk-next-starter, key: NEXT_STARTER_DEPLOY_KEY }
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -41,18 +46,19 @@ jobs:
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Verify the starter (type check, lint, tests, build, first-load budget)
-        run: pnpm starter:verify
+      - name: Verify the ${{ matrix.target }} starter (type check, lint, tests, build, first-load budget)
+        run: pnpm starter:verify -- --target ${{ matrix.target }}
 
       - name: Build the starter
-        run: pnpm starter:build "$RUNNER_TEMP/starter"
+        run: pnpm starter:build --target ${{ matrix.target }} "$RUNNER_TEMP/starter"
 
+      # The deploy key is loaded only now, after the starter verified and built.
       - uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
         with:
-          ssh-private-key: ${{ secrets.STARTER_DEPLOY_KEY }}
+          ssh-private-key: ${{ secrets[matrix.key] }}
 
-      - name: Clone rsk-starter
-        run: git clone --depth 1 git@github.com:mohammadsafia/rsk-starter.git "$RUNNER_TEMP/publish"
+      - name: Clone ${{ matrix.repo }}
+        run: git clone --depth 1 git@github.com:mohammadsafia/${{ matrix.repo }}.git "$RUNNER_TEMP/publish"
 
       - name: Commit the starter
         run: pnpm starter:publish "$RUNNER_TEMP/starter" "$RUNNER_TEMP/publish"
