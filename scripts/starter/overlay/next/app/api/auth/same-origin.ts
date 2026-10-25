@@ -2,9 +2,21 @@
 export function sameOrigin(request: Request): boolean {
   if (!(request.headers.get('content-type') ?? '').startsWith('application/json')) return false;
   const origin = request.headers.get('origin');
-  if (origin) return origin === new URL(request.url).origin;
+  if (origin) return hostOf(origin) === addressedHost(request);
   return request.headers.get('sec-fetch-site') === 'same-origin';
 }
+
+const hostOf = (origin: string): string | null => {
+  try {
+    return new URL(origin).host;
+  } catch {
+    return null;
+  }
+};
+
+/** The host the browser sent the request to: a proxy's forwarded host, else Host (Next rewrites request.url's). */
+const addressedHost = (request: Request): string =>
+  request.headers.get('x-forwarded-host')?.split(',')[0].trim() || request.headers.get('host') || new URL(request.url).host;
 
 /** The value of one cookie the request carries. */
 export const requestCookie = (request: Request, name: string): string | undefined =>

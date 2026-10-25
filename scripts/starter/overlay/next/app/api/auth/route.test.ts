@@ -50,6 +50,28 @@ describe('sign-in route handlers', () => {
     expect((await login(post('/api/auth/login', { email: 1 }))).status).toBe(400);
   });
 
+  it('compares the origin with the host the browser addressed (Next and proxies rewrite request.url)', async () => {
+    const asServed = (origin: string) =>
+      new Request('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(DEMO),
+        headers: { 'Content-Type': 'application/json', Origin: origin, Host: '127.0.0.1:5410' },
+      });
+    expect((await login(asServed('http://127.0.0.1:5410'))).status).toBe(200);
+    expect((await login(asServed('http://evil.example'))).status).toBe(403);
+    const forwarded = new Request('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(DEMO),
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: 'https://app.example.com',
+        Host: 'internal:3000',
+        'X-Forwarded-Host': 'app.example.com',
+      },
+    });
+    expect((await login(forwarded)).status).toBe(200);
+  });
+
   it('signs out by expiring the cookie', async () => {
     const response = await logout(post('/api/auth/logout', {}));
     expect(response.status).toBe(204);

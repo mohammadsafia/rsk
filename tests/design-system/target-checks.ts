@@ -11,6 +11,8 @@ type Pkg = { dependencies?: Record<string, string>; devDependencies?: Record<str
 const NEXT_CONFIGS = ['next.config.ts', 'next.config.mjs', 'next.config.js'];
 /** A Next app's root layout: metadata, icons and fonts live there. */
 export const NEXT_LAYOUT = 'app/[lang]/layout.tsx';
+/** Where a Next app may load its next/font families, shared by its root documents. */
+export const NEXT_FONTS = 'app/fonts.ts';
 
 const read = (root: string, file: string): string => (existsSync(path.join(root, file)) ? readFileSync(path.join(root, file), 'utf8') : '');
 const readPkg = (root: string): Pkg => JSON.parse(read(root, 'package.json') || '{}') as Pkg;
@@ -159,9 +161,14 @@ export function checkA11yScript(root: string): string[] {
 /** The three approved families load: Google Fonts in a Vite app's index.css, next/font in a Next app's root layout. */
 export function checkFontLoading(root: string): string[] {
   if (kitTarget(root) === 'next') {
-    const layout = read(root, NEXT_LAYOUT);
+    // The root layout, or the fonts module it shares with the global 404.
+    const layout = `${read(root, NEXT_LAYOUT)}\n${read(root, NEXT_FONTS)}`;
     return [
-      ...missing(layout, ["from 'next/font/google'", 'Schibsted_Grotesk', 'Noto_Kufi_Arabic', 'Spline_Sans_Mono'], NEXT_LAYOUT),
+      ...missing(
+        layout,
+        ["from 'next/font/google'", 'Schibsted_Grotesk', 'Noto_Kufi_Arabic', 'Spline_Sans_Mono'],
+        `${NEXT_LAYOUT} (or ${NEXT_FONTS})`,
+      ),
       ...(/DM_Sans|Fraunces|IBM_Plex/.test(layout) ? [`${NEXT_LAYOUT} loads an unapproved family`] : []),
     ];
   }

@@ -11,6 +11,9 @@ const config: NextConfig = {
   // The kit is written for the React Compiler (see vite.config.ts's lint rules).
   reactCompiler: true,
   poweredByHeader: false,
+  // The root layout sits under [lang], so a URL no route matches gets app/global-not-found.tsx (a full page in the
+  // visitor's language) instead of Next's own 404 outside the app.
+  experimental: { globalNotFound: true },
   // The app's settings (paths, strictness) live in tsconfig.app.json; next build reads them from there.
   typescript: { tsconfigPath: 'tsconfig.app.json' },
   async headers() {

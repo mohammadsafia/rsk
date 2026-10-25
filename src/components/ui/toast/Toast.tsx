@@ -7,7 +7,7 @@ import * as ToastPrimitives from '@radix-ui/react-toast';
 // !Direct import: toastVariants reads this at module load, before the ui barrel reaches ./popover
 import { floatingSurfaceClassName } from '@components/ui/popover/floating';
 
-import { useAppTranslation } from '@hooks/shared';
+import { useAppTranslation, useIsHydrated } from '@hooks/shared';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@utils';
@@ -94,13 +94,15 @@ const TONE_ICON: Record<ToastTone, { Icon: typeof Info; className: string }> = {
 
 /**
  * Portalled to <body>: rendered inside the app shell, it would share the shell's stacking context, and while a dialog
- * recedes the page (motion page depth) its toasts would sit dimmed under the dialog's overlay.
+ * recedes the page (motion page depth) its toasts would sit dimmed under the dialog's overlay. A server can't portal,
+ * so on a server-rendered page the viewport arrives right after hydration (no toast can show before then anyway).
  */
 const ToastViewport: FC<ToastViewportProps> = ({ className, position, ...props }) => {
+  const hydrated = useIsHydrated();
   const viewport = (
     <ToastPrimitives.Viewport data-slot="toast-viewport" className={cn(viewportVariants({ position }), className)} {...props} />
   );
-  return typeof document === 'undefined' ? viewport : createPortal(viewport, document.body);
+  return hydrated ? createPortal(viewport, document.body) : null;
 };
 
 const ToastTitle: FC<ToastTitleProps> = ({ className, ...props }) => (
