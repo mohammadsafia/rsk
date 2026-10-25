@@ -13,6 +13,7 @@ const PAGE = '<!doctype html><html><head><script src="/app.js"></script></head><
 
 let server;
 const cookies = [];
+const logins = [];
 
 const start = () =>
   new Promise((resolve) => {
@@ -20,6 +21,16 @@ const start = () =>
       if (request.url === '/app.js') {
         response.setHeader('content-type', 'text/javascript');
         response.end(SCRIPT);
+        return;
+      }
+      if (request.method === 'POST' && request.url === '/api/auth/login') {
+        let body = '';
+        request.on('data', (chunk) => (body += chunk));
+        request.on('end', () => {
+          logins.push({ body: JSON.parse(body), origin: request.headers.origin, type: request.headers['content-type'] });
+          response.setHeader('set-cookie', 'rsk_session=sealed; Path=/; HttpOnly');
+          response.end('{}');
+        });
         return;
       }
       cookies.push(request.headers.cookie ?? '');
@@ -32,6 +43,7 @@ const start = () =>
 afterEach(() => {
   server?.close();
   cookies.length = 0;
+  logins.length = 0;
 });
 
 describe('first-load against a running server', () => {
@@ -43,10 +55,11 @@ describe('first-load against a running server', () => {
     expect(result.gzipKb).toBeGreaterThan(1);
   });
 
-  it('signs in by a session cookie the server receives, when --seed cookie', async () => {
+  it('signs in through the app’s own sign-in endpoint, when --seed api, so the server’s cookie comes with each page', async () => {
     const url = await start();
-    await measureFirstLoad({ url, routes: ['/'], session: true, seed: 'cookie' });
-    expect(cookies.at(-1)).toMatch(/(^|; )session=/);
+    await measureFirstLoad({ url, routes: ['/'], session: true, seed: 'api' });
+    expect(logins).toEqual([{ body: { email: 'demo@example.com', password: 'demo-password' }, origin: url, type: 'application/json' }]);
+    expect(cookies.at(-1)).toMatch(/(^|; )rsk_session=sealed/);
   });
 
   it('measures each route under each language with --lang-in path', async () => {

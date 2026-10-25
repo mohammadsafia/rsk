@@ -1,8 +1,9 @@
-import { Link } from 'react-router';
+'use client';
 
 import { Button } from '@components/ui';
 import { EmptyState, PageHeader } from '@components/shared';
 
+import { KitLink } from '@contexts';
 import { useAppTranslation } from '@hooks/shared';
 
 import { FULL_ROUTES_PATH } from './routes';
@@ -15,7 +16,7 @@ export function NotFound() {
       <EmptyState kind="no-results" titleAs="h1" title={t('notFound.title')} description={t('notFound.description')}>
         <EmptyState.Actions>
           <Button variant="outline" asChild>
-            <Link to={FULL_ROUTES_PATH.HOME.INDEX}>{t('notFound.backHome')}</Link>
+            <KitLink href={FULL_ROUTES_PATH.HOME.INDEX}>{t('notFound.backHome')}</KitLink>
           </Button>
         </EmptyState.Actions>
       </EmptyState>

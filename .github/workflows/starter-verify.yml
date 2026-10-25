@@ -1,0 +1,44 @@
+# Verifies both starters on every pull request: the Vite one (with the upgrade check for apps made before) and the
+# Next one (built, served, audited and walked through in a browser). Read-only: no secrets, no pushes.
+name: Starter verify
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [vite, next]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          # The upgrade check fetches the published kit it starts from by itself.
+          fetch-depth: 1
+          persist-credentials: false
+
+      # The pnpm version comes from package.json `packageManager`.
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # The first-load budget, the accessibility audit and the Next smoke tests drive headless Chromium.
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Verify the ${{ matrix.target }} starter
+        run: pnpm starter:verify -- --target ${{ matrix.target }}

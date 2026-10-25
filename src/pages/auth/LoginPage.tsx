@@ -1,5 +1,6 @@
+'use client';
+
 import { useState } from 'react';
-import { Link } from 'react-router';
 
 import { useForm } from 'react-hook-form';
 
@@ -8,6 +9,7 @@ import { Alert, Button } from '@components/ui';
 import { FormContainer, FormInput } from '@components/forms';
 import { Conditional } from '@components/utils';
 
+import { KitLink } from '@contexts';
 import { useAppTranslation, useAuth } from '@hooks/shared';
 
 import { authApi } from '@api/handlers/auth';
@@ -19,14 +21,24 @@ import { emailRules, requiredRules } from './fields';
 
 type LoginForm = { email: string; password: string };
 
+type LoginPageProps = {
+  /**
+   * The demo account to show, from whoever knows whether the mock is on (a Next app's server). Left out, the app
+   * config decides (the Vite app); null shows none.
+   */
+  demo?: LoginForm | null;
+};
+
 /** Sign in. On success the session starts and AuthLayout sends the person on to ?next= (or the dashboard). */
-function LoginPage() {
+function LoginPage({ demo }: LoginPageProps) {
   const { signIn } = useAuth();
   const { t } = useAppTranslation('auth');
 
   const form = useForm<LoginForm>({ defaultValues: { email: '', password: '' } });
 
   const [failure, setFailure] = useState<string | null>(null);
+
+  const shownDemo = demo === undefined ? (APP_CONFIGURATIONS.AUTH_MOCK ? DEMO_CREDENTIALS : null) : demo;
 
   const handleSubmit = async (values: LoginForm) => {
     setFailure(null);
@@ -48,7 +60,7 @@ function LoginPage() {
         <p className="text-fg-muted text-sm">{t('login.subtitle')}</p>
       </header>
 
-      <Conditional.If condition={APP_CONFIGURATIONS.AUTH_MOCK}>
+      <Conditional.If condition={!!shownDemo}>
         <Alert tone="info">
           <Alert.Title>{t('login.demoTitle')}</Alert.Title>
           <Alert.Description>
@@ -56,11 +68,11 @@ function LoginPage() {
             <dl className="grid grid-cols-[auto_1fr] gap-x-2">
               <dt>{t('login.email')}</dt>
               <dd dir="ltr" className="text-fg justify-self-start font-mono">
-                {DEMO_CREDENTIALS.email}
+                {shownDemo?.email}
               </dd>
               <dt>{t('login.password')}</dt>
               <dd dir="ltr" className="text-fg justify-self-start font-mono">
-                {DEMO_CREDENTIALS.password}
+                {shownDemo?.password}
               </dd>
             </dl>
           </Alert.Description>
@@ -93,12 +105,12 @@ function LoginPage() {
           rules={requiredRules(t('login.passwordRequired'))}
         />
 
-        <Link
-          to={FULL_ROUTES_PATH.AUTH.FORGOT_PASSWORD}
+        <KitLink
+          href={FULL_ROUTES_PATH.AUTH.FORGOT_PASSWORD}
           className="text-fg-muted hover:text-fg focus-ring self-end rounded-sm text-sm underline-offset-4 hover:underline"
         >
           {t('login.forgot')}
-        </Link>
+        </KitLink>
 
         <Button type="submit" loading={form.formState.isSubmitting}>
           {t('login.submit')}

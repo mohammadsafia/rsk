@@ -67,6 +67,16 @@ describe('kit:add', () => {
     expect(result.install).toBe('pnpm add date-fns@^4.1.0');
   });
 
+  it('refuses in a Next app until its block routes arrive, and writes nothing', () => {
+    const { app, catalogue } = setup();
+    writeLock(app, 'aaaaaaa', readTree(app), [], { starter: 'mohammadsafia/rsk-next-starter', target: 'next' });
+    const before = read(app, 'kit.lock.json');
+    expect(() => addBlocks({ appDir: app, catalogue, ids: ['b'] })).toThrow('Blocks in a Next app arrive with the next kit version.');
+    expect(() => removeBlocks({ appDir: app, ids: ['b'] })).toThrow('Blocks in a Next app arrive with the next kit version.');
+    expect(read(app, 'kit.lock.json')).toBe(before);
+    expect(existsSync(path.join(app, 'src/blocks/a'))).toBe(false);
+  });
+
   it('refuses to overwrite a file the app already has with different content, and writes nothing', () => {
     const { app, catalogue } = setup();
     put(app, 'src/blocks/a/index.ts', 'my own\n');
@@ -144,7 +154,9 @@ describe('kit:add and the app’s kit version', () => {
     expect(wiringGaps(app).join('\n')).toMatch(/@locales\/\*/);
     // The starter's wiring: its overlay in the kit, its own src/routes in an app made from it.
     const root = path.resolve(import.meta.dirname, '../..');
-    const overlay = path.join(root, 'scripts/starter/overlay');
+    // The Vite overlay (overlay/vite once the overlay splits by target).
+    const split = path.join(root, 'scripts/starter/overlay/vite');
+    const overlay = existsSync(split) ? split : path.join(root, 'scripts/starter/overlay');
     expect(wiringGaps(existsSync(overlay) ? overlay : root, root)).toEqual([]);
   });
 });

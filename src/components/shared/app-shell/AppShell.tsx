@@ -15,12 +15,14 @@ import { AppShellContext, type AppShellState, useAppShell } from './AppShellCont
 
 const DEFAULT_STORAGE_KEY = 'rsk:sidebar-collapsed';
 
-const readStored = (key: string | null): boolean => {
-  if (!key) return false;
+/** The stored choice, or null when there is none (no key, nothing stored, storage blocked). */
+const readStored = (key: string | null): boolean | null => {
+  if (!key) return null;
   try {
-    return localStorage.getItem(key) === 'true';
+    const value = localStorage.getItem(key);
+    return value === null ? null : value === 'true';
   } catch {
-    return false;
+    return null;
   }
 };
 
@@ -39,6 +41,8 @@ export type AppShellProps = {
   storageKey?: string | null;
   /** The collapsed state a server renders before storage can be read (a Next app reads it from a cookie). */
   initialCollapsed?: boolean;
+  /** Called when the person collapses or expands the sidebar, e.g. to keep the choice in a cookie a server reads. */
+  onCollapsedChange?: (collapsed: boolean) => void;
   className?: string;
   children: ReactNode;
 };
@@ -114,7 +118,14 @@ const MenuButton: FC<{ className?: string }> = ({ className }) => {
   );
 };
 
-const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY, initialCollapsed = false, className, children }) => {
+const AppShell: AppShellComponent = ({
+  sidebar,
+  storageKey = DEFAULT_STORAGE_KEY,
+  initialCollapsed = false,
+  onCollapsedChange,
+  className,
+  children,
+}) => {
   const { t } = useAppTranslation('nav');
   const hydrated = useIsHydrated();
   const shellId = useId().replaceAll(':', '');
@@ -124,18 +135,20 @@ const AppShell: AppShellComponent = ({ sidebar, storageKey = DEFAULT_STORAGE_KEY
   const asideRef = useRef<HTMLElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
 
-  // Until the person toggles it: the stored choice once storage is readable (from the first render under createRoot).
+  // Until the person toggles it: the stored choice once storage is readable (from the first render under createRoot),
+  // else the initial state (with no storage, the server's state holds through hydration).
   const [chosen, setChosen] = useState<boolean | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const collapsed = chosen ?? (hydrated ? readStored(storageKey) : initialCollapsed);
+  const collapsed = chosen ?? (hydrated ? (readStored(storageKey) ?? initialCollapsed) : initialCollapsed);
 
   const setCollapsed = useCallback(
     (value: boolean) => {
       setChosen(value);
       writeStored(storageKey, value);
+      onCollapsedChange?.(value);
     },
-    [storageKey],
+    [storageKey, onCollapsedChange],
   );
 
   const closeMobile = useCallback((restoreFocus = false) => {

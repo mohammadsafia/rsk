@@ -11,7 +11,8 @@ import { adapterGaps } from '../../scripts/kit/gaps';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 // In the kit's own repository the starter's routes live in its overlay; in an app, in its own src/routes.
-const OVERLAY = path.join(ROOT, 'scripts/starter/overlay');
+const SPLIT = path.join(ROOT, 'scripts/starter/overlay/vite');
+const OVERLAY = existsSync(SPLIT) ? SPLIT : path.join(ROOT, 'scripts/starter/overlay');
 
 describe('kit wiring', () => {
   it('the app wires everything the kit needs (src/routes/routerAdapter.tsx, block routes)', () => {

@@ -1,5 +1,7 @@
 // @vitest-environment happy-dom
 import { act, cleanup, render, screen } from '@testing-library/react';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
 import { Toast } from '@components/ui';
@@ -126,5 +128,31 @@ describe('Toast', () => {
       window.dispatchEvent(new Event('focus'));
     });
     expect(toast.dataset.paused).toBeUndefined();
+  });
+
+  it('renders on a server and hydrates without a mismatch, then portals its viewport (a Next app)', async () => {
+    const tree = (
+      <Toast.Provider>
+        <Toast.Viewport />
+      </Toast.Provider>
+    );
+    // On a server there is no document: nothing to portal into.
+    const saved = Object.getOwnPropertyDescriptor(globalThis, 'document')!;
+    Object.defineProperty(globalThis, 'document', { value: undefined, configurable: true });
+    let html = '';
+    try {
+      html = renderToString(tree);
+    } finally {
+      Object.defineProperty(globalThis, 'document', saved);
+    }
+    expect(() => renderToString(tree)).not.toThrow();
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    document.body.append(container);
+    const errors: unknown[] = [];
+    await act(async () => void hydrateRoot(container, tree, { onRecoverableError: (error) => errors.push(error) }));
+    expect(errors).toEqual([]);
+    expect(document.body.querySelector(':scope > [data-slot="toast-viewport"], :scope > * > [data-slot="toast-viewport"]')).toBeTruthy();
+    container.remove();
   });
 });

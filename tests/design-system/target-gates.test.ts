@@ -95,7 +95,7 @@ describe('target-aware gates in a Next app', () => {
   it('catches missing favicon metadata and fonts in the root layout', () => {
     const dir = nextApp({ [NEXT_LAYOUT]: 'export const metadata = {};' });
     expect(checkFaviconLinks(dir)).toContain(`${NEXT_LAYOUT} lacks icons:`);
-    expect(checkFontLoading(dir)).toContain(`${NEXT_LAYOUT} lacks from 'next/font/google'`);
+    expect(checkFontLoading(dir)).toContain(`${NEXT_LAYOUT} (or app/fonts.ts) lacks from 'next/font/google'`);
   });
 
   it('catches an app project that leaves out app/ or Next’s types', () => {
@@ -105,6 +105,19 @@ describe('target-aware gates in a Next app', () => {
       'tsconfig.app.json does not include next-env.d.ts',
       'tsconfig.app.json does not include .next/types/**/*.ts',
     ]);
+  });
+
+  it('reads tsconfig files the way TypeScript does: block comments and trailing commas', () => {
+    const dir = nextApp({
+      'tsconfig.app.json': `{\n  "compilerOptions": {\n    /* Bundler mode */\n    "strict": true, // on\n  },\n  "include": ["src", "app", "next-env.d.ts", ".next/types/**/*.ts",],\n}\n`,
+    });
+    expect(checkTypecheckProjects(dir)).toEqual([]);
+  });
+
+  it('finds the fonts in app/fonts.ts, which the root layout and the global 404 share', () => {
+    const fonts = "import { Noto_Kufi_Arabic, Schibsted_Grotesk, Spline_Sans_Mono } from 'next/font/google';";
+    const dir = nextApp({ [NEXT_LAYOUT]: LAYOUT.split('\n').slice(1).join('\n'), 'app/fonts.ts': fonts });
+    expect(checkFontLoading(dir)).toEqual([]);
   });
 
   it('catches an index.html left in a Next app', () => {

@@ -1,10 +1,10 @@
-import { useNavigate } from 'react-router';
+'use client';
 
 import { Avatar, Button, DropdownMenu, IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
 import { AppShell, LanguageSwitcher, ThemeSwitcher } from '@components/shared';
 
-import { useCommandPalette } from '@contexts';
+import { useCommandPalette, useKitNavigate } from '@contexts';
 import { useAppTranslation, useAuth } from '@hooks/shared';
 
 import { FULL_ROUTES_PATH } from '@routes';
@@ -12,7 +12,7 @@ import { FULL_ROUTES_PATH } from '@routes';
 import { Bell, LogOut, Search, Settings, User } from 'lucide-react';
 
 function AppHeader() {
-  const navigate = useNavigate();
+  const navigate = useKitNavigate();
   const { t } = useAppTranslation('header');
   const { currentUser, signOut } = useAuth();
   const { toggle } = useCommandPalette();

@@ -5,8 +5,8 @@
 //   node scripts/bundle/first-load.mjs --dist dist --budget 150    # fail a route over 150 KB gz
 //   node scripts/bundle/first-load.mjs --dist dist --budget starter --routes /,/dashboard --redirects /=/dashboard --session
 //                                      (--session: signed in as the mock backend's demo user)
-//   node scripts/bundle/first-load.mjs --url http://localhost:3000 --routes /login --session --seed cookie --lang-in path
-//                                      (a running server, e.g. a Next app's `next start`: signed in by cookie, each
+//   node scripts/bundle/first-load.mjs --url http://localhost:3000 --routes /login --session --seed api --lang-in path
+//                                      (a running server, e.g. a Next app's `next start`: signed in through its API, each
 //                                      route measured under /en and /ar)
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
@@ -28,10 +28,18 @@ export { localizedRoutes };
  */
 export const BUNDLE_BUDGET_KB = 210;
 
-/** --budget: 'starter' is BUNDLE_BUDGET_KB, a number is itself, absent means report only. */
+/**
+ * The Next starter's first-load budget per route, in KB of gzipped JS: 290.5 KB measured on /settings when the budget
+ * was set (2026-10-25; sign-in 283.9; Next and React alone are ~132), plus ~5%. Raising it is a decision: say why in
+ * the commit.
+ */
+export const NEXT_BUDGET_KB = 306;
+
+/** --budget: 'starter' is BUNDLE_BUDGET_KB, 'next-starter' NEXT_BUDGET_KB, a number is itself, absent means report only. */
 export function resolveBudget(value) {
   if (value === undefined) return undefined;
   if (value === 'starter') return BUNDLE_BUDGET_KB;
+  if (value === 'next-starter') return NEXT_BUDGET_KB;
   const budget = Number(value);
   if (!Number.isFinite(budget) || budget <= 0) throw new Error(`--budget must be a number of KB or "starter", not "${value}"`);
   return budget;
@@ -115,6 +123,11 @@ export async function measureFirstLoad({ dist, url, routes, localesDir, session 
       // A fresh cache per route: each measures a first visit.
       await page.route('**/*', (route) => route.continue());
       const errors = [];
+      // A server-rendered page whose browser render differs (React logs it): the HTML was wrong, then replaced.
+      const hydrationErrors = [];
+      page.on('console', (message) => {
+        if (message.type() === 'error' && /hydrat|did not match/i.test(message.text())) hydrationErrors.push(message.text());
+      });
       const scripts = new Map();
       page.on('pageerror', (error) => errors.push(String(error)));
       const reads = [];
@@ -144,6 +157,7 @@ export async function measureFirstLoad({ dist, url, routes, localesDir, session 
         gzipKb: Math.round(([...scripts.values()].reduce((sum, size) => sum + size, 0) / 1024) * 10) / 10,
         files: [...scripts.keys()],
         errors,
+        hydrationErrors,
         rawKeys: rawKeysIn(text, keys),
       });
       await page.close();
@@ -180,6 +194,7 @@ export function failuresOf(result, { budget, redirects }) {
     budget !== undefined && result.gzipKb > budget ? `over ${budget} KB` : '',
     result.errors.length ? `${result.errors.length} errors: ${result.errors[0].slice(0, 120)}` : '',
     result.rawKeys.length ? `raw keys: ${result.rawKeys.slice(0, 5).join(', ')}` : '',
+    result.hydrationErrors?.length ? `hydration errors: ${result.hydrationErrors[0].slice(0, 120)}` : '',
     redirects && result.landed !== expected ? `redirected to ${result.landed}` : '',
   ].filter(Boolean);
 }

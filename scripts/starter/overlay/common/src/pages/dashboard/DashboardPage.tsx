@@ -1,3 +1,5 @@
+'use client';
+
 import { EmptyState } from '@components/ui';
 import { PageHeader } from '@components/shared';
 

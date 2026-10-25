@@ -34,7 +34,10 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
   // While bulk actions show, the toolbar stays mounted (typed search survives) but hidden.
   const hasSelection = bulkActionsMounted && Object.values(table.state.rowSelection).some(Boolean);
 
-  const [search, setSearch] = useState(table.state.globalFilter ?? '');
+  // What the person typed; until they type, the table's own search (which a server-rendered page restores after
+  // hydrating, so the box follows it).
+  const [typed, setTyped] = useState<string | null>(null);
+  const search = typed ?? table.state.globalFilter ?? '';
   const debouncedSearch = useDebounce(search, 500);
 
   // Push the search only when the debounced text changes. In TanStack Table v9 the `table` object changes identity
@@ -75,7 +78,7 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
             aria-label={placeholder ?? t('search')}
             placeholder={placeholder ?? t('searchHere')}
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => setTyped(event.target.value)}
             className="ps-8"
           />
         </div>
@@ -100,7 +103,7 @@ const DataTableToolbar: FC<ToolbarProps> = ({ totalCount, totalLabel, placeholde
               table.resetColumnFilters(true);
               table.setGlobalFilter('');
             }
-            setSearch('');
+            setTyped('');
           }}
         >
           {t('clearFilters')}

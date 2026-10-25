@@ -41,6 +41,7 @@ export const DROP = [
   'playwright.config.ts',
   '.github/workflows/visual.yml',
   '.github/workflows/starter-sync.yml',
+  '.github/workflows/starter-verify.yml',
   'docs/',
   '.superpowers/',
   '.claude/',
@@ -49,6 +50,8 @@ export const DROP = [
   'skills-lock.json',
   'AGENTS.md',
   '.env',
+  // Deploys this repository's docs site.
+  'vercel.json',
 ] as const;
 
 /** Dependencies only the docs site uses. */
@@ -88,3 +91,35 @@ export const LEFTOVER_PATTERNS = [
   /__RSK_DOC_COUNTS__/,
   /\.mdx\b/,
 ] as const;
+
+/** Dependencies only the Next starter uses: the repo has them so its lockfile and store cover the Next build. */
+export const NEXT_ONLY_DEPENDENCIES = ['next', 'server-only', '@tailwindcss/postcss', 'postcss'] as const;
+
+/** Of those, the ones a Next app runs on (dependencies); the rest stay devDependencies. */
+export const NEXT_RUNTIME_DEPENDENCIES = ['next', 'server-only'] as const;
+
+/**
+ * Files of the Vite starter a Next starter replaces with app/, proxy.ts and next.config.ts (or doesn't need). The kit's
+ * own files are never here: both starters ship the same kit (kit.lock.json `files` are identical).
+ */
+export const NEXT_DROP = [
+  'index.html',
+  'src/main.tsx',
+  'src/bootstrap.tsx',
+  'src/bootstrap.test.tsx',
+  'src/App.tsx',
+  'src/vite-env.d.ts',
+  'src/i18n.test.ts',
+  'src/routes/router.tsx',
+  'src/routes/RoutePlaceholders.test.tsx',
+  'src/layouts/auth-guard/',
+  'src/layouts/error-boundary/',
+  'src/layouts/app-layout/AppLayout.tsx',
+  'src/layouts/app-layout/AppLayout.test.tsx',
+  'src/layouts/auth-layout/AuthLayout.tsx',
+  'src/pages/auth/auth-flow.test.tsx',
+  'src/blocks/index.ts',
+] as const;
+
+/** Vite-only scripts a Next app doesn't have (it builds and serves with next). */
+export const NEXT_DROP_SCRIPTS = ['preview', 'build:dev', 'bundle:report'] as const;

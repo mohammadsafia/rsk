@@ -51,6 +51,11 @@ const source = (catalogue: Catalogue, id: string, file: string) => path.join(cat
  * What an app made before blocks still lacks for added blocks to work: the wiring lives in files the app owns, so
  * kit:update can't add it. [] when the app has it. `configDir` holds tsconfig.app.json and src/locales (the app).
  */
+/** A Next app's block routes are generated files that arrive with the next kit version: until then, blocks wait. */
+const refuseInNext = (appDir: string): void => {
+  if (kitTarget(appDir) === 'next') throw new Error('Blocks in a Next app arrive with the next kit version.');
+};
+
 export function wiringGaps(appDir: string, configDir = appDir): string[] {
   // A Next app's block routes are generated files (Phase 4), not wiring the app adds by hand.
   if (kitTarget(appDir) === 'next') return [];
@@ -87,6 +92,7 @@ export function addBlocks({
   ids: string[];
   dryRun?: boolean;
 }): AddResult {
+  refuseInNext(appDir);
   const lock = readLock(appDir);
   // Blocks are built on the kit: one from a newer kit than the app's may use what the app doesn't have yet, and its
   // later updates would merge against the wrong base.
@@ -140,6 +146,7 @@ export function addBlocks({
  * its blocks depends on one, unless `force`. Needs only the app (no catalogue).
  */
 export function removeBlocks({ appDir, ids, force = false }: { appDir: string; ids: string[]; force?: boolean }): RemoveResult {
+  refuseInNext(appDir);
   const lock = readLock(appDir);
   const have = lock.blocks ?? [];
   for (const id of ids) if (!have.includes(id)) throw new Error(`"${id}" isn't added to this app.`);

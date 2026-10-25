@@ -132,3 +132,103 @@ describe('buildStarter', () => {
     expect(pkg.scripts['visual:test']).toBeUndefined();
   });
 });
+
+describe('buildStarter --target next', () => {
+  let next = '';
+  let vite = '';
+  const json = <T>(dir: string, file: string) => JSON.parse(readFileSync(path.join(dir, file), 'utf8')) as T;
+  type Pkg = {
+    scripts: Record<string, string>;
+    dependencies: Record<string, string>;
+    devDependencies: Record<string, string>;
+    sideEffects: string[];
+  };
+
+  beforeAll(() => {
+    next = buildStarter(mkdtempSync(path.join(os.tmpdir(), 'rsk-next-starter-test-')), 'next');
+    vite = out;
+  });
+
+  afterAll(() => {
+    rmSync(next, { recursive: true, force: true });
+  });
+
+  it('ships the same kit files as the Vite starter (one kit, two starters)', () => {
+    type Lock = { files: Record<string, string>; starter: string; target: string };
+    expect(json<Lock>(next, 'kit.lock.json').files).toEqual(json<Lock>(vite, 'kit.lock.json').files);
+    expect(json<Lock>(next, 'kit.lock.json')).toMatchObject({ starter: 'mohammadsafia/rsk-next-starter', target: 'next' });
+  });
+
+  it('is a Next app: next config and app/, no Vite entry, no React Router, Next scripts', () => {
+    for (const file of ['next.config.ts', 'postcss.config.mjs', 'app/[lang]/layout.tsx', 'src/routes/routerAdapter.tsx'])
+      expect(existsSync(path.join(next, file)), file).toBe(true);
+    // Next would read src/pages as Pages Router routes: the shared screens live in src/screens (still @pages).
+    expect(existsSync(path.join(next, 'src/pages'))).toBe(false);
+    expect(existsSync(path.join(next, 'src/screens/auth/LoginPage.tsx'))).toBe(true);
+    expect(readFileSync(path.join(next, 'src/routes/routerAdapter.tsx'), 'utf8')).toContain("from 'next/navigation'");
+    for (const file of ['index.html', 'src/main.tsx', 'src/bootstrap.tsx', 'vercel.json', 'src/blocks/index.ts'])
+      expect(existsSync(path.join(next, file)), file).toBe(false);
+    const pkg = json<Pkg>(next, 'package.json');
+    expect(pkg.dependencies.next).toMatch(/^\^16/);
+    expect(pkg.dependencies['server-only']).toBeDefined();
+    expect(pkg.dependencies['react-router']).toBeUndefined();
+    expect(pkg.devDependencies['@tailwindcss/vite']).toBeUndefined();
+    expect(pkg.devDependencies['@tailwindcss/postcss']).toBeDefined();
+    expect(pkg.scripts).toMatchObject({ dev: 'next dev', build: 'next typegen && tsc -b && next build', start: 'next start' });
+    expect(pkg.scripts['a11y:audit']).toBe(
+      'node scripts/a11y/audit.mjs --base http://localhost:3000 --seed api --lang-in path --signed-out /login,/forgot-password',
+    );
+    for (const script of ['preview', 'build:dev', 'bundle:report']) expect(pkg.scripts[script], script).toBeUndefined();
+    expect(pkg.sideEffects).toEqual(['*.css', './src/i18n.ts']);
+  });
+
+  it('keeps the Vite starter free of the Next packages', () => {
+    const pkg = json<Pkg>(vite, 'package.json');
+    for (const name of ['next', 'server-only', '@tailwindcss/postcss', 'postcss']) expect(pkg.devDependencies[name], name).toBeUndefined();
+  });
+
+  it('writes config in the form next build keeps, and CSS without the remote font import', () => {
+    const tsconfig = readFileSync(path.join(next, 'tsconfig.app.json'), 'utf8');
+    expect(tsconfig).toContain('"include": ["src", "app", "proxy.ts", "next-env.d.ts", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"]');
+    expect(tsconfig).toContain('"exclude": ["node_modules"]');
+    expect(tsconfig).toContain('"plugins": [{ "name": "next" }]');
+    const css = readFileSync(path.join(next, 'src/index.css'), 'utf8');
+    expect(css).not.toContain('fonts.googleapis');
+    expect(css).toBe(
+      readFileSync(path.join(import.meta.dirname, '../../src/index.css'), 'utf8')
+        .split('\n')
+        .slice(1)
+        .join('\n')
+        .replace(/^\n+/, ''),
+    );
+    const viteConfig = readFileSync(path.join(next, 'vite.config.ts'), 'utf8');
+    expect(viteConfig).not.toContain('@tailwindcss/vite');
+    expect(viteConfig).toContain("'.next/**'");
+  });
+
+  it('maps every locale namespace statically, with no Vite-only import.meta', () => {
+    const locales = readFileSync(path.join(next, 'src/locales/index.ts'), 'utf8');
+    expect(locales).not.toContain('import.meta');
+    // In the formatter's own style, so the app's first vp check passes.
+    expect(locales).toContain('  common: enCommon,');
+    for (const lang of ['en', 'ar'])
+      for (const file of readdirSync(path.join(next, 'src/locales', lang)).filter(
+        (name) => name.endsWith('.json') && !name.startsWith('block-'),
+      ))
+        expect(locales, `${lang}/${file}`).toContain(`'./${lang}/${file}'`);
+  });
+
+  it('leaves no barrel pointing at a dropped file, and ships its own env template', () => {
+    const barrels = walk(path.join(next, 'src')).filter((file) => file.endsWith('/index.ts'));
+    const broken = barrels.flatMap((barrel) =>
+      [...readFileSync(barrel, 'utf8').matchAll(/from '(\.[^']+)'/g)]
+        .map((match) => path.resolve(path.dirname(barrel), match[1]))
+        .filter((target) => !['', '.ts', '.tsx', '/index.ts', '/index.tsx', '.json'].some((ext) => existsSync(`${target}${ext}`)))
+        .map((target) => `${path.relative(next, barrel)} → ${path.relative(next, target)}`),
+    );
+    expect(broken).toEqual([]);
+    const env = readFileSync(path.join(next, '.env.example'), 'utf8');
+    for (const key of ['NEXT_PUBLIC_SITE_URL', 'API_URL', 'SESSION_SECRET', 'AUTH_MOCK']) expect(env).toMatch(new RegExp(`^${key}=`, 'm'));
+    expect(env).toMatch(/^SESSION_SECRET=$/m);
+  });
+});
