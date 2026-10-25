@@ -20,6 +20,12 @@ describe('pageMetadata', () => {
       languages: { en: '/en', ar: '/ar', 'x-default': '/' },
     });
   });
+
+  it('a title that already names the site skips the layout template, in search results and previews alike', () => {
+    const metadata = pageMetadata({ lang: 'en', path: '/', title: 'Build on RSK', absoluteTitle: true });
+    expect(metadata.title).toEqual({ absolute: 'Build on RSK' });
+    expect(metadata.openGraph?.title).toBe('Build on RSK');
+  });
 });
 
 describe('siteUrl', () => {

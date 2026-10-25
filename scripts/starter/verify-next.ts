@@ -87,7 +87,9 @@ const locationOf = (response: Response) => {
 
 async function checkPages(app: string) {
   check(locationOf(await get('/', { 'Accept-Language': 'en;q=0.2, ar;q=0.9' })) === '/ar', '/ goes to /ar for an Arabic browser');
-  check(locationOf(await get('/en')) === '/en/dashboard', '/en opens the app');
+  const home = await get('/en');
+  const enLanding = JSON.parse(readFileSync(path.join(app, 'src/locales/en/landing.json'), 'utf8')) as { hero: { title: string } };
+  check(home.status === 200 && (await home.text()).includes(enLanding.hero.title), '/en is the public landing page, server-rendered');
   const guarded = await get('/en/dashboard');
   check(
     guarded.status === 307 && locationOf(guarded) === '/en/login?next=%2Fen%2Fdashboard',

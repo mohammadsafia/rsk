@@ -21,17 +21,25 @@ export function siteUrl(path: string, base: string = clientEnv.NEXT_PUBLIC_SITE_
   return `${base.replace(/\/+$/, '')}${path}`;
 }
 
-type PageSeo = { lang: KitLanguage; path: string; title: string; description?: string };
+type PageSeo = {
+  lang: KitLanguage;
+  path: string;
+  title: string;
+  description?: string;
+  /** The title already names the site (a home page): no "· RSK" after it. */
+  absoluteTitle?: boolean;
+};
 
 /**
  * A page's metadata. `path` is language-free (/login). x-default is that path without a language, where the proxy
  * picks one for the visitor. Next replaces openGraph and twitter whole, so each page sends both complete.
  */
-export function pageMetadata({ lang, path, title, description }: PageSeo): Metadata {
+export function pageMetadata({ lang, path, title, description, absoluteTitle }: PageSeo): Metadata {
   const url = localized(lang, path);
   const text = { title, ...(description ? { description } : {}) };
   return {
     ...text,
+    ...(absoluteTitle ? { title: { absolute: title } } : {}),
     alternates: {
       canonical: url,
       languages: { ...Object.fromEntries(LANGS.map((each) => [each, localized(each, path)])), 'x-default': path },

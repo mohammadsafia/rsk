@@ -13,6 +13,9 @@ pnpm dev
 
 Sign in with the demo account shown on the sign-in page (`AUTH_MOCK`, on in development).
 
+`/en` and `/ar` open a public, server-rendered landing page (`app/[lang]/(public)/page.tsx`, its copy in
+`src/locales/*/landing.json`); the app itself starts at `/en/dashboard`.
+
 ## Blocks
 
 `pnpm kit:add` adds ready-made pages and components, as in the Vite starter. A block's pages arrive as generated files
