@@ -8,12 +8,13 @@
  */
 import { execFileSync, spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
-import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
 import { chromium, type Page } from 'playwright';
 
+import { hashFile } from '../kit/core';
 import { buildStarter, refreshLockfile } from './build-starter';
 import { installArgs } from './install';
 import { LEFTOVER_PATTERNS } from './manifest';
@@ -65,6 +66,17 @@ async function serve(cwd: string, env: NodeJS.ProcessEnv): Promise<() => void> {
   stop();
   throw new Error('verify-next: next start did not answer');
 }
+
+/** Every file of the app but what building, testing and measuring it leave behind. */
+const fingerprint = (root: string) =>
+  new Map(
+    walk(root)
+      .map((file) => path.relative(root, file).split(path.sep).join('/'))
+      .filter(
+        (file) => !/^(node_modules|\.next)\/|^next-env\.d\.ts$|\.tsbuildinfo$|^first-load-[\w-]+\.json$|^a11y-report\.json$/.test(file),
+      )
+      .map((file) => [file, hashFile(path.join(root, file))]),
+  );
 
 /** A request as the browser sends it, the redirect not followed. */
 const get = (route: string, headers: Record<string, string> = {}) => fetch(`${BASE}${route}`, { redirect: 'manual', headers });
@@ -221,6 +233,113 @@ async function checkInBrowser(app: string) {
   }
 }
 
+/**
+ * A test-only page that fails in the browser until the check sets window.verifyRecovered: the error page shows, then
+ * "Try again" (Next's reset) renders the page again. (Failing only once wouldn't do: React retries a render that throws
+ * while hydrating, and the retry would succeed before any error page.)
+ */
+const FAILING_PAGE = 'app/[lang]/verify-fails/page.tsx';
+const FAILING_SOURCE = `'use client';
+
+export default function Page() {
+  if (typeof window !== 'undefined' && !(window as { verifyRecovered?: boolean }).verifyRecovered)
+    throw new Error('verify-next: a page that fails');
+  return <h1>recovered</h1>;
+}
+`;
+
+type SystemCopy = Record<'notFound' | 'maintenance' | 'noAccess' | 'serverError', { title: string }> & { serverError: { retry: string } };
+
+/**
+ * Round trip: every block in the catalogue added, the app checked the same way (a block may never break an app or its
+ * first load), their pages as a person meets them, then every block removed and the app back byte for byte.
+ */
+async function checkBlocks(app: string, budget: (...args: string[]) => void, audit: (...args: string[]) => void) {
+  const before = fingerprint(app);
+  const ids = (JSON.parse(readFileSync(path.join(app, 'registry/index.json'), 'utf8')) as { id: string }[]).map((block) => block.id);
+  run(app, ['exec', 'tsx', 'scripts/kit/add.ts', 'add', ...ids, '--from', '.']);
+  mkdirSync(path.dirname(path.join(app, FAILING_PAGE)), { recursive: true });
+  writeFileSync(path.join(app, FAILING_PAGE), FAILING_SOURCE);
+  run(app, ['exec', 'next', 'typegen']);
+  run(app, ['exec', 'tsc', '-b']);
+  run(app, ['exec', 'vp', 'check']);
+  run(app, ['exec', 'vp', 'test', '--run']);
+  run(app, ['exec', 'next', 'build']);
+
+  const copy = (lang: string) =>
+    JSON.parse(readFileSync(path.join(app, `src/locales/${lang}/block-system-pages.json`), 'utf8')) as SystemCopy;
+  const stop = await serve(app, { SESSION_SECRET: randomBytes(32).toString('hex'), AUTH_MOCK: 'true' });
+  try {
+    const maintenance = await get('/ar/maintenance');
+    const html = await maintenance.text();
+    check(
+      maintenance.status === 200 && html.includes('<html lang="ar" dir="rtl"'),
+      "a block's page outside the shell is public, right to left",
+    );
+    check(
+      html.includes(`<title>${copy('ar').maintenance.title} · RSK</title>`) && html.includes(copy('ar').maintenance.title),
+      '…with its Arabic title and heading in the server HTML',
+    );
+
+    const signedIn = await fetch(`${BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: BASE },
+      body: JSON.stringify({ email: 'demo@example.com', password: 'demo-password' }),
+    });
+    const cookie = (signedIn.headers.get('set-cookie') ?? '').split(';')[0];
+    for (const lang of ['en', 'ar']) {
+      const page = await get(`/${lang}/no-access`, { cookie });
+      check(
+        page.status === 200 && (await page.text()).includes(copy(lang).noAccess.title),
+        `/${lang}/no-access shows the block's ${lang} heading`,
+      );
+    }
+    check(locationOf(await get('/en/no-access')) === '/en/login?next=%2Fen%2Fno-access', '…and sends a signed-out visitor to sign in');
+    const missing = await get('/en/no-such-page');
+    check(
+      missing.status === 404 && (await missing.text()).includes(copy('en').notFound.title),
+      "an unknown URL is the block's 404, server-rendered",
+    );
+
+    const browser = await chromium.launch();
+    try {
+      const page = await (await browser.newContext()).newPage();
+      await page.goto(`${BASE}/en/verify-fails`);
+      await page.getByRole('heading', { name: copy('en').serverError.title }).waitFor();
+      await page.evaluate(() => {
+        (window as { verifyRecovered?: boolean }).verifyRecovered = true;
+      });
+      await page.getByRole('button', { name: copy('en').serverError.retry }).click();
+      await page.getByRole('heading', { name: 'recovered' }).waitFor();
+      check(true, "a page that fails shows the block's error page, and Try again recovers it");
+    } finally {
+      await browser.close();
+    }
+
+    budget('--routes', '/login,/forgot-password,/maintenance', '--report', 'first-load-next-blocks-signed-out.json');
+    budget(
+      '--session',
+      '--seed',
+      'api',
+      '--routes',
+      '/dashboard,/settings,/no-access',
+      '--report',
+      'first-load-next-blocks-signed-in.json',
+    );
+    audit('--signed-in', '/no-access', '--signed-out', '/login,/forgot-password,/maintenance');
+  } finally {
+    stop();
+  }
+
+  rmSync(path.join(app, path.dirname(FAILING_PAGE)), { recursive: true, force: true });
+  run(app, ['exec', 'tsx', 'scripts/kit/add.ts', 'remove', ...ids, '--from', '.']);
+  const after = fingerprint(app);
+  const changed = [...new Set([...before.keys(), ...after.keys()])].filter((file) => before.get(file) !== after.get(file)).sort();
+  if (changed.length)
+    throw new Error(`kit:add then kit:remove left the Next starter different:\n${changed.map((file) => `  ${file}`).join('\n')}`);
+  check(true, 'adding then removing every block leaves the app as it was');
+}
+
 export async function verifyNext() {
   const app = buildStarter(mkdtempSync(path.join(os.tmpdir(), 'rsk-next-starter-')), 'next');
   let stop: (() => void) | undefined;
@@ -267,20 +386,14 @@ export async function verifyNext() {
     budget('--routes', '/login,/forgot-password', '--report', 'first-load-next-signed-out.json');
     budget('--session', '--seed', 'api', '--routes', '/dashboard,/settings', '--report', 'first-load-next-signed-in.json');
 
-    run(app, [
-      'exec',
-      'node',
-      'scripts/a11y/audit.mjs',
-      '--base',
-      BASE,
-      '--seed',
-      'api',
-      '--lang-in',
-      'path',
-      '--signed-out',
-      '/login,/forgot-password',
-    ]);
+    const audit = (...args: string[]) =>
+      run(app, ['exec', 'node', 'scripts/a11y/audit.mjs', '--base', BASE, '--seed', 'api', '--lang-in', 'path', ...args]);
+    audit('--signed-out', '/login,/forgot-password');
     await checkInBrowser(app);
+    stop();
+    stop = undefined;
+
+    await checkBlocks(app, budget, audit);
     console.log(`\nNext starter verified: ${app}`);
   } finally {
     stop?.();

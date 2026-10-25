@@ -36,6 +36,8 @@ const LANG_IN = arg('lang-in', 'storage');
 const WORKERS = 4;
 /** Pages a signed-in visitor never sees (they're sent on): audited signed out. */
 const SIGNED_OUT = arg('signed-out', '/auth/login,/auth/forgot-password').split(',').filter(Boolean);
+/** Signed-in pages no link reaches (a block's 403 page, say): audited with the ones discovery finds. */
+const SIGNED_IN = arg('signed-in', '').split(',').filter(Boolean);
 const COMBOS = [
   { theme: 'light', lang: 'en' },
   { theme: 'dark', lang: 'en' },
@@ -52,6 +54,9 @@ export const routesFor = (routes, lang, langIn) => (langIn === 'path' ? routes.m
 
 /** Discovered routes without their language (a Next app links /en/…), each once. */
 export const languageFree = (routes) => [...new Set(routes.map(stripLang))];
+
+/** The discovered routes, then the named ones discovery can't find, each once. */
+export const signedInRoutes = (discovered, named) => [...new Set([...discovered, ...named])];
 
 const responds = async (url) => {
   try {
@@ -164,7 +169,7 @@ async function main() {
     await seedDemoSession(discovery, { via: SEED, url: BASE });
     const discovered = await discoverRoutes(discovery, { base: BASE, max: MAX_PAGES });
     const { truncated } = discovered;
-    const routes = LANG_IN === 'path' ? languageFree(discovered.routes) : discovered.routes;
+    const routes = signedInRoutes(LANG_IN === 'path' ? languageFree(discovered.routes) : discovered.routes, SIGNED_IN);
     await discovery.close();
     if (truncated) console.warn(`Stopped discovering at --max ${MAX_PAGES}: some pages are not audited. Raise --max to audit them all.`);
     console.log(`Auditing ${routes.length} pages signed in and ${SIGNED_OUT.length} signed out × ${COMBOS.length} (light/dark × en/ar)…`);
