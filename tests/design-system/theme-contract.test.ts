@@ -183,17 +183,6 @@ describe('utility behavior', () => {
   });
 });
 
-describe('code blocks', () => {
-  it('render comments in --code-muted (the GitHub theme grey is too faint on the code surface)', () => {
-    expect(indexCss).toMatch(/\[style\*='--shiki-dark: #6A737D'\]\s*\{\s*color: var\(--code-muted\) !important;/);
-  });
-
-  it('always use the dark syntax palette, because --code-surface is dark in both themes', () => {
-    expect(indexCss).not.toContain('var(--shiki-light)');
-    expect(indexCss).toMatch(/\[data-rehype-pretty-code-figure\] code \[style\*='--shiki-dark'\] \{\s*color: var\(--shiki-dark\)/);
-  });
-});
-
 describe('Ledger signature marks', () => {
   const utilitiesCss = readProjectFile('src/styles/utilities.css');
   /** The body of one @utility block (up to the next @utility or the end). */

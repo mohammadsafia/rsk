@@ -11,6 +11,8 @@ export const DROP = [
   '.github/workflows/docs.yml',
   'src/types/doc-counts.d.ts',
   'src/types/mdx.d.ts',
+  // Types for the docs site's code highlighter.
+  'src/types/rehype-pretty-code.d.ts',
   // How blocks are authored in the kit (each documented, at least one); an app only adds them
   'tests/design-system/blocks.test.ts',
   // Showcase pages and their data
@@ -35,6 +37,11 @@ export const DROP = [
   'scripts/starter/',
   // Renders RSK's own logo favicons; an app replaces public/ favicons with its own.
   'scripts/design-system/favicons/',
+  // One-off migrations of this repository's own source after kit renames. An app never updates its copy (scripts/ is
+  // the app's), so they would only go stale there.
+  'scripts/design-system/codemods/',
+  'tests/design-system/codemods/',
+  'tests/design-system/migrate-classes.test.ts',
   'tests/starter/',
   // Screenshot tests shoot the docs site, which the starter doesn't have.
   'tests/visual/',
@@ -80,6 +87,9 @@ export const DOCS_ONLY_SCRIPTS = [
   'starter:publish',
   'visual:test',
   'visual:update',
+  // Run the codemods the starter drops.
+  'ds:migrate',
+  'ds:classes',
 ] as const;
 
 /** Words that must not survive in the starter's src/ (showcase leftovers). */
@@ -107,7 +117,6 @@ export const NEXT_DROP = [
   'src/main.tsx',
   'src/bootstrap.tsx',
   'src/bootstrap.test.tsx',
-  'src/App.tsx',
   'src/vite-env.d.ts',
   'src/i18n.test.ts',
   'src/routes/router.tsx',
@@ -119,6 +128,15 @@ export const NEXT_DROP = [
   'src/layouts/auth-layout/AuthLayout.tsx',
   'src/pages/auth/auth-flow.test.tsx',
   'src/blocks/index.ts',
+  // The browser's API client: it calls the backend with the token, which a Next app's browser never holds. Sign-in
+  // goes through app/api/auth instead.
+  'src/api/config/ApiEndpoints.ts',
+  'src/api/config/AxiosInstance.ts',
+  'src/api/config/AxiosInstance.test.tsx',
+  'src/api/config/HttpClient.ts',
+  'src/api/config/HttpClient.test.ts',
+  // Its axios options are the dropped client's.
+  'src/types/global.d.ts',
 ] as const;
 
 /** Vite-only scripts a Next app doesn't have (it builds and serves with next). */

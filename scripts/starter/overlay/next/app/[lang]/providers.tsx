@@ -10,7 +10,7 @@ import { Tooltip } from '@components/ui';
 
 import { AppDirectionProvider, type KitLanguage, MotionProvider, ThemeProvider } from '@contexts';
 
-import { getQueryClient } from '@api/config/QueryClient';
+import { getQueryClient } from '@api/config/getQueryClient';
 import { NextKitRouterProvider } from '@routes/routerAdapter';
 
 type ProvidersProps = {
