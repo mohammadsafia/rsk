@@ -5,6 +5,7 @@ import path from 'node:path';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test';
 
+import { generateBlockIndex } from '../../scripts/kit/blocks';
 import { hashFile, inScope } from '../../scripts/kit/core';
 import { buildStarter } from '../../scripts/starter/build-starter';
 
@@ -166,7 +167,7 @@ describe('buildStarter --target next', () => {
     expect(existsSync(path.join(next, 'src/pages'))).toBe(false);
     expect(existsSync(path.join(next, 'src/screens/auth/LoginPage.tsx'))).toBe(true);
     expect(readFileSync(path.join(next, 'src/routes/routerAdapter.tsx'), 'utf8')).toContain("from 'next/navigation'");
-    for (const file of ['index.html', 'src/main.tsx', 'src/bootstrap.tsx', 'vercel.json', 'src/blocks/index.ts'])
+    for (const file of ['index.html', 'src/main.tsx', 'src/bootstrap.tsx', 'vercel.json'])
       expect(existsSync(path.join(next, file)), file).toBe(false);
     const pkg = json<Pkg>(next, 'package.json');
     expect(pkg.dependencies.next).toMatch(/^\^16/);
@@ -261,6 +262,14 @@ describe('buildStarter --target next', () => {
     ];
     expect(appFiles(vite).sort()).toEqual([...APP_FILES.vite].sort());
     expect(appFiles(next).sort()).toEqual([...APP_FILES.next].sort());
+  });
+
+  it("ships the Next block index, and the menu and the page's translations read it", () => {
+    expect(readFileSync(path.join(next, 'src/blocks/index.ts'), 'utf8')).toBe(generateBlockIndex([], 'next'));
+    expect(readFileSync(path.join(next, 'src/routes/routes.ts'), 'utf8')).toContain(
+      'export const APP_MENU: AppMenu[] = [...BASE_MENU, ...blockNav];',
+    );
+    expect(readFileSync(path.join(next, 'app/[lang]/layout.tsx'), 'utf8')).toContain('...blockNavLabels[lang]');
   });
 
   it('leaves no barrel pointing at a dropped file, and ships its own env template', () => {

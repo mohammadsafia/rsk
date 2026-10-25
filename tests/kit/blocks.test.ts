@@ -154,3 +154,21 @@ describe('generated block index', () => {
     expect(source).not.toContain('addResourceBundle');
   });
 });
+
+describe('generated block index (next)', () => {
+  it('with no blocks, exports an empty menu and no labels, and runs nothing at import', () => {
+    const source = generateBlockIndex([], 'next');
+    expect(source).toContain('export const blockNav: AppMenu[] = [];');
+    expect(source).toContain("export const blockNavLabels: Record<'en' | 'ar', ResourceLanguage> = { en: {}, ar: {} };");
+    // Next generates the pages under app/, and a server makes an i18n instance per request: no routes, no global bundles.
+    for (const absent of ['react-router', 'addResourceBundle', 'lazy(', 'RouteObject']) expect(source).not.toContain(absent);
+  });
+
+  it("hands each block's menu labels to the page's translations, by language", () => {
+    const source = generateBlockIndex([meta('a', { nav: [{ id: 'home', path: '/a', icon: 'House' }] })], 'next');
+    expect(source).toContain("import { nav as blockANavEn } from '@locales/en/block-a.json';");
+    expect(source).toContain("import { House } from 'lucide-react';");
+    expect(source).toContain("export const blockNav: AppMenu[] = [{ id: 'home', path: '/a', icon: House, labelKey: 'block-a:nav.home' }];");
+    expect(source).toContain("  en: { 'block-a': { nav: blockANavEn } },\n  ar: { 'block-a': { nav: blockANavAr } },");
+  });
+});

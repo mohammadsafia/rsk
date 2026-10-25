@@ -137,8 +137,8 @@ export function buildStarter(outDir: string, target: KitTarget = 'vite') {
   mkdirSync(path.join(out, 'registry'), { recursive: true });
   writeFileSync(path.join(out, 'registry/index.json'), `${JSON.stringify(blocks, null, 2)}\n`);
   mkdirSync(path.join(out, 'src/blocks'), { recursive: true });
-  // The Vite app's block index (its router reads it); a Next app's block routes are generated files (Phase 4).
-  if (target === 'vite') writeFileSync(path.join(out, 'src/blocks/index.ts'), generateBlockIndex([]));
+  // The block index: the Vite router's routes, or a Next app's menu entries (its pages are generated under app/).
+  writeFileSync(path.join(out, 'src/blocks/index.ts'), generateBlockIndex([], target));
 
   // 4. package.json for a new app.
   const pkgFile = path.join(out, 'package.json');

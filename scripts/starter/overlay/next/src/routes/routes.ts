@@ -2,6 +2,8 @@ import type { ElementType } from 'react';
 
 import { LayoutDashboard, Settings } from 'lucide-react';
 
+import { blockNav } from '../blocks';
+
 export type AppMenu = {
   id: string;
   path: string;
@@ -56,5 +58,5 @@ const BASE_MENU: AppMenu[] = [
   },
 ];
 
-/** The app's entries (a Next app's blocks arrive with the next kit version). */
-export const APP_MENU: AppMenu[] = BASE_MENU;
+/** The app's entries, then the added blocks' (src/blocks/index.ts, written by kit:add). */
+export const APP_MENU: AppMenu[] = [...BASE_MENU, ...blockNav];

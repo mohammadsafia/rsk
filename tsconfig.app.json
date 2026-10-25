@@ -31,6 +31,7 @@
       "@utils": ["./src/lib/utils/index"],
       "@hoc": ["./src/lib/hoc/index"],
       "@components/*": ["./src/components/*"],
+      "@blocks": ["./src/blocks/index"],
       "@blocks/*": ["./src/blocks/*"],
       "@pages/*": ["./src/pages/*"],
       "@views/*": ["./src/views/*"],

@@ -175,6 +175,7 @@ export const APP_FILES = {
     'src/app-config/index.ts',
     'src/app-config/initialize.ts',
     'src/app-config/theme-colors.json',
+    'src/blocks/index.ts',
     'src/env.ts',
     'src/i18n.ts',
     'src/index.css',

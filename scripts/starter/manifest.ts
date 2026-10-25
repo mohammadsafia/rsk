@@ -127,7 +127,6 @@ export const NEXT_DROP = [
   'src/layouts/app-layout/AppLayout.test.tsx',
   'src/layouts/auth-layout/AuthLayout.tsx',
   'src/pages/auth/auth-flow.test.tsx',
-  'src/blocks/index.ts',
   // The browser's API client: it calls the backend with the token, which a Next app's browser never holds. Sign-in
   // goes through app/api/auth instead.
   'src/api/config/ApiEndpoints.ts',
