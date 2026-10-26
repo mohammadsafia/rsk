@@ -80,6 +80,7 @@
     "ds:classes": "tsx scripts/design-system/codemods/migrate-classes.ts",
     "bundle:report": "vp build && node scripts/bundle/first-load.mjs --dist dist --session",
     "starter:build": "tsx scripts/starter/build-starter.ts",
+    "starter:dev": "tsx scripts/starter/dev-starter.ts",
     "starter:verify": "tsx scripts/starter/verify-starter.ts",
     "starter:publish": "tsx scripts/starter/publish.ts",
     "a11y:audit": "node scripts/a11y/audit.mjs",
