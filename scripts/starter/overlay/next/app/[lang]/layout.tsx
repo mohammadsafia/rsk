@@ -11,7 +11,7 @@ import { clientEnv, dirOf, isLang, LANGS } from '@env';
 import { getT } from '@server/i18n';
 import { fontVariables } from '../fonts';
 import { Providers } from './providers';
-import { THEME_SCRIPT } from '../theme-script';
+import { SERVER_THEME, THEME_SCRIPT } from '../theme-script';
 
 import '../../src/index.css';
 
@@ -54,7 +54,7 @@ export default async function Layout({ children, params }: LayoutProps) {
   if (!isLang(lang)) notFound();
 
   return (
-    <html lang={lang} dir={dirOf(lang)} style={fontVariables} suppressHydrationWarning>
+    <html lang={lang} dir={dirOf(lang)} className={SERVER_THEME} style={fontVariables} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

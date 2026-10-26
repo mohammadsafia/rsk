@@ -167,3 +167,10 @@ describe('the lock', () => {
     expect(before).not.toContain('generated');
   });
 });
+
+describe('the 404 documents', () => {
+  it("paint the server's default theme, as the [lang] layout does, so a 404 without JavaScript isn't the other theme", () => {
+    for (const blocks of [[], [SYSTEM_PAGES]])
+      expect(nextRouteFiles(blocks).get('app/global-not-found.tsx')).toContain('className={SERVER_THEME}');
+  });
+});
