@@ -18,6 +18,7 @@ import { hashFile } from '../kit/core';
 import { buildStarter, refreshLockfile } from './build-starter';
 import { installArgs } from './install';
 import { LEFTOVER_PATTERNS } from './manifest';
+import { smokeSignInOut } from './smoke';
 
 const PORT = 5410;
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -185,6 +186,67 @@ async function checkSeo(app: string) {
   );
 }
 
+/** The share of pixels two PNG screenshots differ in (a channel off by more than 32), counted in the browser's canvas. */
+async function pixelDifference(page: Page, one: Buffer, two: Buffer): Promise<number> {
+  // Anonymous functions only: tsx names inner functions with a helper the page doesn't have.
+  return page.evaluate(
+    async (pngs) => {
+      const [a, b] = await Promise.all(
+        pngs.map(async (base64) => {
+          const image = new Image();
+          image.src = `data:image/png;base64,${base64}`;
+          await image.decode();
+          const canvas = document.createElement('canvas');
+          canvas.width = image.width;
+          canvas.height = image.height;
+          const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+          context.drawImage(image, 0, 0);
+          return context.getImageData(0, 0, image.width, image.height);
+        }),
+      );
+      if (a.width !== b.width || a.height !== b.height) return 1;
+      let differ = 0;
+      for (let at = 0; at < a.data.length; at += 4)
+        if ([0, 1, 2].some((channel) => Math.abs(a.data[at + channel] - b.data[at + channel]) > 32)) differ += 1;
+      return differ / (a.data.length / 4);
+    },
+    [one.toString('base64'), two.toString('base64')],
+  );
+}
+
+/**
+ * The server's HTML alone is the page: with JavaScript off, /ar/login is Arabic, right to left and readable, and it
+ * looks the same as once the browser has hydrated it (nothing jumps, appears or changes theme).
+ */
+async function checkNoFlash(browser: Browser) {
+  const options = { viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce', colorScheme: 'light' } as const;
+  const arAuth = (await (await get('/ar/login')).text()).match(/<h1[^>]*>([^<]+)<\/h1>/)?.[1];
+
+  const off = await browser.newContext({ ...options, javaScriptEnabled: false });
+  const serverOnly = await off.newPage();
+  await serverOnly.goto(`${BASE}/ar/login`, { waitUntil: 'networkidle' });
+  const html = serverOnly.locator('html');
+  check(
+    (await html.getAttribute('lang')) === 'ar' &&
+      (await html.getAttribute('dir')) === 'rtl' &&
+      !!arAuth &&
+      (await serverOnly.locator('h1').textContent()) === arAuth &&
+      (await serverOnly.locator('h1').isVisible()),
+    'with JavaScript off, /ar/login is Arabic, right to left, its heading showing',
+  );
+  const before = await serverOnly.screenshot();
+  await off.close();
+
+  const on = await browser.newContext(options);
+  const hydrated = await on.newPage();
+  await hydrated.goto(`${BASE}/ar/login`, { waitUntil: 'networkidle' });
+  await hydrated.evaluate(() => document.fonts.ready);
+  const after = await hydrated.screenshot();
+  const differ = await pixelDifference(hydrated, before, after);
+  check(differ <= 0.005, `…and looks the same once hydrated (${(differ * 100).toFixed(2)} % of pixels differ)`);
+  await on.close();
+}
+
 async function signIn(page: Page, route: string) {
   await page.goto(`${BASE}${route}`);
   await page.getByLabel('Email').fill('demo@example.com');
@@ -220,28 +282,37 @@ async function checkInBrowser(app: string) {
     check(arabic.includes('Noto Kufi Arabic') && !arabic.includes('Arial'), 'Arabic text paints in Noto Kufi Arabic');
     check((await fontsOf('/en/login', 'h1')).includes('Schibsted Grotesk'), 'Latin text paints in Schibsted Grotesk');
 
-    // A stored light theme never paints dark first, and the motion setting is there before the page is parsed.
-    const themed = await browser.newContext();
-    await themed.addInitScript(() => {
-      localStorage.setItem('rsk-theme', '"light"');
-      const seen = ((window as unknown as { __classes: string[] }).__classes = [] as string[]);
-      new MutationObserver(() => seen.push(document.documentElement.className)).observe(document, { attributes: true, subtree: true });
-      document.addEventListener('DOMContentLoaded', () => {
-        (window as unknown as { __motion: string | undefined }).__motion = document.documentElement.dataset.motion;
-      });
-    });
-    const themedPage = await themed.newPage();
-    await themedPage.goto(`${BASE}/ar/login`, { waitUntil: 'networkidle' });
-    const { classes, motion } = await themedPage.evaluate(() => ({
-      classes: (window as unknown as { __classes: string[] }).__classes,
-      motion: (window as unknown as { __motion?: string }).__motion,
-    }));
-    check(
-      !classes.some((value) => /\bdark\b/.test(value)) && classes.some((value) => /\blight\b/.test(value)),
-      'a stored light theme never paints dark',
-    );
-    check(!!motion, 'the motion setting is set before the page is parsed');
-    await themed.close();
+    // A stored theme wins over the system's from the first paint (a dark choice on a light system is the flash people
+    // see), and the motion setting is there before the page is parsed.
+    for (const [stored, system] of [
+      ['light', 'dark'],
+      ['dark', 'light'],
+    ] as const) {
+      const themed = await browser.newContext({ colorScheme: system });
+      await themed.addInitScript((theme) => {
+        localStorage.setItem('rsk-theme', JSON.stringify(theme));
+        const seen = ((window as unknown as { __classes: string[] }).__classes = [] as string[]);
+        new MutationObserver(() => seen.push(document.documentElement.className)).observe(document, { attributes: true, subtree: true });
+        document.addEventListener('DOMContentLoaded', () => {
+          (window as unknown as { __motion: string | undefined }).__motion = document.documentElement.dataset.motion;
+        });
+      }, stored);
+      const themedPage = await themed.newPage();
+      await themedPage.goto(`${BASE}/ar/login`, { waitUntil: 'networkidle' });
+      const { classes, motion } = await themedPage.evaluate(() => ({
+        classes: (window as unknown as { __classes: string[] }).__classes,
+        motion: (window as unknown as { __motion?: string }).__motion,
+      }));
+      const has = (value: string, theme: string) => new RegExp(`\\b${theme}\\b`).test(value);
+      check(
+        has(classes.find(Boolean) ?? '', stored) && !classes.some((value) => has(value, system)),
+        `a stored ${stored} theme on a ${system} system never paints ${system}`,
+      );
+      check(!!motion, '…and the motion setting is set before the page is parsed');
+      await themed.close();
+    }
+
+    await checkNoFlash(browser);
 
     // Sign in lands where the visitor was going.
     await signIn(page, '/en/login?next=%2Fen%2Fsettings%3Ftab%3Da');
@@ -293,6 +364,24 @@ async function checkInBrowser(app: string) {
     await fresh.close();
 
     await checkMembers(browser, watch);
+
+    // The smoke test both starters run, in English and a fresh browser.
+    const header = JSON.parse(readFileSync(path.join(app, 'src/locales/en/header.json'), 'utf8')) as {
+      openUserMenu: string;
+      logout: string;
+    };
+    const smoke = await browser.newContext();
+    const smokePage = await smoke.newPage();
+    watch(smokePage);
+    await smokeSignInOut(smokePage, {
+      base: BASE,
+      login: '/en/login',
+      home: '/en/dashboard',
+      menuLabel: header.openUserMenu,
+      signOutLabel: header.logout,
+    });
+    check(true, 'sign in → dashboard → sign out');
+    await smoke.close();
 
     check(problems.length === 0, `no page error or console error${problems.length ? `:\n${problems.join('\n')}` : ''}`);
   } finally {
@@ -365,12 +454,13 @@ async function checkBlocks(app: string, budget: (...args: string[]) => void, aud
   const before = fingerprint(app);
   const ids = (JSON.parse(readFileSync(path.join(app, 'registry/index.json'), 'utf8')) as { id: string }[]).map((block) => block.id);
   run(app, ['exec', 'tsx', 'scripts/kit/add.ts', 'add', ...ids, '--from', '.']);
-  mkdirSync(path.dirname(path.join(app, FAILING_PAGE)), { recursive: true });
-  writeFileSync(path.join(app, FAILING_PAGE), FAILING_SOURCE);
   run(app, ['exec', 'next', 'typegen']);
   run(app, ['exec', 'tsc', '-b']);
   run(app, ['exec', 'vp', 'check']);
   run(app, ['exec', 'vp', 'test', '--run']);
+  // After the app's tests: the test-only page is a client page, so it has no metadata (standards 13.4).
+  mkdirSync(path.dirname(path.join(app, FAILING_PAGE)), { recursive: true });
+  writeFileSync(path.join(app, FAILING_PAGE), FAILING_SOURCE);
   run(app, ['exec', 'next', 'build']);
 
   const copy = (lang: string) =>
