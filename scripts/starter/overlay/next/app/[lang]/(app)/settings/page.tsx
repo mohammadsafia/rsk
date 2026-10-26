@@ -3,13 +3,14 @@ import type { Metadata } from 'next';
 import { isLang } from '@env';
 import { SettingsPlaceholder } from '@routes/RoutePlaceholders';
 import { getT } from '@server/i18n';
+import { pageMetadata } from '@server/seo';
 import { requireSession } from '@server/session';
 
 type PageProps = { params: Promise<{ lang: string }> };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
-  return isLang(lang) ? { title: (await getT(lang, 'nav'))('settings') } : {};
+  return isLang(lang) ? pageMetadata({ lang, path: '/settings', title: (await getT(lang, 'nav'))('settings') }) : {};
 }
 
 export default async function Page({ params }: PageProps) {

@@ -5,10 +5,19 @@ import { useState } from 'react';
 import { type QueryKey } from '@tanstack/query-core';
 import { ColumnFiltersState, OnChangeFn, PaginationState, Updater } from '@tanstack/react-table';
 import { keepPreviousData, useQuery, type UseQueryOptions } from '@tanstack/react-query';
-import { type Options, parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
+import { useQueryStates } from 'nuqs';
 import type { AxiosRequestConfig } from 'axios';
 
 import type { ExtendedSortingState, PaginatedResult } from '@app-types';
+
+import {
+  DATA_TABLE_DEFAULTS as DEFAULTS,
+  dataTableQueryKey,
+  dataTableRequestParams,
+  dataTableSearchParams,
+  deserializeColumnFilters,
+  deserializeSorting,
+} from './dataTableQuery';
 
 export type PaginatedDataTable<T> = PaginatedResult<T>;
 
@@ -37,63 +46,16 @@ export type UseDataTableQueryProps<
   filtersToParam?: (state: ColumnFiltersState) => string;
 };
 
-const DEFAULTS = {
-  pageKey: 'page',
-  perPageKey: 'pageSize',
-  globalFilterKey: 'search',
-  sortKey: 'sort',
-  filterKey: 'filter',
-  defaultFirstPage: 1,
-  defaultPageSize: 30,
-  sortToParam: <T extends Record<string, unknown>>(sortState: ExtendedSortingState<T>) =>
-    sortState.map((sort) => `${sort.id}:${sort.desc ? 'desc' : 'asc'}`).join(','),
-  filtersToParam: (state: ColumnFiltersState) => {
-    const queryParams = new URLSearchParams();
-    state.forEach((filter) => {
-      if (Array.isArray(filter.value) && filter.value.length > 0) {
-        filter.value.forEach((val) => queryParams.append(filter.id, val));
-      } else {
-        queryParams.append(filter.id, filter.value as string);
-      }
-    });
-    return queryParams.toString();
-  },
-};
-
-const queryStateOptions: Options = {
-  history: 'replace',
-};
-
 const serializeColumnFilters = (filters: ColumnFiltersState): string => {
   if (filters.length === 0) return '';
 
   return JSON.stringify(filters);
 };
 
-const deserializeColumnFilters = (serialized: string): ColumnFiltersState => {
-  if (!serialized) return [];
-
-  try {
-    return JSON.parse(serialized);
-  } catch {
-    return [];
-  }
-};
-
 const serializeSorting = <T extends Record<string, unknown>>(sorting: ExtendedSortingState<T>): string => {
   if (sorting.length === 0) return '';
 
   return JSON.stringify(sorting);
-};
-
-const deserializeSorting = <T extends Record<string, unknown>>(serialized: string): ExtendedSortingState<T> => {
-  if (!serialized) return [];
-
-  try {
-    return JSON.parse(serialized);
-  } catch {
-    return [];
-  }
 };
 
 export const useDataTableQuery = <T extends Record<string, unknown>>(props: UseDataTableQueryProps<T>) => {
@@ -113,13 +75,7 @@ export const useDataTableQuery = <T extends Record<string, unknown>>(props: UseD
   } = props;
 
   // URL-synced state (always called to satisfy rules of hooks)
-  const [urlQuery, setUrlQuery] = useQueryStates({
-    page: parseAsInteger.withOptions(queryStateOptions).withDefault(DEFAULTS.defaultFirstPage),
-    perPage: parseAsInteger.withOptions(queryStateOptions).withDefault(defaultPageSize ?? DEFAULTS.defaultPageSize),
-    globalFilter: parseAsString.withOptions(queryStateOptions).withDefault(''),
-    columnFilters: parseAsString.withOptions(queryStateOptions).withDefault(''),
-    sorting: parseAsString.withOptions(queryStateOptions).withDefault(''),
-  });
+  const [urlQuery, setUrlQuery] = useQueryStates(dataTableSearchParams(defaultPageSize));
 
   // Local state (always called to satisfy rules of hooks)
   const [localQuery, setLocalQuery] = useState({
@@ -164,34 +120,9 @@ export const useDataTableQuery = <T extends Record<string, unknown>>(props: UseD
   const sorting = deserializeSorting<T>(query.sorting);
 
   const dataTableQuery = useQuery<PaginatedDataTable<T>, Error>({
-    queryKey: [...queryKey, query.page, query.perPage, query.globalFilter, sorting, columnFilters],
-    queryFn: async () => {
-      const queryParams = new URLSearchParams(params);
-      const pageNumber = query.page;
-
-      if (query.globalFilter && query.globalFilter.length > 0) {
-        queryParams.append(globalFilterKey ?? DEFAULTS.globalFilterKey, query.globalFilter);
-      }
-
-      const filters = (filtersToParam ?? DEFAULTS.filtersToParam)(columnFilters);
-
-      if (filters) {
-        const filterParams = new URLSearchParams(filters);
-        filterParams.forEach((value, key) => {
-          queryParams.append(key, value);
-        });
-      }
-
-      const sorts = (sortToParam ?? DEFAULTS.sortToParam)(sorting);
-      if (sorting.length > 0 && sorts) {
-        queryParams.append(sortKey ?? DEFAULTS.sortKey, sorts ?? '');
-      }
-
-      queryParams.append(pageKey ?? DEFAULTS.pageKey, pageNumber.toString());
-      queryParams.append(perPageKey ?? DEFAULTS.perPageKey, query.perPage.toString());
-
-      return await queryFn(queryParams.toString());
-    },
+    queryKey: dataTableQueryKey(queryKey, query),
+    queryFn: async () =>
+      await queryFn(dataTableRequestParams(query, { params, pageKey, perPageKey, globalFilterKey, sortKey, sortToParam, filtersToParam })),
     enabled,
     placeholderData: keepPreviousData,
   });

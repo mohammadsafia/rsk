@@ -1,0 +1,34 @@
+{
+  "title": "Members",
+  "description": "Everyone with access to this workspace.",
+  "search": "Search members",
+  "total": "members",
+  "columns": {
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "joined": "Joined"
+  },
+  "roles": {
+    "admin": "Admin",
+    "member": "Member"
+  },
+  "invite": {
+    "button": "Invite member",
+    "title": "Invite a member",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "submit": "Send invite",
+    "cancel": "Cancel",
+    "sent": "{{name}} is now a member.",
+    "signedOut": "Sign in again to invite someone.",
+    "failed": "The invite didn't go through. Try again.",
+    "errors": {
+      "name": "Enter a name.",
+      "email": "Enter a valid email address.",
+      "role": "Choose a role.",
+      "taken": "That email is already a member."
+    }
+  }
+}

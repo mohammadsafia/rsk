@@ -1,6 +1,6 @@
 import type { ElementType } from 'react';
 
-import { LayoutDashboard, Settings } from 'lucide-react';
+import { LayoutDashboard, Settings, Users } from 'lucide-react';
 
 import { blockNav } from '../blocks';
 
@@ -29,6 +29,9 @@ export const FULL_ROUTES_PATH = {
     LOGIN: '/login',
     FORGOT_PASSWORD: '/forgot-password',
   },
+  MEMBERS: {
+    INDEX: '/members',
+  },
   SETTINGS: {
     INDEX: '/settings',
   },
@@ -48,6 +51,13 @@ const BASE_MENU: AppMenu[] = [
     name: 'Dashboard',
     group: 'main',
     icon: LayoutDashboard,
+  },
+  {
+    id: 'members',
+    path: FULL_ROUTES_PATH.MEMBERS.INDEX,
+    name: 'Members',
+    group: 'main',
+    icon: Users,
   },
   {
     id: 'settings',

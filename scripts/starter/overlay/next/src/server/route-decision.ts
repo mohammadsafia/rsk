@@ -5,7 +5,7 @@ import type { KitLanguage } from '@contexts';
 import { DEFAULT_LANG, isLang, LANGS } from '@env';
 
 /** Pages behind sign-in (and everything under them). */
-export const PROTECTED = ['/dashboard', '/settings'];
+export const PROTECTED = ['/dashboard', '/members', '/settings'];
 
 const LANG_SEGMENT = new RegExp(`^/(${LANGS.join('|')})(?=/|$)`);
 

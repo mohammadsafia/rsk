@@ -13,6 +13,9 @@ pnpm dev
 
 Sign in with the demo account shown on the sign-in page (`AUTH_MOCK`, on in development).
 
+`/en` and `/ar` open a public, server-rendered landing page (`app/[lang]/(public)/page.tsx`, its copy in
+`src/locales/*/landing.json`); the app itself starts at `/en/dashboard`.
+
 ## Blocks
 
 `pnpm kit:add` adds ready-made pages and components, as in the Vite starter. A block's pages arrive as generated files
@@ -21,10 +24,38 @@ under `app/` (`app/[lang]/(app)/no-access/page.tsx`, the 404 in `app/global-not-
 `kit:add`, `kit:remove` and `kit:update` leave a changed file where it is, and `kit:add` refuses to write over it.
 `kit.lock.json` records what they wrote, under `generated`.
 
+## SEO
+
+Every page sets its title and description with `pageMetadata` (`src/server/seo.ts`): a canonical URL, `hreflang` links
+to the same page in the other language (and `x-default`, the language-free path where the proxy picks one), and Open
+Graph and Twitter data. Pages behind sign-in answer `noindex`. `app/sitemap.ts` lists the public pages in both
+languages (add yours to `PUBLIC_PATHS`), `app/robots.ts` keeps crawlers out of `/api` and the signed-in app, and
+`app/[lang]/opengraph-image.tsx` draws the link preview in each language, Arabic in Noto Kufi Arabic
+(`assets/og`, OFL). URLs are absolute on `NEXT_PUBLIC_SITE_URL`, read at build time.
+
+## Full-stack examples
+
+The members page (`/en/members`) shows the three patterns, on a mock backend while `AUTH_MOCK` is on:
+
+- **A route handler as the browser's API.** `app/api/[...path]/route.ts` answers `/api/<path>` from your API's
+  `/<path>`, sending the session's token; the browser never sees it. Server code calls the API the same way with
+  `callApi` (`src/server/api.ts`).
+- **A Server Component that prefetches.** `app/[lang]/(app)/members/page.tsx` fetches the page of members the URL asks
+  for (`prefetchMembers`, `src/server/members.ts`) and sends it with the HTML; the kit table reads it from the cache
+  without fetching again.
+- **A server action behind a kit form.** The invite form and `inviteMember` (`app/[lang]/(app)/members/actions.ts`)
+  share one Zod schema (`inviteSchema`); the action checks the session, validates again and returns field errors the
+  form shows under each field.
+
+When you have your own pages, delete the example: `app/[lang]/(app)/members`, `src/screens/members`,
+`src/server/members.ts`, `src/api/handlers/members.ts`, `src/api/mock/members.ts` (keep `src/server/api.ts` and the
+`/api` route, and point `callApi`'s mock at your own), `src/locales/*/members.json`, and the `members` entries in
+`src/routes/routes.ts` and `src/server/route-decision.ts`.
+
 ## Deploying to Vercel
 
-Import the repository and set `SESSION_SECRET` (and, once your API is ready, `API_URL` and `AUTH_MOCK=false`) in the
-project's environment variables. That is the only configuration a deploy needs.
+Import the repository and set `SESSION_SECRET` and `NEXT_PUBLIC_SITE_URL` (and, once your API is ready, `API_URL` and
+`AUTH_MOCK=false`) in the project's environment variables. That is the only configuration a deploy needs.
 
 ## Sessions
 
