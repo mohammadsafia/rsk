@@ -16,6 +16,7 @@ import { autocompleteMultiselect, isCancel } from '@clack/prompts';
 
 import { kitTarget } from '../lib/kit-target.mjs';
 
+import { nextRouteFiles, planBlockRoutes } from './block-routes';
 import { type BlockLevel, type BlockMeta, readBlocks, resolveDependencies, writeIndex } from './blocks';
 import { dependencyChanges, hashFile, LOCK_FILE, readLock, writeLock } from './core';
 import { download, starterRepo } from './download';
@@ -23,7 +24,12 @@ import { download, starterRepo } from './download';
 /** The blocks a starter offers: `dir` is the starter checkout, with registry/. */
 export type Catalogue = { dir: string; blocks: BlockMeta[]; /** The starter's kit version (its kit.lock.json). */ kit?: string };
 export type AddResult = { added: string[]; files: string[]; install: string | null };
-export type RemoveResult = { removed: string[]; files: string[] };
+export type RemoveResult = {
+  removed: string[];
+  files: string[];
+  /** A Next app's generated pages the app changed: left where they are, now the app's own. */
+  kept: string[];
+};
 
 /** Every file under `root/dir`, as posix paths relative to `root`. */
 const walk = (root: string, dir = ''): string[] => {
@@ -51,13 +57,8 @@ const source = (catalogue: Catalogue, id: string, file: string) => path.join(cat
  * What an app made before blocks still lacks for added blocks to work: the wiring lives in files the app owns, so
  * kit:update can't add it. [] when the app has it. `configDir` holds tsconfig.app.json and src/locales (the app).
  */
-/** A Next app's block routes are generated files that arrive with the next kit version: until then, blocks wait. */
-const refuseInNext = (appDir: string): void => {
-  if (kitTarget(appDir) === 'next') throw new Error('Blocks in a Next app arrive with the next kit version.');
-};
-
 export function wiringGaps(appDir: string, configDir = appDir): string[] {
-  // A Next app's block routes are generated files (Phase 4), not wiring the app adds by hand.
+  // A Next app's block routes are generated files (src/blocks/index.ts and app/), not wiring the app adds by hand.
   if (kitTarget(appDir) === 'next') return [];
   const text = (dir: string, file: string) => (existsSync(path.join(dir, file)) ? readFileSync(path.join(dir, file), 'utf8') : '');
   const router = text(appDir, 'src/routes/router.tsx');
@@ -92,7 +93,6 @@ export function addBlocks({
   ids: string[];
   dryRun?: boolean;
 }): AddResult {
-  refuseInNext(appDir);
   const lock = readLock(appDir);
   // Blocks are built on the kit: one from a newer kit than the app's may use what the app doesn't have yet, and its
   // later updates would merge against the wrong base.
@@ -108,6 +108,22 @@ export function addBlocks({
     const target = path.join(appDir, file);
     if (existsSync(target) && hashFile(target) !== hashFile(source(catalogue, id, file)))
       throw new Error(`${file} already exists in this app with other content; move it away to add "${id}".`);
+  }
+  // A Next app's pages for them are generated: none may land on a file the app wrote or changed. Files these blocks
+  // leave as they are (an edited 404, when no added block has one) don't stand in the way.
+  if (wanted.length && kitTarget(appDir) === 'next') {
+    const current = readBlocks(appDir);
+    const blocks = [...current, ...catalogue.blocks.filter((block) => wanted.includes(block.id))];
+    const [now, next] = [nextRouteFiles(current), nextRouteFiles(blocks)];
+    const inTheWay = planBlockRoutes(appDir, blocks)
+      .refused.filter((file) => next.get(file) !== now.get(file))
+      .sort();
+    if (inTheWay.length === 1)
+      throw new Error(`${inTheWay[0]} isn't a page kit:add wrote (or you changed it); move it away to add ${wanted.join(', ')}.`);
+    if (inTheWay.length)
+      throw new Error(
+        `${inTheWay.join(', ')} aren't pages kit:add wrote (or you changed them); move them away to add ${wanted.join(', ')}.`,
+      );
   }
   const packages: Record<string, string> = Object.assign(
     {},
@@ -146,7 +162,6 @@ export function addBlocks({
  * its blocks depends on one, unless `force`. Needs only the app (no catalogue).
  */
 export function removeBlocks({ appDir, ids, force = false }: { appDir: string; ids: string[]; force?: boolean }): RemoveResult {
-  refuseInNext(appDir);
   const lock = readLock(appDir);
   const have = lock.blocks ?? [];
   for (const id of ids) if (!have.includes(id)) throw new Error(`"${id}" isn't added to this app.`);
@@ -174,9 +189,15 @@ export function removeBlocks({ appDir, ids, force = false }: { appDir: string; i
   // With --force the app's own files go too; otherwise there are none left, and the folders are empty.
   for (const id of ids) rmSync(path.join(appDir, 'src/blocks', id), { recursive: true, force: true });
   writeLock(appDir, lock.kit, new Map(Object.entries(lock.files).filter(([file]) => !files.includes(file))), remaining);
-  writeIndex(appDir);
-  return { removed: ids, files };
+  const kept = writeIndex(appDir);
+  return { removed: ids, files, kept };
 }
+
+/** What to do after adding blocks: the Vite router reads the block index; a Next app has its pages under app/. */
+export const closingMessage = (target: 'vite' | 'next'): string =>
+  target === 'next'
+    ? 'Run pnpm dev: block pages are generated under app/.'
+    : 'Run vp dev: template pages are routed from src/blocks/index.ts.';
 
 type Args = { command: 'add' | 'remove'; ids: string[]; from?: string; dryRun: boolean; force: boolean };
 
@@ -281,6 +302,8 @@ async function main() {
     if (!ids.length) throw new Error('usage: pnpm kit:remove <block ids…> [--force]');
     const result = removeBlocks({ appDir, ids, force });
     console.log(`Removed ${result.removed.join(', ')} (${result.files.length} files).`);
+    if (result.kept.length)
+      console.log(`You changed these pages, so they stay (they are yours now):\n${result.kept.map((file) => `  ${file}`).join('\n')}`);
     return;
   }
 
@@ -312,7 +335,7 @@ async function main() {
     const gaps = wiringGaps(appDir);
     if (gaps.length)
       console.log(`\nThis app was made before blocks; for them to show up, it still needs:\n${gaps.map((gap) => `  - ${gap}`).join('\n')}`);
-    else if (!dryRun) console.log('\nRun vp dev: template pages are routed from src/blocks/index.ts.');
+    else if (!dryRun) console.log(`\n${closingMessage(kitTarget(appDir))}`);
   } finally {
     if (!from) rmSync(starterDir, { recursive: true, force: true });
   }

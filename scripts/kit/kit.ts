@@ -137,6 +137,10 @@ async function main() {
       console.log(
         `Resolve these (look for <<<<<<< or a .upstream file beside them):\n${result.conflicts.map((file) => `  ${file}`).join('\n')}`,
       );
+    if (result.keptPages.length)
+      console.log(
+        `You changed these generated pages, so the update left them as they are:\n${result.keptPages.map((file) => `  ${file}`).join('\n')}`,
+      );
     if (result.conflicts.length) process.exitCode = 1;
     const gaps = dryRun ? [] : updateGaps(appDir, upstreamDir);
     if (gaps.length) console.log(`\nTo finish this update:\n${gaps.map((gap) => `  - ${gap}`).join('\n')}`);

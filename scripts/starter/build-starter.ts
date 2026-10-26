@@ -9,8 +9,9 @@ import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { nextRouteFiles } from '../kit/block-routes';
 import { blockFiles, generateBlockIndex, readBlocks, validateBlocks } from '../kit/blocks';
-import { type KitTarget, readTree, writeLock } from '../kit/core';
+import { hashFile, type KitTarget, readTree, writeLock } from '../kit/core';
 import { lockfileArgs } from './install';
 import { DOCS_ONLY_DEV_DEPENDENCIES, DOCS_ONLY_SCRIPTS, DROP, NEXT_ONLY_DEPENDENCIES, SHOWCASE_NAV_KEYS } from './manifest';
 import { nextTransform } from './next';
@@ -97,6 +98,9 @@ export function buildStarter(outDir: string, target: KitTarget = 'vite') {
   const viteConfig = path.join(out, 'vite.config.ts');
   writeFileSync(viteConfig, readFileSync(viteConfig, 'utf8').replace(/\n{3,}/g, '\n\n'));
 
+  // The docs site's code-block styles: from their comment to the end of the base layer.
+  edit('src/index.css', /\n\n {2}\/\* Rehype Pretty Code[\s\S]*\n {2}\}\n(?=\}\n$)/, '\n', out);
+
   // An app keeps its real settings in .env (this repo tracks an empty one instead).
   const gitignore = path.join(out, '.gitignore');
   writeFileSync(
@@ -134,8 +138,8 @@ export function buildStarter(outDir: string, target: KitTarget = 'vite') {
   mkdirSync(path.join(out, 'registry'), { recursive: true });
   writeFileSync(path.join(out, 'registry/index.json'), `${JSON.stringify(blocks, null, 2)}\n`);
   mkdirSync(path.join(out, 'src/blocks'), { recursive: true });
-  // The Vite app's block index (its router reads it); a Next app's block routes are generated files (Phase 4).
-  if (target === 'vite') writeFileSync(path.join(out, 'src/blocks/index.ts'), generateBlockIndex([]));
+  // The block index: the Vite router's routes, or a Next app's menu entries (its pages are generated under app/).
+  writeFileSync(path.join(out, 'src/blocks/index.ts'), generateBlockIndex([], target));
 
   // 4. package.json for a new app.
   const pkgFile = path.join(out, 'package.json');
@@ -169,9 +173,18 @@ export function buildStarter(outDir: string, target: KitTarget = 'vite') {
     nextTransform(out);
   }
 
-  // 4b. The kit version this app starts from, and a fingerprint of each kit file (what kit:update compares against).
+  // 4b. A Next app's 404 and error files: the generated defaults kit:add replaces when a block claims them.
+  const generated: Record<string, string> = {};
+  if (target === 'next')
+    for (const [file, source] of nextRouteFiles([])) {
+      mkdirSync(path.dirname(path.join(out, file)), { recursive: true });
+      writeFileSync(path.join(out, file), source);
+      generated[file] = hashFile(path.join(out, file));
+    }
+
+  // 4c. The kit version this app starts from, and a fingerprint of each kit file (what kit:update compares against).
   const kitCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
-  writeLock(out, kitCommit, readTree(out), [], { starter: STARTER_REPOS[target], target });
+  writeLock(out, kitCommit, readTree(out), [], { starter: STARTER_REPOS[target], target, generated });
 
   // 5. Environment template: the keys, never this repo's values (the Next overlay ships its own).
   if (target === 'next') return out;

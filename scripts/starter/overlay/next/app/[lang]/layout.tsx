@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 
 import { THEME_COLORS } from '@app-config';
+import { blockNavLabels } from '@blocks';
 import { LOCALES } from '@locales';
 
 import { dirOf, isLang, LANGS } from '@env';
@@ -56,7 +57,7 @@ export default async function Layout({ children, params }: LayoutProps) {
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body>
-        <Providers lang={lang} resources={LOCALES[lang === 'ar' ? 'AR' : 'EN']}>
+        <Providers lang={lang} resources={{ ...LOCALES[lang === 'ar' ? 'AR' : 'EN'], ...blockNavLabels[lang] }}>
           {children}
         </Providers>
       </body>

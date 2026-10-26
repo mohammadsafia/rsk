@@ -5,8 +5,11 @@ import path from 'node:path';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test';
 
-import { hashFile } from '../../scripts/kit/core';
+import { generateBlockIndex } from '../../scripts/kit/blocks';
+import { hashFile, inScope } from '../../scripts/kit/core';
 import { buildStarter } from '../../scripts/starter/build-starter';
+
+import { APP_FILES } from './app-files';
 
 const walk = (dir: string): string[] =>
   readdirSync(dir).flatMap((name) => {
@@ -89,8 +92,6 @@ describe('buildStarter', () => {
 
   it('ships none of the RSK brand tooling (the favicon renderer)', () => {
     expect(existsSync(path.join(out, 'scripts/design-system/favicons'))).toBe(false);
-    // The class/prop codemods stay: the starter's own tests and scripts use them.
-    expect(existsSync(path.join(out, 'scripts/design-system/codemods'))).toBe(true);
   });
 
   it('ships no script that runs a file the starter drops (docs:build runs scripts/docs/)', () => {
@@ -166,7 +167,7 @@ describe('buildStarter --target next', () => {
     expect(existsSync(path.join(next, 'src/pages'))).toBe(false);
     expect(existsSync(path.join(next, 'src/screens/auth/LoginPage.tsx'))).toBe(true);
     expect(readFileSync(path.join(next, 'src/routes/routerAdapter.tsx'), 'utf8')).toContain("from 'next/navigation'");
-    for (const file of ['index.html', 'src/main.tsx', 'src/bootstrap.tsx', 'vercel.json', 'src/blocks/index.ts'])
+    for (const file of ['index.html', 'src/main.tsx', 'src/bootstrap.tsx', 'vercel.json'])
       expect(existsSync(path.join(next, file)), file).toBe(false);
     const pkg = json<Pkg>(next, 'package.json');
     expect(pkg.dependencies.next).toMatch(/^\^16/);
@@ -194,13 +195,7 @@ describe('buildStarter --target next', () => {
     expect(tsconfig).toContain('"plugins": [{ "name": "next" }]');
     const css = readFileSync(path.join(next, 'src/index.css'), 'utf8');
     expect(css).not.toContain('fonts.googleapis');
-    expect(css).toBe(
-      readFileSync(path.join(import.meta.dirname, '../../src/index.css'), 'utf8')
-        .split('\n')
-        .slice(1)
-        .join('\n')
-        .replace(/^\n+/, ''),
-    );
+    expect(css).toBe(readFileSync(path.join(vite, 'src/index.css'), 'utf8').split('\n').slice(1).join('\n').replace(/^\n+/, ''));
     const viteConfig = readFileSync(path.join(next, 'vite.config.ts'), 'utf8');
     expect(viteConfig).not.toContain('@tailwindcss/vite');
     expect(viteConfig).toContain("'.next/**'");
@@ -216,6 +211,65 @@ describe('buildStarter --target next', () => {
         (name) => name.endsWith('.json') && !name.startsWith('block-'),
       ))
         expect(locales, `${lang}/${file}`).toContain(`'./${lang}/${file}'`);
+  });
+
+  it('ships only what the app uses: no showcase API, docs-site code or one-off repo tooling, in either starter', () => {
+    const read = (dir: string, file: string) => readFileSync(path.join(dir, file), 'utf8');
+    for (const dir of [vite, next]) {
+      for (const file of [
+        'src/App.tsx',
+        'src/api/handlers/doctors.ts',
+        'src/api/handlers/lookup.ts',
+        'src/assets/images',
+        'src/types/rehype-pretty-code.d.ts',
+        'scripts/design-system/codemods',
+        'tests/design-system/codemods',
+        'tests/design-system/migrate-classes.test.ts',
+      ])
+        expect(existsSync(path.join(dir, file)), `${path.basename(dir)}: ${file}`).toBe(false);
+      expect(read(dir, 'src/api/handlers/index.ts')).toBe("export * from './auth';\n");
+      expect(read(dir, 'src/index.css')).not.toContain('rehype-pretty-code');
+      const { scripts } = json<Pkg>(dir, 'package.json');
+      for (const script of ['ds:migrate', 'ds:classes']) expect(scripts[script], script).toBeUndefined();
+    }
+    expect(read(vite, 'src/api/config/ApiEndpoints.ts')).not.toContain('DOCTORS');
+    expect(read(vite, 'src/types/global.d.ts')).not.toContain('material-react-table');
+    // The server-rendering cache helper is the Next app's alone.
+    expect(read(vite, 'src/api/config/QueryClient.ts')).not.toContain('getQueryClient');
+    // A Next app's browser never holds the token, so it has no client that calls the backend with one (Phase 5's BFF
+    // client calls /api instead).
+    for (const file of [
+      'src/api/config/ApiEndpoints.ts',
+      'src/api/config/AxiosInstance.ts',
+      'src/api/config/AxiosInstance.test.tsx',
+      'src/api/config/HttpClient.ts',
+      'src/api/config/HttpClient.test.ts',
+      'src/types/global.d.ts',
+    ])
+      expect(existsSync(path.join(next, file)), file).toBe(false);
+    expect(read(next, 'src/api/config/index.ts')).toBe("export * from './getQueryClient';\nexport * from './QueryClient';\n");
+  });
+
+  it('ships exactly the reviewed app files, in each starter (tests/starter/app-files.ts)', () => {
+    const appFiles = (dir: string) => [
+      ...new Set(
+        walk(dir)
+          .map((file) => path.relative(dir, file).split(path.sep).join('/'))
+          // .git: an earlier test runs git init in the Vite starter.
+          .filter((file) => !inScope(file) && !file.startsWith('registry/') && !file.startsWith('.git/'))
+          .map((file) => (file.startsWith('scripts/cli/') ? 'scripts/cli/' : file)),
+      ),
+    ];
+    expect(appFiles(vite).sort()).toEqual([...APP_FILES.vite].sort());
+    expect(appFiles(next).sort()).toEqual([...APP_FILES.next].sort());
+  });
+
+  it("ships the Next block index, and the menu and the page's translations read it", () => {
+    expect(readFileSync(path.join(next, 'src/blocks/index.ts'), 'utf8')).toBe(generateBlockIndex([], 'next'));
+    expect(readFileSync(path.join(next, 'src/routes/routes.ts'), 'utf8')).toContain(
+      'export const APP_MENU: AppMenu[] = [...BASE_MENU, ...blockNav];',
+    );
+    expect(readFileSync(path.join(next, 'app/[lang]/layout.tsx'), 'utf8')).toContain('...blockNavLabels[lang]');
   });
 
   it('leaves no barrel pointing at a dropped file, and ships its own env template', () => {

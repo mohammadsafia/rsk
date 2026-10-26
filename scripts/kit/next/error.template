@@ -5,7 +5,6 @@ import { EmptyState } from '@components/shared';
 
 import { useAppTranslation } from '@hooks/shared';
 
-// Starter default: a later kit version's kit:add may replace it with a block's page.
 export default function ErrorPage({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   const { t } = useAppTranslation('errors');
 

@@ -44,8 +44,10 @@ export type Lock = {
   starter?: string;
   /** Which starter: a Vite or a Next app; older locks have none: vite. */
   target?: KitTarget;
+  /** A Next app's generated App Router files (block pages, 404, error), by hash: kit:add replaces only unchanged ones. */
+  generated?: Record<string, string>;
 };
-export type LockMeta = Pick<Lock, 'starter' | 'target'>;
+export type LockMeta = Pick<Lock, 'starter' | 'target' | 'generated'>;
 export type Status = 'same' | 'updated' | 'added' | 'removed' | 'modified' | 'conflict';
 export type Row = { path: string; status: Status };
 
@@ -126,10 +128,11 @@ export function readLock(appDir: string): Lock {
   return JSON.parse(readFileSync(file, 'utf8')) as Lock;
 }
 
-/** Writes kit.lock.json. `meta` names the starter and target; left out, the lock keeps the ones it has. */
-export function writeLock(appDir: string, kit: string, files: Map<string, string>, blocks: string[] = [], meta?: LockMeta) {
+/** Writes kit.lock.json. `meta` sets the starter, target or generated files; each one left out keeps the lock's own. */
+export function writeLock(appDir: string, kit: string, files: Map<string, string>, blocks: string[] = [], meta: LockMeta = {}) {
   const file = path.join(appDir, LOCK_FILE);
-  const { starter, target } = meta ?? (existsSync(file) ? (JSON.parse(readFileSync(file, 'utf8')) as Lock) : {});
+  const current: LockMeta = existsSync(file) ? (JSON.parse(readFileSync(file, 'utf8')) as Lock) : {};
+  const { starter, target, generated } = { starter: current.starter, target: current.target, generated: current.generated, ...meta };
   const sorted = Object.fromEntries([...files].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
   // Keys left out when absent, so an older app's lock stays byte for byte what it was.
   const lock = {
@@ -137,6 +140,10 @@ export function writeLock(appDir: string, kit: string, files: Map<string, string
     ...(starter && { starter }),
     ...(target && { target }),
     blocks: [...blocks].sort((a, b) => a.localeCompare(b)),
+    ...(generated &&
+      Object.keys(generated).length && {
+        generated: Object.fromEntries(Object.entries(generated).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))),
+      }),
     files: sorted,
   };
   writeFileSync(file, `${JSON.stringify(lock, null, 2)}\n`);
@@ -190,6 +197,8 @@ export type UpdateResult = {
   kept: string[];
   /** Blocks the kit no longer offers: they stay in the app as its own, out of the lock. */
   released: string[];
+  /** A Next app's generated pages the app changed: the update left them as they are. */
+  keptPages: string[];
 };
 
 /** A block's files in the lock: its folder and its locale files. */
@@ -257,7 +266,7 @@ export function applyUpdate(options: {
   // Check before touching anything: a missing git must not stop an update halfway.
   if (rows.some((row) => row.status === 'conflict' && wanted(row.path)) && baseDir && !gitAvailable())
     throw new Error('kit:update needs git to merge files changed on both sides; install git and run it again.');
-  const result: UpdateResult = { updated: [], added: [], removed: [], merged: [], conflicts: [], kept: [], released };
+  const result: UpdateResult = { updated: [], added: [], removed: [], merged: [], conflicts: [], kept: [], released, keptPages: [] };
   const nextLock = new Map(Object.entries(lock.files));
 
   const copy = (file: string) => {
@@ -301,7 +310,7 @@ export function applyUpdate(options: {
   // their three-way merges need it as their base.
   if (!dryRun) writeLock(appDir, prefixes.length ? lock.kit : kit, nextLock, lock.blocks ?? []);
   // The blocks' routes, menu entries and error page follow their (maybe updated) block.json.
-  if (!dryRun && (appLock.blocks?.length || existsSync(path.join(appDir, 'src/blocks/index.ts')))) writeIndex(appDir);
+  if (!dryRun && (appLock.blocks?.length || existsSync(path.join(appDir, 'src/blocks/index.ts')))) result.keptPages = writeIndex(appDir);
   return result;
 }
 

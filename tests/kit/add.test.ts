@@ -67,12 +67,29 @@ describe('kit:add', () => {
     expect(result.install).toBe('pnpm add date-fns@^4.1.0');
   });
 
-  it('refuses in a Next app until its block routes arrive, and writes nothing', () => {
+  it('adds and removes a block in a Next app: its page generated and recorded in the lock, then gone again', () => {
     const { app, catalogue } = setup();
     writeLock(app, 'aaaaaaa', readTree(app), [], { starter: 'mohammadsafia/rsk-next-starter', target: 'next' });
+    addBlocks({ appDir: app, catalogue, ids: ['b'] });
+    const page = 'app/[lang]/(app)/b/page.tsx';
+    expect(read(app, page)).toContain('return <BPage />;');
+    const lock = JSON.parse(read(app, 'kit.lock.json'));
+    expect(Object.keys(lock.generated)).toEqual(expect.arrayContaining([page, 'app/[lang]/error.tsx', 'app/global-not-found.tsx']));
+    expect(read(app, 'src/blocks/index.ts')).toContain('export const blockNav: AppMenu[] = [];');
+    const removed = removeBlocks({ appDir: app, ids: ['b', 'a'] });
+    expect(removed.kept).toEqual([]);
+    expect(existsSync(path.join(app, page))).toBe(false);
+    expect(JSON.parse(read(app, 'kit.lock.json')).generated).not.toHaveProperty([page]);
+  });
+
+  it('refuses to add a Next block over a page the app wrote itself, and writes nothing', () => {
+    const { app, catalogue } = setup();
+    writeLock(app, 'aaaaaaa', readTree(app), [], { starter: 'mohammadsafia/rsk-next-starter', target: 'next' });
+    put(app, 'app/[lang]/(app)/b/page.tsx', 'export default function Mine() {\n  return null;\n}\n');
     const before = read(app, 'kit.lock.json');
-    expect(() => addBlocks({ appDir: app, catalogue, ids: ['b'] })).toThrow('Blocks in a Next app arrive with the next kit version.');
-    expect(() => removeBlocks({ appDir: app, ids: ['b'] })).toThrow('Blocks in a Next app arrive with the next kit version.');
+    expect(() => addBlocks({ appDir: app, catalogue, ids: ['b'] })).toThrow(
+      "app/[lang]/(app)/b/page.tsx isn't a page kit:add wrote (or you changed it); move it away to add a, b.",
+    );
     expect(read(app, 'kit.lock.json')).toBe(before);
     expect(existsSync(path.join(app, 'src/blocks/a'))).toBe(false);
   });

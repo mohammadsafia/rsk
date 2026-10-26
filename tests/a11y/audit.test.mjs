@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import { discoverRoutes, isEntry, languageFree, routesFor } from '../../scripts/a11y/audit.mjs';
+import { discoverRoutes, isEntry, languageFree, routesFor, signedInRoutes } from '../../scripts/a11y/audit.mjs';
 
 const BASE = 'http://localhost:5173';
 
@@ -65,5 +65,10 @@ describe('a11y audit route discovery', () => {
     expect(languageFree(['/en', '/en/dashboard', '/ar/dashboard', '/about'])).toEqual(['/', '/dashboard', '/about']);
     expect(routesFor(['/', '/dashboard'], 'ar', 'path')).toEqual(['/ar', '/ar/dashboard']);
     expect(routesFor(['/', '/dashboard'], 'ar', 'storage')).toEqual(['/', '/dashboard']);
+  });
+
+  it('audits signed-in pages no link reaches (--signed-in) beside the discovered ones, each once', () => {
+    expect(signedInRoutes(['/', '/dashboard'], ['/no-access', '/dashboard'])).toEqual(['/', '/dashboard', '/no-access']);
+    expect(signedInRoutes(['/'], [])).toEqual(['/']);
   });
 });
