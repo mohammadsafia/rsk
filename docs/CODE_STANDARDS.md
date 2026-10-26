@@ -1,6 +1,6 @@
 # Code Standards
 
-This is the complete frontend code standards checklist for RSK. Every `.ts`/`.tsx` file in the codebase must pass these rules. Standards are grouped into 12 categories.
+This is the complete frontend code standards checklist for RSK. Every `.ts`/`.tsx` file in the codebase must pass these rules. Standards are grouped into 13 categories. Most apply to both starters; a rule marked **(Vite)** or **(Next)** applies to that starter only, and §13 is the Next starter's.
 
 ---
 
@@ -17,7 +17,7 @@ This is the complete frontend code standards checklist for RSK. Every `.ts`/`.ts
 ### Import order
 
 ```
-1. React & core (react, react-router-dom)
+1. React & core (react; react-router-dom in Vite, next/* in Next)
 2. Third-party (zod, react-hook-form, framer-motion, etc.)
 3. UI components (@components/ui barrel)
 4. Shared components (@components/shared barrel)
@@ -167,4 +167,18 @@ Inside the component function, hooks and logic must follow this exact order:
 | 12.2 | No new dependencies without explicit instruction | `npm install lodash` | Use existing utils |
 | 12.3 | Event handlers named `handle*` | `onClickDelete` | `handleDelete` |
 | 12.4 | Errors surfaced via toast, never silently swallowed | Empty `catch {}` | `toast({ title: error.message })` |
-| 12.5 | Route pages use `React.lazy` | Direct import | `const Page = lazy(() => import(...))` |
+| 12.5 | **(Vite)** Route pages use `React.lazy` (in Next, see 13.5) | Direct import | `const Page = lazy(() => import(...))` |
+
+---
+
+## 13. Next.js (Next starter)
+
+| # | Rule | Wrong | Correct |
+|---|------|-------|---------|
+| 13.1 | Files under `app/` are Server Components; `'use client'` only on modules that render with hooks, state or events (the kit's components are all client components) | `'use client'` on a page that only fetches and renders | A server `page.tsx` rendering a client screen from `src/screens` |
+| 13.2 | Server-only code imports `server-only` and lives in `src/server`, a route handler or an action file | A token read in a module a client component imports | `import 'server-only';` in `src/server/members.ts` |
+| 13.3 | Secrets are unprefixed env vars read through `src/server/env.ts`; values the browser may see are `NEXT_PUBLIC_*` through `src/env.ts` | `NEXT_PUBLIC_API_TOKEN`, `process.env.X` in a component | `getServerEnv().API_URL`, `clientEnv.NEXT_PUBLIC_SITE_URL` |
+| 13.4 | Every page under `app/[lang]` exports `generateMetadata` (or `metadata`), through `pageMetadata` for public pages; generated block pages are exempt | A page with no title or canonical URL | `export async function generateMetadata(...) { return pageMetadata({ ... }); }` |
+| 13.5 | No `React.lazy` route pages: the App Router splits per route. A part of a page that loads on demand (a dialog's form) may be lazy | `const Page = lazy(() => import('@pages/x'))` in `page.tsx` | `import XPage from '@pages/x/XPage'` |
+| 13.6 | Your own forms' mutations go through server actions; what the browser fetches goes through route handlers (`/api`). Both check the session themselves; neither trusts the proxy | An action that writes without `getServerSession()` | `const session = await getServerSession(); if (!session) return { ok: false, ... }` |
+| 13.7 | The browser never holds the API token: it calls `/api/*`, and server code calls the API with `callApi` | `fetch(API_URL, { headers: { Authorization } })` in a client component | `fetch('/api/members')` in the browser, `callApi(session, ...)` on the server |
