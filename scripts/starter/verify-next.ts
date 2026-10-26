@@ -243,7 +243,8 @@ async function checkNoFlash(browser: Browser) {
   await hydrated.evaluate(() => document.fonts.ready);
   const after = await hydrated.screenshot();
   const differ = await pixelDifference(hydrated, before, after);
-  check(differ <= 0.005, `…and looks the same once hydrated (${(differ * 100).toFixed(2)} % of pixels differ)`);
+  // Anti-aliasing stays under the per-channel tolerance; a missing word or icon is hundreds of pixels.
+  check(differ <= 0.0002, `…and looks the same once hydrated (${(differ * 100).toFixed(2)} % of pixels differ)`);
   await on.close();
 }
 
@@ -283,30 +284,40 @@ async function checkInBrowser(app: string) {
     check((await fontsOf('/en/login', 'h1')).includes('Schibsted Grotesk'), 'Latin text paints in Schibsted Grotesk');
 
     // A stored theme wins over the system's from the first paint (a dark choice on a light system is the flash people
-    // see), and the motion setting is there before the page is parsed.
-    for (const [stored, system] of [
-      ['light', 'dark'],
-      ['dark', 'light'],
+    // see), and the motion setting is there before the page is parsed. The class is read when <body> arrives: nothing
+    // paints before that, and it is after the server's class and the theme script in <head>.
+    for (const [stored, system, painted] of [
+      ['light', 'dark', 'light'],
+      ['dark', 'light', 'dark'],
+      ['system', 'light', 'light'],
     ] as const) {
       const themed = await browser.newContext({ colorScheme: system });
       await themed.addInitScript((theme) => {
         localStorage.setItem('rsk-theme', JSON.stringify(theme));
-        const seen = ((window as unknown as { __classes: string[] }).__classes = [] as string[]);
-        new MutationObserver(() => seen.push(document.documentElement.className)).observe(document, { attributes: true, subtree: true });
-        document.addEventListener('DOMContentLoaded', () => {
-          (window as unknown as { __motion: string | undefined }).__motion = document.documentElement.dataset.motion;
+        const page = window as unknown as { __atBody?: string; __classes: string[]; __motion?: string };
+        page.__classes = [];
+        new MutationObserver(() => {
+          if (document.body && page.__atBody === undefined) {
+            page.__atBody = document.documentElement.className;
+            page.__motion = document.documentElement.dataset.motion;
+          }
+        }).observe(document, { childList: true, subtree: true });
+        new MutationObserver(() => page.__classes.push(document.documentElement.className)).observe(document, {
+          attributes: true,
+          subtree: true,
         });
       }, stored);
       const themedPage = await themed.newPage();
       await themedPage.goto(`${BASE}/ar/login`, { waitUntil: 'networkidle' });
-      const { classes, motion } = await themedPage.evaluate(() => ({
-        classes: (window as unknown as { __classes: string[] }).__classes,
-        motion: (window as unknown as { __motion?: string }).__motion,
-      }));
+      const { atBody, classes, motion } = await themedPage.evaluate(() => {
+        const page = window as unknown as { __atBody?: string; __classes: string[]; __motion?: string };
+        return { atBody: page.__atBody ?? '', classes: page.__classes, motion: page.__motion };
+      });
       const has = (value: string, theme: string) => new RegExp(`\\b${theme}\\b`).test(value);
+      const other = painted === 'dark' ? 'light' : 'dark';
       check(
-        has(classes.find(Boolean) ?? '', stored) && !classes.some((value) => has(value, system)),
-        `a stored ${stored} theme on a ${system} system never paints ${system}`,
+        has(atBody, painted) && !has(atBody, other) && !classes.some((value) => has(value, other)),
+        `a stored ${stored} theme on a ${system} system paints ${painted} from the first paint`,
       );
       check(!!motion, '…and the motion setting is set before the page is parsed');
       await themed.close();

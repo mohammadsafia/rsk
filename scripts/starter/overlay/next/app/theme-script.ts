@@ -1,5 +1,10 @@
-/** The theme the server's HTML paints (the kit's default), so a page without JavaScript looks as it will once hydrated. */
-export const SERVER_THEME = 'dark';
+import { THEME_TYPES } from '@contexts';
+
+/**
+ * The theme the server's HTML paints: the kit's default (ThemeProvider's), so a page without JavaScript looks as it
+ * will once hydrated. The generated 404 (app/global-not-found.tsx) uses THEME_TYPES.DARK directly.
+ */
+export const SERVER_THEME = THEME_TYPES.DARK;
 
 /**
  * Runs in <head> before the first paint: the stored theme's class on <html> in place of the server's default (so a
