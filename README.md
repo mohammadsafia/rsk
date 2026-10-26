@@ -307,9 +307,22 @@ pnpm starter:build [outDir]                 # write the Vite starter (default: .
 pnpm starter:build --target next [outDir]   # write the Next.js starter
 pnpm starter:verify                         # build it in a temp folder, install offline, run tsc, vp check, vp test and vp build
 pnpm starter:verify -- --target next        # the same for the Next starter, then serve it, audit it and sign in through it
+pnpm starter:dev -- --target next           # run the Next starter with next dev on this repo's kit, copying each saved file in
 ```
 
-**Vite or Next?** Both starters ship the same kit. Pick the Vite starter for an app that runs behind a sign-in and is served as static files. Pick the Next starter when pages need server rendering (SEO, shared links that preview), the session should live in an httpOnly cookie, or the app needs its own server routes. The Next starter's README covers its folders, environment variables, blocks and deploying to Vercel. Blocks (`pnpm kit:add`) work in both.
+**Vite or Next?** Both starters ship the same kit, with the same `pnpm kit:update` and `pnpm kit:add`:
+
+|                                  | Vite starter                                  | Next starter                                                 |
+| -------------------------------- | --------------------------------------------- | ------------------------------------------------------------ |
+| Rendering                        | In the browser, static files                  | On the server first, then hydrated                           |
+| Search engines and link previews | Not indexed                                   | Indexed in English and Arabic, a preview image per language  |
+| Session                          | Token in localStorage                         | Encrypted httpOnly cookie; the browser never sees the token  |
+| API calls                        | The browser calls the API                     | The browser calls the app's `/api`; the server calls the API |
+| Routing and language             | React Router; the language is a stored choice | App Router; the language is in the URL (`/en`, `/ar`)        |
+| Hosting                          | Any static host                               | A Node host such as Vercel                                   |
+| First-load budget                | 210 KB                                        | 306 KB (React and Next alone are about 132)                  |
+
+Pick Vite for an app that lives behind a sign-in; pick Next when pages must be found or shared, the token must stay off the browser, or the app needs its own server routes. The docs' **Next.js** guide covers the differences, and the Next starter's README its folders, environment variables, blocks and deploying to Vercel.
 
 `vp create` takes GitHub repositories and npm packages, not local folders. The starter is published to [mohammadsafia/rsk-starter](https://github.com/mohammadsafia/rsk-starter), and apps start with:
 

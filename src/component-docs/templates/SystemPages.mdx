@@ -91,3 +91,7 @@ The pages land in `src/blocks/system-pages/` and join the router through `src/bl
 ## RTL notes
 
 - Everything is centred; the home and retry icons don't point anywhere, so nothing mirrors.
+
+## In Next
+
+`pnpm kit:add system-pages` generates App Router files: the 404 is `app/global-not-found.tsx` (server-rendered for any unknown URL) and `app/[lang]/not-found.tsx` (for `notFound()`, shown in the browser), the error page is `app/[lang]/error.tsx` ("Try again" is Next's `reset`), and maintenance and no-access are pages under `app/[lang]`. "Back to home" goes to `/`, the public landing page.
