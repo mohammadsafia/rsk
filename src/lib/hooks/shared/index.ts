@@ -12,6 +12,7 @@ export * from './useAsyncOptionsInfiniteQuery';
 export * from './useComboboxOptions';
 export * from './useTime';
 export * from './useAuth';
+export * from './dataTableQuery';
 export * from './useDataTableQuery';
 export * from './useAppTranslation';
 export * from './useBlockTranslation';

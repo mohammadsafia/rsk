@@ -1,0 +1,13 @@
+{
+  "hero": {
+    "title": "Build your app on RSK",
+    "description": "A React and Next.js starter with a UI kit, sign-in, English and Arabic, and light and dark themes.",
+    "signIn": "Sign in"
+  },
+  "features": {
+    "title": "What you start with",
+    "rendered": { "title": "Rendered on the server", "description": "Pages arrive as HTML in either language, ready for search engines." },
+    "languages": { "title": "English and Arabic", "description": "Every screen reads right to left in Arabic, with its own fonts." },
+    "kit": { "title": "One UI kit", "description": "The same components, forms and tables as the React starter." }
+  }
+}

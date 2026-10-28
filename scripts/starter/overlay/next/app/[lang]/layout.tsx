@@ -7,7 +7,7 @@ import { THEME_COLORS } from '@app-config';
 import { blockNavLabels } from '@blocks';
 import { LOCALES } from '@locales';
 
-import { dirOf, isLang, LANGS } from '@env';
+import { clientEnv, dirOf, isLang, LANGS } from '@env';
 import { getT } from '@server/i18n';
 import { fontVariables } from '../fonts';
 import { Providers } from './providers';
@@ -26,6 +26,8 @@ export async function generateMetadata({ params }: Pick<LayoutProps, 'params'>):
   if (!isLang(lang)) return {};
   const t = await getT(lang, 'common');
   return {
+    // Every page's canonical, hreflang and Open Graph URLs are relative to this (src/server/seo.ts).
+    metadataBase: new URL(clientEnv.NEXT_PUBLIC_SITE_URL),
     title: { template: '%s · RSK', default: 'RSK' },
     description: t('app.description'),
     icons: {

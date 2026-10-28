@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import {
   BUNDLE_BUDGET_KB,
   NEXT_BUDGET_KB,
+  NEXT_TABLE_BUDGET_KB,
   localeKeys,
   rawKeysIn,
   failuresOf,
@@ -85,6 +86,11 @@ describe('first-load page check', () => {
   it("resolves --budget next-starter to the Next starter's own budget", () => {
     expect(NEXT_BUDGET_KB).toBeGreaterThan(BUNDLE_BUDGET_KB);
     expect(resolveBudget('next-starter')).toBe(NEXT_BUDGET_KB);
+  });
+
+  it('resolves --budget next-table to the budget for a page with a kit data table (the members example)', () => {
+    expect(NEXT_TABLE_BUDGET_KB).toBeGreaterThan(NEXT_BUDGET_KB);
+    expect(resolveBudget('next-table')).toBe(NEXT_TABLE_BUDGET_KB);
   });
 
   it('fails a route whose page logged a hydration error (the server and the browser rendered differently)', () => {
