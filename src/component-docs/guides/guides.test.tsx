@@ -3,10 +3,10 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { getComponentDocsRegistry } from '@component-docs/registry';
 
-const GUIDES = ['introduction', 'installation', 'theming', 'rtl-i18n', 'forms', 'data-tables'];
+const GUIDES = ['introduction', 'installation', 'theming', 'rtl-i18n', 'forms', 'data-tables', 'nextjs'];
 
 describe('guides', () => {
-  it('registers all six guides in order with real sections', () => {
+  it('registers all seven guides in order with real sections', () => {
     const guides = getComponentDocsRegistry()
       .filter((doc) => doc.category.toUpperCase() === 'GUIDES')
       .sort((a, b) => (a.order ?? 99) - (b.order ?? 99));

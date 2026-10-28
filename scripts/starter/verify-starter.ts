@@ -7,14 +7,19 @@
  *   pnpm starter:verify -- --target next   # the Next starter (verify-next.ts)
  */
 import { execFileSync } from 'node:child_process';
+import type { AddressInfo, Server } from 'node:net';
 import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
+import { chromium } from 'playwright';
+
+import { serve } from '../bundle/first-load.mjs';
 import { hashFile } from '../kit/core';
 import { buildStarter, refreshLockfile } from './build-starter';
 import { installArgs } from './install';
 import { LEFTOVER_PATTERNS } from './manifest';
+import { smokeSignInOut } from './smoke';
 import { verifyNext } from './verify-next';
 import { verifyUpgrade } from './verify-upgrade';
 
@@ -38,7 +43,32 @@ const fingerprint = (root: string) =>
       .map((file) => [file, hashFile(path.join(root, file))]),
   );
 
-function verifyVite() {
+/** The built app in a browser: sign in, the dashboard, sign out; no page or console error on the way. */
+async function smokeVite(out: string) {
+  const header = JSON.parse(readFileSync(path.join(out, 'src/locales/en/header.json'), 'utf8')) as { openUserMenu: string; logout: string };
+  const server = (await serve(path.join(out, 'dist'))) as Server;
+  const browser = await chromium.launch();
+  const problems: string[] = [];
+  try {
+    const page = await (await browser.newContext()).newPage();
+    page.on('pageerror', (error) => problems.push(`${page.url()}: ${error.message}`));
+    page.on('console', (message) => message.type() === 'error' && problems.push(`${page.url()}: ${message.text()}`));
+    await smokeSignInOut(page, {
+      base: `http://127.0.0.1:${(server.address() as AddressInfo).port}`,
+      login: '/auth/login',
+      home: '/dashboard',
+      menuLabel: header.openUserMenu,
+      signOutLabel: header.logout,
+    });
+    if (problems.length) throw new Error(`Page or console errors:\n${problems.join('\n')}`);
+    console.log('  ✓ sign in → dashboard → sign out');
+  } finally {
+    await browser.close();
+    server.close();
+  }
+}
+
+async function verifyVite() {
   const out = buildStarter(mkdtempSync(path.join(os.tmpdir(), 'rsk-starter-')));
   const pnpm = ['pnpm@10.34.7'];
 
@@ -55,6 +85,7 @@ function verifyVite() {
     run(out, 'corepack', [...pnpm, 'exec', 'vp', 'check']);
     run(out, 'corepack', [...pnpm, 'exec', 'vp', 'test', '--run']);
     run(out, 'corepack', [...pnpm, 'exec', 'vp', 'build']);
+    await smokeVite(out);
     // First-load budget: each route's gzipped JS, page errors and untranslated keys (a dropped side-effect module).
     // The app's pages signed in as the demo user, and the sign-in pages as a signed-out visitor sees them.
     const budget = (...args: string[]) =>
@@ -101,5 +132,5 @@ function verifyVite() {
 const targetAt = process.argv.indexOf('--target');
 const target = targetAt === -1 ? 'vite' : process.argv[targetAt + 1];
 if (target === 'next') await verifyNext();
-else if (target === 'vite') verifyVite();
+else if (target === 'vite') await verifyVite();
 else throw new Error(`--target must be vite or next, not "${target}"`);

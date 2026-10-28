@@ -95,3 +95,7 @@ import { Download, Plus } from 'lucide-react';
 ## RTL notes
 
 - The back chevron mirrors in Arabic, and the action row aligns to the end (left).
+
+## In Next
+
+Links go through the app's router (`KitLink`): in a Next app that is `next/link`, and the visitor's language goes in front of every path, so pass language-free paths (`/members`, not `/en/members`). Nothing to change between the two starters. That covers `back` and the breadcrumb.

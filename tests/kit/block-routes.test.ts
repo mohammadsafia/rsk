@@ -167,3 +167,21 @@ describe('the lock', () => {
     expect(before).not.toContain('generated');
   });
 });
+
+describe('the 404 documents', () => {
+  it("paint the kit's default theme, as the [lang] layout does, so a 404 without JavaScript isn't the other theme", () => {
+    for (const blocks of [[], [SYSTEM_PAGES]])
+      expect(nextRouteFiles(blocks).get('app/global-not-found.tsx')).toContain('className={THEME_TYPES.DARK}');
+  });
+
+  it('import from the app only what every published Next starter has (app/theme-script.ts exports THEME_SCRIPT)', () => {
+    for (const blocks of [[], [SYSTEM_PAGES]]) {
+      const source = nextRouteFiles(blocks).get('app/global-not-found.tsx') ?? '';
+      const names = source
+        .match(/import \{ ([^}]+) \} from '\.\/theme-script';/)?.[1]
+        .split(',')
+        .map((name) => name.trim());
+      expect(names).toEqual(['THEME_SCRIPT']);
+    }
+  });
+});

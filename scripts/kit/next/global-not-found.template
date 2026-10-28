@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 
+import { THEME_TYPES } from '@contexts';
+
 import { DEFAULT_LANG, dirOf, isLang } from '@env';
 import { getT } from '@server/i18n';
 
@@ -26,7 +28,7 @@ export default async function GlobalNotFound() {
   const t = await getT(lang, 'errors');
 
   return (
-    <html lang={lang} dir={dirOf(lang)} style={fontVariables} suppressHydrationWarning>
+    <html lang={lang} dir={dirOf(lang)} className={THEME_TYPES.DARK} style={fontVariables} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

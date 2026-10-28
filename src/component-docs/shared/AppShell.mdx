@@ -96,3 +96,7 @@ The app's `AppLayout` and this site's docs layout are both built on it:
 ## RTL notes
 
 - The rail and drawer sit at the start: on the right in Arabic, and the drawer slides in from the right.
+
+## In Next
+
+The shell renders on the server first. Pass `initialCollapsed` from a cookie the server reads (the Next starter's `(app)` layout does) and `onCollapsedChange` to write it, so the first paint has the sidebar as the person left it; `storageKey` (localStorage) is the Vite starter's way. Its sidebar links follow the Sidebar's In Next note.

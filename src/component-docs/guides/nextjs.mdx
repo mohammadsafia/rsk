@@ -1,0 +1,77 @@
+---
+id: nextjs
+title: Next.js
+section: Guides
+category: Guides
+description: The same kit in a Next.js App Router app — the router adapter, client components, hydration, auth, blocks, SEO, server patterns and deploying.
+order: 7
+tags: [guides, nextjs, ssr, seo]
+---
+
+## Vite or Next?
+
+Both starters ship the same kit: the same files, the same `pnpm kit:update` and `pnpm kit:add`.
+
+| | Vite starter | Next starter |
+|---|---|---|
+| Rendering | In the browser, served as static files | On the server first, then hydrated |
+| Search engines and link previews | Not indexed | Every page indexed in English and Arabic, with an image per language |
+| Session | Token in localStorage | Encrypted httpOnly cookie; the browser never sees the token |
+| API calls | The browser calls the API | The browser calls the app's `/api`, the server calls the API |
+| Routing | React Router, `src/routes` | App Router, `app/[lang]` |
+| Language | Stored choice | In the URL (`/en/…`, `/ar/…`) |
+| Hosting | Any static host | A Node host, such as Vercel |
+| First load | 210 KB budget | 306 KB budget (React and Next alone are about 132) |
+| Blocks | Routes in `src/blocks/index.ts` | Generated pages under `app/` |
+
+Pick Vite for an app that lives behind a sign-in. Pick Next when pages must be found or shared, when the token must stay off the browser, or when the app needs its own server routes.
+
+## The router adapter
+
+Kit components never import a router. They link and navigate through `KitLink`, `useKitNavigate`, `useKitPathname` and `useKitSearchParams` (`@contexts`), and each starter provides them: React Router in Vite, `next/link` and `next/navigation` in Next. In Next the adapter also puts the visitor's language in front of every path, so kit code and `src/routes` stay language-free: pass `/members`, the app links to `/ar/members`.
+
+## The client boundary
+
+Every kit component is a client component (`'use client'` sits on the modules that render or use hooks, and only those). In Next, pages under `app/` are Server Components that render a client screen from `src/screens`:
+
+```tsx
+// app/[lang]/(app)/members/page.tsx (server)
+export default async function Page({ params }: PageProps) {
+  const session = await requireSession((await params).lang);
+  return <MembersPage />; // 'use client' inside
+}
+```
+
+Server-only code imports `server-only` and lives in `src/server`, a route handler or a server action.
+
+## Hydration rules
+
+The server's HTML and the browser's first render must match:
+
+- Read browser-only state (`localStorage`, `matchMedia`, the time zone) after mount, never during render. The kit's theme and motion are applied by an inline script before the first paint, so they don't flash.
+- Format dates in a fixed time zone (or after mount): the server's zone is not the visitor's.
+- Nothing is shared between requests on the server: i18n and the query cache are created per request (`app/[lang]/providers.tsx`).
+
+## Auth
+
+Sign-in posts to the app's own route handlers (`app/api/auth/*`), which call the API and keep the session in an encrypted httpOnly cookie; the page gets the user, never the token. `proxy.ts` puts the language in the URL and sends signed-out visitors to sign in, but it is only a first check: the `(app)` layout, every page, route handler and server action check the session again with `getServerSession()` or `requireSession()`.
+
+## Blocks
+
+`pnpm kit:add` works the same. A block's routes become generated pages under `app/[lang]` (inside `(app)` when the route is in the app shell), its 404 becomes `app/global-not-found.tsx` and its error page `app/[lang]/error.tsx`. `kit.lock.json` records each generated file's hash: edit one and it is yours, kit commands leave it where it is.
+
+## SEO
+
+Every page exports `generateMetadata` through `pageMetadata` (`src/server/seo.ts`): the title, description, canonical URL, `hreflang` links to the other language and `x-default`, and Open Graph and Twitter data with the page's language image. Signed-in pages answer `noindex`; `app/sitemap.ts` and `app/robots.ts` list and guard the rest. URLs are absolute on `NEXT_PUBLIC_SITE_URL`.
+
+## Server patterns
+
+The starter's members page shows the three:
+
+- **A route handler as the browser's API.** `app/api/[...path]/route.ts` answers `/api/<path>` from the API's `/<path>` with the session's token. Server code calls the API the same way with `callApi`.
+- **A Server Component that prefetches.** The page fetches the table page the URL asks for and sends it in a `HydrationBoundary`; the kit table reads it under the same key (`dataTableQueryKey`) without fetching again.
+- **A server action behind a kit form.** The form and the action share one Zod schema; the action validates again, checks the session and returns field errors the form shows with `setError`.
+
+## Deploying to Vercel
+
+Import the repository and set `SESSION_SECRET` and `NEXT_PUBLIC_SITE_URL` (with `API_URL` and `AUTH_MOCK=false` once the API is ready). `proxy.ts` runs on the Node runtime. Pages behind sign-in and the API route are dynamic, so nothing private is cached; public pages and the Open Graph images are built ahead. To serve the app under a path, set `basePath` in `next.config.ts` and include the path in `NEXT_PUBLIC_SITE_URL`.

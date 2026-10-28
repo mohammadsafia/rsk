@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { THEME_SCRIPT } from './theme-script';
+import { SERVER_THEME, THEME_SCRIPT } from './theme-script';
 
 const root = document.documentElement;
 const run = (reduced = false) => {
@@ -32,6 +32,14 @@ describe('theme script', () => {
     localStorage.clear();
     run();
     expect(root.className).toBe('dark');
+  });
+
+  it("replaces the server's default class rather than adding to it (the HTML paints the default without JavaScript)", () => {
+    expect(SERVER_THEME).toBe('dark');
+    root.className = SERVER_THEME;
+    localStorage.setItem('rsk-theme', '"light"');
+    run();
+    expect(root.className).toBe('light');
   });
 
   it('never writes the stored value into the page', () => {

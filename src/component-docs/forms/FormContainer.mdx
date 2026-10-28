@@ -77,3 +77,7 @@ Other `<form>` attributes pass through (`className`, `id`, …).
 ## RTL notes
 
 - The actions row aligns to the end, so Save sits on the left in Arabic, with Cancel before it.
+
+## In Next
+
+Cancel goes back through the app's router (`useKitNavigate`), the same in both starters. A form whose submit is a server action awaits it in `onSuccess` and maps the field errors it returns with `setError`; the Next starter's members example (`InviteMemberForm`) shows the whole pattern.
