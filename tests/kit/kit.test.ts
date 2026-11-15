@@ -13,6 +13,7 @@ import {
   hashFile,
   inScope,
   parseArgs,
+  parseLock,
   readTree,
   stageUpstream,
   writeLock,
@@ -85,7 +86,7 @@ describe('kit scope', () => {
 describe('kit:status', () => {
   it('sorts every kit file: updated, added, removed, changed locally, changed on both sides; ignores the app’s own', () => {
     const { app, upstream } = scenario();
-    const lock = JSON.parse(read(app, 'kit.lock.json'));
+    const lock = parseLock(read(app, 'kit.lock.json'));
     const rows = classify(lock, readTree(app), readTree(upstream));
     expect(statusOf(rows, BUTTON)).toBe('updated');
     expect(statusOf(rows, NEW)).toBe('added');
@@ -98,7 +99,7 @@ describe('kit:status', () => {
 
   it('calls a file the app removed but upstream changed a conflict, never a silent re-add', () => {
     const { app, upstream } = scenario();
-    const lock = JSON.parse(read(app, 'kit.lock.json'));
+    const lock = parseLock(read(app, 'kit.lock.json'));
     const local = readTree(app);
     local.delete(BUTTON);
     expect(statusOf(classify(lock, local, readTree(upstream)), BUTTON)).toBe('conflict');
@@ -118,7 +119,7 @@ describe('kit:update', () => {
     expect(read(app, PAGE)).toBe('my page\n');
     expect(result.merged).toEqual(['src/components/ui/tag/Tag.tsx']);
     expect(result.conflicts).toEqual([]);
-    const lock = JSON.parse(read(app, 'kit.lock.json'));
+    const lock = parseLock(read(app, 'kit.lock.json'));
     expect(lock.kit).toBe('bbbbbbb');
     expect(lock.files[BUTTON]).toBe(hashFile(path.join(upstream, BUTTON)));
     expect(lock.files[OLD]).toBeUndefined();
@@ -175,7 +176,7 @@ describe('kit:update safety', () => {
   it('a partial update keeps the lock’s kit version, so a later full update still merges against the right base', () => {
     const { base, app, upstream } = scenario();
     applyUpdate({ appDir: app, upstreamDir: upstream, baseDir: base, kit: 'bbbbbbb', only: ['src/components/ui/new/'] });
-    const lock = JSON.parse(read(app, 'kit.lock.json'));
+    const lock = parseLock(read(app, 'kit.lock.json'));
     expect(lock.kit).toBe('aaaaaaa');
     expect(lock.files[NEW]).toBe(hashFile(path.join(upstream, NEW)));
   });
@@ -269,7 +270,7 @@ describe('kit:update with added blocks', () => {
     expect(result.removed).toEqual([]);
     expect(read(app, BLOCK)).toBe('v2\n');
     expect(read(app, LOCALE)).toBe('{"v":2}\n');
-    expect(JSON.parse(read(app, 'kit.lock.json')).blocks).toEqual(['search-field']);
+    expect(parseLock(read(app, 'kit.lock.json')).blocks).toEqual(['search-field']);
   });
 
   it('never adds a block the app didn’t add', () => {
@@ -307,7 +308,7 @@ describe('kit:update and the block index', () => {
     expect(result.removed).toEqual([]);
     expect(result.released).toEqual(['pages']);
     expect(existsSync(path.join(app, 'src/blocks/pages/index.ts'))).toBe(true);
-    const lock = JSON.parse(read(app, 'kit.lock.json'));
+    const lock = parseLock(read(app, 'kit.lock.json'));
     expect(lock.blocks).toEqual([]);
     expect(Object.keys(lock.files).some((file) => file.includes('pages'))).toBe(false);
   });
@@ -323,5 +324,44 @@ describe('kit:update and the block index', () => {
     put(starter, 'registry/blocks/pages/files/src/blocks/pages/index.ts', 'export const NewPage = () => null;\n');
     applyUpdate({ appDir: app, upstreamDir: stageUpstream(starter, ['pages']), kit: 'bbbbbbb' });
     expect(read(app, 'src/blocks/index.ts')).toContain("import('./pages')).NewPage");
+  });
+});
+
+describe('kit.lock.json on disk', () => {
+  // A scanner's generic rule reads `"…/auth.ts": "<64 random characters>"` as a credential assignment, and a new
+  // app's first push then fails its secret scan. Each hash is written as `sha256:<hex>`, which no longer has that shape.
+  const SENSITIVE = /(access|auth|api|client|credential|creds|key|passw|secret|token)/i;
+  const BARE_VALUE = /["']?\s*[:=,]\s*["']([\w.=-]{10,150})["']/;
+
+  it('writes every hash with the digest prefix, and never a sensitive-looking path beside a bare long value', () => {
+    const app = dir();
+    for (const file of [
+      'src/lib/utils/auth.ts',
+      'src/lib/constants/StorageKeys.ts',
+      'src/styles/tokens.css',
+      'src/components/ui/button/Button.tsx',
+    ])
+      put(app, file, `// ${file}\n`);
+    writeLock(app, 'aaaaaaa', readTree(app), [], {
+      generated: { 'app/token/page.tsx': hashFile(path.join(app, 'src/lib/utils/auth.ts')) },
+    });
+
+    const text = read(app, 'kit.lock.json');
+    const raw = JSON.parse(text) as { files: Record<string, string>; generated: Record<string, string> };
+    for (const value of [...Object.values(raw.files), ...Object.values(raw.generated)]) expect(value).toMatch(/^sha256:[0-9a-f]{64}$/);
+    for (const line of text.split('\n').filter((each) => SENSITIVE.test(each))) expect(line, line).not.toMatch(BARE_VALUE);
+  });
+
+  it('reads hashes as bare hex whether the lock has the prefix or was written before it', () => {
+    const app = dir();
+    put(app, 'src/lib/utils/auth.ts', 'export const a = 1;\n');
+    const hash = hashFile(path.join(app, 'src/lib/utils/auth.ts'));
+    writeLock(app, 'aaaaaaa', readTree(app), []);
+    expect(parseLock(read(app, 'kit.lock.json')).files['src/lib/utils/auth.ts']).toBe(hash);
+
+    const older = JSON.stringify({ kit: 'aaaaaaa', blocks: [], files: { 'src/lib/utils/auth.ts': hash } });
+    expect(parseLock(older).files['src/lib/utils/auth.ts']).toBe(hash);
+    // An app made before the prefix is still "unchanged" against the same kit.
+    expect(classify(parseLock(older), readTree(app), readTree(app)).every((row) => row.status === 'same')).toBe(true);
   });
 });

@@ -122,19 +122,41 @@ export function readTree(root: string): Map<string, string> {
   return tree;
 }
 
+/**
+ * On disk a hash is written as `sha256:<hex>`. A bare 64-character hex string beside a path such as
+ * `src/lib/utils/auth.ts` reads to a secret scanner as a credential ("auth": "<random>"), which fails the first
+ * push of every new app whose pipeline scans for secrets. In memory hashes stay bare hex.
+ */
+const DIGEST_PREFIX = 'sha256:';
+const withPrefix = (hashes: Record<string, string>) =>
+  Object.fromEntries(
+    Object.entries(hashes).map(([file, hash]) => [file, hash.startsWith(DIGEST_PREFIX) ? hash : `${DIGEST_PREFIX}${hash}`]),
+  );
+const withoutPrefix = (hashes: Record<string, string>) =>
+  Object.fromEntries(
+    Object.entries(hashes).map(([file, hash]) => [file, hash.startsWith(DIGEST_PREFIX) ? hash.slice(DIGEST_PREFIX.length) : hash]),
+  );
+
+/** Reads kit.lock.json. Hashes come back as bare hex whether the lock was written with the prefix or before it. */
+export function parseLock(text: string): Lock {
+  const lock = JSON.parse(text) as Lock;
+  return { ...lock, files: withoutPrefix(lock.files ?? {}), ...(lock.generated && { generated: withoutPrefix(lock.generated) }) };
+}
+
 export function readLock(appDir: string): Lock {
   const file = path.join(appDir, LOCK_FILE);
   if (!existsSync(file)) throw new Error(`No ${LOCK_FILE} here: run this in an app made from the RSK starter.`);
-  return JSON.parse(readFileSync(file, 'utf8')) as Lock;
+  return parseLock(readFileSync(file, 'utf8'));
 }
 
 /** Writes kit.lock.json. `meta` sets the starter, target or generated files; each one left out keeps the lock's own. */
 export function writeLock(appDir: string, kit: string, files: Map<string, string>, blocks: string[] = [], meta: LockMeta = {}) {
   const file = path.join(appDir, LOCK_FILE);
-  const current: LockMeta = existsSync(file) ? (JSON.parse(readFileSync(file, 'utf8')) as Lock) : {};
+  const current: LockMeta = existsSync(file) ? parseLock(readFileSync(file, 'utf8')) : {};
   const { starter, target, generated } = { starter: current.starter, target: current.target, generated: current.generated, ...meta };
   const sorted = Object.fromEntries([...files].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
-  // Keys left out when absent, so an older app's lock stays byte for byte what it was.
+  // Keys left out when absent. Hashes are written with the digest prefix (see DIGEST_PREFIX), so the first write
+  // after this change rewrites an older app's hashes in the new form; the hashes themselves do not change.
   const lock = {
     kit,
     ...(starter && { starter }),
@@ -142,9 +164,9 @@ export function writeLock(appDir: string, kit: string, files: Map<string, string
     blocks: [...blocks].sort((a, b) => a.localeCompare(b)),
     ...(generated &&
       Object.keys(generated).length && {
-        generated: Object.fromEntries(Object.entries(generated).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))),
+        generated: withPrefix(Object.fromEntries(Object.entries(generated).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))),
       }),
-    files: sorted,
+    files: withPrefix(sorted),
   };
   writeFileSync(file, `${JSON.stringify(lock, null, 2)}\n`);
 }

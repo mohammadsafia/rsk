@@ -6,7 +6,7 @@ import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test';
 
 import { generateBlockIndex } from '../../scripts/kit/blocks';
-import { hashFile, inScope } from '../../scripts/kit/core';
+import { hashFile, inScope, parseLock } from '../../scripts/kit/core';
 import { buildStarter } from '../../scripts/starter/build-starter';
 
 import { APP_FILES } from './app-files';
@@ -29,12 +29,7 @@ afterAll(() => {
 
 describe('buildStarter', () => {
   it('ships a kit.lock.json naming the kit commit and fingerprinting every kit file, and the kit:status/kit:update scripts', () => {
-    const lock = JSON.parse(readFileSync(path.join(out, 'kit.lock.json'), 'utf8')) as {
-      kit: string;
-      starter?: string;
-      target?: string;
-      files: Record<string, string>;
-    };
+    const lock = parseLock(readFileSync(path.join(out, 'kit.lock.json'), 'utf8'));
     expect(lock.kit).toBe(execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim());
     // kit:update and kit:add download from the repository the lock names.
     expect(lock).toMatchObject({ starter: 'mohammadsafia/rsk-starter', target: 'vite' });
