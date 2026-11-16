@@ -114,7 +114,7 @@ function TimeColumn<TValue extends number | string>({ label, options, selected, 
       role="listbox"
       aria-label={label}
       data-slot="time-picker-column"
-      className="flex max-h-48 w-12 [scrollbar-width:thin] flex-col gap-0.5 overflow-y-auto font-mono text-sm"
+      className="flex max-h-56 w-12 [scrollbar-width:thin] flex-col gap-0.5 overflow-y-auto font-mono text-sm"
     >
       {options.map((option, index) => (
         <button
@@ -125,7 +125,7 @@ function TimeColumn<TValue extends number | string>({ label, options, selected, 
           tabIndex={option.value === selected ? 0 : -1}
           ref={option.value === selected ? scrollSelectedIntoView : undefined}
           className={cn(
-            'focus-ring text-fg-muted hover:bg-hover hover:text-fg h-7 shrink-0 cursor-pointer rounded-md tabular-nums transition-colors',
+            'focus-ring text-fg-muted hover:bg-hover hover:text-fg h-control-md pointer-coarse:h-11 shrink-0 cursor-pointer rounded-md tabular-nums transition-colors',
             'aria-selected:text-fg aria-selected:ink',
           )}
           onClick={() => onSelect(option.value)}
@@ -272,7 +272,8 @@ const TimePickerColumns: FC<TimePickerColumnsProps> = ({ available, selected, us
   const periodOptions = columns.periods.map((period) => ({ label: period, value: period }));
 
   return (
-    <div className="flex gap-1">
+    // A time reads hours, minutes, AM/PM from left to right in every language (the field shows it the same way).
+    <div dir="ltr" className="flex gap-1">
       <TimeColumn
         label={labels.hours}
         options={columns.hours}
