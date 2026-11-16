@@ -14,6 +14,8 @@ import { cn, mergeRefs } from '@utils';
 
 import { XIcon } from 'lucide-react';
 
+import { useReturnFocusOnClose } from './useReturnFocusOnClose';
+
 const dialogContentVariants = cva(
   [
     'bg-surface-raised text-fg shadow-overlay rule-top rule-top-section fixed inset-x-4 top-1/2 z-50 mx-auto flex max-h-[85dvh] -translate-y-1/2 flex-col gap-4',
@@ -88,11 +90,14 @@ const DialogContent: FC<DialogContentProps> = ({
   dismissible = true,
   onEscapeKeyDown,
   onInteractOutside,
+  onOpenAutoFocus,
+  onCloseAutoFocus,
   children,
   ...props
 }) => {
   const { t } = useAppTranslation('common');
   const flightRef = useFlight<HTMLDivElement>();
+  const returnFocus = useReturnFocusOnClose({ onOpenAutoFocus, onCloseAutoFocus });
 
   const handleEscapeKeyDown = (event: EscapeKeyDownEvent) => {
     if (!dismissible) event.preventDefault();
@@ -126,6 +131,8 @@ const DialogContent: FC<DialogContentProps> = ({
           className={cn(dialogContentVariants({ size }), dialogMotionClassName, className)}
           onEscapeKeyDown={handleEscapeKeyDown}
           onInteractOutside={handleInteractOutside}
+          onOpenAutoFocus={returnFocus.onOpenAutoFocus}
+          onCloseAutoFocus={returnFocus.onCloseAutoFocus}
           {...describedBy}
           {...props}
         >

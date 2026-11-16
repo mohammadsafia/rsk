@@ -3,7 +3,7 @@
 import { type ComponentProps, type ComponentPropsWithoutRef, type FC, type ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
-import { IconButton, SectionsReset } from '@components/ui';
+import { IconButton, SectionsReset, useReturnFocusOnClose } from '@components/ui';
 import { Conditional } from '@components/utils';
 
 import { useAppTranslation } from '@hooks/shared';
@@ -75,10 +75,13 @@ const SheetContent: FC<SheetContentProps> = ({
   dismissible = true,
   onEscapeKeyDown,
   onInteractOutside,
+  onOpenAutoFocus,
+  onCloseAutoFocus,
   children,
   ...props
 }) => {
   const { t } = useAppTranslation('common');
+  const returnFocus = useReturnFocusOnClose({ onOpenAutoFocus, onCloseAutoFocus });
   const describedBy = description ? {} : { 'aria-describedby': undefined };
 
   return (
@@ -103,6 +106,8 @@ const SheetContent: FC<SheetContentProps> = ({
             if (!dismissible) event.preventDefault();
             onInteractOutside?.(event);
           }}
+          onOpenAutoFocus={returnFocus.onOpenAutoFocus}
+          onCloseAutoFocus={returnFocus.onCloseAutoFocus}
           {...describedBy}
           {...props}
         >

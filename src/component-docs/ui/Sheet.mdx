@@ -67,7 +67,7 @@ Below the `md` breakpoint every sheet becomes a bottom sheet. Use [Dialog](/docs
 
 ## Accessibility
 
-- A modal dialog (Radix): `role="dialog"`, `aria-modal`, named by the title; focus is trapped and returns to the trigger.
+- A modal dialog (Radix): `role="dialog"`, `aria-modal`, named by the title; focus is trapped and, on close, returns to whatever had it when the sheet opened: the trigger, or the button that set `open` (Escape, Cancel and state changes alike).
 - Escape and the scrim close a dismissible sheet.
 
 ## RTL notes

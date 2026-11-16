@@ -79,7 +79,7 @@ For "Are you sure?" prompts, use [ConfirmDialog](/docs/components/confirm-dialog
 
 ## Accessibility
 
-- Radix sets `role="dialog"`, `aria-modal`, and links the title and description; focus moves in, is trapped, and returns to the trigger on close.
+- Radix sets `role="dialog"`, `aria-modal`, and links the title and description; focus moves in, is trapped, and on close returns to whatever had it when the dialog opened (the trigger, or the button that set `open` when there is no trigger), whether it closed by Escape, a Cancel button or a state change. Prevent `onCloseAutoFocus` to place focus yourself.
 - Escape closes a dismissible dialog. Put the primary action last in the footer.
 
 ## RTL notes
