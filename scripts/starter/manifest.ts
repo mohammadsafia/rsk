@@ -49,6 +49,8 @@ export const DROP = [
   '.github/workflows/visual.yml',
   '.github/workflows/starter-sync.yml',
   '.github/workflows/starter-verify.yml',
+  // The kit repository's own checks; an app's pipeline is its own.
+  '.github/workflows/checks.yml',
   'docs/',
   '.superpowers/',
   '.claude/',
