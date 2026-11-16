@@ -472,7 +472,9 @@ describe('kit files an app is expected to change', () => {
     put(upstream, QUERIES, 'export {};\n');
     put(app, QUERIES, "export * from './useVisits';\n");
     const report = statusReport(parseLock(read(app, 'kit.lock.json')), readTree(app), readTree(upstream)).join('\n');
-    expect(report).toMatch(/changed by you, expected \(the app adds its own exports there\) \(1\):\n {2}src\/lib\/hooks\/queries\/index\.ts/);
+    expect(report).toMatch(
+      /changed by you, expected \(the app adds its own exports there\) \(1\):\n {2}src\/lib\/hooks\/queries\/index\.ts/,
+    );
     expect(report).toMatch(/Unexplained changes to kit files: none/);
   });
 
