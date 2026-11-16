@@ -35,6 +35,7 @@ const Button: FC<ButtonProps> = ({
   onClick,
   onPointerDown,
   tabIndex,
+  type,
   ...props
 }) => {
   const { t } = useAppTranslation('common');
@@ -61,6 +62,9 @@ const Button: FC<ButtonProps> = ({
       aria-busy={loading || undefined}
       aria-disabled={isDisabled || undefined}
       disabled={asChild ? undefined : isDisabled}
+      // A plain button unless asked: the browser's default (submit) made every Button in a form its Enter-key target.
+      // A slotted child (e.g. a link) keeps its own semantics.
+      type={asChild ? type : (type ?? 'button')}
       tabIndex={asChild && isDisabled ? -1 : tabIndex}
       onClick={handleClick}
       onPointerDown={(event: PointerEvent<HTMLButtonElement>) => {

@@ -33,6 +33,23 @@ describe('IconButton', () => {
     expect(button.className).toContain('w-control-md');
   });
 
+  it('is a plain button by default; type="submit" opts in', () => {
+    render(
+      <Tooltip.Provider>
+        <form>
+          <IconButton aria-label="Clear">
+            <Icon />
+          </IconButton>
+          <IconButton type="submit" aria-label="Search">
+            <Icon />
+          </IconButton>
+        </form>
+      </Tooltip.Provider>,
+    );
+    expect((screen.getByRole('button', { name: 'Clear' }) as HTMLButtonElement).type).toBe('button');
+    expect((screen.getByRole('button', { name: 'Search' }) as HTMLButtonElement).type).toBe('submit');
+  });
+
   it('shows its label as a tooltip on keyboard focus', async () => {
     render(
       <Tooltip.Provider delayDuration={0}>

@@ -24,6 +24,26 @@ describe('Button', () => {
     expect(handleClick).not.toHaveBeenCalled();
   });
 
+  it('is a plain button by default, so it never submits the form it sits in', () => {
+    const handleSubmit = vi.fn((event: SubmitEvent) => event.preventDefault());
+    render(
+      <form onSubmit={(event) => handleSubmit(event.nativeEvent as SubmitEvent)}>
+        <Button>Collapse sidebar</Button>
+        <Button type="submit">Save</Button>
+        <Button asChild>
+          <a href="/members">Members</a>
+        </Button>
+      </form>,
+    );
+    const collapse = screen.getByRole('button', { name: 'Collapse sidebar' }) as HTMLButtonElement;
+    expect(collapse.getAttribute('type')).toBe('button');
+    fireEvent.click(collapse);
+    expect(handleSubmit).not.toHaveBeenCalled();
+    expect((screen.getByRole('button', { name: 'Save' }) as HTMLButtonElement).type).toBe('submit');
+    // A slotted child keeps its own semantics: a link gets no type attribute.
+    expect(screen.getByRole('link', { name: 'Members' }).hasAttribute('type')).toBe(false);
+  });
+
   it('defaults to solid / neutral / md', () => {
     render(<Button>Save</Button>);
     const button = screen.getByRole('button', { name: 'Save' });
