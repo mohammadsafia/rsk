@@ -218,7 +218,7 @@ export default defineConfig({
   define: {
     __RSK_DOC_COUNTS__: JSON.stringify(scanDocCounts(path.resolve(__dirname, 'src/component-docs'))),
   },
-  // Port 3000 and no API proxy unless DEV_PORT / DEV_API_TARGET say otherwise (scripts/lib/dev-server.ts).
+  // Port 3000 and no API proxy unless FRONTEND_PORT / API_PROXY_TARGET say otherwise (scripts/lib/dev-server.ts).
   server: devServer(),
 
   resolve: {

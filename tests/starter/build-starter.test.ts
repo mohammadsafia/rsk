@@ -43,7 +43,7 @@ describe('buildStarter', () => {
     expect(pkg.scripts['kit:accept']).toBe('tsx scripts/kit/kit.ts accept');
   });
 
-  it('gives the Vite starter a dev server whose port and API proxy come from DEV_PORT and DEV_API_TARGET', () => {
+  it('gives the Vite starter a dev server whose port and API proxy come from FRONTEND_PORT and API_PROXY_TARGET', () => {
     const config = readFileSync(path.join(out, 'vite.config.ts'), 'utf8');
     expect(config).toContain("import { devServer } from './scripts/lib/dev-server';");
     expect(config).toContain('server: devServer(),');
