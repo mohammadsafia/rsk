@@ -61,6 +61,28 @@ describe('TimePicker', () => {
     expect(within(hours).getByRole('option', { name: '11' }).getAttribute('aria-selected')).toBe('true');
   });
 
+  it('is named by a <label htmlFor> pointing at its id, as the docs show', async () => {
+    render(
+      <Tooltip.Provider>
+        <label htmlFor="visit-time">Visit time</label>
+        <TimePicker id="visit-time" name="visit-time" value="10:30" use24hFormat />
+      </Tooltip.Provider>,
+    );
+    expect(await screen.findByRole('combobox', { name: 'Visit time' })).toBeTruthy();
+  });
+
+  it('is named by aria-labelledby, and by its own text only when nothing else names it', () => {
+    render(
+      <Tooltip.Provider>
+        <span id="arrival-label">Expected arrival time</span>
+        <TimePicker name="arrival" aria-labelledby="arrival-label" value="10:30" use24hFormat />
+        <TimePicker name="loose" value="11:15" use24hFormat />
+      </Tooltip.Provider>,
+    );
+    expect(screen.getByRole('combobox', { name: 'Expected arrival time' }).textContent).toContain('10:30');
+    expect(screen.getByRole('combobox', { name: '11:15' })).toBeTruthy();
+  });
+
   it('snaps an off-range seed onto the grid so confirm emits what is shown', () => {
     const handleTempChange = vi.fn();
     render(

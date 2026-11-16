@@ -97,10 +97,11 @@ import { Button } from '@components/ui';
     { prop: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner, sets aria-busy and blocks clicks.' },
     { prop: 'fullWidth', type: 'boolean', default: 'false', description: 'Stretches to the container width.' },
     { prop: 'asChild', type: 'boolean', default: 'false', description: 'Renders the child element (e.g. a Link) with button styling.' },
+    { prop: 'type', type: "'button' | 'submit' | 'reset'", default: "'button'", description: 'Only `type="submit"` submits a form.' },
   ]}
 />
 
-All native `<button>` attributes pass through. The default `type` is the browser's (`submit` inside a form), so set `type="button"` for buttons that should not submit.
+All native `<button>` attributes pass through. Unlike a native `<button>`, the default `type` is `button`, so a Button inside a form never submits it by accident (and is never the target of Enter in a field). Give the form's own submit control `type="submit"`; `FormContainer.Actions` already does. With `asChild` no `type` is added, so a link stays a link.
 
 ## Accessibility
 
