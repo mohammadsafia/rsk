@@ -174,7 +174,7 @@ export function checkFontLoading(root: string): string[] {
     const where = `${NEXT_LAYOUT} (or ${NEXT_FONTS})`;
     return [
       ...missing(layout, ["from 'next/font/local'", ...FONT_PACKAGES.map((name) => `${name}/files/`)], where),
-      ...(layout.includes('next/font/google')
+      ...(/from\s+['"]next\/font\/google['"]/.test(layout)
         ? [`${where} fetches fonts from Google at build time (next/font/google): load the @fontsource-variable files with next/font/local`]
         : []),
       ...(/DM_Sans|Fraunces|IBM_Plex|dm-sans|fraunces|ibm-plex/i.test(layout) ? [`${NEXT_LAYOUT} loads an unapproved family`] : []),

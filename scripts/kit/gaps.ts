@@ -46,7 +46,7 @@ export function fontGaps(appDir: string): string[] {
   const read = (file: string) => (existsSync(path.join(appDir, file)) ? readFileSync(path.join(appDir, file), 'utf8') : '');
   const install = `pnpm add ${FONT_PACKAGES.join(' ')}`;
   if (kitTarget(appDir) === 'next') {
-    return /next\/font\/google/.test(read('app/fonts.ts'))
+    return /from\s+['"]next\/font\/google['"]/.test(read('app/fonts.ts'))
       ? [
           `app/fonts.ts: load the fonts with next/font/local from the @fontsource-variable files instead of next/font/google`,
           `  (${install}; the starter's app/fonts.ts shows the three calls). next build then fetches nothing.`,

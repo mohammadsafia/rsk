@@ -20,6 +20,7 @@ import {
 } from './target-checks';
 
 const FONTS = `import localFont from 'next/font/local';
+// Served with the app, not fetched by next/font/google at build time: a comment naming it is not a fetch.
 const sans = localFont({ src: '../node_modules/@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2' });
 const arabic = localFont({ src: '../node_modules/@fontsource-variable/noto-kufi-arabic/files/noto-kufi-arabic-arabic-wght-normal.woff2' });
 const mono = localFont({ src: '../node_modules/@fontsource-variable/spline-sans-mono/files/spline-sans-mono-latin-wght-normal.woff2' });`;
