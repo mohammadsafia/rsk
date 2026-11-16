@@ -74,7 +74,7 @@ Use `TimePicker.Content` inside your own `Popover` for a custom trigger, as the 
 
 ## Accessibility
 
-- Label it with `id` and a `<label htmlFor>` (or use the form field); `aria-describedby` and `aria-required` pass through.
+- Label it with `id` and a `<label htmlFor>`, `aria-labelledby` or `aria-label` (`FormTimePicker` names it by its label for you); the time shown is the field's content, not its name. With none of these, its own text (the time or placeholder) names it. `aria-describedby` and `aria-required` pass through.
 - The hour, minute and AM/PM columns are keyboard-reachable listboxes.
 
 ## RTL notes

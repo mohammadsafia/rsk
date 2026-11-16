@@ -16,7 +16,7 @@ import { Conditional } from '@components/utils';
 
 import { useAppTranslation, useDebounce } from '@hooks/shared';
 
-import { cn } from '@utils';
+import { cn, mergeRefs } from '@utils';
 
 import { Clock4Icon, XIcon } from 'lucide-react';
 
@@ -74,6 +74,9 @@ export type TimePickerProps = FieldVariants & {
   step?: number;
   startAt?: string;
   invalid?: boolean;
+  /** Names the field, e.g. its label's id. Without it (or aria-label), the trigger is named by its own text. */
+  'aria-labelledby'?: string;
+  'aria-label'?: string;
   'aria-describedby'?: string;
   'aria-required'?: boolean;
 };
@@ -165,12 +168,19 @@ const TimePickerTrigger: FC<TimePickerTriggerProps> = ({
   ...props
 }) => {
   // role="combobox" isn't named by its content (as Combobox's trigger): without a label, its own visible text names it.
+  // A <label htmlFor> must win over that fallback, and only the DOM knows whether one points here.
   const textId = useId();
-  const labelledBy = props['aria-labelledby'] ?? (props['aria-label'] ? undefined : textId);
+  const [hasLabelElement, setHasLabelElement] = useState(false);
+  const labelRef = (node: HTMLButtonElement | null) => {
+    const labelled = (node?.labels?.length ?? 0) > 0;
+    if (node && labelled !== hasLabelElement) setHasLabelElement(labelled);
+  };
+  const namedElsewhere = !!props['aria-label'] || hasLabelElement;
+  const labelledBy = props['aria-labelledby'] ?? (namedElsewhere ? undefined : textId);
 
   return (
     <button
-      ref={ref}
+      ref={mergeRefs(ref, labelRef)}
       type="button"
       // A field that opens a panel of options, like Select's trigger: combobox also supports aria-invalid (button doesn't).
       role="combobox"
@@ -318,6 +328,8 @@ const TimePicker: TimePickerComponent = ({
   value,
   onChange,
   invalid = false,
+  'aria-labelledby': ariaLabelledBy,
+  'aria-label': ariaLabel,
   'aria-describedby': ariaDescribedBy,
   'aria-required': ariaRequired,
 }) => {
@@ -361,6 +373,8 @@ const TimePicker: TimePickerComponent = ({
         <Popover.Trigger id={id ?? name} asChild>
           <TimePickerTrigger
             size={size}
+            aria-labelledby={ariaLabelledBy}
+            aria-label={ariaLabel}
             aria-describedby={ariaDescribedBy}
             aria-required={ariaRequired}
             invalid={invalid}

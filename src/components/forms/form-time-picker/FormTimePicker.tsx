@@ -62,6 +62,8 @@ function FormTimePicker<TFieldValues extends FieldValues>({
                 name={name}
                 id={fieldControl.id}
                 invalid={fieldControl.invalid}
+                // The trigger is a combobox named by its own text unless told otherwise: name it by the field's label.
+                aria-labelledby={fieldControl['aria-labelledby']}
                 aria-describedby={fieldControl['aria-describedby']}
                 aria-required={fieldControl['aria-required']}
                 value={timeValue}
