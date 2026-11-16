@@ -77,16 +77,16 @@ function MembersPage({ invite }: MembersPageProps) {
     initialState: { pagination: { pageIndex: 0, pageSize: MEMBERS_PAGE_SIZE } },
   });
 
+  const handleInvite = () => {
+    setInvitedOnce(true);
+    setInviting(true);
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={t('title')} description={t('description')}>
         <PageHeader.Actions>
-          <Button
-            onClick={() => {
-              setInvitedOnce(true);
-              setInviting(true);
-            }}
-          >
+          <Button onClick={handleInvite}>
             <UserPlus aria-hidden="true" />
             {t('invite.button')}
           </Button>

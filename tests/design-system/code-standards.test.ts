@@ -1,5 +1,5 @@
 // tests/design-system/code-standards.test.ts — the machine-checkable rules of docs/CODE_STANDARDS.md, over the code
-// held to them (blocks, the sign-in pages, layouts, the lazy palette). The rest of the standards are reviewed with the
+// held to them (blocks, the lazy palette, and the app's own pages, views, layouts, routes and API code). The rest of the standards are reviewed with the
 // forge skills (forge:review-code) before each commit.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -9,14 +9,39 @@ import { describe, expect, it } from 'vite-plus/test';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 
-/** Folders and files held to the standards by this test. Add to it as code is brought up to them. */
+/**
+ * Folders and files held to the standards by this test: the kit's blocks and lazy palette, and an app's own code
+ * (pages, views, layouts, routes, API code, and a Next app's app/). An app that needs a folder left out for a while
+ * lists it in UNCHECKED below, with the reason, in its own copy of this file (kit:accept records that change).
+ */
 export const SCOPE = [
   'src/blocks',
-  'src/pages/auth',
-  'src/layouts/auth-layout',
   'src/components/shared/command-palette/LazyCommandPalette.tsx',
+  'src/pages',
+  // A Next app's shared screens (its src/pages, renamed so Next does not read them as routes).
+  'src/screens',
+  'src/views',
+  'src/layouts',
+  'src/routes',
+  'src/api',
   // A Next app's routes and layouts, when there are any.
   'app',
+];
+
+/**
+ * Paths under SCOPE not checked: this repository's docs site and showcase, which no app has (starter:build drops
+ * them). An app adds an entry only with a reason beside it.
+ */
+export const UNCHECKED = [
+  'src/pages/docs/',
+  'src/pages/components/',
+  'src/pages/clinic/',
+  'src/pages/members/',
+  'src/pages/home/',
+  'src/views/home/',
+  'src/layouts/docs-layout/',
+  'src/routes/docs-routes.tsx',
+  'src/api/clinic/',
 ];
 
 type Rule = { id: string; standard: string; pattern: RegExp; tsxOnly?: boolean };
@@ -28,7 +53,8 @@ export const RULES: Rule[] = [
   {
     id: 'jsx-ternary',
     standard: '6.2 Conditional, not a ternary',
-    pattern: /\?\s*\(?\s*<[A-Za-z]|\?\s*\($|^\s*\)\s*:\s*\(?\s*<|\)\s*:\s*null\s*\}?;?$/,
+    // `??` is nullish coalescing, not a ternary.
+    pattern: /(?<!\?)\?(?!\?)\s*\(?\s*<[A-Za-z]|\?\s*\($|^\s*\)\s*:\s*\(?\s*<|\)\s*:\s*null\s*\}?;?$/,
     tsxOnly: true,
   },
   { id: 'interface', standard: '2.1 type, not interface', pattern: /^\s*(export\s+)?interface\s/ },
@@ -68,9 +94,34 @@ export function violations(files: string[]): string[] {
   );
 }
 
-const inScope = () => SCOPE.flatMap(walk).filter((file) => /\.tsx?$/.test(file) && !/\.test\.tsx?$/.test(file));
+const inScope = () =>
+  SCOPE.flatMap(walk).filter(
+    (file) => /\.tsx?$/.test(file) && !/\.test\.tsx?$/.test(file) && !UNCHECKED.some((prefix) => file.startsWith(prefix)),
+  );
 
 describe('code standards (machine-checkable part of docs/CODE_STANDARDS.md)', () => {
+  it('holds an app’s own code to them by default: pages, views, layouts, routes and API code', () => {
+    // An app's pages were outside SCOPE, so its own code was never checked unless it edited this kit file.
+    for (const folder of ['src/pages', 'src/screens', 'src/views', 'src/layouts', 'src/routes', 'src/api']) expect(SCOPE).toContain(folder);
+  });
+
+  it('documents the Conditional API and the token names the code has (this repository only: apps have no docs/)', () => {
+    const doc = path.join(ROOT, 'docs/CODE_STANDARDS.md');
+    if (!existsSync(doc)) return;
+    const text = readFileSync(doc, 'utf8');
+    // Conditional has If and Else; there is no fallback prop.
+    expect(text).not.toMatch(/fallback=\{/);
+    expect(text).toContain('<Conditional.Else>');
+    // shadcn-era names the kit does not define.
+    expect(text).not.toMatch(/\b(bg-background|text-foreground|ring-tokens-\w+|bg-primary|text-muted-foreground)\b/);
+  });
+
+  it('reads `??` as nullish coalescing, not a JSX ternary', () => {
+    const ternary = RULES.find((rule) => rule.id === 'jsx-ternary')!.pattern;
+    expect(ternary.test('  return props.children ?? <Outlet />;')).toBe(false);
+    expect(ternary.test('  {open ? <A /> : null}')).toBe(true);
+  });
+
   it('finds no violations in the code held to them', () => {
     expect(violations(inScope())).toEqual([]);
   });
