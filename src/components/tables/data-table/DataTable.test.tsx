@@ -20,13 +20,25 @@ const rows: Visit[] = [
   { patient: 'Omar Nasser', amount: 80 },
 ];
 
-function Harness({ total, label, pageSize }: { total?: number; label?: string; pageSize?: number }) {
+function Harness({
+  total,
+  label,
+  pageSize,
+  data = rows,
+  search,
+}: {
+  total?: number;
+  label?: string;
+  pageSize?: number;
+  data?: Visit[];
+  search?: string;
+}) {
   const table = useTable({
     features: kitFeatures,
-    data: rows,
+    data,
     columns,
     enableGlobalFilter: true,
-    initialState: pageSize ? { pagination: { pageIndex: 0, pageSize } } : undefined,
+    initialState: { ...(pageSize && { pagination: { pageIndex: 0, pageSize } }), ...(search && { globalFilter: search }) },
   });
 
   return (
@@ -44,6 +56,14 @@ afterEach(async () => {
 });
 
 describe('DataTable', () => {
+  it('says a table with no rows is empty, and says "no results" only when a search or filter hides them', () => {
+    render(<Harness data={[]} />);
+    expect(screen.getByText('Nothing here yet')).toBeTruthy();
+    cleanup();
+    render(<Harness search="nobody" />);
+    expect(screen.getByText('No results')).toBeTruthy();
+  });
+
   it('forwards meta.numeric to the header and cells', () => {
     render(<Harness />);
     expect(screen.getByRole('columnheader', { name: 'Amount' }).getAttribute('data-numeric')).toBe('true');

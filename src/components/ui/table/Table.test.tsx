@@ -39,7 +39,8 @@ describe('Table', () => {
     expect(screen.getByTestId('row').className).toContain('data-[state=selected]:bg-accent-subtle');
   });
 
-  it('falls back to translated empty-state copy', () => {
+  it('says an empty table is empty, not that a search found nothing, by default', () => {
+    // The default used to be search wording ("No results found for your search…") on a table nobody had searched.
     render(
       <table>
         <tbody>
@@ -47,7 +48,20 @@ describe('Table', () => {
         </tbody>
       </table>,
     );
-    expect(screen.getByText('No Results Found')).toBeTruthy();
+    expect(screen.getByText('Nothing here yet')).toBeTruthy();
+    expect(screen.queryByText(/search/i)).toBeNull();
+  });
+
+  it('uses the no-results copy when asked, and shows an action to take', () => {
+    render(
+      <table>
+        <tbody>
+          <Table.Empty when colSpan={3} kind="no-results" action={<button type="button">Clear filters</button>} />
+        </tbody>
+      </table>,
+    );
+    expect(screen.getByText('No results')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Clear filters' })).toBeTruthy();
   });
 
   it('announces skeleton loading once through a status cell and hides the skeleton rows', () => {

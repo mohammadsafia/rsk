@@ -496,7 +496,7 @@ For all the above, prefer the action-icon pattern.
     { prop: 'getRowClassName', type: '(row: Row<TData>) => string', description: 'Per-row classes.' },
     { prop: 'onResetFilters', type: '() => void', description: 'Called by "Clear filters"; pass useDataTableFilters().reset.' },
     { prop: 'Toolbar · totalCount · totalLabel · placeholder', type: 'number · string · string', description: 'Search box, filter pills and the result count.' },
-    { prop: 'Content · emptyState', type: '{ title, description }', description: 'Scrollable body with a pinned header; message when no rows match.' },
+    { prop: 'Content · emptyState', type: '{ title, description, kind, action }', description: 'Scrollable body with a pinned header; the message when there are no rows: "no results" while a search or filter is on, "nothing here yet" otherwise, unless kind says which. action is the next step.' },
     { prop: 'BulkActions · children', type: '(rows: Row<TData>[], ids: string[]) => ReactNode', description: 'Action buttons; rows are the loaded selected rows, ids every selected id (including other server-side pages).' },
     { prop: 'createSelectionColumn · getRowLabel', type: '(row: TData) => string', description: 'Names each row checkbox ("Select INV-0142").' },
     { prop: 'Pagination · pageSizeOptions', type: 'number[]', default: '[30, 50, 100, 200]', description: 'Page navigation and rows-per-page selector.' },
