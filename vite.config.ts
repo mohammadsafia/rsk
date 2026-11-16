@@ -12,6 +12,7 @@ import rehypePrettyCode from 'rehype-pretty-code';
 import remarkGfm from 'remark-gfm';
 import remarkDocs from './scripts/docs/remark-docs';
 import { scanDocCounts } from './scripts/docs/doc-counts';
+import { devServer } from './scripts/lib/dev-server';
 
 const mdxBase = mdx({
   providerImportSource: '@mdx-js/react',
@@ -217,10 +218,8 @@ export default defineConfig({
   define: {
     __RSK_DOC_COUNTS__: JSON.stringify(scanDocCounts(path.resolve(__dirname, 'src/component-docs'))),
   },
-  server: {
-    port: 3000,
-    open: true,
-  },
+  // Port 3000 and no API proxy unless DEV_PORT / DEV_API_TARGET say otherwise (scripts/lib/dev-server.ts).
+  server: devServer(),
 
   resolve: {
     alias: [

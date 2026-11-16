@@ -40,6 +40,14 @@ describe('buildStarter', () => {
     const pkg = JSON.parse(readFileSync(path.join(out, 'package.json'), 'utf8')) as { scripts: Record<string, string> };
     expect(pkg.scripts['kit:status']).toBe('tsx scripts/kit/kit.ts status');
     expect(pkg.scripts['kit:update']).toBe('tsx scripts/kit/kit.ts update');
+    expect(pkg.scripts['kit:accept']).toBe('tsx scripts/kit/kit.ts accept');
+  });
+
+  it('gives the Vite starter a dev server whose port and API proxy come from DEV_PORT and DEV_API_TARGET', () => {
+    const config = readFileSync(path.join(out, 'vite.config.ts'), 'utf8');
+    expect(config).toContain("import { devServer } from './scripts/lib/dev-server';");
+    expect(config).toContain('server: devServer(),');
+    expect(existsSync(path.join(out, 'scripts/lib/dev-server.ts'))).toBe(true);
   });
 
   it('ships the block catalogue in registry/ (not in src), an empty block index, kit:add/kit:remove and the picker’s library', () => {
