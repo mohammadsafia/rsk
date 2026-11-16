@@ -191,14 +191,18 @@ describe('buildStarter --target next', () => {
     for (const name of ['next', 'server-only', '@tailwindcss/postcss', 'postcss']) expect(pkg.devDependencies[name], name).toBeUndefined();
   });
 
-  it('writes config in the form next build keeps, and CSS without the remote font import', () => {
+  it('writes config in the form next build keeps, and CSS without the font imports next/font/local replaces', () => {
     const tsconfig = readFileSync(path.join(next, 'tsconfig.app.json'), 'utf8');
     expect(tsconfig).toContain('"include": ["src", "app", "proxy.ts", "next-env.d.ts", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"]');
     expect(tsconfig).toContain('"exclude": ["node_modules"]');
     expect(tsconfig).toContain('"plugins": [{ "name": "next" }]');
     const css = readFileSync(path.join(next, 'src/index.css'), 'utf8');
     expect(css).not.toContain('fonts.googleapis');
-    expect(css).toBe(readFileSync(path.join(vite, 'src/index.css'), 'utf8').split('\n').slice(1).join('\n').replace(/^\n+/, ''));
+    // next/font/local loads the fonts (app/fonts.ts); the rest of the CSS is the Vite starter's.
+    expect(css).not.toContain('@fontsource-variable');
+    const viteCss = readFileSync(path.join(vite, 'src/index.css'), 'utf8');
+    expect(viteCss).toContain("@import '@fontsource-variable/schibsted-grotesk';");
+    expect(css).toBe(viteCss.replace(/^[\s\S]*?\n\n/, ''));
     const viteConfig = readFileSync(path.join(next, 'vite.config.ts'), 'utf8');
     expect(viteConfig).not.toContain('@tailwindcss/vite');
     expect(viteConfig).toContain("'.next/**'");

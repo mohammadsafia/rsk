@@ -158,23 +158,38 @@ export function checkA11yScript(root: string): string[] {
   return ok ? [] : [`a11y:audit is "${script}"`];
 }
 
-/** The three approved families load: Google Fonts in a Vite app's index.css, next/font in a Next app's root layout. */
+/** The kit's three families, as packages an app installs: served with the app, never fetched from a font host. */
+export const FONT_PACKAGES = ['schibsted-grotesk', 'noto-kufi-arabic', 'spline-sans-mono'].map((name) => `@fontsource-variable/${name}`);
+
+/**
+ * The three approved families load from the app itself: @fontsource-variable imports in a Vite app's index.css, the
+ * same packages' files through next/font/local in a Next app's root layout (or app/fonts.ts). A font host fetched at
+ * run time loses the brand fonts on a blocked network; next/font/google fetches at build time, so a build without
+ * that network (CI, a closed network) fails.
+ */
 export function checkFontLoading(root: string): string[] {
   if (kitTarget(root) === 'next') {
     // The root layout, or the fonts module it shares with the global 404.
     const layout = `${read(root, NEXT_LAYOUT)}\n${read(root, NEXT_FONTS)}`;
+    const where = `${NEXT_LAYOUT} (or ${NEXT_FONTS})`;
     return [
-      ...missing(
-        layout,
-        ["from 'next/font/google'", 'Schibsted_Grotesk', 'Noto_Kufi_Arabic', 'Spline_Sans_Mono'],
-        `${NEXT_LAYOUT} (or ${NEXT_FONTS})`,
-      ),
-      ...(/DM_Sans|Fraunces|IBM_Plex/.test(layout) ? [`${NEXT_LAYOUT} loads an unapproved family`] : []),
+      ...missing(layout, ["from 'next/font/local'", ...FONT_PACKAGES.map((name) => `${name}/files/`)], where),
+      ...(layout.includes('next/font/google')
+        ? [`${where} fetches fonts from Google at build time (next/font/google): load the @fontsource-variable files with next/font/local`]
+        : []),
+      ...(/DM_Sans|Fraunces|IBM_Plex|dm-sans|fraunces|ibm-plex/i.test(layout) ? [`${NEXT_LAYOUT} loads an unapproved family`] : []),
     ];
   }
-  const fontImport = read(root, 'src/index.css').split('\n')[0];
+  const css = read(root, 'src/index.css');
   return [
-    ...missing(fontImport, ['family=Schibsted+Grotesk', 'family=Noto+Kufi+Arabic', 'family=Spline+Sans+Mono'], "index.css's font import"),
-    ...(/DM\+Sans|Fraunces|IBM\+Plex/.test(fontImport) ? ["index.css's font import loads an unapproved family"] : []),
+    ...missing(
+      css,
+      FONT_PACKAGES.map((name) => `@import '${name}'`),
+      'index.css',
+    ),
+    ...(/@import\s+url\(\s*['"]?https?:/.test(css)
+      ? ['index.css fetches fonts from a font host at run time: import the @fontsource-variable packages instead']
+      : []),
+    ...(/DM\+Sans|Fraunces|IBM\+Plex|dm-sans|fraunces|ibm-plex/i.test(css) ? ["index.css's font import loads an unapproved family"] : []),
   ];
 }

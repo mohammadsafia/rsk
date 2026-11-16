@@ -33,7 +33,37 @@ const rendersProvider = (appDir: string): boolean =>
  * wiring kit:add needs. `starterDir` is the starter kit:update read, whose adapter is printed to copy.
  */
 export function updateGaps(appDir: string, starterDir?: string): string[] {
-  return [...adapterGaps(appDir, starterDir), ...wiringGaps(appDir)];
+  return [...adapterGaps(appDir, starterDir), ...wiringGaps(appDir), ...fontGaps(appDir)];
+}
+
+const FONT_PACKAGES = ['schibsted-grotesk', 'noto-kufi-arabic', 'spline-sans-mono'].map((name) => `@fontsource-variable/${name}`);
+
+/**
+ * An app made before the kit served its own fonts still fetches them from Google: at run time in a Vite app's
+ * index.css, at build time through next/font/google in a Next app. The kit's font check fails until it changes.
+ */
+export function fontGaps(appDir: string): string[] {
+  const read = (file: string) => (existsSync(path.join(appDir, file)) ? readFileSync(path.join(appDir, file), 'utf8') : '');
+  const install = `pnpm add ${FONT_PACKAGES.join(' ')}`;
+  if (kitTarget(appDir) === 'next') {
+    return /next\/font\/google/.test(read('app/fonts.ts'))
+      ? [
+          `app/fonts.ts: load the fonts with next/font/local from the @fontsource-variable files instead of next/font/google`,
+          `  (${install}; the starter's app/fonts.ts shows the three calls). next build then fetches nothing.`,
+        ]
+      : [];
+  }
+  return /fonts\.googleapis\.com/.test(read('src/index.css'))
+    ? [
+        [
+          'src/index.css: replace the Google Fonts @import with the fonts served with the app:',
+          `  ${install}`,
+          ...FONT_PACKAGES.map((name) => `  @import '${name}';`),
+          "  and, after the @custom-variant line, :root { --font-brand-sans: 'Schibsted Grotesk Variable';",
+          "  --font-brand-arabic: 'Noto Kufi Arabic Variable'; --font-brand-mono: 'Spline Sans Mono Variable'; }",
+        ].join('\n'),
+      ]
+    : [];
 }
 
 /** The router adapter a Vite app still lacks: without it kit links reload the page. */
