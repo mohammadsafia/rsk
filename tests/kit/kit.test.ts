@@ -15,6 +15,7 @@ import {
   inScope,
   parseArgs,
   parseLock,
+  EXTENSION_POINTS,
   readTree,
   stageUpstream,
   statusReport,
@@ -457,5 +458,25 @@ describe('kit:status accepted app changes', () => {
       reason: 'DEMO-12: why',
     });
     expect(() => parseArgs(['accept', CARD])).toThrow(/--reason/);
+  });
+});
+
+describe('kit files an app is expected to change', () => {
+  it('lists an extension point the app filled (its query hooks barrel) as expected, not unexplained', () => {
+    const QUERIES = 'src/lib/hooks/queries/index.ts';
+    expect(EXTENSION_POINTS).toContain(QUERIES);
+    const app = dir();
+    put(app, QUERIES, 'export {};\n');
+    writeLock(app, 'aaaaaaa', readTree(app));
+    const upstream = dir();
+    put(upstream, QUERIES, 'export {};\n');
+    put(app, QUERIES, "export * from './useVisits';\n");
+    const report = statusReport(parseLock(read(app, 'kit.lock.json')), readTree(app), readTree(upstream)).join('\n');
+    expect(report).toMatch(/changed by you, expected \(the app adds its own exports there\) \(1\):\n {2}src\/lib\/hooks\/queries\/index\.ts/);
+    expect(report).toMatch(/Unexplained changes to kit files: none/);
+  });
+
+  it('every extension point is a kit file', () => {
+    for (const file of EXTENSION_POINTS) expect(inScope(file), file).toBe(true);
   });
 });

@@ -34,6 +34,18 @@ export const KIT_PATHS = [
 
 export const LOCK_FILE = 'kit.lock.json';
 
+/**
+ * Kit files an app is expected to change: barrels the kit ships empty or nearly so, where the app adds its own
+ * exports. kit:status lists an app's changes to them as expected, not unexplained, and kit:update merges as usual.
+ * The starter's README lists them for a project's rules to point at.
+ */
+export const EXTENSION_POINTS = [
+  'src/lib/hooks/queries/index.ts',
+  'src/lib/hooks/mutations/index.ts',
+  'src/assets/icons/index.ts',
+] as const;
+const isExtensionPoint = (file: string) => (EXTENSION_POINTS as readonly string[]).includes(file);
+
 export type KitTarget = 'vite' | 'next';
 export type Lock = {
   kit: string;
@@ -317,10 +329,14 @@ export function statusReport(
     const files = changed.filter((row) => row.status === status).map((row) => row.path);
     if (status !== 'modified') block(LABELS[status], files);
     else {
-      const unexplained = files.filter((file) => !standing[file]);
+      const unexplained = files.filter((file) => !standing[file] && !isExtensionPoint(file));
       block(
         LABELS.modified,
         unexplained.map((file) => (lock.accepted?.[file] ? `${file} (changed since it was accepted)` : file)),
+      );
+      block(
+        'changed by you, expected (the app adds its own exports there)',
+        files.filter((file) => !standing[file] && isExtensionPoint(file)),
       );
       block(
         'changed by you, accepted',
@@ -333,7 +349,7 @@ export function statusReport(
     'already the kit’s version, only the lock changes',
     lockOnly(lock, local, upstream).filter((file) => paths.has(file)),
   );
-  const unexplained = changed.filter((row) => row.status === 'modified' && !standing[row.path]).length;
+  const unexplained = changed.filter((row) => row.status === 'modified' && !standing[row.path] && !isExtensionPoint(row.path)).length;
   lines.push(
     '',
     unexplained
