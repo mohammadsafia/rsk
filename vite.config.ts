@@ -13,6 +13,7 @@ import remarkGfm from 'remark-gfm';
 import remarkDocs from './scripts/docs/remark-docs';
 import { scanDocCounts } from './scripts/docs/doc-counts';
 import { devServer } from './scripts/lib/dev-server';
+import { TEST_TIMEOUT_MS } from './src/test-utils/timeouts';
 
 const mdxBase = mdx({
   providerImportSource: '@mdx-js/react',
@@ -188,6 +189,9 @@ export default defineConfig({
     },
   },
   test: {
+    // A realistic wait for an element, well under the test limit (src/test-utils/timeouts.ts).
+    testTimeout: TEST_TIMEOUT_MS,
+    setupFiles: ['./src/test-utils/setup.ts'],
     // Vitest v4 compatibility: preserve mock call history.
     // Remove after tests no longer rely on calls from setup or earlier tests.
     // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
