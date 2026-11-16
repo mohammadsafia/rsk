@@ -13,4 +13,13 @@ describe('ScrollArea', () => {
     expect(viewport.getAttribute('tabindex')).toBe('0');
     expect(viewport.className).toContain('focus-ring');
   });
+
+  it('stays out of the tab order with focusable={false}, for content whose own controls scroll it', () => {
+    render(
+      <ScrollArea className="h-20" focusable={false}>
+        <a href="/a">A</a>
+      </ScrollArea>,
+    );
+    expect(document.querySelector('[data-slot="scroll-area-viewport"]')!.hasAttribute('tabindex')).toBe(false);
+  });
 });

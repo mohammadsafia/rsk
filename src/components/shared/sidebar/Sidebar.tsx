@@ -66,7 +66,8 @@ const Content: FC<ComponentPropsWithoutRef<'nav'>> = ({ className, children, ...
   const { t } = useAppTranslation('nav');
 
   return (
-    <ScrollArea className="min-h-0 flex-1">
+    // The menu's links take the focus and scroll it into view: the viewport itself is no tab stop.
+    <ScrollArea className="min-h-0 flex-1" focusable={false}>
       <nav data-slot="sidebar-content" aria-label={t('navigation')} className={cn('flex flex-col gap-4 px-3 py-2', className)} {...props}>
         {children}
       </nav>

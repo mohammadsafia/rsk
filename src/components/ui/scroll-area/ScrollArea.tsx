@@ -10,6 +10,12 @@ type ScrollBarProps = ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Scroll
 type ScrollAreaProps = ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
   orientation?: 'vertical' | 'horizontal';
   viewportClassName?: string;
+  /**
+   * Whether the viewport is a tab stop, so keyboard users can reach and scroll it (WCAG 2.1.1). Default true. Pass
+   * false when the content is focusable controls (a menu of links): tabbing through them scrolls it already, and the
+   * viewport would be an extra, invisible stop.
+   */
+  focusable?: boolean;
 };
 
 type ScrollAreaComponent = FC<ScrollAreaProps> & {
@@ -33,7 +39,14 @@ const Bar: FC<ScrollBarProps> = ({ className, orientation = 'vertical', ...props
   </ScrollAreaPrimitive.ScrollAreaScrollbar>
 );
 
-const ScrollArea: ScrollAreaComponent = ({ orientation = 'vertical', className, viewportClassName, children, ...props }) => (
+const ScrollArea: ScrollAreaComponent = ({
+  orientation = 'vertical',
+  className,
+  viewportClassName,
+  focusable = true,
+  children,
+  ...props
+}) => (
   <ScrollAreaPrimitive.Root
     data-slot="scroll-area"
     className={cn('relative overflow-hidden', orientation === 'vertical' && '[&>[data-slot=scroll-area-viewport]>div]:block!', className)}
@@ -41,8 +54,8 @@ const ScrollArea: ScrollAreaComponent = ({ orientation = 'vertical', className, 
   >
     <ScrollAreaPrimitive.Viewport
       data-slot="scroll-area-viewport"
-      // Focusable so keyboard users can reach and scroll it (WCAG 2.1.1).
-      tabIndex={0}
+      // Focusable so keyboard users can reach and scroll it (WCAG 2.1.1), unless its own controls do that.
+      tabIndex={focusable ? 0 : undefined}
       className={cn('focus-ring h-full w-full rounded-[inherit]', viewportClassName)}
     >
       {children}

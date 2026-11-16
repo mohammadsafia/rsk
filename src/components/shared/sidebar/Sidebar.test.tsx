@@ -36,6 +36,13 @@ const menu = (collapsed = false) => (
 );
 
 describe('Sidebar', () => {
+  it('does not put its scroll area in the tab order: Tab goes from link to link and scrolls the menu with them', () => {
+    // A keyboard walk found an extra, invisible stop before the first menu link.
+    const { container } = wrap(menu());
+    const viewport = container.querySelector('[data-slot="scroll-area-viewport"]') as HTMLElement;
+    expect(viewport.hasAttribute('tabindex')).toBe(false);
+  });
+
   it('lets a long menu scroll (the viewport only scrolls while a vertical bar is mounted)', () => {
     const { container } = wrap(menu());
     const viewport = container.querySelector<HTMLElement>('[data-slot="sidebar"] [data-slot="scroll-area-viewport"]');

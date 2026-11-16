@@ -51,6 +51,7 @@ Give the area a fixed or flex-constrained height, and always render `ScrollArea.
   rows={[
     { prop: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Main scroll direction; vertical also stops content from stretching wider than the area.' },
     { prop: 'viewportClassName', type: 'string', description: 'Classes for the inner viewport, e.g. to make it a flex column.' },
+    { prop: 'focusable', type: 'boolean', default: 'true', description: 'The viewport is a tab stop so keyboard users can scroll it. Pass false when its content is focusable controls (a menu of links), which scroll it as they take the focus.' },
     { prop: 'Bar · orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Which bar to render; render both for two-way scrolling.' },
   ]}
 />
