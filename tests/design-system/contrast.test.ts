@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import { compositeOver, contrastRatio, oklchToSrgb, parseOklch } from './color';
-import { extractBlock, readProjectFile, resolveToken } from './css-tokens';
+import { appTokens, extractBlock, readProjectFile, resolveToken } from './css-tokens';
 
 const TEXT = 4.5;
 const UI = 3;
@@ -67,7 +67,7 @@ describe('semantic token contrast (WCAG AA)', () => {
 
   for (const mode of ['.light', '.dark'] as const) {
     describe(mode, () => {
-      const vars = { ...paletteVars, ...extractBlock(tokensCss, mode) };
+      const vars = { ...paletteVars, ...appTokens(mode) };
 
       for (const [foreground, background, minimum] of PAIRS) {
         it(`${foreground} on ${background} ≥ ${minimum}:1`, () => {
@@ -84,7 +84,7 @@ const TINT_PAIRS = ['success', 'warning', 'danger', 'info'] as const;
 
 describe('status text on its own tint (WCAG AA text)', () => {
   for (const mode of ['.light', '.dark'] as const) {
-    const vars = extractBlock(tokensCss, mode);
+    const vars = appTokens(mode);
     const surface = oklchToSrgb(parseOklch(resolveToken(vars, 'surface')));
 
     for (const status of TINT_PAIRS) {
@@ -100,7 +100,7 @@ describe('status text on its own tint (WCAG AA text)', () => {
 /** Body text on every tint (selected rows use accent-subtle; calendar events use each status tint). SP2 deferred, owned by SP3 Plan C. */
 describe('fg and fg-muted on tints (WCAG AA text)', () => {
   for (const mode of ['.light', '.dark'] as const) {
-    const vars = extractBlock(tokensCss, mode);
+    const vars = appTokens(mode);
     const surface = oklchToSrgb(parseOklch(resolveToken(vars, 'surface')));
 
     for (const tint of ['accent', 'success', 'warning', 'danger', 'info'] as const) {
