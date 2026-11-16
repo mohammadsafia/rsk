@@ -22,14 +22,31 @@ vp install
 vp dev
 ```
 
+The dev server opens on port 3000 and proxies nothing. To run two copies side by side, or to send `/api` to a local
+API, set these when you start it (none is `VITE_`-prefixed, so none reaches the browser bundle):
+
+```bash
+FRONTEND_PORT=5101 API_PROXY_TARGET=http://localhost:5080 pnpm dev
+```
+
+`FRONTEND_PORT` is strict: a taken port stops the server instead of moving it to another one. `API_PROXY_PATH`
+changes the proxied path (default `/api`), and `FRONTEND_OPEN=false` stops it opening a browser tab.
+
+The app starts in the dark theme. To start in light, or follow the system, pass `defaultTheme="light"` (or
+`"system"`) to `ThemeProvider` in `src/bootstrap.tsx`; the person's own choice is remembered over it.
+
+The fonts (Schibsted Grotesk, Noto Kufi Arabic, Spline Sans Mono) come from the `@fontsource-variable` packages and
+are served with the app: no font host is contacted at build or run time.
+
 ## Your brand colour
 
 ```bash
 pnpm theme:accent "<your brand colour>"   # a hex value or an OKLCH colour; --dry-run to preview
 ```
 
-It sets the accent for light and dark at the lightness that passes WCAG AA, in `src/styles/tokens.css`; `vp test`
-rechecks every contrast pair.
+It sets the accent for light and dark at the lightness that passes WCAG AA, in `src/app-config/accent.css` (your
+file: `src/index.css` imports it after the kit's tokens, and `kit:update` never touches it); `vp test` rechecks every
+contrast pair.
 
 ## Blocks
 
@@ -69,10 +86,43 @@ pnpm kit:status    # what changed in the kit, and what you changed yourself
 pnpm kit:update    # take the kit's changes (add paths to take only some, --dry-run to preview)
 ```
 
-Files you never touched are updated. Files only you changed are kept. Files changed on both sides are merged; if your
+Files you never touched are updated. Files only you changed are kept. When a kit file's content already matches the
+kit and only its record in `kit.lock.json` changes, `kit:update` lists it as recorded in the lock only. Files changed on both sides are merged; if your
 change and the kit's touch the same lines, the file gets `<<<<<<<` markers to resolve. Your pages, routes, layouts,
 API code and translations are never touched. If the kit's dependencies changed, the command prints the `pnpm add`
 line to run.
+
+### Kit files your app changes
+
+Some kit files are yours to fill: `kit:status` lists your changes to them as expected, not as unexplained.
+
+- `src/lib/hooks/queries/index.ts`: export your query hooks
+- `src/lib/hooks/mutations/index.ts`: export your mutation hooks
+- `src/assets/icons/index.ts`: export your own icons
+- `src/app-config/accent.css`: your brand accent (`pnpm theme:accent`); not a kit file at all
+
+Any other change to a kit file is unexplained until you record why:
+
+```bash
+pnpm kit:accept src/components/ui/card/Card.tsx --reason "DEMO-12: tighter padding until the kit has a density option"
+```
+
+`kit.lock.json` keeps the reason (`accepted`), and `kit:status` lists the file with it and ends with
+`Unexplained changes to kit files: none.` Change the file again and it is unexplained again. In an app made before
+`kit:accept` existed, run `pnpm tsx scripts/kit/kit.ts accept …` until `kit:update` has brought the new updater.
+
+### Roles
+
+The session's user (`useAuth().currentUser`) has an optional `roles` list: fill it from your sign-in response
+(`src/api/handlers/auth.ts`) to show or hide parts of the screen. It is never authorization: your API checks every
+request.
+
+### A defect in the kit
+
+Fix a kit defect in the kit, not in your copy: report it as the kit's `CONTRIBUTING.md` says
+(https://github.com/mohammadsafia/rsk/blob/main/CONTRIBUTING.md), then take the fix with `pnpm kit:update` once it is
+published here. If you must work around it first, keep the workaround in your own code where you can, or record the
+kit file you change with `kit:accept` and the issue's key, and remove it when the fix arrives.
 
 ## Where to add things
 

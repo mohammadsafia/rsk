@@ -58,6 +58,8 @@ export const DROP = [
   '.impeccable.md',
   'skills-lock.json',
   'AGENTS.md',
+  // How to report a kit defect and change the kit: the starter README links to it here.
+  'CONTRIBUTING.md',
   '.env',
   // Deploys this repository's docs site.
   'vercel.json',

@@ -137,6 +137,24 @@ describe('buildStarter', () => {
   });
 });
 
+describe('the starter README', () => {
+  // A project's rules point at this list instead of naming kit files; each entry must exist in the app.
+  it('lists the kit files an app is expected to change, and each one is in the starter', async () => {
+    const { EXTENSION_POINTS } = await import('../../scripts/kit/core');
+    const readme = readFileSync(path.join(out, 'README.md'), 'utf8');
+    for (const file of [...EXTENSION_POINTS, 'src/app-config/accent.css']) {
+      expect(readme, file).toContain(`\`${file}\``);
+      expect(existsSync(path.join(out, file)), file).toBe(true);
+    }
+  });
+
+  it('says how to run two copies, record an intended kit change, and report a kit defect', () => {
+    const readme = readFileSync(path.join(out, 'README.md'), 'utf8');
+    for (const words of ['FRONTEND_PORT', 'API_PROXY_TARGET', 'pnpm kit:accept', 'CONTRIBUTING.md', 'defaultTheme'])
+      expect(readme, words).toContain(words);
+  });
+});
+
 describe('buildStarter --target next', () => {
   let next = '';
   let vite = '';

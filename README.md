@@ -255,7 +255,9 @@ vp install   # or: pnpm install
 vp dev       # or: pnpm dev
 ```
 
-Opens on http://localhost:3000.
+Opens on http://localhost:3000. `FRONTEND_PORT=5101 pnpm dev` picks another port (strictly: a taken port stops it),
+and `API_PROXY_TARGET=http://localhost:5080` proxies `/api` to a local API (`scripts/lib/dev-server.ts`). Neither is
+`VITE_`-prefixed, so neither reaches the bundle.
 
 ### Scripts
 
@@ -288,7 +290,9 @@ Opens on http://localhost:3000.
 
 - **DTO generator** — Requires a Swagger/OpenAPI endpoint configured in `.dto-gen.json`. Run `pnpm dto:init` to scaffold the config file before first use.
 
-- **Theming** — The default theme is dark. Semantic tokens live in `src/styles/tokens.css` (light on `:root, .light`, dark on `.dark`) and are exposed to Tailwind in `src/styles/theme.css`; `pnpm test` enforces WCAG contrast for every pair.
+- **Theming** — The default theme is dark; an app changes it with `ThemeProvider`'s `defaultTheme` (`'light'`, `'system'`) in `src/bootstrap.tsx`. Semantic tokens live in `src/styles/tokens.css` (light on `:root, .light`, dark on `.dark`) and are exposed to Tailwind in `src/styles/theme.css`; `pnpm theme:accent` writes an app's brand accent to `src/app-config/accent.css`, imported after them. `pnpm test` enforces WCAG contrast for every pair, the app's accent included.
+
+- **Fonts** — The three families come from the `@fontsource-variable` packages and are served with the app (`src/index.css`; `next/font/local` in the Next starter). No font host is contacted at build or run time.
 
 - **Component docs** — Run `pnpm docs:new` to scaffold MDX component documentation in `src/component-docs/`. The live demo gallery is driven by these files.
 
@@ -318,9 +322,17 @@ vp create github:mohammadsafia/rsk-starter -- my-app        # Vite
 vp create github:mohammadsafia/rsk-next-starter -- my-app   # Next.js
 ```
 
-Every pull request runs the `Starter verify` workflow (`.github/workflows/starter-verify.yml`), which verifies both starters without secrets. On every push to `main`, the `Starter sync` workflow (`.github/workflows/starter-sync.yml`) runs `pnpm starter:verify` for each starter, then builds it and commits it to its repository as `sync: rsk@<sha> — <subject>`. A starter that fails verification is never published, and one failing doesn't hold back the other. Each push uses its own deploy key, with write access to that repository only: `STARTER_DEPLOY_KEY` for `rsk-starter`, `NEXT_STARTER_DEPLOY_KEY` for `rsk-next-starter`.
+Every pull request runs the kit's own checks (`.github/workflows/checks.yml`: `vp check`, `vp test run`, `pnpm docs:lint`) and the `Starter verify` workflow (`.github/workflows/starter-verify.yml`), which verifies both starters without secrets. On every push to `main`, the `Starter sync` workflow (`.github/workflows/starter-sync.yml`) runs `pnpm starter:verify` for each starter, then builds it and commits it to its repository as `sync: rsk@<sha> — <subject>`. A starter that fails verification is never published, and one failing doesn't hold back the other. Each push uses its own deploy key, with write access to that repository only: `STARTER_DEPLOY_KEY` for `rsk-starter`, `NEXT_STARTER_DEPLOY_KEY` for `rsk-next-starter`.
 
 The `-- my-app` names the folder. Without it, `vp create` names it after the repository. For a private registry, the starter can instead be bundled under `templates/` in an `@org/create` package, and apps start with `vp create @org:web`. Rename `.gitignore` to `_gitignore` there, because `npm publish` drops `.gitignore` files.
+
+---
+
+## Contributing
+
+A project that finds a defect in the kit reports it here and takes the fix with `pnpm kit:update`: see
+[`CONTRIBUTING.md`](CONTRIBUTING.md), which also says what a change to the kit needs (a failing test first, docs, a
+"Changes behaviour" note).
 
 ---
 
