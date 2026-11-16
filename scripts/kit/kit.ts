@@ -4,6 +4,11 @@
  *   pnpm kit:status                     # how each kit file compares with the latest starter
  *   pnpm kit:update                     # take the kit's changes (never overwrites your own edits)
  *   pnpm kit:update src/components/ui/button/ --dry-run
+ *   pnpm kit:accept src/components/ui/card/Card.tsx --reason "DEMO-12: why the app changes it"
+ *
+ * kit:accept records a kit file the app changed on purpose, with the reason, in kit.lock.json (`accepted`); kit:status
+ * then lists it as accepted, not as an unexplained change, until the file changes again. It works offline. An app
+ * whose package.json has no kit:accept script runs `pnpm tsx scripts/kit/kit.ts accept …`.
  *
  * Options: --from <dir> (a local starter instead of GitHub), --base <dir> (the version you took, for three-way merges),
  * --dry-run. The GitHub repository is the one kit.lock.json names (`starter`); for an older lock without one,
@@ -14,6 +19,7 @@ import { existsSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
 import {
+  acceptChanges,
   applyUpdate,
   checkUpstream,
   classify,
@@ -24,7 +30,7 @@ import {
   readTree,
   releaseDroppedBlocks,
   stageUpstream,
-  type Status,
+  statusReport,
 } from './core';
 import { download, starterRepo } from './download';
 import { needsSelfUpdate, updateGaps } from './gaps';
@@ -46,17 +52,14 @@ const handOverArgs = (argv: string[], starterDir: string, baseStarter: string | 
   return [...kept, '--from', starterDir, ...(baseStarter ? ['--base', baseStarter] : [])];
 };
 
-const LABELS: Record<Exclude<Status, 'same'>, string> = {
-  updated: 'updated in the kit',
-  added: 'new in the kit',
-  removed: 'removed from the kit',
-  modified: 'changed by you (kept)',
-  conflict: 'changed on both sides',
-};
-
 async function main() {
-  const { command, paths, from: fromArg, base: baseArg, dryRun } = parseArgs(process.argv.slice(2));
+  const { command, paths, from: fromArg, base: baseArg, reason, dryRun } = parseArgs(process.argv.slice(2));
   const appDir = process.cwd();
+  if (command === 'accept') {
+    const files = acceptChanges(appDir, paths, reason ?? '');
+    console.log(`Accepted in kit.lock.json (${files.length}):\n${files.map((file) => `  ${file}: ${reason?.trim()}`).join('\n')}`);
+    return;
+  }
   const lock = readLock(appDir);
   const temporary: string[] = [];
 
@@ -75,15 +78,14 @@ async function main() {
     const listed = (file: string) =>
       !paths.length || paths.some((prefix) => file.startsWith(prefix.replaceAll('\\', '/').replace(/^\.\//, '')));
     const { lock: kept, released } = releaseDroppedBlocks(lock, upstreamDir);
-    const rows = classify(kept, readTree(appDir), readTree(upstreamDir)).filter((row) => row.status !== 'same' && listed(row.path));
+    const local = readTree(appDir);
+    const upstreamTree = readTree(upstreamDir);
+    const listedRows = classify(kept, local, upstreamTree).filter((row) => listed(row.path));
+    const rows = listedRows.filter((row) => row.status !== 'same');
     console.log(`Kit: you have rsk@${lock.kit.slice(0, 7)}, the starter has rsk@${kit.slice(0, 7)}.`);
     if (released.length)
       console.log(`\nNo longer in the kit, so ${command === 'status' ? 'kit:update keeps' : 'kept'} as your own: ${released.join(', ')}.`);
-    if (!rows.length) console.log('Every kit file is up to date.');
-    for (const status of Object.keys(LABELS) as (keyof typeof LABELS)[]) {
-      const files = rows.filter((row) => row.status === status).map((row) => row.path);
-      if (files.length) console.log(`\n${LABELS[status]} (${files.length}):\n${files.map((file) => `  ${file}`).join('\n')}`);
-    }
+    console.log(statusReport(kept, local, upstreamTree, listedRows).join('\n'));
 
     const install = dependencyChanges(
       JSON.parse(readFileSync(path.join(appDir, 'package.json'), 'utf8')),
@@ -128,6 +130,7 @@ async function main() {
       [result.removed.length, 'removed'],
       [result.merged.length, 'merged'],
       [result.conflicts.length, 'need your attention'],
+      [result.relocked.length, 'recorded in the lock only'],
     ]
       .filter(([count]) => count)
       .map(([count, label]) => `${count} ${label}`)
@@ -136,6 +139,10 @@ async function main() {
     if (result.conflicts.length)
       console.log(
         `Resolve these (look for <<<<<<< or a .upstream file beside them):\n${result.conflicts.map((file) => `  ${file}`).join('\n')}`,
+      );
+    if (result.relocked.length)
+      console.log(
+        `${dryRun ? 'Would record' : 'Recorded'} in kit.lock.json only (the file already matched the kit):\n${result.relocked.map((file) => `  ${file}`).join('\n')}`,
       );
     if (result.keptPages.length)
       console.log(

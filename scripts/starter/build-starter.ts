@@ -161,6 +161,7 @@ export function buildStarter(outDir: string, target: KitTarget = 'vite') {
   // The kit updater: compare the app's kit files with the latest starter, and take the kit's changes.
   pkg.scripts['kit:status'] = 'tsx scripts/kit/kit.ts status';
   pkg.scripts['kit:update'] = 'tsx scripts/kit/kit.ts update';
+  pkg.scripts['kit:accept'] = 'tsx scripts/kit/kit.ts accept';
   // Blocks: search the catalogue and add molecules, organisms and page templates; or take them out again.
   pkg.scripts['kit:add'] = 'tsx scripts/kit/add.ts add';
   pkg.scripts['kit:remove'] = 'tsx scripts/kit/add.ts remove';
