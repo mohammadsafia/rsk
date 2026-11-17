@@ -6,8 +6,9 @@
  *   pnpm kit:update src/components/ui/button/ --dry-run
  *   pnpm kit:accept src/components/ui/card/Card.tsx --reason "DEMO-12: why the app changes it"
  *
- * kit:accept records a kit file the app changed on purpose, with the reason, in kit.lock.json (`accepted`); kit:status
- * then lists it as accepted, not as an unexplained change, until the file changes again. It works offline. An app
+ * kit:accept records a kit file the app changed or deleted on purpose, with the reason, in kit.lock.json (`accepted`);
+ * kit:status then lists it as accepted, not as an unexplained change, until the file changes again (a deleted one: until
+ * it comes back or the kit changes it), and kit:update leaves an accepted deletion deleted. It works offline. An app
  * whose package.json has no kit:accept script runs `pnpm tsx scripts/kit/kit.ts accept …`.
  *
  * Options: --from <dir> (a local starter instead of GitHub), --base <dir> (the version you took, for three-way merges),
@@ -57,7 +58,9 @@ async function main() {
   const appDir = process.cwd();
   if (command === 'accept') {
     const files = acceptChanges(appDir, paths, reason ?? '');
-    console.log(`Accepted in kit.lock.json (${files.length}):\n${files.map((file) => `  ${file}: ${reason?.trim()}`).join('\n')}`);
+    console.log(
+      `Accepted in kit.lock.json (${files.length}):\n${files.map(({ file, deleted }) => `  ${file}${deleted ? ' (deleted)' : ''}: ${reason?.trim()}`).join('\n')}`,
+    );
     return;
   }
   const lock = readLock(appDir);
@@ -143,6 +146,10 @@ async function main() {
     if (result.relocked.length)
       console.log(
         `${dryRun ? 'Would record' : 'Recorded'} in kit.lock.json only (the file already matched the kit):\n${result.relocked.map((file) => `  ${file}`).join('\n')}`,
+      );
+    if (result.skipped.length)
+      console.log(
+        `Skipped, deleted on purpose (kit:accept), so the update did not bring them back:\n${result.skipped.map((file) => `  ${file}`).join('\n')}`,
       );
     if (result.keptPages.length)
       console.log(

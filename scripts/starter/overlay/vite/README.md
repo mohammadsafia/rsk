@@ -111,6 +111,11 @@ pnpm kit:accept src/components/ui/card/Card.tsx --reason "DEMO-12: tighter paddi
 `Unexplained changes to kit files: none.` Change the file again and it is unexplained again. In an app made before
 `kit:accept` existed, run `pnpm tsx scripts/kit/kit.ts accept …` until `kit:update` has brought the new updater.
 
+A kit file you delete on purpose is recorded the same way, for example the mock sign-in's test once your own API signs
+users in: `pnpm kit:accept tests/a11y/demo-session.test.ts --reason "DEMO-31: sign-in goes through our API"`.
+`kit:status` lists it as deleted, `kit:update` leaves it deleted (and says so), and it is unexplained again if it comes
+back or the kit changes it.
+
 ### Roles
 
 The session's user (`useAuth().currentUser`) has an optional `roles` list: fill it from your sign-in response

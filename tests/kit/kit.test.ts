@@ -1,5 +1,5 @@
 // tests/kit/kit.test.ts — kit:status / kit:update, on throwaway app, upstream and base folders.
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
@@ -449,6 +449,75 @@ describe('kit:status accepted app changes', () => {
     acceptChanges(app, [CARD], 'DEMO-12: tighter padding');
     const raw = JSON.parse(read(app, 'kit.lock.json')) as { accepted: Record<string, { hash: string }> };
     expect(raw.accepted[CARD].hash).toMatch(/^sha256:[0-9a-f]{64}$/);
+  });
+
+  // An app deletes a kit file on purpose (a test of the starter's mock sign-in, once a real API signs users in).
+  // kit:accept refused it ("an accepted change is a changed file, not a deleted one"), so kit:status could never
+  // reach "Unexplained changes to kit files: none" for that app.
+  describe('a kit file the app deleted on purpose', () => {
+    const DEMO = 'tests/a11y/demo-session.test.ts';
+    const REASON = 'DEMO-31: the app signs in through its own API, so the mock sign-in and its test are gone';
+    /** The scenario plus a kit test the app took and then deleted. */
+    const deleted = () => {
+      const { base, app, upstream } = scenario();
+      for (const root of [base, app, upstream]) put(root, DEMO, 'demo session\n');
+      writeLock(app, 'aaaaaaa', readTree(base));
+      put(app, CARD, 'card v1 with my tweak\n');
+      rmSync(path.join(app, DEMO));
+      return { base, app, upstream };
+    };
+
+    it('records the deletion with its reason, and kit:status lists it as accepted and deleted', () => {
+      const { app, upstream } = deleted();
+      const before = statusReport(parseLock(read(app, 'kit.lock.json')), readTree(app), readTree(upstream)).join('\n');
+      expect(before).toMatch(/changed by you \(kept\) \(2\):[\s\S]*tests\/a11y\/demo-session\.test\.ts/);
+
+      acceptChanges(app, [CARD], 'DEMO-12: tighter padding');
+      expect(acceptChanges(app, [DEMO], REASON)).toEqual([{ file: DEMO, deleted: true }]);
+      const lock = parseLock(read(app, 'kit.lock.json'));
+      expect(lock.accepted?.[DEMO]).toEqual({ reason: REASON, deleted: true, hash: hashFile(path.join(upstream, DEMO)) });
+      const raw = JSON.parse(read(app, 'kit.lock.json')) as { accepted: Record<string, { hash: string; deleted?: boolean }> };
+      expect(raw.accepted[DEMO]).toMatchObject({ deleted: true, hash: expect.stringMatching(/^sha256:[0-9a-f]{64}$/) });
+
+      const after = statusReport(lock, readTree(app), readTree(upstream)).join('\n');
+      expect(after).toMatch(/changed by you, accepted \(2\):[\s\S]*\n {2}tests\/a11y\/demo-session\.test\.ts \(deleted\): DEMO-31/);
+      expect(after).toMatch(/Unexplained changes to kit files: none/);
+    });
+
+    it('lapses when the file reappears', () => {
+      const { app, upstream } = deleted();
+      acceptChanges(app, [DEMO], REASON);
+      put(app, DEMO, 'demo session, back with my edit\n');
+      const report = statusReport(parseLock(read(app, 'kit.lock.json')), readTree(app), readTree(upstream)).join('\n');
+      expect(report).toMatch(
+        /changed by you \(kept\) \([12]\):[\s\S]*tests\/a11y\/demo-session\.test\.ts \(changed since it was accepted\)/,
+      );
+      expect(report).not.toMatch(/demo-session\.test\.ts \(deleted\)/);
+    });
+
+    it('kit:update does not re-create it, says it skipped it, and keeps the acceptance', () => {
+      const { base, app, upstream } = deleted();
+      acceptChanges(app, [DEMO], REASON);
+      const result = applyUpdate({ appDir: app, upstreamDir: upstream, baseDir: base, kit: 'bbbbbbb' });
+      expect(existsSync(path.join(app, DEMO))).toBe(false);
+      expect(result.skipped).toEqual([DEMO]);
+      expect(result.kept).not.toContain(DEMO);
+      expect(parseLock(read(app, 'kit.lock.json')).accepted?.[DEMO]).toMatchObject({ reason: REASON, deleted: true });
+    });
+
+    it('lapses when the kit changes the file: kit:status shows it changed on both sides, kit:update drops the acceptance', () => {
+      const { base, app, upstream } = deleted();
+      acceptChanges(app, [DEMO], REASON);
+      put(upstream, DEMO, 'demo session v2\n');
+      const report = statusReport(parseLock(read(app, 'kit.lock.json')), readTree(app), readTree(upstream)).join('\n');
+      expect(report).toMatch(/changed on both sides \(2\):[\s\S]*tests\/a11y\/demo-session\.test\.ts/);
+      expect(report).not.toMatch(/demo-session\.test\.ts \(deleted\)/);
+
+      const result = applyUpdate({ appDir: app, upstreamDir: upstream, baseDir: base, kit: 'bbbbbbb' });
+      expect(result.skipped).toEqual([]);
+      expect(result.conflicts).toContain(DEMO);
+      expect(parseLock(read(app, 'kit.lock.json')).accepted?.[DEMO]).toBeUndefined();
+    });
   });
 
   it('reads `accept <paths> --reason <text>`', () => {

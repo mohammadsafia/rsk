@@ -59,12 +59,13 @@ export type Lock = {
   /** A Next app's generated App Router files (block pages, 404, error), by hash: kit:add replaces only unchanged ones. */
   generated?: Record<string, string>;
   /**
-   * Kit files the app changed on purpose (`kit:accept`), each with the reason and the hash of the accepted content.
-   * kit:status lists them apart from unexplained changes; a further edit makes the file unexplained again.
+   * Kit files the app changed or deleted on purpose (`kit:accept`), each with the reason and the hash of the accepted
+   * content (for a deletion, of the kit's version the app deleted). kit:status lists them apart from unexplained
+   * changes; a further edit, a deleted file coming back, or the kit changing a deleted file makes it unexplained again.
    */
   accepted?: Record<string, Accepted>;
 };
-export type Accepted = { reason: string; hash: string };
+export type Accepted = { reason: string; hash: string; deleted?: true };
 export type LockMeta = Pick<Lock, 'starter' | 'target' | 'generated' | 'accepted'>;
 export type Status = 'same' | 'updated' | 'added' | 'removed' | 'modified' | 'conflict';
 export type Row = { path: string; status: Status };
@@ -169,7 +170,12 @@ const withoutPrefix = (hashes: Record<string, string>) =>
 
 const acceptedHashes = (accepted: Record<string, Accepted>, map: (hashes: Record<string, string>) => Record<string, string>) => {
   const hashes = map(Object.fromEntries(Object.entries(accepted).map(([file, entry]) => [file, entry.hash])));
-  return Object.fromEntries(Object.entries(accepted).map(([file, entry]) => [file, { reason: entry.reason, hash: hashes[file] }]));
+  return Object.fromEntries(
+    Object.entries(accepted).map(([file, entry]) => [
+      file,
+      { reason: entry.reason, ...(entry.deleted && { deleted: true as const }), hash: hashes[file] },
+    ]),
+  );
 };
 
 /** Reads kit.lock.json. Hashes come back as bare hex whether the lock was written with the prefix or before it. */
@@ -270,30 +276,48 @@ export function lockOnly(lock: Lock, local: Map<string, string>, upstream: Map<s
     .sort((a, b) => a.localeCompare(b));
 }
 
-/** The app's accepted changes that still stand: the file is as it was when accepted. */
-export function standingAcceptances(lock: Lock, local: Map<string, string>): Record<string, Accepted> {
-  return Object.fromEntries(Object.entries(lock.accepted ?? {}).filter(([file, entry]) => local.get(file) === entry.hash));
+/**
+ * Whether an accepted deletion still stands: the file is still gone and the kit's version is still the one the app
+ * deleted (in the lock and, when given, in the kit now). A changed kit file is a new decision to make.
+ */
+const deletionStands = (file: string, entry: Accepted, local: Map<string, string>, kitHash: string | undefined) =>
+  !local.has(file) && kitHash === entry.hash;
+
+/**
+ * The app's accepted changes that still stand: a changed file is as it was when accepted; a deleted file is still gone
+ * and the kit has not changed it since (`upstream`, when given, is the kit now).
+ */
+export function standingAcceptances(lock: Lock, local: Map<string, string>, upstream?: Map<string, string>): Record<string, Accepted> {
+  return Object.fromEntries(
+    Object.entries(lock.accepted ?? {}).filter(([file, entry]) =>
+      entry.deleted
+        ? deletionStands(file, entry, local, lock.files[file]) && (!upstream || upstream.get(file) === entry.hash)
+        : local.get(file) === entry.hash,
+    ),
+  );
 }
 
 /**
- * Records kit files the app changed on purpose, with the reason, in kit.lock.json (`accepted`). kit:status then lists
- * them as accepted instead of unexplained, until the file changes again. Only a kit file that differs from the kit
- * version the app last took can be accepted.
+ * Records kit files the app changed or deleted on purpose, with the reason, in kit.lock.json (`accepted`). kit:status
+ * then lists them as accepted instead of unexplained, until the file changes again (or, deleted, comes back or is
+ * changed by the kit). Only a kit file that differs from, or is missing against, the kit version the app last took can
+ * be accepted.
  */
-export function acceptChanges(appDir: string, files: string[], reason: string): string[] {
+export function acceptChanges(appDir: string, files: string[], reason: string): { file: string; deleted: boolean }[] {
   if (!reason.trim()) throw new Error('kit:accept needs a reason: say why the app changes this kit file (an issue key helps).');
   const lock = readLock(appDir);
   const local = readTree(appDir);
   const accepted = { ...lock.accepted };
-  const taken: string[] = [];
+  const taken: { file: string; deleted: boolean }[] = [];
   for (const given of files) {
     const file = normalise(given);
     if (lock.files[file] === undefined) throw new Error(`${file} is not a kit file (kit.lock.json does not list it).`);
     const mine = local.get(file);
-    if (mine === undefined) throw new Error(`${file} is missing: an accepted change is a changed file, not a deleted one.`);
     if (mine === lock.files[file]) throw new Error(`${file} is the same as the kit: there is no change to accept.`);
-    accepted[file] = { reason: reason.trim(), hash: mine };
-    taken.push(file);
+    // Deleted: the hash is the kit's version the app deleted, so the acceptance lapses when the kit changes the file.
+    accepted[file] =
+      mine === undefined ? { reason: reason.trim(), deleted: true, hash: lock.files[file] } : { reason: reason.trim(), hash: mine };
+    taken.push({ file, deleted: mine === undefined });
   }
   writeLock(appDir, lock.kit, new Map(Object.entries(lock.files)), lock.blocks ?? [], { accepted });
   return taken;
@@ -319,7 +343,7 @@ export function statusReport(
   rows: Row[] = classify(lock, local, upstream),
 ): string[] {
   const changed = rows.filter((row) => row.status !== 'same');
-  const standing = standingAcceptances(lock, local);
+  const standing = standingAcceptances(lock, local, upstream);
   const lines: string[] = [];
   if (!changed.length) lines.push('Every kit file is up to date.');
   const block = (label: string, files: string[]) => {
@@ -340,7 +364,9 @@ export function statusReport(
       );
       block(
         'changed by you, accepted',
-        files.filter((file) => standing[file]).map((file) => `${file}: ${standing[file].reason}`),
+        files
+          .filter((file) => standing[file])
+          .map((file) => `${file}${standing[file].deleted ? ' (deleted)' : ''}: ${standing[file].reason}`),
       );
     }
   }
@@ -372,6 +398,8 @@ export type UpdateResult = {
   keptPages: string[];
   /** Files whose lock record changed although the file did not (see lockOnly). */
   relocked: string[];
+  /** Kit files the app deleted on purpose (an accepted deletion): the update leaves them deleted. */
+  skipped: string[];
 };
 
 /** A block's files in the lock: its folder and its locale files. */
@@ -450,7 +478,9 @@ export function applyUpdate(options: {
     released,
     keptPages: [],
     relocked: lockOnly(lock, local, upstream).filter(wanted),
+    skipped: [],
   };
+  const standing = standingAcceptances(lock, local, upstream);
   const nextLock = new Map(Object.entries(lock.files));
 
   const copy = (file: string) => {
@@ -469,7 +499,7 @@ export function applyUpdate(options: {
       if (!dryRun) rmSync(path.join(appDir, file));
       result.removed.push(file);
     } else if (status === 'modified') {
-      result.kept.push(file);
+      result[standing[file]?.deleted ? 'skipped' : 'kept'].push(file);
     } else if (status === 'conflict') {
       const appFile = path.join(appDir, file);
       const baseFile = baseDir ? path.join(baseDir, file) : '';
@@ -492,10 +522,13 @@ export function applyUpdate(options: {
 
   // A partial update keeps the kit version the lock had: the files it didn't take still came from that version, and
   // their three-way merges need it as their base.
-  // An accepted change stays accepted while the app's file still differs from the kit's version the lock now records.
+  // An accepted change stays accepted while the app's file still differs from the kit's version the lock now records;
+  // an accepted deletion while the file is still gone and the kit's version is still the one the app deleted.
   const after = readTree(appDir);
   const accepted = Object.fromEntries(
-    Object.entries(lock.accepted ?? {}).filter(([file]) => nextLock.has(file) && after.get(file) !== nextLock.get(file)),
+    Object.entries(lock.accepted ?? {}).filter(([file, entry]) =>
+      entry.deleted ? deletionStands(file, entry, after, nextLock.get(file)) : nextLock.has(file) && after.get(file) !== nextLock.get(file),
+    ),
   );
   if (!dryRun) writeLock(appDir, prefixes.length ? lock.kit : kit, nextLock, lock.blocks ?? [], { accepted });
   // The blocks' routes, menu entries and error page follow their (maybe updated) block.json.
