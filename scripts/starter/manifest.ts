@@ -49,6 +49,8 @@ export const DROP = [
   '.github/workflows/visual.yml',
   '.github/workflows/starter-sync.yml',
   '.github/workflows/starter-verify.yml',
+  // The kit repository's own checks; an app's pipeline is its own.
+  '.github/workflows/checks.yml',
   'docs/',
   '.superpowers/',
   '.claude/',
@@ -56,6 +58,8 @@ export const DROP = [
   '.impeccable.md',
   'skills-lock.json',
   'AGENTS.md',
+  // How to report a kit defect and change the kit: the starter README links to it here.
+  'CONTRIBUTING.md',
   '.env',
   // Deploys this repository's docs site.
   'vercel.json',

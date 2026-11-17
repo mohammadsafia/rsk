@@ -1,6 +1,16 @@
 // The session as storage keeps it, readable from anywhere (the API layer reads it outside React).
 
-export type CurrentUser = { userId: string; name: string; email: string; picture?: string };
+export type CurrentUser = {
+  userId: string;
+  name: string;
+  email: string;
+  picture?: string;
+  /**
+   * The signed-in person's roles as the API reported them at sign-in, for showing or hiding parts of the screen only.
+   * The API decides what a request may do; never treat this list as authorization.
+   */
+  roles?: readonly string[];
+};
 
 export type Session = { token: string; user: CurrentUser };
 

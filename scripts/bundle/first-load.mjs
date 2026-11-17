@@ -31,9 +31,10 @@ export const BUNDLE_BUDGET_KB = 210;
 /**
  * The Next starter's first-load budget per route, in KB of gzipped JS: 290.5 KB measured on /settings when the budget
  * was set (2026-10-25; sign-in 283.9; Next and React alone are ~132), plus ~5%. Raising it is a decision: say why in
- * the commit.
+ * the commit. Raised to 307 on 2026-11-17 by the Engineering Manager's decision: /no-access had reached exactly 306.0
+ * KB, and the shell's focus-on-navigation code (an accessibility fix, already loaded lazily) took it to 306.2 KB.
  */
-export const NEXT_BUDGET_KB = 306;
+export const NEXT_BUDGET_KB = 307;
 
 /**
  * A Next page with a kit data table (the starter's members example): 406 KB measured when the budget was set

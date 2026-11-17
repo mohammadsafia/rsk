@@ -52,6 +52,20 @@ When you have your own pages, delete the example: `app/[lang]/(app)/members`, `s
 `/api` route, and point `callApi`'s mock at your own), `src/locales/*/members.json`, and the `members` entries in
 `src/routes/routes.ts` and `src/server/route-decision.ts`.
 
+## Running it, theme and fonts
+
+`pnpm dev` serves on port 3000; `PORT=5101 pnpm dev` runs a second copy beside it. The app starts in the dark theme:
+pass `defaultTheme="light"` (or `"system"`) to `ThemeProvider` in `app/[lang]/providers.tsx`. The fonts load with
+`next/font/local` from the `@fontsource-variable` packages (`app/fonts.ts`), so `next build` fetches nothing.
+
+## Kit files your app changes
+
+`src/lib/hooks/queries/index.ts`, `src/lib/hooks/mutations/index.ts` and `src/assets/icons/index.ts` are yours to
+fill; `kit:status` lists those changes as expected. Your brand accent lives in `src/app-config/accent.css`
+(`pnpm theme:accent`). Record any other intended change to a kit file with
+`pnpm kit:accept <file> --reason "<why>"`. Report a kit defect as the kit's `CONTRIBUTING.md` says
+(https://github.com/mohammadsafia/rsk/blob/main/CONTRIBUTING.md) and take the fix with `pnpm kit:update`.
+
 ## Deploying to Vercel
 
 Import the repository and set `SESSION_SECRET` and `NEXT_PUBLIC_SITE_URL` (and, once your API is ready, `API_URL` and

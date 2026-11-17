@@ -73,6 +73,21 @@ describe('docs:lint', () => {
     expect(lint({ 'guides/__lint-probe.mdx': guide })).toBe('');
   }, 30_000);
 
+  it('passes on the kit’s own docs (CI runs it, so main cannot hold a failing page)', () => {
+    let output = '';
+    try {
+      execFileSync('npx', ['tsx', 'src/component-docs/scripts/lint.ts'], { cwd: ROOT, stdio: 'pipe' });
+    } catch (error) {
+      output = String((error as { stderr: Buffer }).stderr);
+    }
+    expect(output).toBe('');
+  }, 30_000);
+
+  it('names the field and the problem when frontmatter is invalid, not only the file', () => {
+    const page = PROBE.replace('description: Probe.', 'description: Probe.\ntags: [block, 404]');
+    expect(lint({ 'ui/__lint-probe.mdx': page })).toMatch(/__lint-probe\.mdx invalid frontmatter: tags\.1/);
+  }, 30_000);
+
   it('the template emits the new page anatomy', () => {
     const template = readFileSync(`${ROOT}src/component-docs/_template/component.mdx.tpl`, 'utf8');
     expect(template).toMatch(/<Example title=/);

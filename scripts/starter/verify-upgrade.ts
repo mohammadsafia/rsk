@@ -101,7 +101,32 @@ export function verifyUpgrade(newStarter: string) {
     if (wireAdapter && !/To finish this update:[\s\S]*KitRouterProvider/.test(output))
       throw new Error('verify-upgrade: the second kit:update did not name the missing KitRouterProvider');
 
-    // 4. Wire it as the message says, then the app checks, tests and builds.
+    // A baseline that fetched Google Fonts: the new updater names the font packages and the index.css lines.
+    const indexCss = path.join(app, 'src/index.css');
+    const googleFonts = readFileSync(indexCss, 'utf8').includes('fonts.googleapis.com');
+    if (googleFonts && !/To finish this update:[\s\S]*src\/index\.css: replace the Google Fonts @import/.test(output))
+      throw new Error('verify-upgrade: the second kit:update did not name the Google Fonts import to replace');
+
+    // 4. Wire it as the messages say, then the app checks, tests and builds.
+    if (googleFonts) {
+      const { dependencies } = JSON.parse(readFileSync(path.join(newStarter, 'package.json'), 'utf8')) as {
+        dependencies: Record<string, string>;
+      };
+      const fonts = Object.keys(dependencies).filter((name) => name.startsWith('@fontsource-variable/'));
+      // Offline where install is (a warm local store); CI fetches.
+      const offline = installArgs().includes('--offline') ? ['--offline'] : [];
+      run(app, ['add', ...fonts.map((name) => `${name}@${dependencies[name]}`), ...offline]);
+      const css = readFileSync(indexCss, 'utf8').split('\n');
+      writeFileSync(
+        indexCss,
+        [...fonts.map((name) => `@import '${name}';`), ...css.slice(1)]
+          .join('\n')
+          .replace(
+            '@custom-variant dark (&:is(.dark *));\n',
+            "@custom-variant dark (&:is(.dark *));\n\n:root {\n  --font-brand-sans: 'Schibsted Grotesk Variable';\n  --font-brand-arabic: 'Noto Kufi Arabic Variable';\n  --font-brand-mono: 'Spline Sans Mono Variable';\n}\n",
+          ),
+      );
+    }
     if (wireAdapter) {
       copyFileSync(path.join(newStarter, 'src/routes/routerAdapter.tsx'), path.join(app, 'src/routes/routerAdapter.tsx'));
       const bootstrap = path.join(app, 'src/bootstrap.tsx');

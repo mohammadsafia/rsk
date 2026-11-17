@@ -90,7 +90,7 @@ This is the complete frontend code standards checklist for RSK. Every `.ts`/`.ts
 | # | Rule | Wrong | Correct |
 |---|------|-------|---------|
 | 6.1 | Always use `Conditional` component | `{show && <X />}` | `<Conditional.If condition={show}><X /></Conditional.If>` |
-| 6.2 | Use `fallback` prop for else-case | `{x ? <A/> : <B/>}` | `<Conditional.If condition={x} fallback={<B/>}><A/></Conditional.If>` |
+| 6.2 | Use `Conditional.Else` for the else-case (there is no `fallback` prop) | `{x ? <A/> : <B/>}` | `<Conditional><Conditional.If condition={x}><A/></Conditional.If><Conditional.Else><B/></Conditional.Else></Conditional>` |
 
 ---
 
@@ -108,12 +108,12 @@ This is the complete frontend code standards checklist for RSK. Every `.ts`/`.ts
 
 | # | Rule | Wrong | Correct |
 |---|------|-------|---------|
-| 8.1 | Theme-aware classes only | `bg-white`, `text-slate-900` | `bg-background`, `text-foreground` |
+| 8.1 | Semantic token classes only (`src/styles/tokens.css`, exposed by `theme.css`) | `bg-white`, `text-slate-900`, `ring-blue-500` | `bg-surface`, `bg-canvas`, `text-fg`, `text-fg-muted`, `ring-ring` |
 | 8.2 | Use `cn()` for conditional classes | `` className={`base ${x ? 'a' : ''}`} `` | `className={cn('base', x && 'a')}` |
 | 8.3 | Tailwind scale values, not arbitrary pixels | `p-[24px]`, `gap-[32px]` | `p-6`, `gap-8` |
 | 8.4 | No hardcoded hex/rgb — use CSS tokens | `#3B82F6` | Token from design system |
 | 8.5 | No CSS files or style tags — Tailwind only | `<style>` or `.css` import | Tailwind utility classes |
-| 8.6 | New tokens need both light and dark mode in `index.css` | Token without dark variant | `:root` + `.dark` values |
+| 8.6 | New tokens need both light and dark values | Token without a dark value | `:root, .light` and `.dark` blocks of `src/styles/tokens.css` (an app's accent: `pnpm theme:accent`, which writes `src/app-config/accent.css`) |
 
 ---
 

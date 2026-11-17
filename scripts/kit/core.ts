@@ -34,6 +34,18 @@ export const KIT_PATHS = [
 
 export const LOCK_FILE = 'kit.lock.json';
 
+/**
+ * Kit files an app is expected to change: barrels the kit ships empty or nearly so, where the app adds its own
+ * exports. kit:status lists an app's changes to them as expected, not unexplained, and kit:update merges as usual.
+ * The starter's README lists them for a project's rules to point at.
+ */
+export const EXTENSION_POINTS = [
+  'src/lib/hooks/queries/index.ts',
+  'src/lib/hooks/mutations/index.ts',
+  'src/assets/icons/index.ts',
+] as const;
+const isExtensionPoint = (file: string) => (EXTENSION_POINTS as readonly string[]).includes(file);
+
 export type KitTarget = 'vite' | 'next';
 export type Lock = {
   kit: string;
@@ -46,8 +58,14 @@ export type Lock = {
   target?: KitTarget;
   /** A Next app's generated App Router files (block pages, 404, error), by hash: kit:add replaces only unchanged ones. */
   generated?: Record<string, string>;
+  /**
+   * Kit files the app changed on purpose (`kit:accept`), each with the reason and the hash of the accepted content.
+   * kit:status lists them apart from unexplained changes; a further edit makes the file unexplained again.
+   */
+  accepted?: Record<string, Accepted>;
 };
-export type LockMeta = Pick<Lock, 'starter' | 'target' | 'generated'>;
+export type Accepted = { reason: string; hash: string };
+export type LockMeta = Pick<Lock, 'starter' | 'target' | 'generated' | 'accepted'>;
 export type Status = 'same' | 'updated' | 'added' | 'removed' | 'modified' | 'conflict';
 export type Row = { path: string; status: Status };
 
@@ -81,13 +99,24 @@ export function checkUpstream(upstreamLock: Lock | null): asserts upstreamLock i
     throw new Error(`The starter to update from has no ${LOCK_FILE}: use the published starter or a folder built by starter:build.`);
 }
 
-export type Args = { command: 'status' | 'update'; paths: string[]; from?: string; base?: string; dryRun: boolean };
+export type Args = {
+  command: 'status' | 'update' | 'accept';
+  paths: string[];
+  from?: string;
+  base?: string;
+  reason?: string;
+  dryRun: boolean;
+};
 
-/** kit.ts's arguments: `status|update [paths…] [--from dir] [--base dir] [--dry-run]` (also --from=dir). */
+const USAGE = 'usage: kit.ts status|update [paths…] [--from dir] [--base dir] [--dry-run], or kit.ts accept <paths…> --reason "<why>"';
+
+/**
+ * kit.ts's arguments: `status|update [paths…] [--from dir] [--base dir] [--dry-run]` (also --from=dir), and
+ * `accept <paths…> --reason <text>`.
+ */
 export function parseArgs(argv: string[]): Args {
   const [command = 'status', ...rest] = argv;
-  if (command !== 'status' && command !== 'update')
-    throw new Error('usage: kit.ts status|update [paths…] [--from dir] [--base dir] [--dry-run]');
+  if (command !== 'status' && command !== 'update' && command !== 'accept') throw new Error(USAGE);
   const args: Args = { command, paths: [], dryRun: false };
   for (let index = 0; index < rest.length; index += 1) {
     const value = rest[index];
@@ -97,13 +126,14 @@ export function parseArgs(argv: string[]): Args {
     }
     const [flag, inline] = value.split(/=(.*)/s);
     if (flag === '--dry-run') args.dryRun = true;
-    else if (flag === '--from' || flag === '--base') {
+    else if (flag === '--from' || flag === '--base' || (flag === '--reason' && command === 'accept')) {
       const given = inline ?? rest[index + 1];
       if (!given || given.startsWith('--')) throw new Error(`${flag} needs a value`);
       if (inline === undefined) index += 1;
-      args[flag === '--from' ? 'from' : 'base'] = given;
+      args[flag === '--from' ? 'from' : flag === '--base' ? 'base' : 'reason'] = given;
     } else throw new Error(`Unknown option ${flag}`);
   }
+  if (command === 'accept' && (!args.paths.length || !args.reason)) throw new Error(USAGE.replace(/^usage: .*, or /, 'usage: '));
   return args;
 }
 
@@ -137,10 +167,20 @@ const withoutPrefix = (hashes: Record<string, string>) =>
     Object.entries(hashes).map(([file, hash]) => [file, hash.startsWith(DIGEST_PREFIX) ? hash.slice(DIGEST_PREFIX.length) : hash]),
   );
 
+const acceptedHashes = (accepted: Record<string, Accepted>, map: (hashes: Record<string, string>) => Record<string, string>) => {
+  const hashes = map(Object.fromEntries(Object.entries(accepted).map(([file, entry]) => [file, entry.hash])));
+  return Object.fromEntries(Object.entries(accepted).map(([file, entry]) => [file, { reason: entry.reason, hash: hashes[file] }]));
+};
+
 /** Reads kit.lock.json. Hashes come back as bare hex whether the lock was written with the prefix or before it. */
 export function parseLock(text: string): Lock {
   const lock = JSON.parse(text) as Lock;
-  return { ...lock, files: withoutPrefix(lock.files ?? {}), ...(lock.generated && { generated: withoutPrefix(lock.generated) }) };
+  return {
+    ...lock,
+    files: withoutPrefix(lock.files ?? {}),
+    ...(lock.generated && { generated: withoutPrefix(lock.generated) }),
+    ...(lock.accepted && { accepted: acceptedHashes(lock.accepted, withoutPrefix) }),
+  };
 }
 
 export function readLock(appDir: string): Lock {
@@ -153,7 +193,15 @@ export function readLock(appDir: string): Lock {
 export function writeLock(appDir: string, kit: string, files: Map<string, string>, blocks: string[] = [], meta: LockMeta = {}) {
   const file = path.join(appDir, LOCK_FILE);
   const current: LockMeta = existsSync(file) ? parseLock(readFileSync(file, 'utf8')) : {};
-  const { starter, target, generated } = { starter: current.starter, target: current.target, generated: current.generated, ...meta };
+  const { starter, target, generated, accepted } = {
+    starter: current.starter,
+    target: current.target,
+    generated: current.generated,
+    accepted: current.accepted,
+    ...meta,
+  };
+  const byPath = <T>(record: Record<string, T>) =>
+    Object.fromEntries(Object.entries(record).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
   const sorted = Object.fromEntries([...files].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
   // Keys left out when absent. Hashes are written with the digest prefix (see DIGEST_PREFIX), so the first write
   // after this change rewrites an older app's hashes in the new form; the hashes themselves do not change.
@@ -164,8 +212,9 @@ export function writeLock(appDir: string, kit: string, files: Map<string, string
     blocks: [...blocks].sort((a, b) => a.localeCompare(b)),
     ...(generated &&
       Object.keys(generated).length && {
-        generated: withPrefix(Object.fromEntries(Object.entries(generated).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))),
+        generated: withPrefix(byPath(generated)),
       }),
+    ...(accepted && Object.keys(accepted).length && { accepted: acceptedHashes(byPath(accepted), withPrefix) }),
     files: withPrefix(sorted),
   };
   writeFileSync(file, `${JSON.stringify(lock, null, 2)}\n`);
@@ -210,6 +259,106 @@ export function classify(lock: Lock, local: Map<string, string>, upstream: Map<s
   return rows;
 }
 
+/**
+ * Files whose lock record changes although the app's file needs nothing: the app already has the kit's version (the
+ * lock still names an older one), or a file the kit removed that the app removed too. kit:update rewrites their
+ * hashes, so it lists them; otherwise kit.lock.json changes in a pull request with no line saying why.
+ */
+export function lockOnly(lock: Lock, local: Map<string, string>, upstream: Map<string, string>): string[] {
+  return [...new Set([...Object.keys(lock.files), ...upstream.keys()])]
+    .filter((file) => lock.files[file] !== upstream.get(file) && local.get(file) === upstream.get(file))
+    .sort((a, b) => a.localeCompare(b));
+}
+
+/** The app's accepted changes that still stand: the file is as it was when accepted. */
+export function standingAcceptances(lock: Lock, local: Map<string, string>): Record<string, Accepted> {
+  return Object.fromEntries(Object.entries(lock.accepted ?? {}).filter(([file, entry]) => local.get(file) === entry.hash));
+}
+
+/**
+ * Records kit files the app changed on purpose, with the reason, in kit.lock.json (`accepted`). kit:status then lists
+ * them as accepted instead of unexplained, until the file changes again. Only a kit file that differs from the kit
+ * version the app last took can be accepted.
+ */
+export function acceptChanges(appDir: string, files: string[], reason: string): string[] {
+  if (!reason.trim()) throw new Error('kit:accept needs a reason: say why the app changes this kit file (an issue key helps).');
+  const lock = readLock(appDir);
+  const local = readTree(appDir);
+  const accepted = { ...lock.accepted };
+  const taken: string[] = [];
+  for (const given of files) {
+    const file = normalise(given);
+    if (lock.files[file] === undefined) throw new Error(`${file} is not a kit file (kit.lock.json does not list it).`);
+    const mine = local.get(file);
+    if (mine === undefined) throw new Error(`${file} is missing: an accepted change is a changed file, not a deleted one.`);
+    if (mine === lock.files[file]) throw new Error(`${file} is the same as the kit: there is no change to accept.`);
+    accepted[file] = { reason: reason.trim(), hash: mine };
+    taken.push(file);
+  }
+  writeLock(appDir, lock.kit, new Map(Object.entries(lock.files)), lock.blocks ?? [], { accepted });
+  return taken;
+}
+
+const LABELS: Record<Exclude<Status, 'same'>, string> = {
+  updated: 'updated in the kit',
+  added: 'new in the kit',
+  removed: 'removed from the kit',
+  modified: 'changed by you (kept)',
+  conflict: 'changed on both sides',
+};
+
+/**
+ * kit:status's lines: each kit file that differs from the kit, by status; the app's accepted changes with their
+ * reasons; the files where only the lock changes; and a last line counting the unexplained changes (changed by the app
+ * and not accepted). `rows` defaults to every file classify() finds.
+ */
+export function statusReport(
+  lock: Lock,
+  local: Map<string, string>,
+  upstream: Map<string, string>,
+  rows: Row[] = classify(lock, local, upstream),
+): string[] {
+  const changed = rows.filter((row) => row.status !== 'same');
+  const standing = standingAcceptances(lock, local);
+  const lines: string[] = [];
+  if (!changed.length) lines.push('Every kit file is up to date.');
+  const block = (label: string, files: string[]) => {
+    if (files.length) lines.push('', `${label} (${files.length}):`, ...files.map((file) => `  ${file}`));
+  };
+  for (const status of Object.keys(LABELS) as (keyof typeof LABELS)[]) {
+    const files = changed.filter((row) => row.status === status).map((row) => row.path);
+    if (status !== 'modified') block(LABELS[status], files);
+    else {
+      const unexplained = files.filter((file) => !standing[file] && !isExtensionPoint(file));
+      block(
+        LABELS.modified,
+        unexplained.map((file) => (lock.accepted?.[file] ? `${file} (changed since it was accepted)` : file)),
+      );
+      block(
+        'changed by you, expected (the app adds its own exports there)',
+        files.filter((file) => !standing[file] && isExtensionPoint(file)),
+      );
+      block(
+        'changed by you, accepted',
+        files.filter((file) => standing[file]).map((file) => `${file}: ${standing[file].reason}`),
+      );
+    }
+  }
+  const paths = new Set(rows.map((row) => row.path));
+  block(
+    'already the kit’s version, only the lock changes',
+    lockOnly(lock, local, upstream).filter((file) => paths.has(file)),
+  );
+  const unexplained = changed.filter((row) => row.status === 'modified' && !standing[row.path] && !isExtensionPoint(row.path)).length;
+  lines.push(
+    '',
+    unexplained
+      ? `Unexplained changes to kit files: ${unexplained}. Take the kit's version, or record why with pnpm kit:accept <file> --reason "<why>".`
+      : 'Unexplained changes to kit files: none.',
+  );
+  return lines;
+}
+
 export type UpdateResult = {
   updated: string[];
   added: string[];
@@ -221,6 +370,8 @@ export type UpdateResult = {
   released: string[];
   /** A Next app's generated pages the app changed: the update left them as they are. */
   keptPages: string[];
+  /** Files whose lock record changed although the file did not (see lockOnly). */
+  relocked: string[];
 };
 
 /** A block's files in the lock: its folder and its locale files. */
@@ -281,14 +432,25 @@ export function applyUpdate(options: {
   const appLock = readLock(appDir);
   const { lock, released } = releaseDroppedBlocks(appLock, upstreamDir);
   const upstream = readTree(upstreamDir);
-  const rows = classify(lock, readTree(appDir), upstream);
+  const local = readTree(appDir);
+  const rows = classify(lock, local, upstream);
   const prefixes = (only ?? []).map(normalise);
   for (const prefix of prefixes) if (!rows.some((row) => row.path.startsWith(prefix))) throw new Error(`"${prefix}" matches no kit file.`);
   const wanted = (file: string) => !prefixes.length || prefixes.some((prefix) => file.startsWith(prefix));
   // Check before touching anything: a missing git must not stop an update halfway.
   if (rows.some((row) => row.status === 'conflict' && wanted(row.path)) && baseDir && !gitAvailable())
     throw new Error('kit:update needs git to merge files changed on both sides; install git and run it again.');
-  const result: UpdateResult = { updated: [], added: [], removed: [], merged: [], conflicts: [], kept: [], released, keptPages: [] };
+  const result: UpdateResult = {
+    updated: [],
+    added: [],
+    removed: [],
+    merged: [],
+    conflicts: [],
+    kept: [],
+    released,
+    keptPages: [],
+    relocked: lockOnly(lock, local, upstream).filter(wanted),
+  };
   const nextLock = new Map(Object.entries(lock.files));
 
   const copy = (file: string) => {
@@ -330,7 +492,12 @@ export function applyUpdate(options: {
 
   // A partial update keeps the kit version the lock had: the files it didn't take still came from that version, and
   // their three-way merges need it as their base.
-  if (!dryRun) writeLock(appDir, prefixes.length ? lock.kit : kit, nextLock, lock.blocks ?? []);
+  // An accepted change stays accepted while the app's file still differs from the kit's version the lock now records.
+  const after = readTree(appDir);
+  const accepted = Object.fromEntries(
+    Object.entries(lock.accepted ?? {}).filter(([file]) => nextLock.has(file) && after.get(file) !== nextLock.get(file)),
+  );
+  if (!dryRun) writeLock(appDir, prefixes.length ? lock.kit : kit, nextLock, lock.blocks ?? [], { accepted });
   // The blocks' routes, menu entries and error page follow their (maybe updated) block.json.
   if (!dryRun && (appLock.blocks?.length || existsSync(path.join(appDir, 'src/blocks/index.ts')))) result.keptPages = writeIndex(appDir);
   return result;

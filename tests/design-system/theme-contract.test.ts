@@ -75,12 +75,12 @@ describe('legacy accent migration', () => {
 });
 
 describe('typography', () => {
-  it('loads exactly the three approved families (Vite: Google Fonts in index.css; Next: next/font in the root layout)', () => {
+  it('loads exactly the three approved families, served with the app (Vite: @fontsource-variable in index.css; Next: next/font/local)', () => {
     expect(checkFontLoading(fileURLToPath(new URL('../../', import.meta.url)))).toEqual([]);
   });
 
   it('exposes the sans and mono stacks', () => {
-    // A Next app sets --font-brand-* from next/font; a Vite app leaves them unset and gets the named families.
+    // A Next app sets --font-brand-* from next/font/local; a Vite app's index.css sets them to the @fontsource-variable families.
     expect(FONT_FAMILIES.sans).toBe(
       "var(--font-brand-sans, 'Schibsted Grotesk'), var(--font-brand-arabic, 'Noto Kufi Arabic'), system-ui, sans-serif",
     );

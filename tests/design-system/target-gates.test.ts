@@ -19,7 +19,13 @@ import {
   sourceRoots,
 } from './target-checks';
 
-const LAYOUT = `import { Noto_Kufi_Arabic, Schibsted_Grotesk, Spline_Sans_Mono } from 'next/font/google';
+const FONTS = `import localFont from 'next/font/local';
+// Served with the app, not fetched by next/font/google at build time: a comment naming it is not a fetch.
+const sans = localFont({ src: '../node_modules/@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2' });
+const arabic = localFont({ src: '../node_modules/@fontsource-variable/noto-kufi-arabic/files/noto-kufi-arabic-arabic-wght-normal.woff2' });
+const mono = localFont({ src: '../node_modules/@fontsource-variable/spline-sans-mono/files/spline-sans-mono-latin-wght-normal.woff2' });`;
+
+const LAYOUT = `import { fontVariables } from '../fonts';
 export const metadata = {
   icons: { icon: [{ url: '/favicon.svg' }, { url: '/favicon.ico' }], apple: '/apple-touch-icon.png' },
   manifest: '/site.webmanifest',
@@ -43,6 +49,7 @@ const FILES: Record<string, string> = {
   'tsconfig.scripts.json': JSON.stringify({ extends: './tsconfig.app.json', include: ['scripts', 'tests', 'src/**/*.d.ts'] }),
   '.env.example': '# The API the server calls.\nAPI_URL=http://localhost:4000\nNEXT_PUBLIC_SITE_URL=http://localhost:3000\n',
   [NEXT_LAYOUT]: LAYOUT,
+  'app/fonts.ts': FONTS,
 };
 
 let dirs: string[] = [];
@@ -93,9 +100,16 @@ describe('target-aware gates in a Next app', () => {
   });
 
   it('catches missing favicon metadata and fonts in the root layout', () => {
-    const dir = nextApp({ [NEXT_LAYOUT]: 'export const metadata = {};' });
+    const dir = nextApp({ [NEXT_LAYOUT]: 'export const metadata = {};', 'app/fonts.ts': null });
     expect(checkFaviconLinks(dir)).toContain(`${NEXT_LAYOUT} lacks icons:`);
-    expect(checkFontLoading(dir)).toContain(`${NEXT_LAYOUT} (or app/fonts.ts) lacks from 'next/font/google'`);
+    expect(checkFontLoading(dir)).toContain(`${NEXT_LAYOUT} (or app/fonts.ts) lacks from 'next/font/local'`);
+  });
+
+  it('catches fonts fetched from Google at build time (next build then needs the network)', () => {
+    const google = "import { Noto_Kufi_Arabic, Schibsted_Grotesk, Spline_Sans_Mono } from 'next/font/google';";
+    expect(checkFontLoading(nextApp({ 'app/fonts.ts': `${FONTS}\n${google}` }))).toContain(
+      `${NEXT_LAYOUT} (or app/fonts.ts) fetches fonts from Google at build time (next/font/google): load the @fontsource-variable files with next/font/local`,
+    );
   });
 
   it('catches an app project that leaves out app/ or Next’s types', () => {
@@ -114,9 +128,8 @@ describe('target-aware gates in a Next app', () => {
     expect(checkTypecheckProjects(dir)).toEqual([]);
   });
 
-  it('finds the fonts in app/fonts.ts, which the root layout and the global 404 share', () => {
-    const fonts = "import { Noto_Kufi_Arabic, Schibsted_Grotesk, Spline_Sans_Mono } from 'next/font/google';";
-    const dir = nextApp({ [NEXT_LAYOUT]: LAYOUT.split('\n').slice(1).join('\n'), 'app/fonts.ts': fonts });
+  it('finds the fonts in the root layout itself too', () => {
+    const dir = nextApp({ [NEXT_LAYOUT]: `${FONTS}\n${LAYOUT}`, 'app/fonts.ts': null });
     expect(checkFontLoading(dir)).toEqual([]);
   });
 
@@ -126,5 +139,34 @@ describe('target-aware gates in a Next app', () => {
 
   it('without a lock, a next.config file is enough to check the app as Next', () => {
     expect(checkCompilerConfig(nextApp({ 'kit.lock.json': null }))).toEqual([]);
+  });
+});
+
+describe('font loading in a Vite app', () => {
+  const viteApp = (css: string): string => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'kit-vite-app-'));
+    dirs.push(dir);
+    mkdirSync(path.join(dir, 'src'), { recursive: true });
+    writeFileSync(path.join(dir, 'src/index.css'), css);
+    return dir;
+  };
+  const SELF_HOSTED = [
+    "@import '@fontsource-variable/schibsted-grotesk';",
+    "@import '@fontsource-variable/noto-kufi-arabic';",
+    "@import '@fontsource-variable/spline-sans-mono';",
+    "@import 'tailwindcss';",
+  ].join('\n');
+
+  it('passes the three families served with the app', () => {
+    expect(checkFontLoading(viteApp(SELF_HOSTED))).toEqual([]);
+  });
+
+  it('catches fonts fetched from a font host at run time (blocked networks and offline runs lose the brand fonts)', () => {
+    const google =
+      "@import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic&family=Schibsted+Grotesk&family=Spline+Sans+Mono');";
+    expect(checkFontLoading(viteApp(`${google}\n${SELF_HOSTED}`))).toContain(
+      'index.css fetches fonts from a font host at run time: import the @fontsource-variable packages instead',
+    );
+    expect(checkFontLoading(viteApp(google))).toContain("index.css lacks @import '@fontsource-variable/schibsted-grotesk'");
   });
 });

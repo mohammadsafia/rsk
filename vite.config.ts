@@ -12,6 +12,8 @@ import rehypePrettyCode from 'rehype-pretty-code';
 import remarkGfm from 'remark-gfm';
 import remarkDocs from './scripts/docs/remark-docs';
 import { scanDocCounts } from './scripts/docs/doc-counts';
+import { devServer } from './scripts/lib/dev-server';
+import { TEST_TIMEOUT_MS } from './src/test-utils/timeouts';
 
 const mdxBase = mdx({
   providerImportSource: '@mdx-js/react',
@@ -187,6 +189,9 @@ export default defineConfig({
     },
   },
   test: {
+    // A realistic wait for an element, well under the test limit (src/test-utils/timeouts.ts).
+    testTimeout: TEST_TIMEOUT_MS,
+    setupFiles: ['./src/test-utils/setup.ts'],
     // Vitest v4 compatibility: preserve mock call history.
     // Remove after tests no longer rely on calls from setup or earlier tests.
     // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
@@ -217,10 +222,8 @@ export default defineConfig({
   define: {
     __RSK_DOC_COUNTS__: JSON.stringify(scanDocCounts(path.resolve(__dirname, 'src/component-docs'))),
   },
-  server: {
-    port: 3000,
-    open: true,
-  },
+  // Port 3000 and no API proxy unless FRONTEND_PORT / API_PROXY_TARGET say otherwise (scripts/lib/dev-server.ts).
+  server: devServer(),
 
   resolve: {
     alias: [

@@ -40,6 +40,14 @@ describe('buildStarter', () => {
     const pkg = JSON.parse(readFileSync(path.join(out, 'package.json'), 'utf8')) as { scripts: Record<string, string> };
     expect(pkg.scripts['kit:status']).toBe('tsx scripts/kit/kit.ts status');
     expect(pkg.scripts['kit:update']).toBe('tsx scripts/kit/kit.ts update');
+    expect(pkg.scripts['kit:accept']).toBe('tsx scripts/kit/kit.ts accept');
+  });
+
+  it('gives the Vite starter a dev server whose port and API proxy come from FRONTEND_PORT and API_PROXY_TARGET', () => {
+    const config = readFileSync(path.join(out, 'vite.config.ts'), 'utf8');
+    expect(config).toContain("import { devServer } from './scripts/lib/dev-server';");
+    expect(config).toContain('server: devServer(),');
+    expect(existsSync(path.join(out, 'scripts/lib/dev-server.ts'))).toBe(true);
   });
 
   it('ships the block catalogue in registry/ (not in src), an empty block index, kit:add/kit:remove and the picker’s library', () => {
@@ -129,6 +137,24 @@ describe('buildStarter', () => {
   });
 });
 
+describe('the starter README', () => {
+  // A project's rules point at this list instead of naming kit files; each entry must exist in the app.
+  it('lists the kit files an app is expected to change, and each one is in the starter', async () => {
+    const { EXTENSION_POINTS } = await import('../../scripts/kit/core');
+    const readme = readFileSync(path.join(out, 'README.md'), 'utf8');
+    for (const file of [...EXTENSION_POINTS, 'src/app-config/accent.css']) {
+      expect(readme, file).toContain(`\`${file}\``);
+      expect(existsSync(path.join(out, file)), file).toBe(true);
+    }
+  });
+
+  it('says how to run two copies, record an intended kit change, and report a kit defect', () => {
+    const readme = readFileSync(path.join(out, 'README.md'), 'utf8');
+    for (const words of ['FRONTEND_PORT', 'API_PROXY_TARGET', 'pnpm kit:accept', 'CONTRIBUTING.md', 'defaultTheme'])
+      expect(readme, words).toContain(words);
+  });
+});
+
 describe('buildStarter --target next', () => {
   let next = '';
   let vite = '';
@@ -183,14 +209,18 @@ describe('buildStarter --target next', () => {
     for (const name of ['next', 'server-only', '@tailwindcss/postcss', 'postcss']) expect(pkg.devDependencies[name], name).toBeUndefined();
   });
 
-  it('writes config in the form next build keeps, and CSS without the remote font import', () => {
+  it('writes config in the form next build keeps, and CSS without the font imports next/font/local replaces', () => {
     const tsconfig = readFileSync(path.join(next, 'tsconfig.app.json'), 'utf8');
     expect(tsconfig).toContain('"include": ["src", "app", "proxy.ts", "next-env.d.ts", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"]');
     expect(tsconfig).toContain('"exclude": ["node_modules"]');
     expect(tsconfig).toContain('"plugins": [{ "name": "next" }]');
     const css = readFileSync(path.join(next, 'src/index.css'), 'utf8');
     expect(css).not.toContain('fonts.googleapis');
-    expect(css).toBe(readFileSync(path.join(vite, 'src/index.css'), 'utf8').split('\n').slice(1).join('\n').replace(/^\n+/, ''));
+    // next/font/local loads the fonts (app/fonts.ts); the rest of the CSS is the Vite starter's.
+    expect(css).not.toContain('@fontsource-variable');
+    const viteCss = readFileSync(path.join(vite, 'src/index.css'), 'utf8');
+    expect(viteCss).toContain("@import '@fontsource-variable/schibsted-grotesk';");
+    expect(css).toBe(viteCss.replace(/^[\s\S]*?\n\n/, ''));
     const viteConfig = readFileSync(path.join(next, 'vite.config.ts'), 'utf8');
     expect(viteConfig).not.toContain('@tailwindcss/vite');
     expect(viteConfig).toContain("'.next/**'");

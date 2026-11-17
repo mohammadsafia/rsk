@@ -5,6 +5,7 @@ import { type ComponentPropsWithoutRef, type FC, type ReactNode, useCallback, us
 import { IconButton } from '@components/ui';
 import { Conditional } from '@components/utils';
 
+import { usePathname } from '@contexts';
 import { useAppTranslation, useIsHydrated } from '@hooks/shared';
 
 import { cn } from '@utils';
@@ -47,9 +48,17 @@ export type AppShellProps = {
   children: ReactNode;
 };
 
+export type AppShellContentProps = ComponentPropsWithoutRef<'main'> & {
+  /**
+   * After a route change, move the focus to the new page's first heading (h1), or to the main region when the page
+   * has none, so keyboard and screen reader users start on the page they asked for. Default true.
+   */
+  focusOnNavigate?: boolean;
+};
+
 type AppShellComponent = FC<AppShellProps> & {
   Header: FC<ComponentPropsWithoutRef<'header'>>;
-  Content: FC<ComponentPropsWithoutRef<'main'>>;
+  Content: FC<AppShellContentProps>;
   MenuButton: FC<{ className?: string }>;
 };
 
@@ -70,9 +79,36 @@ const Header: FC<ComponentPropsWithoutRef<'header'>> = ({ className, ...props })
   );
 };
 
-const Content: FC<ComponentPropsWithoutRef<'main'>> = ({ className, children, ...props }) => {
+/**
+ * After a route change (never on the first load) the focus moves to the new page's heading (focusPageHeading). The
+ * code loads on the first navigation, so it costs a page's first load nothing.
+ */
+function useFocusOnNavigate(mainRef: { current: HTMLElement | null }, enabled: boolean) {
+  const pathname = usePathname();
+  const firstPath = useRef(pathname);
+
+  useEffect(() => {
+    const main = mainRef.current;
+    if (!enabled || !main || pathname === firstPath.current) return;
+    firstPath.current = '';
+    const startedOn = document.activeElement;
+    let stop: (() => void) | undefined;
+    let cancelled = false;
+    void import('./focusPageHeading').then(({ focusPageHeading }) => {
+      if (!cancelled) stop = focusPageHeading(main, startedOn);
+    });
+    return () => {
+      cancelled = true;
+      stop?.();
+    };
+  }, [pathname, enabled, mainRef]);
+}
+
+const Content: FC<AppShellContentProps> = ({ className, children, focusOnNavigate = true, ...props }) => {
   const { setScrolled, contentId } = useAppShell();
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
+  useFocusOnNavigate(mainRef, focusOnNavigate);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -86,6 +122,7 @@ const Content: FC<ComponentPropsWithoutRef<'main'>> = ({ className, children, ..
 
   return (
     <main
+      ref={mainRef}
       id={contentId}
       tabIndex={-1}
       data-slot="app-shell-content"

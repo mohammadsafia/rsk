@@ -35,8 +35,31 @@ describe('starter workflows', () => {
     expect(sync.indexOf('ssh-private-key')).toBeGreaterThan(sync.indexOf('starter:build'));
   });
 
+  it('runs the kit’s own checks on every pull request and push to main: vp check, the tests and docs:lint', () => {
+    // A project found a docs:lint failure that had sat on main, because nothing ran it: only the starters were verified.
+    const checks = workflow('checks.yml');
+    expect(checks).toMatch(/^on:\n {2}push:\n {4}branches: \[main\]\n {2}pull_request:/m);
+    expect(checks).not.toContain('pull_request_target');
+    expect(checks).toMatch(/^permissions:\n {2}contents: read/m);
+    expect(checks).toContain('persist-credentials: false');
+    expect(checks).not.toContain('secrets.');
+    for (const step of [
+      'run: pnpm install --frozen-lockfile',
+      'run: pnpm exec vp check',
+      'run: pnpm exec vp test run',
+      'run: pnpm docs:lint',
+    ])
+      expect(checks).toContain(step);
+  });
+
   it('keeps the CI files out of both starters', async () => {
     const { DROP } = await import('../../scripts/starter/manifest');
-    expect(DROP).toEqual(expect.arrayContaining(['.github/workflows/starter-sync.yml', '.github/workflows/starter-verify.yml']));
+    expect(DROP).toEqual(
+      expect.arrayContaining([
+        '.github/workflows/starter-sync.yml',
+        '.github/workflows/starter-verify.yml',
+        '.github/workflows/checks.yml',
+      ]),
+    );
   });
 });

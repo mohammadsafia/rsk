@@ -6,6 +6,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 
 import {
+  acceptChanges,
   applyUpdate,
   checkUpstream,
   classify,
@@ -14,8 +15,10 @@ import {
   inScope,
   parseArgs,
   parseLock,
+  EXTENSION_POINTS,
   readTree,
   stageUpstream,
+  statusReport,
   writeLock,
 } from '../../scripts/kit/core';
 
@@ -363,5 +366,119 @@ describe('kit.lock.json on disk', () => {
     expect(parseLock(older).files['src/lib/utils/auth.ts']).toBe(hash);
     // An app made before the prefix is still "unchanged" against the same kit.
     expect(classify(parseLock(older), readTree(app), readTree(app)).every((row) => row.status === 'same')).toBe(true);
+  });
+});
+
+describe('kit:update reports lock-only changes', () => {
+  // An app that already holds the kit's new version of a file (copied by hand, or taken in an earlier partial update)
+  // still has the old hash in its lock. kit:update rewrote that hash and listed nothing, so the lock changed in the
+  // pull request with no line saying why.
+  it('lists a file whose lock record changes although the file itself needs nothing', () => {
+    const { base, app, upstream } = scenario();
+    put(app, BUTTON, read(upstream, BUTTON)); // the app already has the kit's new Button
+    const result = applyUpdate({ appDir: app, upstreamDir: upstream, baseDir: base, kit: 'bbbbbbb' });
+    expect(result.updated).not.toContain(BUTTON);
+    expect(result.relocked).toEqual([BUTTON]);
+    expect(parseLock(read(app, 'kit.lock.json')).files[BUTTON]).toBe(hashFile(path.join(upstream, BUTTON)));
+  });
+
+  it('lists nothing as lock-only when the lock already matches', () => {
+    const { base, app, upstream } = scenario();
+    const result = applyUpdate({ appDir: app, upstreamDir: upstream, baseDir: base, kit: 'bbbbbbb' });
+    expect(result.relocked).toEqual([]);
+  });
+
+  it('kit:status names the lock-only files too', () => {
+    const { app, upstream } = scenario();
+    put(app, BUTTON, read(upstream, BUTTON));
+    const lock = parseLock(read(app, 'kit.lock.json'));
+    const local = readTree(app);
+    const report = statusReport(lock, local, readTree(upstream)).join('\n');
+    expect(report).toMatch(/only the lock changes \(1\):\n {2}src\/components\/ui\/button\/Button\.tsx/);
+  });
+});
+
+describe('kit:status accepted app changes', () => {
+  it('reports a changed kit file as unexplained until the app accepts it with a reason', () => {
+    const { app, upstream } = scenario();
+    const before = statusReport(parseLock(read(app, 'kit.lock.json')), readTree(app), readTree(upstream)).join('\n');
+    expect(before).toMatch(/changed by you \(kept\) \(1\):\n {2}src\/components\/ui\/card\/Card\.tsx/);
+    expect(before).toMatch(/Unexplained changes to kit files: 1/);
+
+    acceptChanges(app, [CARD], 'DEMO-12: the card keeps a tighter padding until the kit has a density option');
+    const lock = parseLock(read(app, 'kit.lock.json'));
+    expect(lock.accepted?.[CARD]).toEqual({
+      reason: 'DEMO-12: the card keeps a tighter padding until the kit has a density option',
+      hash: hashFile(path.join(app, CARD)),
+    });
+    const after = statusReport(lock, readTree(app), readTree(upstream)).join('\n');
+    expect(after).toMatch(/changed by you, accepted \(1\):\n {2}src\/components\/ui\/card\/Card\.tsx: DEMO-12/);
+    expect(after).toMatch(/Unexplained changes to kit files: none/);
+    expect(after).not.toMatch(/changed by you \(kept\)/);
+  });
+
+  it('an accepted file changed again is unexplained again', () => {
+    const { app, upstream } = scenario();
+    acceptChanges(app, [CARD], 'DEMO-12: tighter padding');
+    put(app, CARD, 'card v1 with another tweak\n');
+    const report = statusReport(parseLock(read(app, 'kit.lock.json')), readTree(app), readTree(upstream)).join('\n');
+    expect(report).toMatch(/changed by you \(kept\) \(1\):\n {2}src\/components\/ui\/card\/Card\.tsx \(changed since it was accepted\)/);
+    expect(report).toMatch(/Unexplained changes to kit files: 1/);
+  });
+
+  it('refuses an empty reason, a file that is not the kit’s, and a kit file the app has not changed', () => {
+    const { app } = scenario();
+    expect(() => acceptChanges(app, [CARD], '  ')).toThrow(/reason/);
+    expect(() => acceptChanges(app, [PAGE], 'mine')).toThrow(/not a kit file/);
+    expect(() => acceptChanges(app, [BUTTON], 'why')).toThrow(/same as the kit/);
+  });
+
+  it('kit:update keeps an acceptance while the change stands, and drops it once the file matches the kit', () => {
+    const { base, app, upstream } = scenario();
+    acceptChanges(app, [CARD], 'DEMO-12: tighter padding');
+    applyUpdate({ appDir: app, upstreamDir: upstream, baseDir: base, kit: 'bbbbbbb' });
+    expect(parseLock(read(app, 'kit.lock.json')).accepted?.[CARD]?.reason).toBe('DEMO-12: tighter padding');
+
+    put(app, CARD, read(upstream, CARD)); // the app goes back to the kit's version
+    applyUpdate({ appDir: app, upstreamDir: upstream, baseDir: base, kit: 'bbbbbbb' });
+    expect(parseLock(read(app, 'kit.lock.json')).accepted).toBeUndefined();
+  });
+
+  it('writes the accepted hash with the digest prefix, like every other hash', () => {
+    const { app } = scenario();
+    acceptChanges(app, [CARD], 'DEMO-12: tighter padding');
+    const raw = JSON.parse(read(app, 'kit.lock.json')) as { accepted: Record<string, { hash: string }> };
+    expect(raw.accepted[CARD].hash).toMatch(/^sha256:[0-9a-f]{64}$/);
+  });
+
+  it('reads `accept <paths> --reason <text>`', () => {
+    expect(parseArgs(['accept', CARD, '--reason', 'DEMO-12: why'])).toMatchObject({
+      command: 'accept',
+      paths: [CARD],
+      reason: 'DEMO-12: why',
+    });
+    expect(() => parseArgs(['accept', CARD])).toThrow(/--reason/);
+  });
+});
+
+describe('kit files an app is expected to change', () => {
+  it('lists an extension point the app filled (its query hooks barrel) as expected, not unexplained', () => {
+    const QUERIES = 'src/lib/hooks/queries/index.ts';
+    expect(EXTENSION_POINTS).toContain(QUERIES);
+    const app = dir();
+    put(app, QUERIES, 'export {};\n');
+    writeLock(app, 'aaaaaaa', readTree(app));
+    const upstream = dir();
+    put(upstream, QUERIES, 'export {};\n');
+    put(app, QUERIES, "export * from './useVisits';\n");
+    const report = statusReport(parseLock(read(app, 'kit.lock.json')), readTree(app), readTree(upstream)).join('\n');
+    expect(report).toMatch(
+      /changed by you, expected \(the app adds its own exports there\) \(1\):\n {2}src\/lib\/hooks\/queries\/index\.ts/,
+    );
+    expect(report).toMatch(/Unexplained changes to kit files: none/);
+  });
+
+  it('every extension point is a kit file', () => {
+    for (const file of EXTENSION_POINTS) expect(inScope(file), file).toBe(true);
   });
 });

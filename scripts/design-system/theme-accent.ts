@@ -1,13 +1,15 @@
 /**
  * Gives the kit your brand colour: computes the accent tokens for light and dark mode from one colour, keeping its hue
  * and as much of its chroma as sRGB allows, at the lightness that passes WCAG AA wherever the accent is used — as text
- * on every surface, and behind the accent's own text and its hover. Writes them into src/styles/tokens.css.
+ * on every surface, and behind the accent's own text and its hover. Writes them into src/app-config/accent.css, the
+ * app's own file (src/index.css imports it after the kit's tokens.css), so kit:update never has to merge your brand.
  *
  *   pnpm theme:accent "#0f766e"
  *   pnpm theme:accent "oklch(0.55 0.12 190)" --dry-run
  *
- * --ring-subtle (the focus glow) is written too; --ring, --ink and the first chart colour follow --accent. tests/design-system/contrast.test.ts
- * checks the result like any other token change.
+ * --ring-subtle (the focus glow) is written too; --ring, --ink and the first chart colour follow --accent.
+ * tests/design-system/contrast.test.ts reads the kit's tokens with this file over them and checks every pair.
+ * applyAccent (rewriting tokens.css in place) stays for the kit's own default accent.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -129,6 +131,31 @@ export function brandNotes(brand: Oklch, theme: AccentTheme): string[] {
   return notes;
 }
 
+/** The app's accent overrides: app-owned (outside the kit's folders), imported after the kit's tokens.css. */
+export const ACCENT_FILE = 'src/app-config/accent.css';
+const ACCENT_IMPORT = "@import './app-config/accent.css';";
+
+/** accent.css: the four accent tokens of each mode, under the selectors tokens.css uses (same specificity, later wins). */
+export function accentCss(theme: AccentTheme): string {
+  const block = (selector: string, mode: ModeAccent) =>
+    [`${selector} {`, ...TOKENS.map(([token, key]) => `  --${token}: ${mode[key]};`), '}'].join('\n');
+  return [
+    '/* Your brand accent, written by `pnpm theme:accent "<colour>"`. App-owned: kit:update never changes this file. */',
+    block(':root,\n.light', theme.light),
+    '',
+    block('.dark', theme.dark),
+    '',
+  ].join('\n');
+}
+
+/** index.css with the accent file imported right after tokens.css (unchanged when it already is). */
+export function withAccentImport(indexCss: string): string {
+  if (indexCss.includes(ACCENT_IMPORT)) return indexCss;
+  const tokens = /^@import ['"]\.\/styles\/tokens\.css['"];\r?\n/m;
+  if (!tokens.test(indexCss)) throw new Error("src/index.css has no @import './styles/tokens.css'; line to put the accent after");
+  return indexCss.replace(tokens, (line) => `${line}${ACCENT_IMPORT}\n`);
+}
+
 const TOKENS: Array<[string, keyof ModeAccent]> = [
   ['accent', 'accent'],
   ['accent-hover', 'hover'],
@@ -187,8 +214,10 @@ function main() {
   for (const note of brandNotes(brand, theme)) console.log(`  Note: ${note}`);
 
   if (process.argv.includes('--dry-run')) return;
-  writeFileSync(file, applyAccent(css, theme));
-  console.log('Wrote src/styles/tokens.css. Run vp test to recheck every contrast pair.');
+  writeFileSync(path.resolve(ACCENT_FILE), accentCss(theme));
+  const index = path.resolve('src/index.css');
+  writeFileSync(index, withAccentImport(readFileSync(index, 'utf8')));
+  console.log(`Wrote ${ACCENT_FILE} (imported by src/index.css). Run vp test to recheck every contrast pair.`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(import.meta.dirname, 'theme-accent.ts')) main();

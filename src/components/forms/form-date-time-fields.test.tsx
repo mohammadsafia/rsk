@@ -68,4 +68,18 @@ describe('date and time fields', () => {
     expect(shell.className).toContain('data-disabled:bg-surface-sunken');
     expect(shell.className).not.toContain('opacity-50');
   });
+
+  it('the date clear buttons are neutral at rest, like the time picker’s: red is for errors, not for a filled field', () => {
+    const range = { from: new Date(2026, 10, 2), to: new Date(2026, 10, 4) };
+    render(
+      <FormHarness defaultValues={{ visit: new Date(2026, 10, 2), stay: range, arrival: '10:30 AM' }}>
+        <FormDatePicker name="visit" label="Visit" />
+        <FormDateRange name="stay" label="Stay" />
+        <FormTimePicker name="arrival" label="Arrival" />
+      </FormHarness>,
+    );
+    const clears = screen.getAllByRole('button', { name: 'Clear', hidden: true });
+    expect(clears.length).toBe(3);
+    for (const clear of clears) expect(clear.getAttribute('data-tone')).toBe('neutral');
+  });
 });

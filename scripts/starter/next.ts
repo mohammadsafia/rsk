@@ -140,11 +140,12 @@ export function nextTransform(out: string): void {
   );
   replaceIn(out, 'tsconfig.node.json', /"include": \[([^\]]*)\]/, (_: string, list: string) => `"include": [${list}, "next.config.ts"]`);
 
-  // next/font loads the families (app/[lang]/layout.tsx): no remote @import.
+  // next/font/local loads the same @fontsource-variable files (app/fonts.ts), with preloading: drop the CSS imports.
   const css = path.join(out, 'src/index.css');
-  const lines = readFileSync(css, 'utf8').split('\n');
-  if (!lines[0].includes('fonts.googleapis')) throw new Error('next starter: src/index.css no longer starts with the font @import');
-  writeFileSync(css, lines.slice(1).join('\n').replace(/^\n+/, ''));
+  const text = readFileSync(css, 'utf8');
+  const fontBlock = /^\/\* The brand fonts[^\n]*\n(?:@import '@fontsource-variable\/[^']+';\n){3}\n/;
+  if (!fontBlock.test(text)) throw new Error('next starter: src/index.css no longer starts with the three font imports');
+  writeFileSync(css, text.replace(fontBlock, ''));
 
   writeStaticLocales(out);
 

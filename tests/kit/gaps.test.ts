@@ -42,6 +42,16 @@ describe('kit:update wiring gaps', () => {
     expect(updateGaps(viteApp(), starter).join('\n')).toContain('export const reactRouterKitAdapter = {};');
   });
 
+  it('asks a Vite app still fetching Google Fonts to serve the fonts itself, and says nothing once it does', () => {
+    const dir = viteApp('<ReactRouterKitProvider><RouterProvider router={ROUTER} /></ReactRouterKitProvider>');
+    writeFileSync(path.join(dir, 'src/index.css'), "@import url('https://fonts.googleapis.com/css2?family=Schibsted+Grotesk');\n");
+    expect(updateGaps(dir).join('\n')).toMatch(
+      /src\/index\.css: replace the Google Fonts @import[\s\S]*@fontsource-variable\/schibsted-grotesk/,
+    );
+    writeFileSync(path.join(dir, 'src/index.css'), "@import '@fontsource-variable/schibsted-grotesk';\n");
+    expect(updateGaps(dir)).toEqual([]);
+  });
+
   it('asks for a self-update only when the kit updater itself changed', () => {
     expect(needsSelfUpdate([{ path: 'scripts/kit/kit.ts', status: 'updated' }])).toBe(true);
     expect(needsSelfUpdate([{ path: 'scripts/kit/gaps.ts', status: 'added' }])).toBe(true);

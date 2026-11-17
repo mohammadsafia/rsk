@@ -1,0 +1,5 @@
+/*
+ * Your brand accent: run `pnpm theme:accent "<your brand colour>"` and it writes the accent tokens of both modes
+ * here, at the lightness that passes WCAG AA. Until then the kit's accent (src/styles/tokens.css) applies.
+ * App-owned: kit:update never changes this file, and vp test checks the contrast of what it sets.
+ */

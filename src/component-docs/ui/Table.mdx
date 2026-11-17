@@ -77,7 +77,7 @@ Use these primitives for small static tables. For sorting, filtering and paginat
 
 ## Empty and loading
 
-`Table.Empty` renders a full-width message row when `when` is true; `Table.Loader` renders skeleton (or spinner) rows while `isLoading`.
+`Table.Empty` renders a full-width message row when `when` is true. Say why the table is empty with `kind`: `first-use` (the default: nothing added yet) or `no-results` (a search or filter hides every row), and give the next step with `action` (add the first item, clear the filters); `Table.Loader` renders skeleton (or spinner) rows while `isLoading`.
 
 <Example title="Empty row">
   <div className="border-border w-full max-w-md overflow-hidden rounded-lg border">
@@ -117,7 +117,9 @@ Use these primitives for small static tables. For sorting, filtering and paginat
   rows={[
     { prop: 'Head · Cell · numeric', type: 'boolean', default: 'false', description: 'End-aligned, mono tabular figures, LTR-isolated.' },
     { prop: 'Empty · when', type: 'boolean', required: true, description: 'Show the empty row.' },
-    { prop: 'Empty · title · description', type: 'ReactNode', description: 'Message; defaults to a translated "No results".' },
+    { prop: 'Empty · title · description', type: 'ReactNode', description: 'Message; defaults to the translated copy of its kind ("Nothing here yet" or "No results").' },
+    { prop: 'Empty · kind', type: "'first-use' | 'no-results'", default: "'first-use'", description: 'Why there are no rows; picks the default copy.' },
+    { prop: 'Empty · action', type: 'ReactNode', description: 'What the person can do next, shown under the message.' },
     { prop: 'Empty · Loader · colSpan', type: 'number', description: 'Columns to span (required on Loader).' },
     { prop: 'Loader · isLoading · rows', type: 'boolean · number', description: 'Placeholder rows while loading.' },
     { prop: 'Loader · loaderType', type: "'skeleton' | 'spinner'", default: "'skeleton'", description: 'Skeleton rows or a single spinner row.' },

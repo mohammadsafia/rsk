@@ -117,7 +117,9 @@ async function main(): Promise<void> {
     if (pushMissingRequiredErrors(errors, relativePath, (frontmatterRaw ?? {}) as Record<string, unknown>)) continue;
     const result = FrontmatterSchema.safeParse(frontmatterRaw);
     if (!result.success) {
-      errors.push(`${relativePath} invalid frontmatter`);
+      // Name each field and its problem: a YAML number in a list of strings (tags: [404]) is easy to miss.
+      const problems = result.error.issues.map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`).join('; ');
+      errors.push(`${relativePath} invalid frontmatter: ${problems}`);
       continue;
     }
 

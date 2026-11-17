@@ -232,7 +232,7 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
 
             <div className="flex shrink-0 items-center gap-2">
               <Conditional.If condition={!!hasValue && !disabled}>
-                <IconButton tabIndex={-1} tone="danger" size="sm" aria-label={t('clear')} onClick={handleClear}>
+                <IconButton tabIndex={-1} size="sm" aria-label={t('clear')} onClick={handleClear}>
                   <XIcon size={16} />
                 </IconButton>
               </Conditional.If>

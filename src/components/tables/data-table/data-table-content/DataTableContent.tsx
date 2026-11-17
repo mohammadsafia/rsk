@@ -5,7 +5,7 @@
 // they opt out of the React Compiler.
 'use no memo';
 
-import { type MouseEvent, useRef } from 'react';
+import { type MouseEvent, type ReactNode, useRef } from 'react';
 import { flexRender, type SortDirection } from '@tanstack/react-table';
 
 import { ScrollArea, Table } from '@components/ui';
@@ -27,7 +27,11 @@ const ARIA_SORT: Record<SortDirection, 'ascending' | 'descending'> = {
 
 type ContentProps = {
   className?: string;
-  emptyState?: { title?: string; description?: string };
+  /**
+   * The empty row's copy and action. Without `kind`, it says "no results" while a search or filter is on, and "nothing
+   * here yet" otherwise.
+   */
+  emptyState?: { title?: string; description?: string; kind?: 'first-use' | 'no-results'; action?: ReactNode };
 };
 
 function DataTableContent<TData extends RowData>({ className, emptyState }: ContentProps) {
@@ -42,6 +46,7 @@ function DataTableContent<TData extends RowData>({ className, emptyState }: Cont
   useFlip(scopeRef, mode, sortKey);
 
   const isEmpty = !table.getRowModel().rows?.length && !isLoading;
+  const isFiltered = !!globalFilter || !!columnFilters?.length;
   const visibleColumns = table.getVisibleLeafColumns();
 
   const onTableRowClick = (event: MouseEvent<HTMLTableRowElement>, row: KitRow<TData>) => {
@@ -158,7 +163,7 @@ function DataTableContent<TData extends RowData>({ className, emptyState }: Cont
               ))}
             </Conditional.If>
 
-            <Table.Empty when={isEmpty} colSpan={visibleColumns.length} {...emptyState} />
+            <Table.Empty when={isEmpty} colSpan={visibleColumns.length} kind={isFiltered ? 'no-results' : 'first-use'} {...emptyState} />
           </Table.Body>
         </Table>
       </div>

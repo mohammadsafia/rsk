@@ -27,6 +27,13 @@ type TableEmptyProps = ComponentPropsWithoutRef<'tr'> & {
   title?: ReactNode;
   description?: ReactNode;
   when: boolean;
+  /**
+   * Why there are no rows: 'first-use' (nothing added yet, the default) or 'no-results' (a search or filter hides every
+   * row). Each has its own default copy.
+   */
+  kind?: 'first-use' | 'no-results';
+  /** What the person can do next: add the first item, clear the filters. */
+  action?: ReactNode;
 };
 type TableLoaderProps = {
   colSpan: number;
@@ -110,20 +117,17 @@ const Caption: FC<TableCaptionProps> = ({ className, ...props }) => (
   <caption data-slot="table-caption" className={cn('text-fg-muted mt-4 text-sm', className)} {...props} />
 );
 
-const Empty: FC<TableEmptyProps> = ({ className, colSpan = 1, title, description, when, ...props }) => {
-  const { t } = useAppTranslation('common');
-
+const Empty: FC<TableEmptyProps> = ({ className, colSpan = 1, title, description, when, kind = 'first-use', action, ...props }) => {
   if (!when) return null;
 
   return (
     <tr data-slot="table-empty" className={cn('h-full hover:bg-transparent', className)} {...props}>
       <td colSpan={colSpan}>
-        <EmptyState
-          size="sm"
-          kind="no-results"
-          title={title ?? t('table.emptyTitle')}
-          description={description ?? t('table.emptyDescription')}
-        />
+        <EmptyState size="sm" kind={kind} title={title} description={description}>
+          <Conditional.If condition={!!action}>
+            <EmptyState.Actions>{action}</EmptyState.Actions>
+          </Conditional.If>
+        </EmptyState>
       </td>
     </tr>
   );
