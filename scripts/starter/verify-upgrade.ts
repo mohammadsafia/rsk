@@ -2,8 +2,9 @@
  * Proves an app made from the starter before this kit updates cleanly: builds the starter as it was published
  * (UPGRADE_FROM), adds a block, runs the app's own kit:update (the old updater) onto the new starter,
  * expects its type check to pass before any wiring, runs kit:update again (now the new updater, which names the
- * missing router adapter), wires the adapter as it says (bootstrap and the app's memory-router tests), and expects the
- * type check, lint, tests and build to pass.
+ * missing router adapter and each release step for the app's own files), wires and takes them as it says (bootstrap
+ * and the app's memory-router tests, fonts, theme:accent script, kit:accept script, dev server), checks kit:status names
+ * none of them again, and expects the type check, lint, tests and build to pass.
  *
  * Run by starter:verify with the starter it just built; on its own: tsx scripts/starter/verify-upgrade.ts <new-starter>
  */
@@ -107,7 +108,41 @@ export function verifyUpgrade(newStarter: string) {
     if (googleFonts && !/To finish this update:[\s\S]*src\/index\.css: replace the Google Fonts @import/.test(output))
       throw new Error('verify-upgrade: the second kit:update did not name the Google Fonts import to replace');
 
+    // A baseline from before the release steps for the app's own files (scripts/kit/app-steps.ts): the new updater
+    // names each one the app has not taken.
+    const viteConfig = path.join(app, 'vite.config.ts');
+    const packageFile = path.join(app, 'package.json');
+    const accentScript = path.join(app, 'scripts/design-system/theme-accent.ts');
+    const steps = {
+      accent: existsSync(accentScript) && !readFileSync(accentScript, 'utf8').includes('src/app-config/accent.css'),
+      kitAccept: !(JSON.parse(readFileSync(packageFile, 'utf8')) as { scripts: Record<string, string> }).scripts['kit:accept'],
+      devServer: !/\bdevServer\(/.test(readFileSync(viteConfig, 'utf8')),
+    };
+    const named = {
+      accent: 'scripts/design-system/theme-accent.ts and scripts/design-system/theme-accent-file.test.ts',
+      kitAccept: 'package.json: add the kit:accept script',
+      devServer: 'vite.config.ts: import { devServer }',
+    };
+    const toFinish = output.slice(Math.max(0, output.indexOf('To finish this update:')));
+    for (const step of Object.keys(steps) as (keyof typeof steps)[])
+      if (steps[step] && !toFinish.includes(named[step]))
+        throw new Error(`verify-upgrade: the second kit:update did not name the ${step} step`);
+
     // 4. Wire it as the messages say, then the app checks, tests and builds.
+    if (steps.accent)
+      for (const file of ['theme-accent.ts', 'theme-accent-file.test.ts'])
+        copyFileSync(path.join(newStarter, 'scripts/design-system', file), path.join(app, 'scripts/design-system', file));
+    if (steps.kitAccept) {
+      const pkg = JSON.parse(readFileSync(packageFile, 'utf8')) as { scripts: Record<string, string> };
+      pkg.scripts['kit:accept'] = 'tsx scripts/kit/kit.ts accept';
+      writeFileSync(packageFile, `${JSON.stringify(pkg, null, 2)}\n`);
+    }
+    if (steps.devServer) {
+      const config = readFileSync(viteConfig, 'utf8');
+      const server = /server: \{\s*port: 3000,\s*open: true,?\s*\},/;
+      if (!server.test(config)) throw new Error('verify-upgrade: vite.config.ts has no server: { port: 3000, open: true } to replace');
+      writeFileSync(viteConfig, `import { devServer } from './scripts/lib/dev-server';\n${config.replace(server, 'server: devServer(),')}`);
+    }
     if (googleFonts) {
       const { dependencies } = JSON.parse(readFileSync(path.join(newStarter, 'package.json'), 'utf8')) as {
         dependencies: Record<string, string>;
@@ -142,9 +177,12 @@ export function verifyUpgrade(newStarter: string) {
       );
     }
     const tests = wireAdapter ? wrapRouterTests(app) : [];
-    run(app, ['exec', 'tsx', 'scripts/kit/kit.ts', 'status', '--from', newStarter]);
+    // Every step taken: kit:status asks for none of them again.
+    const status = run(app, ['exec', 'tsx', 'scripts/kit/kit.ts', 'status', '--from', newStarter], true);
+    for (const step of Object.keys(steps) as (keyof typeof steps)[])
+      if (status.includes(named[step])) throw new Error(`verify-upgrade: kit:status still names the ${step} step after the app took it`);
     run(app, ['exec', 'tsc', '-b']);
-    run(app, ['exec', 'vp', 'fmt', 'src/bootstrap.tsx', ...tests]);
+    run(app, ['exec', 'vp', 'fmt', 'src/bootstrap.tsx', 'vite.config.ts', 'package.json', ...tests]);
     run(app, ['exec', 'vp', 'check']);
     run(app, ['exec', 'vp', 'test', '--run']);
     run(app, ['exec', 'vp', 'build']);

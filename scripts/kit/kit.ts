@@ -11,6 +11,9 @@
  * it comes back or the kit changes it), and kit:update leaves an accepted deletion deleted. It works offline. An app
  * whose package.json has no kit:accept script runs `pnpm tsx scripts/kit/kit.ts accept …`.
  *
+ * Both kit:status and kit:update end with what the app still has to do in its own files, which kit:update never changes:
+ * the wiring it lacks and each release step it has not taken (scripts/kit/app-steps.ts).
+ *
  * Options: --from <dir> (a local starter instead of GitHub), --base <dir> (the version you took, for three-way merges),
  * --dry-run. The GitHub repository is the one kit.lock.json names (`starter`); for an older lock without one,
  * RSK_STARTER_REPO picks it (default mohammadsafia/rsk-starter).
@@ -51,6 +54,11 @@ const handOverArgs = (argv: string[], starterDir: string, baseStarter: string | 
     kept.push(argv[index]);
   }
   return [...kept, '--from', starterDir, ...(baseStarter ? ['--base', baseStarter] : [])];
+};
+
+/** What the app still has to do in its own files (gaps.ts), under a heading; nothing when there is nothing to do. */
+const printGaps = (heading: string, gaps: string[]) => {
+  if (gaps.length) console.log(`\n${heading}:\n${gaps.map((gap) => `  - ${gap}`).join('\n')}`);
 };
 
 async function main() {
@@ -95,7 +103,10 @@ async function main() {
       JSON.parse(readFileSync(path.join(upstreamDir, 'package.json'), 'utf8')),
     );
     if (install) console.log(`\nThe kit's dependencies changed. To match them:\n  ${install}`);
-    if (command === 'status') return;
+    if (command === 'status') {
+      printGaps('Still to do in your own files (kit:update does not change them)', updateGaps(appDir, upstreamDir));
+      return;
+    }
 
     const needsBase = rows.some((row) => row.status === 'conflict');
     const baseStarter = baseArg ? path.resolve(baseArg) : needsBase ? await download(`refs/tags/kit/${lock.kit.slice(0, 7)}`) : null;
@@ -156,8 +167,7 @@ async function main() {
         `You changed these generated pages, so the update left them as they are:\n${result.keptPages.map((file) => `  ${file}`).join('\n')}`,
       );
     if (result.conflicts.length) process.exitCode = 1;
-    const gaps = dryRun ? [] : updateGaps(appDir, upstreamDir);
-    if (gaps.length) console.log(`\nTo finish this update:\n${gaps.map((gap) => `  - ${gap}`).join('\n')}`);
+    if (!dryRun) printGaps('To finish this update', updateGaps(appDir, upstreamDir));
   } finally {
     for (const dir of temporary) rmSync(dir, { recursive: true, force: true });
   }

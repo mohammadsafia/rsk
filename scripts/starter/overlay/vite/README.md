@@ -90,7 +90,9 @@ Files you never touched are updated. Files only you changed are kept. When a kit
 kit and only its record in `kit.lock.json` changes, `kit:update` lists it as recorded in the lock only. Files changed on both sides are merged; if your
 change and the kit's touch the same lines, the file gets `<<<<<<<` markers to resolve. Your pages, routes, layouts,
 API code and translations are never touched. If the kit's dependencies changed, the command prints the `pnpm add`
-line to run.
+line to run. When a release also changes files that are yours (`package.json`, `vite.config.ts`, `src/index.css`,
+the `theme:accent` script), `kit:update` never overwrites them: it ends with the steps still to take under "To finish
+this update", and `kit:status` lists the same until each is done.
 
 ### Kit files your app changes
 

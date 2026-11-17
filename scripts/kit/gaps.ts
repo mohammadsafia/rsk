@@ -1,13 +1,16 @@
 /**
  * What an app must wire by hand after kit:update: the kit can't edit the app's own files (its bootstrap, router,
- * tsconfig), so kit:update lists what they still lack under "To finish this update".
+ * tsconfig, package.json, vite.config.ts), so kit:update lists what they still lack under "To finish this update", and
+ * kit:status lists the same.
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 import { kitTarget } from '../lib/kit-target.mjs';
 import { wiringGaps } from './add';
+import { appStepGaps } from './app-steps';
 import type { Row } from './core';
+import { starterRepo } from './download';
 
 const ADAPTER = 'src/routes/routerAdapter.tsx';
 /** The provider rendered as an element (not just named or defined). */
@@ -29,41 +32,12 @@ const rendersProvider = (appDir: string): boolean =>
     .some((file) => PROVIDER.test(readFileSync(file, 'utf8')));
 
 /**
- * The wiring a Vite app still lacks: the kit's router adapter (without it kit links reload the page) and the block
- * wiring kit:add needs. `starterDir` is the starter kit:update read, whose adapter is printed to copy.
+ * What the app still has to do by hand: the kit's router adapter (a Vite app without it reloads the page on kit links),
+ * the block wiring kit:add needs, and each release step for the app's own files still to take (app-steps.ts).
+ * `starterDir` is the starter kit:update read, whose adapter is printed to copy.
  */
 export function updateGaps(appDir: string, starterDir?: string): string[] {
-  return [...adapterGaps(appDir, starterDir), ...wiringGaps(appDir), ...fontGaps(appDir)];
-}
-
-const FONT_PACKAGES = ['schibsted-grotesk', 'noto-kufi-arabic', 'spline-sans-mono'].map((name) => `@fontsource-variable/${name}`);
-
-/**
- * An app made before the kit served its own fonts still fetches them from Google: at run time in a Vite app's
- * index.css, at build time through next/font/google in a Next app. The kit's font check fails until it changes.
- */
-export function fontGaps(appDir: string): string[] {
-  const read = (file: string) => (existsSync(path.join(appDir, file)) ? readFileSync(path.join(appDir, file), 'utf8') : '');
-  const install = `pnpm add ${FONT_PACKAGES.join(' ')}`;
-  if (kitTarget(appDir) === 'next') {
-    return /from\s+['"]next\/font\/google['"]/.test(read('app/fonts.ts'))
-      ? [
-          `app/fonts.ts: load the fonts with next/font/local from the @fontsource-variable files instead of next/font/google`,
-          `  (${install}; the starter's app/fonts.ts shows the three calls). next build then fetches nothing.`,
-        ]
-      : [];
-  }
-  return /fonts\.googleapis\.com/.test(read('src/index.css'))
-    ? [
-        [
-          'src/index.css: replace the Google Fonts @import with the fonts served with the app:',
-          `  ${install}`,
-          ...FONT_PACKAGES.map((name) => `  @import '${name}';`),
-          "  and, after the @custom-variant line, :root { --font-brand-sans: 'Schibsted Grotesk Variable';",
-          "  --font-brand-arabic: 'Noto Kufi Arabic Variable'; --font-brand-mono: 'Spline Sans Mono Variable'; }",
-        ].join('\n'),
-      ]
-    : [];
+  return [...adapterGaps(appDir, starterDir), ...wiringGaps(appDir), ...appStepGaps(appDir, kitTarget(appDir), starterRepo(appDir))];
 }
 
 /** The router adapter a Vite app still lacks: without it kit links reload the page. */
