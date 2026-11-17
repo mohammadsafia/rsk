@@ -129,9 +129,13 @@ export function verifyUpgrade(newStarter: string) {
         throw new Error(`verify-upgrade: the second kit:update did not name the ${step} step`);
 
     // 4. Wire it as the messages say, then the app checks, tests and builds.
-    if (steps.accent)
+    if (steps.accent) {
       for (const file of ['theme-accent.ts', 'theme-accent-file.test.ts'])
         copyFileSync(path.join(newStarter, 'scripts/design-system', file), path.join(app, 'scripts/design-system', file));
+      // The fixture keeps the kit's accent: the starter's (empty) accent file, imported after tokens.css.
+      copyFileSync(path.join(newStarter, 'src/app-config/accent.css'), path.join(app, 'src/app-config/accent.css'));
+      edit(indexCss, "@import './styles/tokens.css';\n", "@import './styles/tokens.css';\n@import './app-config/accent.css';\n");
+    }
     if (steps.kitAccept) {
       const pkg = JSON.parse(readFileSync(packageFile, 'utf8')) as { scripts: Record<string, string> };
       pkg.scripts['kit:accept'] = 'tsx scripts/kit/kit.ts accept';

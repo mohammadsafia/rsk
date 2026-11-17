@@ -85,6 +85,20 @@ describe('kit:update wiring gaps', () => {
       expect(gap).toMatch(/pnpm theme:accent/);
     });
 
+    it('keeps asking for the accent step while src/index.css does not import src/app-config/accent.css', () => {
+      const dir = olderApp();
+      writeFileSync(path.join(dir, 'scripts/design-system/theme-accent.ts'), NEW_ACCENT);
+      writeFileSync(path.join(dir, 'scripts/design-system/theme-accent-file.test.ts'), '// the accent file tests\n');
+      writeFileSync(path.join(dir, 'src/index.css'), "@import 'tailwindcss';\n@import './styles/tokens.css';\n");
+      const gap = gapFor(dir, 'scripts/design-system/theme-accent.ts');
+      expect(gap).toContain("@import './app-config/accent.css';");
+      writeFileSync(
+        path.join(dir, 'src/index.css'),
+        "@import 'tailwindcss';\n@import './styles/tokens.css';\n@import './app-config/accent.css';\n",
+      );
+      expect(gapFor(dir, 'scripts/design-system/theme-accent.ts')).toBe('');
+    });
+
     it('asks for the kit:accept script while package.json has none', () => {
       expect(gapFor(olderApp(), 'package.json')).toContain('"kit:accept": "tsx scripts/kit/kit.ts accept"');
     });

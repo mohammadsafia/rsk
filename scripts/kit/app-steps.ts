@@ -39,6 +39,7 @@ const INSTALL_FONTS = `pnpm add ${FONT_PACKAGES.join(' ')}`;
 const ACCENT_SCRIPT = 'scripts/design-system/theme-accent.ts';
 const ACCENT_TEST = 'scripts/design-system/theme-accent-file.test.ts';
 const ACCENT_FILE = 'src/app-config/accent.css';
+const ACCENT_IMPORT = "@import './app-config/accent.css';";
 const KIT_ACCEPT = 'tsx scripts/kit/kit.ts accept';
 
 /** The starter's version of a file, to copy. */
@@ -74,18 +75,22 @@ export const APP_STEPS: AppStep[] = [
     // theme:accent wrote the brand accent into the kit's tokens.css, so every kit:update had to merge the app's brand.
     id: 'accent-file',
     targets: ['vite', 'next'],
-    files: [ACCENT_SCRIPT, ACCENT_TEST],
+    files: [ACCENT_SCRIPT, ACCENT_TEST, ACCENT_FILE, 'src/index.css'],
     pending: (app) => {
       const script = app.read(ACCENT_SCRIPT);
-      return script !== null && (!script.includes(ACCENT_FILE) || app.read(ACCENT_TEST) === null);
+      if (script === null) return false;
+      const index = app.read('src/index.css');
+      // The new test checks src/index.css imports the accent file, so the step is done only once it does.
+      return !script.includes(ACCENT_FILE) || app.read(ACCENT_TEST) === null || (index !== null && !index.includes(ACCENT_IMPORT));
     },
     todo: (app) => [
       `${ACCENT_SCRIPT} and ${ACCENT_TEST}: take the starter's versions (theme:accent now writes your accent to`,
       `  ${ACCENT_FILE}, imported by src/index.css, instead of the kit's src/styles/tokens.css):`,
       `  ${starterFile(app, ACCENT_SCRIPT)}`,
       `  ${starterFile(app, ACCENT_TEST)}`,
-      '  then run pnpm theme:accent "<your brand colour>" again, so the accent lives in your file and kit:update',
-      '  takes the kit’s tokens.css as it is.',
+      '  then run pnpm theme:accent "<your brand colour>" again: it writes the accent file and adds',
+      `  ${ACCENT_IMPORT} after the tokens.css import in src/index.css, so kit:update takes the kit’s tokens.css as it`,
+      `  is. An app on the kit's own accent instead takes the starter's ${ACCENT_FILE} and adds that @import line itself.`,
     ],
   },
   {
