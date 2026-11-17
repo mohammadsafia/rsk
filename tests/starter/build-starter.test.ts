@@ -5,6 +5,7 @@ import path from 'node:path';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test';
 
+import { appStepGaps } from '../../scripts/kit/app-steps';
 import { generateBlockIndex } from '../../scripts/kit/blocks';
 import { hashFile, inScope, parseLock } from '../../scripts/kit/core';
 import { buildStarter } from '../../scripts/starter/build-starter';
@@ -48,6 +49,12 @@ describe('buildStarter', () => {
     expect(config).toContain("import { devServer } from './scripts/lib/dev-server';");
     expect(config).toContain('server: devServer(),');
     expect(existsSync(path.join(out, 'scripts/lib/dev-server.ts'))).toBe(true);
+  });
+
+  // A release step (scripts/kit/app-steps.ts) detects what an existing app has not done from its files: a new app has
+  // done all of them, so a step whose check misreads the starter's own files would ask every new app for it.
+  it('has taken every release step for the app’s own files: kit:update asks a new app for none', () => {
+    expect(appStepGaps(out, 'vite', 'mohammadsafia/rsk-starter')).toEqual([]);
   });
 
   it('ships the block catalogue in registry/ (not in src), an empty block index, kit:add/kit:remove and the picker’s library', () => {
@@ -179,6 +186,10 @@ describe('buildStarter --target next', () => {
     type Lock = { files: Record<string, string>; starter: string; target: string };
     expect(json<Lock>(next, 'kit.lock.json').files).toEqual(json<Lock>(vite, 'kit.lock.json').files);
     expect(json<Lock>(next, 'kit.lock.json')).toMatchObject({ starter: 'mohammadsafia/rsk-next-starter', target: 'next' });
+  });
+
+  it('has taken every release step for the app’s own files, like the Vite starter', () => {
+    expect(appStepGaps(next, 'next', 'mohammadsafia/rsk-next-starter')).toEqual([]);
   });
 
   it('is a Next app: next config and app/, no Vite entry, no React Router, Next scripts', () => {

@@ -6,9 +6,13 @@
  *   pnpm kit:update src/components/ui/button/ --dry-run
  *   pnpm kit:accept src/components/ui/card/Card.tsx --reason "DEMO-12: why the app changes it"
  *
- * kit:accept records a kit file the app changed on purpose, with the reason, in kit.lock.json (`accepted`); kit:status
- * then lists it as accepted, not as an unexplained change, until the file changes again. It works offline. An app
+ * kit:accept records a kit file the app changed or deleted on purpose, with the reason, in kit.lock.json (`accepted`);
+ * kit:status then lists it as accepted, not as an unexplained change, until the file changes again (a deleted one: until
+ * it comes back or the kit changes it), and kit:update leaves an accepted deletion deleted. It works offline. An app
  * whose package.json has no kit:accept script runs `pnpm tsx scripts/kit/kit.ts accept …`.
+ *
+ * Both kit:status and kit:update end with what the app still has to do in its own files, which kit:update never changes:
+ * the wiring it lacks and each release step it has not taken (scripts/kit/app-steps.ts).
  *
  * Options: --from <dir> (a local starter instead of GitHub), --base <dir> (the version you took, for three-way merges),
  * --dry-run. The GitHub repository is the one kit.lock.json names (`starter`); for an older lock without one,
@@ -52,12 +56,19 @@ const handOverArgs = (argv: string[], starterDir: string, baseStarter: string | 
   return [...kept, '--from', starterDir, ...(baseStarter ? ['--base', baseStarter] : [])];
 };
 
+/** What the app still has to do in its own files (gaps.ts), under a heading; nothing when there is nothing to do. */
+const printGaps = (heading: string, gaps: string[]) => {
+  if (gaps.length) console.log(`\n${heading}:\n${gaps.map((gap) => `  - ${gap}`).join('\n')}`);
+};
+
 async function main() {
   const { command, paths, from: fromArg, base: baseArg, reason, dryRun } = parseArgs(process.argv.slice(2));
   const appDir = process.cwd();
   if (command === 'accept') {
     const files = acceptChanges(appDir, paths, reason ?? '');
-    console.log(`Accepted in kit.lock.json (${files.length}):\n${files.map((file) => `  ${file}: ${reason?.trim()}`).join('\n')}`);
+    console.log(
+      `Accepted in kit.lock.json (${files.length}):\n${files.map(({ file, deleted }) => `  ${file}${deleted ? ' (deleted)' : ''}: ${reason?.trim()}`).join('\n')}`,
+    );
     return;
   }
   const lock = readLock(appDir);
@@ -92,7 +103,10 @@ async function main() {
       JSON.parse(readFileSync(path.join(upstreamDir, 'package.json'), 'utf8')),
     );
     if (install) console.log(`\nThe kit's dependencies changed. To match them:\n  ${install}`);
-    if (command === 'status') return;
+    if (command === 'status') {
+      printGaps('Still to do in your own files (kit:update does not change them)', updateGaps(appDir, upstreamDir));
+      return;
+    }
 
     const needsBase = rows.some((row) => row.status === 'conflict');
     const baseStarter = baseArg ? path.resolve(baseArg) : needsBase ? await download(`refs/tags/kit/${lock.kit.slice(0, 7)}`) : null;
@@ -144,13 +158,16 @@ async function main() {
       console.log(
         `${dryRun ? 'Would record' : 'Recorded'} in kit.lock.json only (the file already matched the kit):\n${result.relocked.map((file) => `  ${file}`).join('\n')}`,
       );
+    if (result.skipped.length)
+      console.log(
+        `Skipped, deleted on purpose (kit:accept), so the update did not bring them back:\n${result.skipped.map((file) => `  ${file}`).join('\n')}`,
+      );
     if (result.keptPages.length)
       console.log(
         `You changed these generated pages, so the update left them as they are:\n${result.keptPages.map((file) => `  ${file}`).join('\n')}`,
       );
     if (result.conflicts.length) process.exitCode = 1;
-    const gaps = dryRun ? [] : updateGaps(appDir, upstreamDir);
-    if (gaps.length) console.log(`\nTo finish this update:\n${gaps.map((gap) => `  - ${gap}`).join('\n')}`);
+    if (!dryRun) printGaps('To finish this update', updateGaps(appDir, upstreamDir));
   } finally {
     for (const dir of temporary) rmSync(dir, { recursive: true, force: true });
   }

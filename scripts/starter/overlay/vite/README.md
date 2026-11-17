@@ -90,7 +90,9 @@ Files you never touched are updated. Files only you changed are kept. When a kit
 kit and only its record in `kit.lock.json` changes, `kit:update` lists it as recorded in the lock only. Files changed on both sides are merged; if your
 change and the kit's touch the same lines, the file gets `<<<<<<<` markers to resolve. Your pages, routes, layouts,
 API code and translations are never touched. If the kit's dependencies changed, the command prints the `pnpm add`
-line to run.
+line to run. When a release also changes files that are yours (`package.json`, `vite.config.ts`, `src/index.css`,
+the `theme:accent` script), `kit:update` never overwrites them: it ends with the steps still to take under "To finish
+this update", and `kit:status` lists the same until each is done.
 
 ### Kit files your app changes
 
@@ -110,6 +112,11 @@ pnpm kit:accept src/components/ui/card/Card.tsx --reason "DEMO-12: tighter paddi
 `kit.lock.json` keeps the reason (`accepted`), and `kit:status` lists the file with it and ends with
 `Unexplained changes to kit files: none.` Change the file again and it is unexplained again. In an app made before
 `kit:accept` existed, run `pnpm tsx scripts/kit/kit.ts accept …` until `kit:update` has brought the new updater.
+
+A kit file you delete on purpose is recorded the same way, for example the mock sign-in's test once your own API signs
+users in: `pnpm kit:accept tests/a11y/demo-session.test.ts --reason "DEMO-31: sign-in goes through our API"`.
+`kit:status` lists it as deleted, `kit:update` leaves it deleted (and says so), and it is unexplained again if it comes
+back or the kit changes it.
 
 ### Roles
 
