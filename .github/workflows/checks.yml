@@ -26,8 +26,8 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          # The starter tests name the kit commit (git rev-parse HEAD); one commit is enough.
-          fetch-depth: 1
+          # Full history: the upgrade test checks its pinned starting kit commit is an ancestor of HEAD.
+          fetch-depth: 0
           persist-credentials: false
 
       # The pnpm version comes from package.json `packageManager`.

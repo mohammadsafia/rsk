@@ -79,26 +79,9 @@ const Header: FC<ComponentPropsWithoutRef<'header'>> = ({ className, ...props })
   );
 };
 
-/** The page's first h1, skipping the previous page's, which Suspense keeps hidden (display: none) while the next loads. */
-const visibleHeading = (main: HTMLElement): HTMLElement | null => {
-  for (const heading of main.querySelectorAll<HTMLElement>('h1')) {
-    let hidden = false;
-    for (let node: HTMLElement | null = heading; node && node !== main; node = node.parentElement)
-      if (node.style.display === 'none' || node.hidden) hidden = true;
-    if (!hidden) return heading;
-  }
-  return null;
-};
-
-/** How long a lazily loaded page's heading is waited for. */
-const HEADING_WAIT_MS = 3000;
-/** How soon the main region takes the focus while the page has no heading yet. */
-const INTERIM_FOCUS_MS = 100;
-
 /**
- * Moves the focus into `main` when the path changes (never on the first load): to the page's first h1, else to `main`
- * itself. A lazily loaded page renders its heading later: `main` holds the focus meanwhile and hands it to the heading
- * when it appears. Focus the person or the page moved anywhere else (an autofocused field) is left alone.
+ * After a route change (never on the first load) the focus moves to the new page's heading (focusPageHeading). The
+ * code loads on the first navigation, so it costs a page's first load nothing.
  */
 function useFocusOnNavigate(mainRef: { current: HTMLElement | null }, enabled: boolean) {
   const pathname = usePathname();
@@ -109,33 +92,15 @@ function useFocusOnNavigate(mainRef: { current: HTMLElement | null }, enabled: b
     if (!enabled || !main || pathname === firstPath.current) return;
     firstPath.current = '';
     const startedOn = document.activeElement;
-    // Still ours to move: where it was before the navigation, nowhere, or on the region we focused.
-    const ours = () => [startedOn, document.body, main, null].includes(document.activeElement);
-
-    const focusHeading = (): boolean => {
-      if (!ours()) return true;
-      const heading = visibleHeading(main);
-      if (!heading) return false;
-      if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1');
-      heading.focus();
-      return true;
-    };
-    if (focusHeading()) return;
-
-    const observer = new MutationObserver(() => {
-      if (focusHeading()) stop();
+    let stop: (() => void) | undefined;
+    let cancelled = false;
+    void import('./focusPageHeading').then(({ focusPageHeading }) => {
+      if (!cancelled) stop = focusPageHeading(main, startedOn);
     });
-    const interim = setTimeout(() => {
-      if (ours()) main.focus({ preventScroll: true });
-    }, INTERIM_FOCUS_MS);
-    const timer = setTimeout(() => stop(), HEADING_WAIT_MS);
-    const stop = () => {
-      observer.disconnect();
-      clearTimeout(interim);
-      clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      stop?.();
     };
-    observer.observe(main, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'hidden'] });
-    return stop;
   }, [pathname, enabled, mainRef]);
 }
 
