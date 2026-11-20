@@ -5,6 +5,8 @@ import { describe, expect, it } from 'vite-plus/test';
 // A test that reads the real clock passes on most runs and fails near midnight or on a slow machine. Tests fix the
 // clock (`vi.useFakeTimers` with `vi.setSystemTime`) and take "now" from it. This search keeps it that way: a test
 // file may construct the current date only after it has fixed the clock in the same file.
+// It cannot see a screen that reads the clock in its own code ("90 days from today", a calendar's months): a test of
+// such a screen fixes the clock too, though nothing here would catch it if it did not.
 const root = join(__dirname, '..', '..');
 const realClock = /\bnew Date\(\)|\bDate\.now\(\)/;
 const fixesClock = /\bsetSystemTime\(/;
