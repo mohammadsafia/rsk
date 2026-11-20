@@ -112,4 +112,30 @@ describe('Calendar', () => {
     const day = screen.getAllByRole('button').find((button) => button.textContent === '27')!;
     expect(day.getAttribute('aria-label') ?? day.textContent).toMatch(/(^|\s)27(\s|,|$)/);
   });
+
+  // A form re-renders the calendar whenever its own state changes (choices arriving, a field typed). The calendar must
+  // keep its elements: if it built its parts as new components each render, React would replace them, a button found
+  // before the re-render would no longer be on the page, and keyboard focus would fall to the page body.
+  it('keeps the same elements, and the focus, when the page around it renders again', () => {
+    const Form = ({ note }: { note: string }) => (
+      <div>
+        <p>{note}</p>
+        <Calendar mode="single" defaultMonth={OCTOBER_2026} showWeekNumber />
+      </div>
+    );
+    const { container, rerender } = render(<Form note="first" />);
+    const root = container.querySelector('[data-slot="calendar"]');
+    const next = screen.getByRole('button', { name: 'Next month' });
+    const day = dayButton(14);
+    const weekNumber = container.querySelector('.rdp-week_number');
+    day.focus();
+
+    rerender(<Form note="second" />);
+
+    expect(container.querySelector('[data-slot="calendar"]')).toBe(root);
+    expect(screen.getByRole('button', { name: 'Next month' })).toBe(next);
+    expect(container.querySelector('.rdp-week_number')).toBe(weekNumber);
+    expect(dayButton(14)).toBe(day);
+    expect(document.activeElement).toBe(day);
+  });
 });
