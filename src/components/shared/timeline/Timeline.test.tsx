@@ -65,14 +65,38 @@ describe('Timeline', () => {
     expect(screen.getByText('No activity yet')).toBeTruthy();
   });
 
+  // The clock is fixed: a test that takes "now" from the real clock fails in the minute after midnight,
+  // when "a minute ago" is already yesterday (it did, on a pipeline that started at 00:00:47).
   it('groups items by local day, newest first, labelling today and yesterday', () => {
-    const now = new Date();
-    const earlier = new Date(now.getTime() - 60_000);
-    const yesterday = new Date(now.getTime() - 24 * 3_600_000);
-    const items = [{ at: yesterday }, { at: now }, { at: earlier }];
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      vi.setSystemTime(new Date(2026, 10, 12, 14, 30));
+      const now = new Date();
+      const earlier = new Date(now.getTime() - 60_000);
+      const yesterday = new Date(now.getTime() - 24 * 3_600_000);
+      const items = [{ at: yesterday }, { at: now }, { at: earlier }];
 
-    const { result } = renderHook(() => useGroupedByDay(items, (item) => item.at));
-    expect(result.current.map((group) => group.label)).toEqual(['Today', 'Yesterday']);
-    expect(result.current[0].items).toEqual([items[1], items[2]]);
+      const { result } = renderHook(() => useGroupedByDay(items, (item) => item.at));
+      expect(result.current.map((group) => group.label)).toEqual(['Today', 'Yesterday']);
+      expect(result.current[0].items).toEqual([items[1], items[2]]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('puts an item from a minute before midnight under yesterday', () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      vi.setSystemTime(new Date(2026, 10, 12, 0, 0, 30));
+      const now = new Date();
+      const beforeMidnight = new Date(now.getTime() - 60_000);
+      const items = [{ at: beforeMidnight }, { at: now }];
+
+      const { result } = renderHook(() => useGroupedByDay(items, (item) => item.at));
+      expect(result.current.map((group) => group.label)).toEqual(['Today', 'Yesterday']);
+      expect(result.current[1].items).toEqual([items[0]]);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
