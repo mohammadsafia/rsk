@@ -92,6 +92,8 @@ export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn
   const inputRef = useRef<HTMLInputElement | null>(null);
   const pendingSelectionRef = useRef<[number, number] | null>(null);
   const onChangeRef = useRef(onChange);
+  // What leaving the field does (set below, once it is defined), so Enter can do the same without leaving it.
+  const commitRef = useRef<() => void>(() => {});
   // Handlers call the latest onChange without re-creating themselves when it changes.
   useLayoutEffect(() => {
     onChangeRef.current = onChange;
@@ -170,8 +172,11 @@ export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn
       const cursorPos = target.selectionStart || 0;
 
       if (e.key === 'Enter') {
+        // Take what was typed, as leaving the field does, keep the focus here, and send the form the way Enter does in
+        // any other field. Blurring instead dropped the focus to the page body and sent nothing.
         e.preventDefault();
-        target.blur();
+        commitRef.current();
+        target.form?.requestSubmit();
         return;
       }
 
@@ -255,6 +260,9 @@ export const useDateMask = (options: UseDateMaskOptions = {}): UseDateMaskReturn
       onChangeRef.current?.(undefined);
     }
   }, [inputValue, parsedDate]);
+  useLayoutEffect(() => {
+    commitRef.current = handleBlur;
+  }, [handleBlur]);
 
   return {
     inputValue,
@@ -280,6 +288,8 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const pendingSelectionRef = useRef<[number, number] | null>(null);
   const onChangeRef = useRef(onChange);
+  // What leaving the field does (set below, once it is defined), so Enter can do the same without leaving it.
+  const commitRef = useRef<() => void>(() => {});
   // Handlers call the latest onChange without re-creating themselves when it changes.
   useLayoutEffect(() => {
     onChangeRef.current = onChange;
@@ -414,8 +424,11 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
       const cursorPos = target.selectionStart || 0;
 
       if (e.key === 'Enter') {
+        // Take what was typed, as leaving the field does, keep the focus here, and send the form the way Enter does in
+        // any other field. Blurring instead dropped the focus to the page body and sent nothing.
         e.preventDefault();
-        target.blur();
+        commitRef.current();
+        target.form?.requestSubmit();
         return;
       }
 
@@ -552,6 +565,9 @@ export const useDateRangeMask = (options: UseDateRangeMaskOptions = {}) => {
       setInputValueInternal(fromStr);
     }
   }, [inputValue, dateFormat, dateUtils]);
+  useLayoutEffect(() => {
+    commitRef.current = handleBlur;
+  }, [handleBlur]);
 
   return {
     inputValue,
