@@ -186,7 +186,6 @@ function FormDatePicker<TFieldValues extends FieldValues>({
                   onClick={handleIconClick}
                   className="focus-ring shrink-0 rounded-sm"
                   aria-label={t('openCalendar')}
-                  tabIndex={-1}
                 >
                   <CalendarIcon
                     aria-hidden="true"
@@ -236,6 +235,8 @@ function FormDatePicker<TFieldValues extends FieldValues>({
             <Calendar
               mode="single"
               captionLayout="dropdown"
+              // Without an end month the dropdown stops at December of this year; ten years ahead, as the calendar grid does.
+              endMonth={DEFAULT_END_MONTH()}
               selected={date}
               month={calendarMonth}
               onMonthChange={setCalendarMonth}
@@ -251,5 +252,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
 }
 
 FormDatePicker.displayName = 'FormDatePicker';
+
+const DEFAULT_END_MONTH = () => new Date(new Date().getFullYear() + 10, 11);
 
 export default FormDatePicker;

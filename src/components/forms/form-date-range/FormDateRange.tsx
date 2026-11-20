@@ -37,6 +37,8 @@ type FormDateRangeFlatProps<TFieldValues extends FieldValues> = FormDateRangeBas
   toName: FieldPath<TFieldValues>;
 };
 
+const DEFAULT_END_MONTH = () => new Date(new Date().getFullYear() + 10, 11);
+
 export type FormDateRangeProps<TFieldValues extends FieldValues> =
   | FormDateRangeCompositeProps<TFieldValues>
   | FormDateRangeFlatProps<TFieldValues>;
@@ -194,7 +196,6 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
                   onClick={handleIconClick}
                   className="focus-ring shrink-0 rounded-sm"
                   aria-label={t('openCalendar')}
-                  tabIndex={-1}
                 >
                   <CalendarIcon
                     aria-hidden="true"
@@ -243,6 +244,8 @@ const FormDateRangeCore: FC<FormDateRangeCoreProps> = ({
             <Calendar
               mode="range"
               captionLayout="dropdown"
+              // Without an end month the dropdown stops at December of this year; ten years ahead, as the calendar grid does.
+              endMonth={DEFAULT_END_MONTH()}
               selected={dateRange}
               month={calendarMonth}
               onMonthChange={setCalendarMonth}
