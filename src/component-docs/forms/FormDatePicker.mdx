@@ -23,7 +23,9 @@ export const DateDemo = () => {
 
 ## Typed or picked
 
-Type digits and the mask adds the separators, or open the calendar. The value stored in the form is a `Date`.
+Type digits and the mask adds the separators, or open the calendar. The value stored in the form is a `Date` (or what
+`formatDate` returns), and `null` while there is no date: half typed, cleared, or never given. Never `undefined`, which
+react-hook-form would read back as the form's default value.
 
 <Example
   title="Two date fields"
