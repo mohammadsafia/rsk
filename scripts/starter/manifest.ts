@@ -47,6 +47,8 @@ export const DROP = [
   'tests/visual/',
   'playwright.config.ts',
   '.github/workflows/visual.yml',
+  // The behaviour tests in tests/visual run on the docs site too.
+  '.github/workflows/browser.yml',
   '.github/workflows/starter-sync.yml',
   '.github/workflows/starter-verify.yml',
   // The kit repository's own checks; an app's pipeline is its own.
@@ -89,6 +91,7 @@ export const DOCS_ONLY_SCRIPTS = [
   'starter:build',
   'starter:verify',
   'starter:publish',
+  'browser:test',
   'visual:test',
   'visual:update',
   // Run the codemods the starter drops.
