@@ -27,3 +27,9 @@ The committed set is macOS. To run them in CI, record the Linux set once with th
 "record"), commit the downloaded `linux-baselines` under `__screenshots__/linux/`, and enable its pull_request trigger.
 
 A changed screenshot is a review, not a chore: look at the diff before you accept it.
+
+## Behaviour tests
+
+A test tagged `@behaviour` checks what a person does in a real browser (the keyboard, focus) and takes no
+screenshot, so it needs no baseline and runs on every pull request in the `browser` workflow. Run them with
+`pnpm browser:test`; on a machine without Playwright's own browsers, `PW_CHANNEL=chrome pnpm browser:test`.

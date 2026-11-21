@@ -15,6 +15,8 @@ export default defineConfig({
   retries: 0,
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'visual-report' }]],
   use: {
+    // PW_CHANNEL=chrome runs them in an installed Chrome, for a machine without Playwright's own browsers.
+    ...(process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {}),
     baseURL: `http://localhost:${PORT}`,
     viewport: { width: 1280, height: 900 },
     deviceScaleFactor: 1,

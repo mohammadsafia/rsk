@@ -135,12 +135,14 @@ describe('buildStarter', () => {
     expect(existsSync(path.join(out, 'tests/visual'))).toBe(false);
     expect(existsSync(path.join(out, 'playwright.config.ts'))).toBe(false);
     expect(existsSync(path.join(out, '.github/workflows/visual.yml'))).toBe(false);
+    expect(existsSync(path.join(out, '.github/workflows/browser.yml'))).toBe(false);
     const pkg = JSON.parse(readFileSync(path.join(out, 'package.json'), 'utf8')) as {
       scripts: Record<string, string>;
       devDependencies: Record<string, string>;
     };
     expect(pkg.devDependencies['@playwright/test']).toBeUndefined();
     expect(pkg.scripts['visual:test']).toBeUndefined();
+    expect(pkg.scripts['browser:test']).toBeUndefined();
   });
 });
 
