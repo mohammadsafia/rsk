@@ -43,7 +43,17 @@ function CalendarDayButton({ className, day, modifiers, ...props }: ComponentPro
 
   const ref = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    if (modifiers.focused) ref.current?.focus();
+    const button = ref.current;
+    if (!modifiers.focused || !button) return;
+    // The day picker keeps a "focused" day after its autoFocus even when the focus never reached it (a popover moves
+    // the focus to its first control), and gives that role to the new month's day when the month changes. Taking the
+    // focus then would pull it off "Next month" or "Previous month" the moment a keyboard user presses it, so a second
+    // Enter picks a day. A day takes the focus only when no other control of this calendar holds it: from a day of the
+    // grid (arrow keys), from nowhere (the day that had it left with the old month), or from outside (opening).
+    const active = document.activeElement;
+    const calendar = button.closest('[data-slot="calendar"]');
+    if (active && active !== document.body && calendar?.contains(active) && !active.closest('[role="grid"]')) return;
+    button.focus();
   }, [modifiers.focused]);
 
   const isSelectedSingle = modifiers.selected && !modifiers.range_start && !modifiers.range_end && !modifiers.range_middle;
