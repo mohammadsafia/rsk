@@ -79,16 +79,22 @@ function FormDatePicker<TFieldValues extends FieldValues>({
     [formatDate],
   );
 
+  // What the form is given: null for no date, never undefined. react-hook-form reads a field set to undefined back as
+  // the form's default value, so a half-typed date, the clear button or a calendar day chosen again brought back the
+  // date the form opened with, and the box was refilled with it while the person typed. FormDateRange's two-field form
+  // and FormTimePicker give null the same way.
+  const toFormValue = useCallback((dateValue: Date | undefined) => formatDateValue(dateValue) ?? null, [formatDateValue]);
+
   const handleDateChange = useCallback(
     (newDate: Date | undefined) => {
-      const next = formatDateValue(newDate);
-      setTypedValue(next ?? null);
+      const next = toFormValue(newDate);
+      setTypedValue(next);
       onChange(next);
       if (newDate) {
         setCalendarMonth(newDate);
       }
     },
-    [onChange, formatDateValue],
+    [onChange, toFormValue],
   );
 
   const {
@@ -129,7 +135,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
   }
 
   const handleCalendarSelect = (selectedDate: Date | undefined) => {
-    onChange(formatDateValue(selectedDate));
+    onChange(toFormValue(selectedDate));
     setFromDate(selectedDate);
     if (selectedDate) {
       setCalendarMonth(selectedDate);
@@ -140,7 +146,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
   const handleClear = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    onChange(formatDateValue(undefined));
+    onChange(toFormValue(undefined));
     setFromDate(undefined);
   };
 
@@ -156,7 +162,7 @@ function FormDatePicker<TFieldValues extends FieldValues>({
     handleBlur();
     fieldOnBlur();
     if (!isValidInput) {
-      onChange(formatDateValue(undefined));
+      onChange(toFormValue(undefined));
       setFromDate(undefined);
     }
   };
