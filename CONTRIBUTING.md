@@ -27,6 +27,10 @@ from. A defect found in an app is fixed here, once, and reaches every app throug
 - **A test first.** Every change in behaviour comes with a test that fails without it: write the test, watch it fail
   for the reason the defect gives, then fix. Name the defect in the test's comment in general terms, without a
   project's data.
+- **At the level where it fails.** A fault that shows only in a real browser (focus, the keyboard, layout, a popover
+  inside a sheet) is tested in a real browser: a Playwright test in `tests/visual/` tagged `@behaviour`, with no
+  screenshot. A simulated DOM test that passes on the broken code is not the test. The `browser` workflow runs every
+  `@behaviour` test on each pull request (`pnpm browser:test` locally; `PW_CHANNEL=chrome` uses an installed Chrome).
 - **One defect per commit**, its message saying what was wrong and why the fix is right.
 - **Keep public APIs.** A component's props and exports do not change in a breaking way. Where a default changes what
   an app sees or does, the pull request says so under a **Changes behaviour** heading, with what an app does about it.

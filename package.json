@@ -86,6 +86,7 @@
     "starter:verify": "tsx scripts/starter/verify-starter.ts",
     "starter:publish": "tsx scripts/starter/publish.ts",
     "a11y:audit": "node scripts/a11y/audit.mjs",
+    "browser:test": "playwright test --grep @behaviour",
     "visual:test": "playwright test",
     "visual:update": "playwright test --update-snapshots"
   },

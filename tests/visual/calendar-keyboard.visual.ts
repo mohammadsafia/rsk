@@ -31,7 +31,7 @@ test.beforeEach(async ({ page }) => {
 
 // A keyboard user presses "Next month" to look ahead, then again. The focus must stay on the button: when the calendar
 // sent it into the new month's days, the second Enter picked a day the person never chose and closed the calendar.
-test('"Next month" pressed with Enter keeps the focus, so it can be pressed again', async ({ page }) => {
+test('"Next month" pressed with Enter keeps the focus, so it can be pressed again', { tag: '@behaviour' }, async ({ page }) => {
   await page.keyboard.press('Tab');
   expect(await focused(page)).toBe('Next month');
 
@@ -44,7 +44,7 @@ test('"Next month" pressed with Enter keeps the focus, so it can be pressed agai
   expect(await focused(page)).toBe('Next month');
 });
 
-test('"Previous month" pressed with Enter keeps the focus, so it can be pressed again', async ({ page }) => {
+test('"Previous month" pressed with Enter keeps the focus, so it can be pressed again', { tag: '@behaviour' }, async ({ page }) => {
   expect(await focused(page)).toBe('Previous month');
 
   await page.keyboard.press('Enter');
@@ -58,7 +58,7 @@ test('"Previous month" pressed with Enter keeps the focus, so it can be pressed 
 
 // The days still take the focus when the person moves through them: an arrow key past the month's end shows the next
 // month with the focus on its day.
-test('the arrow keys still carry the focus from day to day, across a month', async ({ page }) => {
+test('the arrow keys still carry the focus from day to day, across a month', { tag: '@behaviour' }, async ({ page }) => {
   for (let i = 0; i < 6 && !((await focused(page)) ?? '').endsWith('2026'); i++) await page.keyboard.press('Tab');
   expect(await focused(page)).toBe('Friday, October 16, 2026');
 
