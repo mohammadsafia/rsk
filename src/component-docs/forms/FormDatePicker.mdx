@@ -8,6 +8,7 @@ tags: [forms, date, calendar]
 ---
 
 import { useForm } from 'react-hook-form';
+import { Button, Sheet } from '@components/ui';
 import { FormContainer, FormDatePicker } from '@components/forms';
 
 export const DateDemo = () => {
@@ -32,6 +33,47 @@ Type digits and the mask adds the separators, or open the calendar. The value st
 <FormDatePicker name="birth" control={form.control} label="Date of birth" dateFormat="dd/MM/yyyy" placeholder="dd/mm/yyyy" required />`}
 >
   <DateDemo />
+</Example>
+
+export const SheetDemo = () => {
+  const form = useForm({ defaultValues: { visit: new Date(2026, 9, 16) } });
+  return (
+    <Sheet>
+      <Sheet.Trigger asChild>
+        <Button variant="outline">Change the visit</Button>
+      </Sheet.Trigger>
+      <Sheet.Content title="Change the visit">
+        <Sheet.Body>
+          <FormContainer formContext={form} onSuccess={() => {}} className="grid gap-3">
+            <FormDatePicker name="visit" control={form.control} label="Visit date" />
+          </FormContainer>
+        </Sheet.Body>
+      </Sheet.Content>
+    </Sheet>
+  );
+};
+
+## In a sheet
+
+A form in a `Sheet` keeps its date field: the calendar opens on the field's date, and "Previous month" and "Next month"
+keep the keyboard focus, so they can be pressed again.
+
+<Example
+  title="Date field in a sheet"
+  code={`<Sheet>
+  <Sheet.Trigger asChild>
+    <Button variant="outline">Change the visit</Button>
+  </Sheet.Trigger>
+  <Sheet.Content title="Change the visit">
+    <Sheet.Body>
+      <FormContainer formContext={form} onSuccess={save} className="grid gap-3">
+        <FormDatePicker name="visit" control={form.control} label="Visit date" />
+      </FormContainer>
+    </Sheet.Body>
+  </Sheet.Content>
+</Sheet>`}
+>
+  <SheetDemo />
 </Example>
 
 ## API
